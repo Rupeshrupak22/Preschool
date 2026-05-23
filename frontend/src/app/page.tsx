@@ -1,30 +1,21 @@
-"use client";
+﻿"use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  ArrowUp,
   BarChart3,
-  Bot,
   Brain,
   CalendarDays,
-  Clock,
   Code2,
   Cpu,
   Download,
   ExternalLink,
-  Facebook,
   Github,
   GraduationCap,
-  Instagram,
-  Linkedin,
-  Mail,
-  MapPin,
   Menu,
   Mic,
   Palette,
-  Phone,
   Play,
   QrCode,
   Rocket,
@@ -707,108 +698,6 @@ export default function Home() {
         </div>
       </section>
 
-      <footer id="footer" className="relative overflow-hidden border-t-4 border-saffron-500 bg-white px-4 py-12 text-saffron-900 md:px-6">
-        <div className="absolute inset-x-0 top-0 h-px bg-saffron-500/15" />
-        <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.15fr_1.1fr_.9fr_1.1fr]">
-          <div>
-            <div className="flex items-end gap-3">
-              <span className="text-5xl font-black leading-none tracking-tight text-saffron-900">Adyapan</span>
-              <span className="mb-1 rounded bg-saffron-500 px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                Future Skills
-              </span>
-            </div>
-            <p className="mt-6 max-w-sm text-sm font-medium leading-7 text-saffron-900/70">
-              We help students from Class 5 to 12 become confident creators through coding, AI, robotics,
-              communication, design, and career-ready future skills.
-            </p>
-            <div className="mt-6 flex gap-3">
-              {[
-                ["Instagram", Instagram],
-                ["LinkedIn", Linkedin],
-                ["Facebook", Facebook]
-              ].map(([label, Icon]) => {
-                const SocialIcon = Icon as Icon;
-                return (
-                  <a
-                    key={String(label)}
-                    href="#top"
-                    aria-label={`ADYAPAN ${String(label)}`}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-saffron-500/20 bg-white text-saffron-700 shadow-[0_10px_24px_rgba(37,99,235,0.08)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_14px_28px_rgba(37,99,235,0.24)]"
-                  >
-                    <SocialIcon className="h-4 w-4" />
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="inline-block border-b-2 border-saffron-500 pb-1 text-xl font-black text-saffron-900">
-              Learning Programs
-            </h3>
-            <div className="mt-6 grid gap-4 text-sm font-medium text-saffron-900/72">
-              {[
-                "Future Skills Foundation (Class 5 to 8)",
-                "Coding & AI Creators (Class 6 to 10)",
-                "Robotics & Innovation Lab (Class 7 to 12)",
-                "Career, Communication & Design (Class 9 to 12)"
-              ].map((item) => (
-                <a key={item} href="#curriculum" className="transition hover:translate-x-1 hover:text-saffron-600">
-                  {item}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="inline-block border-b-2 border-saffron-500 pb-1 text-xl font-black text-saffron-900">
-              Quick Links
-            </h3>
-            <div className="mt-6 grid gap-4 text-sm font-medium text-saffron-900/72">
-              <a href="#top" className="transition hover:translate-x-1 hover:text-saffron-600">About ADYAPAN</a>
-              <a href="#certificates" className="transition hover:translate-x-1 hover:text-saffron-600">Certifications</a>
-              <a href="#schools" className="transition hover:translate-x-1 hover:text-saffron-600">School Partnership</a>
-              <a href="/dashboard" className="transition hover:translate-x-1 hover:text-saffron-600">LMS Dashboard</a>
-              <a href="/login" className="transition hover:translate-x-1 hover:text-saffron-600">Login</a>
-              <a href="#demo" className="transition hover:translate-x-1 hover:text-saffron-600">Contact Us</a>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="inline-block border-b-2 border-saffron-500 pb-1 text-xl font-black text-saffron-900">
-              Get In Touch
-            </h3>
-            <div className="mt-6 grid gap-4 text-sm font-medium text-saffron-900/72">
-              <a href="mailto:info@adyapan.com" className="flex items-center gap-3 transition hover:text-saffron-600">
-                <Mail className="h-4 w-4" /> info@adyapan.com
-              </a>
-              <a href="tel:+919000000000" className="flex items-center gap-3 transition hover:text-saffron-600">
-                <Phone className="h-4 w-4" /> +91 - 90000 00000
-              </a>
-              <span className="flex items-center gap-3">
-                <MapPin className="h-4 w-4" /> India
-              </span>
-            </div>
-            <div className="mt-7 rounded-lg border border-saffron-500/15 bg-saffron-50 p-4 text-sm text-saffron-900 shadow-[0_12px_28px_rgba(37,99,235,0.1)]">
-              <Clock className="mb-3 h-5 w-5 text-saffron-600" />
-              <p>Mon - Sat: 09:00 AM - 5:00 PM</p>
-              <p className="mt-1 text-saffron-700">Sunday: Closed</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mx-auto mt-10 flex max-w-7xl justify-center border-t border-saffron-500/15 pt-6 text-xs text-saffron-900/60">
-          <span>© 2026 ADYAPAN Future Skills Platform. All rights reserved.</span>
-        </div>
-
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-saffron-500 text-white shadow-[0_14px_30px_rgba(37,99,235,0.35)] transition hover:-translate-y-1 hover:bg-saffron-600"
-          aria-label="Back to top"
-        >
-          <ArrowUp className="h-5 w-5" />
-        </button>
-      </footer>
 
       {status && (
         <button
@@ -821,6 +710,7 @@ export default function Home() {
     </main>
   );
 }
+
 
 
 

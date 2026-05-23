@@ -1,27 +1,19 @@
-"use client";
+﻿"use client";
 
 import { FormEvent, useState } from "react";
 import {
   ArrowRight,
-  ArrowUp,
   BarChart3,
   BookOpen,
-  Bot,
   Brain,
-  CalendarDays,
-  CheckCircle2,
   Code2,
   Cpu,
-  FileText,
   GraduationCap,
   Laptop,
-  Mail,
   MessageCircle,
-  Phone,
   Rocket,
   ShieldCheck,
   Target,
-  Trophy,
   Users,
   Wifi,
   Zap
@@ -459,13 +451,6 @@ export default function LMSPage() {
         </div>
       </section>
 
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-blue-700 text-white shadow-xl transition hover:-translate-y-1 hover:bg-slate-950"
-        aria-label="Back to top"
-      >
-        <ArrowUp className="h-5 w-5" />
-      </button>
 
       {status && (
         <button
@@ -478,4 +463,6 @@ export default function LMSPage() {
     </main>
   );
 }
+
+
 
