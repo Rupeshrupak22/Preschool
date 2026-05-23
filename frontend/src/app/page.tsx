@@ -1,14 +1,14 @@
 ﻿"use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  BarChart3,
   Brain,
   CalendarDays,
   Code2,
   Cpu,
+  BookOpen,
   Download,
   ExternalLink,
   Github,
@@ -127,6 +127,44 @@ const testimonials = [
   }
 ];
 
+const heroPrograms: { title: string; range: string; icon: Icon; accent: string; avatar: string }[] = [
+  {
+    title: "Pre School",
+    range: "Nursery to KG",
+    icon: Sparkles,
+    accent: "from-rose-50 to-rose-100 border-rose-100",
+    avatar: "PS"
+  },
+  {
+    title: "Primary",
+    range: "Class 1-5",
+    icon: BookOpen,
+    accent: "from-amber-50 to-yellow-100 border-amber-100",
+    avatar: "P"
+  },
+  {
+    title: "Middle",
+    range: "Class 6 to 8",
+    icon: School,
+    accent: "from-cyan-50 to-teal-100 border-cyan-100",
+    avatar: "M"
+  },
+  {
+    title: "High School",
+    range: "Class 9-12",
+    icon: GraduationCap,
+    accent: "from-indigo-50 to-violet-100 border-indigo-100",
+    avatar: "HS"
+  }
+];
+
+const heroBenefits: { title: string; icon: Icon; color: string }[] = [
+  { title: "Play Based Learning", icon: Play, color: "bg-rose-100 text-rose-600" },
+  { title: "Activity & Fun Worksheets", icon: CalendarDays, color: "bg-amber-100 text-amber-700" },
+  { title: "Live Classes with Expert Teachers", icon: Users, color: "bg-cyan-100 text-cyan-700" },
+  { title: "Safe & Friendly Environment", icon: ShieldCheck, color: "bg-indigo-100 text-indigo-700" }
+];
+
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   show: { opacity: 1, y: 0 }
@@ -178,16 +216,6 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  const stats = useMemo(
-    () => [
-      ["20K+", "future learners"],
-      ["250+", "school workshops"],
-      ["94%", "project completion"],
-      ["4.9/5", "parent rating"]
-    ],
-    []
-  );
-
   async function submitLead(event: FormEvent<HTMLFormElement>, type: "demo" | "school" | "newsletter") {
     event.preventDefault();
     setStatus("Submitting...");
@@ -205,88 +233,92 @@ export default function Home() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-ink text-saffron-900">
-      <section id="top" className="relative min-h-[92vh] overflow-hidden px-4 pt-12 md:px-6">
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 pb-16 lg:grid-cols-[1.02fr_.98fr]">
+      <section id="top" className="relative min-h-[92vh] overflow-hidden px-4 pt-10 md:px-6">
+        <div className="absolute left-10 top-20 hidden h-20 w-20 rounded-full border border-amber-200 md:block" />
+        <div className="absolute right-8 top-28 hidden h-16 w-16 rounded-full border border-blue-200 md:block" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-10 pb-10 lg:grid-cols-[0.95fr_1.18fr]">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-saffron-500/20 bg-white px-5 py-2.5 text-sm font-semibold text-saffron-700 shadow-[0_12px_32px_rgba(37,99,235,0.14)] transition hover:bg-saffron-500 hover:text-white">
-              <Sparkles className="h-4 w-4" />
-              India's Future Skills Platform for Classes 5-12
+            <div className="mb-7 inline-flex items-center gap-3 rounded-full border border-blue-100 bg-white px-4 py-2 text-sm font-black text-blue-950 shadow-[0_12px_32px_rgba(37,99,235,0.12)]">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 via-yellow-500 to-orange-500 text-white shadow-lg">
+                ady.
+              </span>
+              Nurturing Minds. Building Futures.
             </div>
-            <h1 className="max-w-4xl text-5xl font-black leading-[0.98] tracking-tight text-saffron-900 md:text-7xl">
-              ADYAPAN <span className="rounded-2xl bg-saffron-500 px-3 text-white shadow-[0_18px_36px_rgba(37,99,235,0.22)]">Future</span> Skills Platform
+            <h1 className="max-w-3xl text-6xl font-black leading-[0.96] tracking-tight text-blue-950 md:text-8xl">
+              Big Dreams <span className="block text-rose-600">Start Small</span>
             </h1>
-            <p className="mt-6 max-w-2xl text-lg font-medium leading-8 text-saffron-900/72 md:text-xl">
-              Learn coding, AI, robotics, design, communication, and career skills through mentor-led journeys,
-              certification exams, and school-ready future labs.
+            <p className="mt-7 max-w-2xl text-xl font-semibold leading-9 text-blue-950/78 md:text-2xl">
+              Nurturing young minds from <span className="font-black text-blue-950">Pre School</span> and guiding them
+              all the way to <span className="font-black text-blue-950">Class 12</span>.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8 h-3 w-44 rounded-full bg-gradient-to-r from-amber-300 via-yellow-400 to-transparent" />
+            <div className="mt-9 flex flex-col gap-4 sm:flex-row">
               <a
-                href="/signup"
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-saffron-500 px-7 py-3.5 font-bold text-white shadow-[0_16px_34px_rgba(37,99,235,0.28)] transition hover:-translate-y-1 hover:bg-saffron-700 hover:shadow-[0_20px_42px_rgba(37,99,235,0.34)]"
+                href="#curriculum"
+                className="inline-flex h-14 items-center justify-center gap-3 rounded-2xl bg-rose-600 px-7 font-black text-white shadow-[0_18px_34px_rgba(225,29,72,0.24)] transition hover:-translate-y-1 hover:bg-blue-800"
               >
-                Start Learning <ArrowRight className="h-4 w-4" />
+                Explore Programs <ArrowRight className="h-5 w-5" />
               </a>
               <a
                 href="#demo"
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border-2 border-saffron-500 bg-white px-7 py-3.5 font-bold text-saffron-700 shadow-[0_14px_32px_rgba(37,99,235,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_38px_rgba(37,99,235,0.25)]"
+                className="inline-flex h-14 items-center justify-center gap-3 rounded-2xl border-2 border-slate-200 bg-white px-7 font-black text-slate-950 shadow-[0_14px_30px_rgba(15,23,42,0.08)] transition hover:-translate-y-1 hover:border-blue-700 hover:bg-blue-700 hover:text-white"
               >
-                Book Free Demo <CalendarDays className="h-4 w-4" />
+                <CalendarDays className="h-5 w-5" /> Book a Free Class
               </a>
-            </div>
-            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {stats.map(([value, label]) => (
-                <div key={label} className="group rounded-2xl border border-saffron-500/15 bg-white p-4 shadow-[0_12px_30px_rgba(37,99,235,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:shadow-[0_18px_36px_rgba(37,99,235,0.25)]">
-                  <p className="text-2xl font-black text-saffron-800 transition group-hover:text-white">{value}</p>
-                  <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-saffron-900/52 transition group-hover:text-white/90">{label}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 flex flex-wrap gap-3 text-sm text-saffron-900/62">
-              {["CBSE aligned", "Project first", "QR verified certificates", "Mentor reviews"].map((badge) => (
-                <span key={badge} className="rounded-full border border-saffron-500/15 bg-white px-4 py-2 font-semibold text-saffron-800 shadow-[0_8px_20px_rgba(37,99,235,0.08)] transition hover:bg-saffron-500 hover:text-white">
-                  {badge}
-                </span>
-              ))}
             </div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.94 }}
+            initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1, duration: 0.7 }}
-            className="relative rounded-[28px] border border-saffron-500/20 bg-white p-5 shadow-[0_28px_80px_rgba(37,99,235,0.18)]"
+            className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
           >
-            <div className="absolute left-8 right-8 top-8 h-px scan-line" />
-            <div className="grid gap-4 md:grid-cols-2">
-              {[
-                ["AI Lab", Brain, "Build an AI revision coach"],
-                ["Code Studio", Code2, "Ship portfolio websites"],
-                ["Robotics", Cpu, "Automate real-world tasks"],
-                ["Career OS", Trophy, "Badges, streaks, certificates"]
-              ].map(([label, IconComponent, text]) => {
-                const CardIcon = IconComponent as Icon;
-                return (
-                  <div key={String(label)} className="group rounded-2xl border border-saffron-500/15 bg-saffron-50/60 p-5 transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_36px_rgba(37,99,235,0.22)]">
-                    <CardIcon className="h-8 w-8 text-saffron-600 transition group-hover:text-white group-hover:scale-110" />
-                    <p className="mt-5 text-lg font-bold transition group-hover:text-white">{String(label)}</p>
-                    <p className="mt-2 text-sm font-medium leading-6 text-saffron-900/60 transition group-hover:text-white/90">{String(text)}</p>
+            {heroPrograms.map((program, index) => (
+              <a
+                key={program.title}
+                href="#curriculum"
+                className={`group min-h-[430px] overflow-hidden rounded-[36px] border bg-gradient-to-b ${program.accent} p-6 text-center shadow-[0_20px_55px_rgba(37,99,235,0.12)] transition hover:-translate-y-2 hover:shadow-[0_28px_70px_rgba(37,99,235,0.18)]`}
+              >
+                <program.icon className="mx-auto h-14 w-14 text-blue-700 transition group-hover:scale-110 group-hover:text-rose-600" />
+                <h3 className="mt-6 text-2xl font-black text-blue-950">{program.title}</h3>
+                <p className="mt-2 text-lg font-bold text-slate-950">({program.range})</p>
+                <div className="relative mx-auto mt-10 flex h-52 w-36 items-end justify-center">
+                  <div className="absolute bottom-0 h-32 w-28 rounded-t-[46px] rounded-b-[24px] bg-gradient-to-b from-blue-600 to-blue-800 shadow-xl transition group-hover:scale-105" />
+                  <div className="absolute bottom-24 h-24 w-24 rounded-full bg-gradient-to-b from-amber-100 to-orange-200 shadow-lg" />
+                  <div className="absolute bottom-[138px] h-9 w-24 rounded-t-full bg-slate-900" />
+                  <div className="absolute bottom-[110px] flex gap-6">
+                    <span className="h-2.5 w-2.5 rounded-full bg-slate-950" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-slate-950" />
                   </div>
-                );
-              })}
-            </div>
-            <div className="group mt-4 rounded-2xl border border-saffron-500/20 bg-saffron-50 p-5 transition hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_38px_rgba(37,99,235,0.24)]">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-semibold text-saffron-900/60 transition group-hover:text-white/85">Live success pulse</p>
-                  <p className="mt-1 text-2xl font-black transition group-hover:text-white">1,284 projects certified</p>
+                  <div className="absolute bottom-[92px] h-2 w-8 rounded-full bg-rose-500" />
+                  <div className="absolute bottom-8 rounded-xl bg-white/92 px-3 py-2 text-sm font-black text-blue-950 shadow">
+                    {program.avatar}
+                  </div>
+                  <div
+                    className={`absolute ${index % 2 === 0 ? "left-0" : "right-0"} bottom-2 h-14 w-14 rounded-2xl bg-white/80 shadow-md`}
+                  />
                 </div>
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-saffron-500/20 transition group-hover:bg-white/20">
-                  <BarChart3 className="h-8 w-8 text-saffron-700 transition group-hover:text-white" />
-                </div>
-              </div>
-            </div>
+              </a>
+            ))}
           </motion.div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.22, duration: 0.7 }}
+          className="relative mx-auto mb-10 grid max-w-6xl gap-4 rounded-[32px] border border-blue-100 bg-white/92 p-5 shadow-[0_26px_70px_rgba(37,99,235,0.14)] backdrop-blur sm:grid-cols-2 lg:grid-cols-4"
+        >
+          {heroBenefits.map((benefit) => (
+            <div key={benefit.title} className="flex items-center gap-4 rounded-2xl p-3 transition hover:bg-blue-50">
+              <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${benefit.color}`}>
+                <benefit.icon className="h-7 w-7" />
+              </span>
+              <p className="text-base font-black leading-6 text-slate-950">{benefit.title}</p>
+            </div>
+          ))}
+        </motion.div>
       </section>
 
       <section id="curriculum" className="px-4 py-20 md:px-6">
