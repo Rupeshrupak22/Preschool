@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -8,7 +8,7 @@
   --panel: rgba(255, 255, 255, 0.9);
   --line: rgba(37, 99, 235, 0.18);
   --muted: rgba(15, 23, 42, 0.72);
-  --saffron: #dc2626;
+  --saffron: #0d9488;
 }
 
 * {
@@ -33,7 +33,7 @@ body::before {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.72)),
+  background-image: linear-gradient(rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.84)),
     url("/learning-doodles.svg");
   background-position: center top;
   background-size: 1536px auto;
@@ -73,7 +73,7 @@ a {
 }
 
 ::selection {
-  background: rgba(220, 38, 38, 0.22);
+  background: rgba(13, 148, 136, 0.22);
 }
 
 .grid-surface {
@@ -82,7 +82,7 @@ a {
 
 .glass {
   border: 1px solid var(--line);
-  background: var(--panel);
+  background: rgba(255, 255, 255, 0.94);
   box-shadow: 0 20px 70px rgba(37, 99, 235, 0.14);
   backdrop-filter: blur(18px);
   border-radius: 18px;
@@ -109,7 +109,7 @@ a {
   content: "";
   position: absolute;
   inset: -1px;
-  background: linear-gradient(135deg, rgba(220, 38, 38, 0.75), transparent 34%, rgba(37, 99, 235, 0.28));
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.75), transparent 34%, rgba(37, 99, 235, 0.28));
   opacity: 0;
   transition: opacity 220ms ease;
   z-index: -1;
@@ -134,7 +134,7 @@ a {
 }
 
 .scan-line {
-  background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.86), transparent);
+  background: linear-gradient(90deg, transparent, rgba(13, 148, 136, 0.86), transparent);
   animation: scan 3.5s linear infinite;
 }
 
@@ -165,4 +165,5 @@ a {
     transition-duration: 0.01ms !important;
   }
 }
+
 

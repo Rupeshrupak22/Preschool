@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
@@ -155,7 +155,7 @@ function Field(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className="h-12 w-full rounded-lg border border-white/12 bg-white/[0.06] px-4 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
+      className="h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
     />
   );
 }
@@ -164,7 +164,7 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}
-      className="h-12 w-full rounded-lg border border-white/12 bg-white/[0.06] px-4 text-sm text-saffron-900 outline-none transition focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
+      className="h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-saffron-900 outline-none transition focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
     />
   );
 }
@@ -172,7 +172,7 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
 function AdyapanLogo() {
   return (
     <a href="#top" className="flex items-center gap-3" aria-label="ADYAPAN School home">
-      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 via-red-600 to-blue-900 text-sm font-black lowercase text-white shadow-[0_10px_24px_rgba(220,38,38,0.22)]">
+      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-700 via-cyan-600 to-blue-950 text-sm font-black lowercase text-white shadow-[0_10px_24px_rgba(13,148,136,0.22)]">
         ady.
       </span>
       <span className="leading-none">
@@ -479,7 +479,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="path" className="bg-white/[0.025] px-4 py-20 md:px-6">
+      <section id="path" className="bg-white/70 px-4 py-20 md:px-6">
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Learning path"
@@ -502,7 +502,7 @@ export default function Home() {
                       <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-saffron-300/30 bg-saffron-500/15 text-sm font-semibold">
                         {index + 1}
                       </span>
-                      <div className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3">
+                      <div className="rounded-lg border border-slate-200 bg-white px-4 py-3">
                         <p className="font-medium">{step}</p>
                       </div>
                     </div>
@@ -510,7 +510,7 @@ export default function Home() {
                 </div>
                 <div className="mt-6 flex flex-wrap gap-2">
                   {path.courses.map((course) => (
-                    <span key={course} className="rounded-full bg-white/10 px-3 py-1 text-sm text-saffron-900/70">
+                    <span key={course} className="rounded-full bg-blue-50 px-3 py-1 text-sm text-saffron-900/70">
                       {course}
                     </span>
                   ))}
@@ -530,14 +530,14 @@ export default function Home() {
           />
           <div className="grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
             <div className="glass rounded-2xl p-6">
-              <div className="relative overflow-hidden rounded-xl border border-white/12 bg-gradient-to-br from-saffron-500/30 via-white/8 to-saffron-900/24 p-6">
+              <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-saffron-500/30 via-white/8 to-saffron-900/24 p-6">
                 <div className="absolute right-4 top-4 rounded-lg bg-white p-2">
                   <QrCode className="h-8 w-8 text-saffron-900" />
                 </div>
                 <p className="text-sm uppercase tracking-[0.22em] text-saffron-700">ADYAPAN Credential</p>
                 <h3 className="mt-12 text-3xl font-semibold">AI Builder Certificate</h3>
                 <p className="mt-3 text-saffron-900/64">Awarded for project mastery, exam performance, and mentor review.</p>
-                <div className="mt-10 flex items-center justify-between border-t border-white/12 pt-4 text-sm text-saffron-900/62">
+                <div className="mt-10 flex items-center justify-between border-t border-slate-200 pt-4 text-sm text-saffron-900/62">
                   <span>ID ADY-CERT-2026</span>
                   <span>QR Verified</span>
                 </div>
@@ -545,7 +545,7 @@ export default function Home() {
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 <button
                   onClick={() => setStatus("Certificate preview downloaded as a production-ready flow placeholder.")}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-white/10 font-semibold hover:bg-white/14"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-50 font-semibold hover:bg-blue-100"
                 >
                   <Download className="h-4 w-4" /> Download
                 </button>
@@ -559,7 +559,7 @@ export default function Home() {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               {certificates.map((certificate) => (
-                <div key={certificate} className="rounded-xl border border-white/10 bg-white/[0.045] p-5 transition hover:-translate-y-1 hover:border-saffron-300/40">
+                <div key={certificate} className="rounded-xl border border-slate-200 bg-white p-5 transition hover:-translate-y-1 hover:border-saffron-300/40">
                   <ShieldCheck className="h-8 w-8 text-saffron-600" />
                   <h3 className="mt-5 text-xl font-semibold">{certificate}</h3>
                   <p className="mt-3 text-sm leading-6 text-saffron-900/58">Exam, QR credential, mentor remark, and portfolio linkage.</p>
@@ -573,7 +573,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="projects" className="bg-white/[0.025] px-4 py-20 md:px-6">
+      <section id="projects" className="bg-white/70 px-4 py-20 md:px-6">
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Student projects"
@@ -583,7 +583,7 @@ export default function Home() {
           <div className="no-scrollbar flex snap-x gap-4 overflow-x-auto pb-4">
             {projects.map((project) => (
               <div key={project.title} className="glass min-w-[280px] snap-start rounded-2xl p-5 md:min-w-[360px]">
-                <div className="flex aspect-video items-center justify-center rounded-xl border border-white/35 bg-white/15">
+                <div className="flex aspect-video items-center justify-center rounded-xl border border-blue-100 bg-blue-50">
                   <Play className="h-12 w-12 text-saffron-600" />
                 </div>
                 <p className="mt-5 text-sm text-saffron-700">{project.type}</p>
@@ -592,7 +592,7 @@ export default function Home() {
                 <div className="mt-5 flex gap-3">
                   <button
                     onClick={() => setStatus(`${project.title} GitHub workspace opened.`)}
-                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-white/10 text-sm font-semibold hover:bg-white/14"
+                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-blue-50 text-sm font-semibold hover:bg-blue-100"
                   >
                     <Github className="h-4 w-4" /> GitHub
                   </button>
@@ -619,7 +619,7 @@ export default function Home() {
             />
             <div className="grid gap-4 sm:grid-cols-2">
               {["AI Curriculum", "Coding Labs", "Robotics Workshops", "Teacher Training", "Future Skills Programs", "Analytics"].map((item) => (
-                <div key={item} className="rounded-xl border border-white/10 bg-white/[0.045] p-5">
+                <div key={item} className="rounded-xl border border-slate-200 bg-white p-5">
                   <School className="h-7 w-7 text-saffron-600" />
                   <p className="mt-4 font-semibold">{item}</p>
                 </div>
@@ -643,7 +643,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="events" className="bg-white/[0.025] px-4 py-20 md:px-6">
+      <section id="events" className="bg-white/70 px-4 py-20 md:px-6">
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Community"
@@ -655,7 +655,7 @@ export default function Home() {
               <motion.div
                 key={event}
                 whileHover={{ y: -6 }}
-                className="rounded-xl border border-white/10 bg-white/[0.045] p-5"
+                className="rounded-xl border border-slate-200 bg-white p-5"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-saffron-500/15 text-saffron-700">
                   {index + 1}
@@ -690,7 +690,7 @@ export default function Home() {
                   key={testimonial.name}
                   onClick={() => setActiveTestimonial(index)}
                   aria-label={`Show ${testimonial.name} review`}
-                  className={`h-2.5 rounded-full transition ${activeTestimonial === index ? "w-8 bg-saffron-400" : "w-2.5 bg-white/24"}`}
+                  className={`h-2.5 rounded-full transition ${activeTestimonial === index ? "w-8 bg-saffron-400" : "w-2.5 bg-blue-200"}`}
                 />
               ))}
             </div>
@@ -702,7 +702,7 @@ export default function Home() {
       {status && (
         <button
           onClick={() => setStatus("")}
-          className="fixed bottom-5 left-1/2 z-50 max-w-[92vw] -translate-x-1/2 rounded-lg border border-white/12 bg-white px-5 py-3 text-sm font-semibold text-saffron-900 shadow-glass"
+          className="fixed bottom-5 left-1/2 z-50 max-w-[92vw] -translate-x-1/2 rounded-lg border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-saffron-900 shadow-glass"
         >
           {status}
         </button>
@@ -710,6 +710,8 @@ export default function Home() {
     </main>
   );
 }
+
+
 
 
 

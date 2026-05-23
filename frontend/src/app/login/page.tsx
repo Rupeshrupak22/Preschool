@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,7 @@ function Field(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className="h-12 w-full rounded-lg border border-white/12 bg-white/[0.06] px-4 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
+      className="h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
     />
   );
 }
@@ -61,7 +61,7 @@ export default function LoginPage() {
                 type="email"
                 required
                 placeholder="student@example.com"
-                className="h-12 w-full rounded-lg border border-white/12 bg-white/[0.06] pl-11 pr-4 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
+                className="h-12 w-full rounded-lg border border-slate-200 bg-white pl-11 pr-4 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
               />
             </div>
           </label>
@@ -73,7 +73,7 @@ export default function LoginPage() {
                 type={showPassword ? "text" : "password"}
                 required
                 placeholder="Password"
-                className="h-12 w-full rounded-lg border border-white/12 bg-white/[0.06] px-4 pr-12 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
+                className="h-12 w-full rounded-lg border border-slate-200 bg-white px-4 pr-12 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
               />
               <button
                 type="button"
@@ -93,10 +93,10 @@ export default function LoginPage() {
             Login
           </button>
           <div className="grid grid-cols-2 gap-3">
-            <button type="button" onClick={() => setStatus("Google OAuth provider ready for production keys.")} className="h-11 rounded-lg border border-white/12 bg-white/8 text-sm font-semibold hover:bg-white/12">
+            <button type="button" onClick={() => setStatus("Google OAuth provider ready for production keys.")} className="h-11 rounded-lg border border-slate-200 bg-white text-sm font-semibold hover:bg-blue-50">
               Google
             </button>
-            <button type="button" onClick={() => setStatus("GitHub OAuth provider ready for production keys.")} className="flex h-11 items-center justify-center gap-2 rounded-lg border border-white/12 bg-white/8 text-sm font-semibold hover:bg-white/12">
+            <button type="button" onClick={() => setStatus("GitHub OAuth provider ready for production keys.")} className="flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white text-sm font-semibold hover:bg-blue-50">
               <Github className="h-4 w-4" /> GitHub
             </button>
           </div>
@@ -105,7 +105,7 @@ export default function LoginPage() {
           New to ADYAPAN? <a href="/signup" className="font-semibold text-saffron-700">Create account</a>
         </p>
         {status && (
-          <p className="mt-4 rounded-lg border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-sm text-saffron-900/70">
+          <p className="mt-4 rounded-lg border border-slate-200 bg-white px-4 py-3 text-center text-sm text-saffron-900/70">
             <ShieldCheck className="mr-2 inline h-4 w-4 text-saffron-600" />
             {status}
           </p>
@@ -114,6 +114,7 @@ export default function LoginPage() {
     </main>
   );
 }
+
 
 
 
