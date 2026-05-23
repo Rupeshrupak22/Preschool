@@ -193,6 +193,7 @@ export default function Home() {
     { label: "Robotics & AI", href: "#curriculum" },
     { label: "VR/AR Lab", href: "#projects" },
     { label: "LMS", href: "/dashboard", active: true },
+    { label: "Our App", href: "/our.html" },
     { label: "Books", href: "#footer" }
   ];
 
