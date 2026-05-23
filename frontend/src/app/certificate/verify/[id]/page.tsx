@@ -11,11 +11,11 @@ export default function CertificateVerifyPage({ params }: { params: { id: string
           Credential {params.id} is formatted for ADYAPAN QR verification and can be backed by MongoDB Atlas certificate records.
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-xl border border-white/10 bg-white/[0.05] p-5">
+          <div className="rounded-xl border border-slate-200 bg-white p-5">
             <Award className="mx-auto h-8 w-8 text-saffron-600" />
             <p className="mt-3 font-semibold">Active Credential</p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-white/[0.05] p-5">
+          <div className="rounded-xl border border-slate-200 bg-white p-5">
             <QrCode className="mx-auto h-8 w-8 text-saffron-600" />
             <p className="mt-3 font-semibold">QR Secured</p>
           </div>
@@ -27,5 +27,7 @@ export default function CertificateVerifyPage({ params }: { params: { id: string
     </main>
   );
 }
+
+
 
 

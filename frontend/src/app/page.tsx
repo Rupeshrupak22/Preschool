@@ -4,27 +4,18 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  ArrowUp,
   BarChart3,
-  Bot,
   Brain,
   CalendarDays,
-  Clock,
   Code2,
   Cpu,
   Download,
   ExternalLink,
-  Facebook,
   Github,
   GraduationCap,
-  Instagram,
-  Linkedin,
-  Mail,
-  MapPin,
   Menu,
   Mic,
   Palette,
-  Phone,
   Play,
   QrCode,
   Rocket,
@@ -164,7 +155,7 @@ function Field(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className="h-12 w-full rounded-lg border border-white/12 bg-white/[0.06] px-4 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
+      className="h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
     />
   );
 }
@@ -173,8 +164,22 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}
-      className="h-12 w-full rounded-lg border border-white/12 bg-white/[0.06] px-4 text-sm text-saffron-900 outline-none transition focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
+      className="h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-saffron-900 outline-none transition focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
     />
+  );
+}
+
+function AdyapanLogo() {
+  return (
+    <a href="#top" className="flex items-center gap-3" aria-label="ADYAPAN School home">
+      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-700 via-cyan-600 to-blue-950 text-sm font-black lowercase text-white shadow-[0_10px_24px_rgba(13,148,136,0.22)]">
+        ady.
+      </span>
+      <span className="leading-none">
+        <span className="block text-3xl font-black tracking-tight text-slate-950">Adyapan</span>
+        <span className="ml-1 block text-[10px] font-black uppercase tracking-[0.42em] text-slate-500">School</span>
+      </span>
+    </a>
   );
 }
 
@@ -226,15 +231,16 @@ export default function Home() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-ink text-saffron-900">
-      <nav className="fixed left-0 right-0 top-0 z-50 border-b border-saffron-500/15 bg-white/95 shadow-[0_12px_35px_rgba(249,115,22,0.08)] backdrop-blur-xl">
-        <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-center px-6 md:px-10">
-          <div className="hidden items-center gap-3 rounded-full border border-saffron-500/15 bg-white px-3 py-2 shadow-[0_10px_35px_rgba(249,115,22,0.12)] md:flex">
+      <nav className="fixed left-0 right-0 top-0 z-50 border-b border-blue-100 bg-white/95 shadow-[0_12px_35px_rgba(37,99,235,0.10)] backdrop-blur-xl">
+        <div className="mx-auto flex h-[86px] max-w-7xl items-center justify-between gap-6 px-5 md:px-10">
+          <AdyapanLogo />
+          <div className="hidden items-center gap-2 rounded-full border border-blue-100 bg-white px-3 py-2 shadow-[0_10px_35px_rgba(37,99,235,0.12)] md:flex">
             {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className={`relative rounded-full px-5 py-3 text-base font-bold transition duration-200 hover:-translate-y-0.5 hover:bg-saffron-500 hover:text-white hover:shadow-[0_12px_24px_rgba(249,115,22,0.28)] ${
-                  item.active ? "bg-saffron-500 text-white shadow-[0_12px_24px_rgba(249,115,22,0.26)]" : "text-saffron-900/82"
+                className={`relative rounded-full px-5 py-3 text-base font-black transition duration-200 hover:-translate-y-0.5 hover:bg-blue-700 hover:text-white hover:shadow-[0_12px_24px_rgba(37,99,235,0.24)] ${
+                  item.active ? "bg-blue-700 text-white shadow-[0_12px_24px_rgba(37,99,235,0.22)]" : "text-slate-950"
                 }`}
               >
                 {item.label}
@@ -242,7 +248,7 @@ export default function Home() {
             ))}
           </div>
           <button
-            className="ml-auto rounded-xl border border-saffron-500/30 bg-white p-2 text-saffron-900 shadow-[0_10px_28px_rgba(249,115,22,0.12)] transition hover:bg-saffron-500 hover:text-white md:hidden"
+            className="rounded-xl border border-blue-200 bg-white p-2 text-slate-950 shadow-[0_10px_28px_rgba(37,99,235,0.12)] transition hover:bg-blue-700 hover:text-white md:hidden"
             onClick={() => setMenuOpen((value) => !value)}
             aria-label="Open navigation"
           >
@@ -257,8 +263,8 @@ export default function Home() {
                   key={item.label}
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
-                  className={`rounded-xl px-4 py-3 text-base font-bold transition hover:bg-saffron-500 hover:text-white ${
-                    item.active ? "bg-saffron-500 text-white" : "text-saffron-900/82"
+                  className={`rounded-xl px-4 py-3 text-base font-black transition hover:bg-blue-700 hover:text-white ${
+                    item.active ? "bg-blue-700 text-white" : "text-slate-950"
                   }`}
                 >
                   {item.label}
@@ -272,12 +278,12 @@ export default function Home() {
       <section id="top" className="relative min-h-[92vh] overflow-hidden px-4 pt-32 md:px-6">
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 pb-16 lg:grid-cols-[1.02fr_.98fr]">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-saffron-500/20 bg-white px-5 py-2.5 text-sm font-semibold text-saffron-700 shadow-[0_12px_32px_rgba(249,115,22,0.14)] transition hover:bg-saffron-500 hover:text-white">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-saffron-500/20 bg-white px-5 py-2.5 text-sm font-semibold text-saffron-700 shadow-[0_12px_32px_rgba(37,99,235,0.14)] transition hover:bg-saffron-500 hover:text-white">
               <Sparkles className="h-4 w-4" />
               India's Future Skills Platform for Classes 5-12
             </div>
             <h1 className="max-w-4xl text-5xl font-black leading-[0.98] tracking-tight text-saffron-900 md:text-7xl">
-              ADYAPAN <span className="rounded-2xl bg-saffron-500 px-3 text-white shadow-[0_18px_36px_rgba(249,115,22,0.22)]">Future</span> Skills Platform
+              ADYAPAN <span className="rounded-2xl bg-saffron-500 px-3 text-white shadow-[0_18px_36px_rgba(37,99,235,0.22)]">Future</span> Skills Platform
             </h1>
             <p className="mt-6 max-w-2xl text-lg font-medium leading-8 text-saffron-900/72 md:text-xl">
               Learn coding, AI, robotics, design, communication, and career skills through mentor-led journeys,
@@ -286,20 +292,20 @@ export default function Home() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
                 href="/signup"
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-saffron-500 px-7 py-3.5 font-bold text-white shadow-[0_16px_34px_rgba(249,115,22,0.28)] transition hover:-translate-y-1 hover:bg-saffron-700 hover:shadow-[0_20px_42px_rgba(249,115,22,0.34)]"
+                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-saffron-500 px-7 py-3.5 font-bold text-white shadow-[0_16px_34px_rgba(37,99,235,0.28)] transition hover:-translate-y-1 hover:bg-saffron-700 hover:shadow-[0_20px_42px_rgba(37,99,235,0.34)]"
               >
                 Start Learning <ArrowRight className="h-4 w-4" />
               </a>
               <a
                 href="#demo"
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border-2 border-saffron-500 bg-white px-7 py-3.5 font-bold text-saffron-700 shadow-[0_14px_32px_rgba(249,115,22,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_38px_rgba(249,115,22,0.25)]"
+                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border-2 border-saffron-500 bg-white px-7 py-3.5 font-bold text-saffron-700 shadow-[0_14px_32px_rgba(37,99,235,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_38px_rgba(37,99,235,0.25)]"
               >
                 Book Free Demo <CalendarDays className="h-4 w-4" />
               </a>
             </div>
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {stats.map(([value, label]) => (
-                <div key={label} className="group rounded-2xl border border-saffron-500/15 bg-white p-4 shadow-[0_12px_30px_rgba(249,115,22,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:shadow-[0_18px_36px_rgba(249,115,22,0.25)]">
+                <div key={label} className="group rounded-2xl border border-saffron-500/15 bg-white p-4 shadow-[0_12px_30px_rgba(37,99,235,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:shadow-[0_18px_36px_rgba(37,99,235,0.25)]">
                   <p className="text-2xl font-black text-saffron-800 transition group-hover:text-white">{value}</p>
                   <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-saffron-900/52 transition group-hover:text-white/90">{label}</p>
                 </div>
@@ -307,7 +313,7 @@ export default function Home() {
             </div>
             <div className="mt-6 flex flex-wrap gap-3 text-sm text-saffron-900/62">
               {["CBSE aligned", "Project first", "QR verified certificates", "Mentor reviews"].map((badge) => (
-                <span key={badge} className="rounded-full border border-saffron-500/15 bg-white px-4 py-2 font-semibold text-saffron-800 shadow-[0_8px_20px_rgba(249,115,22,0.08)] transition hover:bg-saffron-500 hover:text-white">
+                <span key={badge} className="rounded-full border border-saffron-500/15 bg-white px-4 py-2 font-semibold text-saffron-800 shadow-[0_8px_20px_rgba(37,99,235,0.08)] transition hover:bg-saffron-500 hover:text-white">
                   {badge}
                 </span>
               ))}
@@ -318,7 +324,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1, duration: 0.7 }}
-            className="relative rounded-[28px] border border-saffron-500/20 bg-white p-5 shadow-[0_28px_80px_rgba(249,115,22,0.18)]"
+            className="relative rounded-[28px] border border-saffron-500/20 bg-white p-5 shadow-[0_28px_80px_rgba(37,99,235,0.18)]"
           >
             <div className="absolute left-8 right-8 top-8 h-px scan-line" />
             <div className="grid gap-4 md:grid-cols-2">
@@ -330,7 +336,7 @@ export default function Home() {
               ].map(([label, IconComponent, text]) => {
                 const CardIcon = IconComponent as Icon;
                 return (
-                  <div key={String(label)} className="group rounded-2xl border border-saffron-500/15 bg-saffron-50/60 p-5 transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_36px_rgba(249,115,22,0.22)]">
+                  <div key={String(label)} className="group rounded-2xl border border-saffron-500/15 bg-saffron-50/60 p-5 transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_36px_rgba(37,99,235,0.22)]">
                     <CardIcon className="h-8 w-8 text-saffron-600 transition group-hover:text-white group-hover:scale-110" />
                     <p className="mt-5 text-lg font-bold transition group-hover:text-white">{String(label)}</p>
                     <p className="mt-2 text-sm font-medium leading-6 text-saffron-900/60 transition group-hover:text-white/90">{String(text)}</p>
@@ -338,7 +344,7 @@ export default function Home() {
                 );
               })}
             </div>
-            <div className="group mt-4 rounded-2xl border border-saffron-500/20 bg-saffron-50 p-5 transition hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_38px_rgba(249,115,22,0.24)]">
+            <div className="group mt-4 rounded-2xl border border-saffron-500/20 bg-saffron-50 p-5 transition hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_38px_rgba(37,99,235,0.24)]">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-saffron-900/60 transition group-hover:text-white/85">Live success pulse</p>
@@ -363,7 +369,7 @@ export default function Home() {
               viewport={{ once: true, margin: "-120px" }}
               transition={{ duration: 0.55 }}
             >
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-saffron-500/20 bg-white px-4 py-2 text-xs font-bold text-saffron-800 shadow-[0_10px_28px_rgba(249,115,22,0.1)]">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-saffron-500/20 bg-white px-4 py-2 text-xs font-bold text-saffron-800 shadow-[0_10px_28px_rgba(37,99,235,0.1)]">
                 <span className="h-2 w-2 rounded-full bg-saffron-500" />
                 <span className="h-2 w-2 rounded-full bg-saffron-700" />
                 <span className="h-2 w-2 rounded-full bg-saffron-500" />
@@ -383,7 +389,7 @@ export default function Home() {
                 ].map(([value, label]) => (
                   <div
                     key={label}
-                    className="rounded-2xl border border-saffron-500/15 bg-white p-5 text-center shadow-[0_16px_34px_rgba(249,115,22,0.12)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white"
+                    className="rounded-2xl border border-saffron-500/15 bg-white p-5 text-center shadow-[0_16px_34px_rgba(37,99,235,0.12)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white"
                   >
                     <p className="text-2xl font-black">{value}</p>
                     <p className="mt-1 text-xs font-semibold">{label}</p>
@@ -398,10 +404,10 @@ export default function Home() {
               whileInView="show"
               viewport={{ once: true, margin: "-120px" }}
               transition={{ delay: 0.08, duration: 0.55 }}
-              className="rounded-[24px] border border-saffron-500/12 bg-white p-6 shadow-[0_22px_55px_rgba(154,52,18,0.12)] transition hover:-translate-y-1 hover:border-saffron-500/30"
+              className="rounded-[24px] border border-saffron-500/12 bg-white p-6 shadow-[0_22px_55px_rgba(15,23,42,0.12)] transition hover:-translate-y-1 hover:border-saffron-500/30"
             >
               <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-saffron-500 text-white shadow-[0_14px_30px_rgba(249,115,22,0.26)]">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-saffron-500 text-white shadow-[0_14px_30px_rgba(37,99,235,0.26)]">
                   <Code2 className="h-8 w-8" />
                 </div>
                 <div>
@@ -424,7 +430,7 @@ export default function Home() {
                 whileInView="show"
                 viewport={{ once: true, margin: "-90px" }}
                 transition={{ delay: index * 0.035, duration: 0.45 }}
-                className={`group rounded-2xl border bg-white p-6 shadow-[0_16px_40px_rgba(154,52,18,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_22px_48px_rgba(249,115,22,0.24)] ${
+                className={`group rounded-2xl border bg-white p-6 shadow-[0_16px_40px_rgba(15,23,42,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_22px_48px_rgba(37,99,235,0.24)] ${
                   index === 0 ? "border-saffron-400 ring-2 ring-saffron-300/35" : "border-saffron-500/12"
                 }`}
               >
@@ -445,7 +451,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="mt-9 rounded-[22px] border border-saffron-500/16 bg-white p-7 text-center shadow-[0_18px_48px_rgba(154,52,18,0.1)]">
+          <div className="mt-9 rounded-[22px] border border-saffron-500/16 bg-white p-7 text-center shadow-[0_18px_48px_rgba(15,23,42,0.1)]">
             <h3 className="text-2xl font-black text-saffron-900">Ready to transform education?</h3>
             <p className="mx-auto mt-3 max-w-2xl text-sm font-medium leading-6 text-saffron-900/66">
               Join schools and students using ADYAPAN's future skills curriculum to prepare learners for tomorrow.
@@ -453,13 +459,13 @@ export default function Home() {
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <a
                 href="tel:+919000000000"
-                className="inline-flex h-11 items-center justify-center rounded-lg bg-saffron-500 px-6 text-sm font-black text-white shadow-[0_12px_26px_rgba(249,115,22,0.22)] transition hover:-translate-y-1 hover:bg-saffron-700"
+                className="inline-flex h-11 items-center justify-center rounded-lg bg-saffron-500 px-6 text-sm font-black text-white shadow-[0_12px_26px_rgba(37,99,235,0.22)] transition hover:-translate-y-1 hover:bg-saffron-700"
               >
                 WhatsApp
               </a>
               <a
                 href="#demo"
-                className="inline-flex h-11 items-center justify-center rounded-lg bg-saffron-900 px-6 text-sm font-black text-white shadow-[0_12px_26px_rgba(154,52,18,0.16)] transition hover:-translate-y-1 hover:bg-saffron-700"
+                className="inline-flex h-11 items-center justify-center rounded-lg bg-saffron-900 px-6 text-sm font-black text-white shadow-[0_12px_26px_rgba(15,23,42,0.16)] transition hover:-translate-y-1 hover:bg-saffron-700"
               >
                 Schedule a Demo
               </a>
@@ -474,7 +480,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="path" className="bg-white/[0.025] px-4 py-20 md:px-6">
+      <section id="path" className="bg-white/70 px-4 py-20 md:px-6">
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Learning path"
@@ -497,7 +503,7 @@ export default function Home() {
                       <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-saffron-300/30 bg-saffron-500/15 text-sm font-semibold">
                         {index + 1}
                       </span>
-                      <div className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3">
+                      <div className="rounded-lg border border-slate-200 bg-white px-4 py-3">
                         <p className="font-medium">{step}</p>
                       </div>
                     </div>
@@ -505,7 +511,7 @@ export default function Home() {
                 </div>
                 <div className="mt-6 flex flex-wrap gap-2">
                   {path.courses.map((course) => (
-                    <span key={course} className="rounded-full bg-white/10 px-3 py-1 text-sm text-saffron-900/70">
+                    <span key={course} className="rounded-full bg-blue-50 px-3 py-1 text-sm text-saffron-900/70">
                       {course}
                     </span>
                   ))}
@@ -525,14 +531,14 @@ export default function Home() {
           />
           <div className="grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
             <div className="glass rounded-2xl p-6">
-              <div className="relative overflow-hidden rounded-xl border border-white/12 bg-gradient-to-br from-saffron-500/30 via-white/8 to-saffron-900/24 p-6">
+              <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-saffron-500/30 via-white/8 to-saffron-900/24 p-6">
                 <div className="absolute right-4 top-4 rounded-lg bg-white p-2">
                   <QrCode className="h-8 w-8 text-saffron-900" />
                 </div>
                 <p className="text-sm uppercase tracking-[0.22em] text-saffron-700">ADYAPAN Credential</p>
                 <h3 className="mt-12 text-3xl font-semibold">AI Builder Certificate</h3>
                 <p className="mt-3 text-saffron-900/64">Awarded for project mastery, exam performance, and mentor review.</p>
-                <div className="mt-10 flex items-center justify-between border-t border-white/12 pt-4 text-sm text-saffron-900/62">
+                <div className="mt-10 flex items-center justify-between border-t border-slate-200 pt-4 text-sm text-saffron-900/62">
                   <span>ID ADY-CERT-2026</span>
                   <span>QR Verified</span>
                 </div>
@@ -540,7 +546,7 @@ export default function Home() {
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 <button
                   onClick={() => setStatus("Certificate preview downloaded as a production-ready flow placeholder.")}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-white/10 font-semibold hover:bg-white/14"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-50 font-semibold hover:bg-blue-100"
                 >
                   <Download className="h-4 w-4" /> Download
                 </button>
@@ -554,7 +560,7 @@ export default function Home() {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               {certificates.map((certificate) => (
-                <div key={certificate} className="rounded-xl border border-white/10 bg-white/[0.045] p-5 transition hover:-translate-y-1 hover:border-saffron-300/40">
+                <div key={certificate} className="rounded-xl border border-slate-200 bg-white p-5 transition hover:-translate-y-1 hover:border-saffron-300/40">
                   <ShieldCheck className="h-8 w-8 text-saffron-600" />
                   <h3 className="mt-5 text-xl font-semibold">{certificate}</h3>
                   <p className="mt-3 text-sm leading-6 text-saffron-900/58">Exam, QR credential, mentor remark, and portfolio linkage.</p>
@@ -568,7 +574,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="projects" className="bg-white/[0.025] px-4 py-20 md:px-6">
+      <section id="projects" className="bg-white/70 px-4 py-20 md:px-6">
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Student projects"
@@ -578,7 +584,7 @@ export default function Home() {
           <div className="no-scrollbar flex snap-x gap-4 overflow-x-auto pb-4">
             {projects.map((project) => (
               <div key={project.title} className="glass min-w-[280px] snap-start rounded-2xl p-5 md:min-w-[360px]">
-                <div className="flex aspect-video items-center justify-center rounded-xl border border-white/35 bg-white/15">
+                <div className="flex aspect-video items-center justify-center rounded-xl border border-blue-100 bg-blue-50">
                   <Play className="h-12 w-12 text-saffron-600" />
                 </div>
                 <p className="mt-5 text-sm text-saffron-700">{project.type}</p>
@@ -587,7 +593,7 @@ export default function Home() {
                 <div className="mt-5 flex gap-3">
                   <button
                     onClick={() => setStatus(`${project.title} GitHub workspace opened.`)}
-                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-white/10 text-sm font-semibold hover:bg-white/14"
+                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-blue-50 text-sm font-semibold hover:bg-blue-100"
                   >
                     <Github className="h-4 w-4" /> GitHub
                   </button>
@@ -614,7 +620,7 @@ export default function Home() {
             />
             <div className="grid gap-4 sm:grid-cols-2">
               {["AI Curriculum", "Coding Labs", "Robotics Workshops", "Teacher Training", "Future Skills Programs", "Analytics"].map((item) => (
-                <div key={item} className="rounded-xl border border-white/10 bg-white/[0.045] p-5">
+                <div key={item} className="rounded-xl border border-slate-200 bg-white p-5">
                   <School className="h-7 w-7 text-saffron-600" />
                   <p className="mt-4 font-semibold">{item}</p>
                 </div>
@@ -638,7 +644,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="events" className="bg-white/[0.025] px-4 py-20 md:px-6">
+      <section id="events" className="bg-white/70 px-4 py-20 md:px-6">
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Community"
@@ -650,7 +656,7 @@ export default function Home() {
               <motion.div
                 key={event}
                 whileHover={{ y: -6 }}
-                className="rounded-xl border border-white/10 bg-white/[0.045] p-5"
+                className="rounded-xl border border-slate-200 bg-white p-5"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-saffron-500/15 text-saffron-700">
                   {index + 1}
@@ -685,7 +691,7 @@ export default function Home() {
                   key={testimonial.name}
                   onClick={() => setActiveTestimonial(index)}
                   aria-label={`Show ${testimonial.name} review`}
-                  className={`h-2.5 rounded-full transition ${activeTestimonial === index ? "w-8 bg-saffron-400" : "w-2.5 bg-white/24"}`}
+                  className={`h-2.5 rounded-full transition ${activeTestimonial === index ? "w-8 bg-saffron-400" : "w-2.5 bg-blue-200"}`}
                 />
               ))}
             </div>
@@ -693,113 +699,11 @@ export default function Home() {
         </div>
       </section>
 
-      <footer id="footer" className="relative overflow-hidden border-t-4 border-saffron-500 bg-white px-4 py-12 text-saffron-900 md:px-6">
-        <div className="absolute inset-x-0 top-0 h-px bg-saffron-500/15" />
-        <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.15fr_1.1fr_.9fr_1.1fr]">
-          <div>
-            <div className="flex items-end gap-3">
-              <span className="text-5xl font-black leading-none tracking-tight text-saffron-900">Adyapan</span>
-              <span className="mb-1 rounded bg-saffron-500 px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                Future Skills
-              </span>
-            </div>
-            <p className="mt-6 max-w-sm text-sm font-medium leading-7 text-saffron-900/70">
-              We help students from Class 5 to 12 become confident creators through coding, AI, robotics,
-              communication, design, and career-ready future skills.
-            </p>
-            <div className="mt-6 flex gap-3">
-              {[
-                ["Instagram", Instagram],
-                ["LinkedIn", Linkedin],
-                ["Facebook", Facebook]
-              ].map(([label, Icon]) => {
-                const SocialIcon = Icon as Icon;
-                return (
-                  <a
-                    key={String(label)}
-                    href="#top"
-                    aria-label={`ADYAPAN ${String(label)}`}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-saffron-500/20 bg-white text-saffron-700 shadow-[0_10px_24px_rgba(249,115,22,0.08)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_14px_28px_rgba(255,138,0,0.24)]"
-                  >
-                    <SocialIcon className="h-4 w-4" />
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="inline-block border-b-2 border-saffron-500 pb-1 text-xl font-black text-saffron-900">
-              Learning Programs
-            </h3>
-            <div className="mt-6 grid gap-4 text-sm font-medium text-saffron-900/72">
-              {[
-                "Future Skills Foundation (Class 5 to 8)",
-                "Coding & AI Creators (Class 6 to 10)",
-                "Robotics & Innovation Lab (Class 7 to 12)",
-                "Career, Communication & Design (Class 9 to 12)"
-              ].map((item) => (
-                <a key={item} href="#curriculum" className="transition hover:translate-x-1 hover:text-saffron-600">
-                  {item}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="inline-block border-b-2 border-saffron-500 pb-1 text-xl font-black text-saffron-900">
-              Quick Links
-            </h3>
-            <div className="mt-6 grid gap-4 text-sm font-medium text-saffron-900/72">
-              <a href="#top" className="transition hover:translate-x-1 hover:text-saffron-600">About ADYAPAN</a>
-              <a href="#certificates" className="transition hover:translate-x-1 hover:text-saffron-600">Certifications</a>
-              <a href="#schools" className="transition hover:translate-x-1 hover:text-saffron-600">School Partnership</a>
-              <a href="/dashboard" className="transition hover:translate-x-1 hover:text-saffron-600">LMS Dashboard</a>
-              <a href="/login" className="transition hover:translate-x-1 hover:text-saffron-600">Login</a>
-              <a href="#demo" className="transition hover:translate-x-1 hover:text-saffron-600">Contact Us</a>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="inline-block border-b-2 border-saffron-500 pb-1 text-xl font-black text-saffron-900">
-              Get In Touch
-            </h3>
-            <div className="mt-6 grid gap-4 text-sm font-medium text-saffron-900/72">
-              <a href="mailto:info@adyapan.com" className="flex items-center gap-3 transition hover:text-saffron-600">
-                <Mail className="h-4 w-4" /> info@adyapan.com
-              </a>
-              <a href="tel:+919000000000" className="flex items-center gap-3 transition hover:text-saffron-600">
-                <Phone className="h-4 w-4" /> +91 - 90000 00000
-              </a>
-              <span className="flex items-center gap-3">
-                <MapPin className="h-4 w-4" /> India
-              </span>
-            </div>
-            <div className="mt-7 rounded-lg border border-saffron-500/15 bg-saffron-50 p-4 text-sm text-saffron-900 shadow-[0_12px_28px_rgba(249,115,22,0.1)]">
-              <Clock className="mb-3 h-5 w-5 text-saffron-600" />
-              <p>Mon - Sat: 09:00 AM - 5:00 PM</p>
-              <p className="mt-1 text-saffron-700">Sunday: Closed</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mx-auto mt-10 flex max-w-7xl justify-center border-t border-saffron-500/15 pt-6 text-xs text-saffron-900/60">
-          <span>© 2026 ADYAPAN Future Skills Platform. All rights reserved.</span>
-        </div>
-
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-saffron-500 text-white shadow-[0_14px_30px_rgba(255,138,0,0.35)] transition hover:-translate-y-1 hover:bg-saffron-600"
-          aria-label="Back to top"
-        >
-          <ArrowUp className="h-5 w-5" />
-        </button>
-      </footer>
 
       {status && (
         <button
           onClick={() => setStatus("")}
-          className="fixed bottom-5 left-1/2 z-50 max-w-[92vw] -translate-x-1/2 rounded-lg border border-white/12 bg-white px-5 py-3 text-sm font-semibold text-saffron-900 shadow-glass"
+          className="fixed bottom-5 left-1/2 z-50 max-w-[92vw] -translate-x-1/2 rounded-lg border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-saffron-900 shadow-glass"
         >
           {status}
         </button>
@@ -807,6 +711,11 @@ export default function Home() {
     </main>
   );
 }
+
+
+
+
+
 
 
 

@@ -1,221 +1,293 @@
-﻿"use client";
+"use client";
 
-import { FormEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
 import {
-  Award,
-  Bell,
-  Bot,
-  CalendarDays,
-  CheckCircle2,
+  ArrowRight,
+  BarChart3,
+  BookOpen,
+  Brain,
   Code2,
-  FileText,
-  Flame,
-  LayoutDashboard,
-  Play,
-  Trophy,
-  User,
-  Users
+  Cpu,
+  GraduationCap,
+  Laptop,
+  MessageCircle,
+  Rocket,
+  ShieldCheck,
+  Target,
+  Users,
+  Wifi,
+  Zap
 } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-const progress = [
-  { week: "W1", score: 38 },
-  { week: "W2", score: 52 },
-  { week: "W3", score: 67 },
-  { week: "W4", score: 78 },
-  { week: "W5", score: 86 }
+type Icon = React.ComponentType<{ className?: string }>;
+
+const skillTiles: { label: string; icon: Icon }[] = [
+  { label: "Robotics", icon: Cpu },
+  { label: "Coding", icon: Laptop },
+  { label: "IoT", icon: Wifi },
+  { label: "Electronics", icon: Zap },
+  { label: "AI/ML", icon: Brain },
+  { label: "Programming", icon: Code2 }
 ];
 
-const courses = [
-  ["AI Builder", 78],
-  ["Python Pro", 62],
-  ["Robotics Starter", 44]
-] as const;
-
-const nav = [
-  ["Overview", LayoutDashboard],
-  ["Courses", Code2],
-  ["Certificates", Award],
-  ["Assignments", FileText],
-  ["Attendance", CheckCircle2],
-  ["Community", Users],
-  ["Profile", User],
-  ["Our App", FileText]
-] as const;
-
-export default function DashboardPage() {
-  const router = useRouter();
-  const [assistant, setAssistant] = useState("Ask ADYAPAN AI for a career or project recommendation.");
-  const [active, setActive] = useState("Overview");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    fetch("/api/auth/me").then((response) => {
-      if (!response.ok) router.replace("/login");
-    });
-  }, []);
-
-  async function askAssistant(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const response = await fetch("/api/ai-assistant", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: form.get("message") })
-    });
-    const data = await response.json();
-    setAssistant(`${data.answer} Next: ${data.nextSteps.join(", ")}.`);
+const overviewCards: { title: string; copy: string; icon: Icon }[] = [
+  {
+    title: "Progress Tracking",
+    copy: "Real-time monitoring of student performance",
+    icon: BarChart3
+  },
+  {
+    title: "AI-Powered Tools",
+    copy: "Smart recommendations and automated tasks",
+    icon: Brain
+  },
+  {
+    title: "Curriculum Management",
+    copy: "Organized and structured learning paths",
+    icon: BookOpen
+  },
+  {
+    title: "Collaborative Learning",
+    copy: "Interactive tools for group activities",
+    icon: GraduationCap
   }
+];
 
+const studentFeatures = [
+  "Personalized Learning Path",
+  "Interactive Quizzes & Games",
+  "Doubt Solver (AI Chatbot)",
+  "AI Notes & Summaries",
+  "Practice Question Bank",
+  "Exam Preparation Mode",
+  "Study Planner & Reminders",
+  "Progress Reports & Report Cards",
+  "Project & Idea Suggestions",
+  "Language Translation & Simplification",
+  "Gamification & Leaderboards",
+  "Collaborative Tools",
+  "AI Voice Narration",
+  "Adaptive Revision Plans",
+  "E-Library Access"
+];
+
+const teacherFeatures = [
+  "AI Lesson Plan Generator",
+  "Unit Plan Creation",
+  "Exam & Question Paper Generator",
+  "AI Quiz Maker",
+  "Automatic PPT Maker",
+  "Assignment & Worksheet Generator",
+  "Auto-Grading System",
+  "Homework Allocation",
+  "Content Recommendation",
+  "Progress Dashboard",
+  "AI Teaching Assistant (Chatbot)",
+  "Curriculum Mapping",
+  "Plagiarism Check & Report",
+  "Parent Communication Tools",
+  "AI Notes Generator"
+];
+
+const examCards: {
+  title: string;
+  copy: string;
+  icon: Icon;
+  tags: string[];
+}[] = [
+  {
+    title: "Multiple Formats",
+    copy:
+      "Support for MCQs, essays, coding challenges, and descriptive questions.",
+    icon: BookOpen,
+    tags: ["MCQs", "Essays", "Coding", "True/False"]
+  },
+  {
+    title: "Auto Evaluation",
+    copy:
+      "Instant grading and detailed feedback with AI-powered analysis.",
+    icon: BarChart3,
+    tags: ["Instant Grading", "AI Analysis", "Reports"]
+  },
+  {
+    title: "Secure Platform",
+    copy:
+      "Protected exam environment with anti-cheating and monitoring measures.",
+    icon: ShieldCheck,
+    tags: ["Anti-Cheating", "Secure Browser", "Time Limits"]
+  }
+];
+
+function SectionShell({
+  id,
+  title,
+  subtitle,
+  children,
+  accent = "right"
+}: {
+  id: string;
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+  accent?: "left" | "right";
+}) {
   return (
-    <main className="min-h-screen bg-ink text-saffron-900">
-      <div className="grid min-h-screen lg:grid-cols-[280px_1fr]">
-        <aside className="border-b border-white/10 bg-panel/80 p-4 backdrop-blur-xl lg:border-b-0 lg:border-r">
-          <a href="/" className="mb-8 flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-saffron-500 font-black shadow-glow">A</span>
-            <span className="font-bold">ADYAPAN</span>
-          </a>
-          <div className="grid gap-2">
-            {nav.map(([item, Icon]) => (
-              <button
-                key={item}
-                onClick={() => {
-                  if (item === "Our App") {
-                    router.push("/our.html");
-                  } else {
-                    setActive(item);
-                  }
-                }}
-                className={`flex h-11 items-center gap-3 rounded-lg px-3 text-left text-sm transition ${
-                  active === item ? "bg-saffron-500 text-white shadow-glow" : "text-saffron-900/62 hover:bg-white/8 hover:text-saffron-700"
-                }`}
-              >
-                <Icon className="h-4 w-4" /> {item}
-              </button>
-            ))}
+    <section id={id} className="px-4 py-16 md:px-6">
+      <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[28px] border border-blue-100 bg-white p-8 shadow-[0_22px_70px_rgba(15,23,42,0.10)] md:p-12">
+        <div
+          className={`absolute top-0 h-32 w-32 bg-blue-100 ${
+            accent === "left"
+              ? "left-0 rounded-br-full"
+              : "right-0 rounded-bl-full"
+          }`}
+        />
+        <div className="relative">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-3xl font-black text-slate-950 md:text-4xl">
+              {title}
+            </h2>
+            <p className="mt-4 text-base leading-7 text-slate-600">
+              {subtitle}
+            </p>
           </div>
-        </aside>
-
-        <section className="p-4 md:p-8">
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-            <div>
-              <p className="text-sm uppercase tracking-[0.2em] text-saffron-700">Student dashboard</p>
-              <h1 className="mt-2 text-3xl font-semibold md:text-5xl">Welcome back, future builder</h1>
-            </div>
-            <div className="flex gap-3">
-              <button className="relative rounded-lg border border-white/12 bg-white/8 p-3 hover:bg-white/12" aria-label="Notifications">
-                <Bell className="h-5 w-5" />
-                <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-saffron-400" />
-              </button>
-              <a href="/certificate/verify/demo" className="rounded-lg bg-saffron-500 px-4 py-3 text-sm font-semibold shadow-glow">
-                Verify Certificate
-              </a>
-            </div>
-          </div>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-4">
-            {[
-              ["Courses", "3 active", Code2],
-              ["Certificates", "2 earned", Award],
-              ["Streak", "14 days", Flame],
-              ["Leaderboard", "#12", Trophy]
-            ].map(([label, value, Icon]) => (
-              <div key={String(label)} className="glass rounded-2xl p-5">
-                <Icon className="h-7 w-7 text-saffron-600" />
-                <p className="mt-4 text-sm text-saffron-900/56">{String(label)}</p>
-                <p className="mt-1 text-2xl font-semibold">{String(value)}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_380px]">
-            <div className="glass rounded-2xl p-5">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Progress analytics</h2>
-                <span className="rounded-full bg-saffron-500/15 px-3 py-1 text-sm text-saffron-700">Smart tracking</span>
-              </div>
-              <div className="mt-5 h-72">
-                {mounted && (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={progress}>
-                      <defs>
-                        <linearGradient id="progress" x1="0" x2="0" y1="0" y2="1">
-                          <stop offset="0%" stopColor="#ff7a00" stopOpacity={0.8} />
-                          <stop offset="100%" stopColor="#ff7a00" stopOpacity={0.05} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid stroke="rgba(255,255,255,.08)" vertical={false} />
-                      <XAxis dataKey="week" stroke="rgba(255,255,255,.5)" />
-                      <YAxis stroke="rgba(255,255,255,.5)" />
-                      <Tooltip contentStyle={{ background: "#ff8a00", border: "1px solid rgba(255,255,255,.55)", borderRadius: 8 }} />
-                      <Area type="monotone" dataKey="score" stroke="#ff7a00" fill="url(#progress)" strokeWidth={3} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                )}
-              </div>
-            </div>
-
-            <div className="glass rounded-2xl p-5">
-              <h2 className="flex items-center gap-2 text-xl font-semibold">
-                <Bot className="h-5 w-5 text-saffron-600" /> AI assistant
-              </h2>
-              <p className="mt-4 rounded-xl border border-white/10 bg-white/[0.05] p-4 text-sm leading-6 text-saffron-900/68">{assistant}</p>
-              <form onSubmit={askAssistant} className="mt-4 grid gap-3">
-                <input
-                  name="message"
-                  placeholder="I am in Class 9 and like robotics"
-                  className="h-12 rounded-lg border border-white/12 bg-white/[0.06] px-4 text-sm outline-none focus:border-saffron-400"
-                />
-                <button className="h-11 rounded-lg bg-saffron-500 font-semibold shadow-glow">Ask AI</button>
-              </form>
-            </div>
-          </div>
-
-          <div className="mt-6 grid gap-6 xl:grid-cols-3">
-            <div className="glass rounded-2xl p-5 xl:col-span-2">
-              <h2 className="text-xl font-semibold">Continue learning</h2>
-              <div className="mt-5 grid gap-4">
-                {courses.map(([course, value]) => (
-                  <div key={course} className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="font-semibold">{course}</p>
-                        <p className="mt-1 text-sm text-saffron-900/52">Next live class and project review unlocked</p>
-                      </div>
-                      <button className="flex h-10 w-10 items-center justify-center rounded-lg bg-saffron-500" aria-label={`Continue ${course}`}>
-                        <Play className="h-4 w-4" />
-                      </button>
-                    </div>
-                    <div className="mt-4 h-2 rounded-full bg-white/10">
-                      <div className="h-2 rounded-full bg-saffron-400" style={{ width: `${value}%` }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="glass rounded-2xl p-5">
-              <h2 className="text-xl font-semibold">Upcoming classes</h2>
-              <div className="mt-5 grid gap-3">
-                {["AI Projects - Today 6 PM", "Python Quiz - Tomorrow", "Robotics Lab - Saturday"].map((item) => (
-                  <div key={item} className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.04] p-3 text-sm text-saffron-900/70">
-                    <CalendarDays className="h-4 w-4 text-saffron-600" /> {item}
-                  </div>
-                ))}
-              </div>
-              <h2 className="mt-6 text-xl font-semibold">Assignments</h2>
-              <div className="mt-4 grid gap-3">
-                {["Submit AI chatbot", "Record speaking pitch", "Upload portfolio link"].map((item) => (
-                  <div key={item} className="rounded-lg bg-white/[0.04] p-3 text-sm text-saffron-900/68">{item}</div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+          {children}
+        </div>
       </div>
-    </main>
+    </section>
   );
 }
 
+function FeaturePill({
+  label,
+  active
+}: {
+  label: string;
+  active?: boolean;
+}) {
+  return (
+    <div
+      className={`flex min-h-14 items-center gap-3 rounded-xl border px-4 font-semibold text-slate-950 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-500 hover:bg-blue-600 hover:text-white ${
+        active
+          ? "border-cyan-500 bg-cyan-50 ring-1 ring-cyan-500/25"
+          : "border-slate-200 bg-white"
+      }`}
+    >
+      <span
+        className={`h-3 w-3 rounded-full ${
+          active ? "bg-cyan-600" : "bg-blue-700"
+        }`}
+      />
+      {label}
+    </div>
+  );
+}
 
+export default function LMSPage() {
+  const [status, setStatus] = useState("");
+
+  const navItems = [
+    { label: "Home", href: "/" },
+    { label: "Overview", href: "#overview" },
+    { label: "Students", href: "#student-features" },
+    { label: "Teachers", href: "#teacher-features" },
+    { label: "Exam", href: "#exam-software" },
+    { label: "Demo", href: "#demo" }
+  ];
+
+  function goTo(id: string) {
+    document
+      .getElementById(id)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  async function submitDemo(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setStatus("Submitting demo request...");
+
+    try {
+      const form = new FormData(event.currentTarget);
+
+      const body = Object.fromEntries(form.entries());
+
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          type: "school",
+          name: body.name,
+          email: body.email,
+          phone: body.phone,
+          school: body.school,
+          city: body.city,
+          message: `${body.schedule || ""} ${
+            body.message || ""
+          }`.trim()
+        })
+      });
+
+      const data = await response.json();
+
+      setStatus(
+        response.ok
+          ? "Demo request submitted. ADYAPAN team will contact you."
+          : data.error || "Something went wrong"
+      );
+
+      if (response.ok) {
+        event.currentTarget.reset();
+      }
+    } catch (error) {
+      setStatus("Network error");
+    }
+  }
+
+  return (
+    <main className="min-h-screen bg-[#f4f8ff] text-slate-950">
+      <nav className="fixed left-0 right-0 top-0 z-50 border-b border-blue-100 bg-white/95 shadow-[0_12px_35px_rgba(37,99,235,0.10)] backdrop-blur-xl">
+        <div className="mx-auto flex h-[86px] max-w-7xl items-center justify-between gap-6 px-5 md:px-10">
+          <a
+            href="/"
+            className="flex items-center gap-3"
+            aria-label="ADYAPAN School home"
+          >
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-700 via-cyan-600 to-blue-950 text-sm font-black lowercase text-white shadow-[0_10px_24px_rgba(13,148,136,0.22)]">
+              ady.
+            </span>
+
+            <span className="leading-none">
+              <span className="block text-3xl font-black tracking-tight text-slate-950">
+                Adyapan
+              </span>
+
+              <span className="ml-1 block text-[10px] font-black uppercase tracking-[0.42em] text-slate-500">
+                School
+              </span>
+            </span>
+          </a>
+
+          <div className="hidden items-center gap-2 rounded-full border border-blue-100 bg-white px-3 py-2 shadow-[0_10px_35px_rgba(37,99,235,0.12)] md:flex">
+            {navItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="rounded-full px-5 py-3 text-base font-black text-slate-950 transition hover:-translate-y-0.5 hover:bg-blue-700 hover:text-white"
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
+
+          <a
+            href="#demo"
+            className="hidden rounded-full bg-blue-700 px-5 py-3 text-sm font-black text-white shadow-[0_12px_24px_rgba(37,99,235,0.24)] transition hover:-translate-y-0.5 hover:bg-slate-950 sm:inline-flex"
+          >
+            Book Demo
+          </a>
+        </div>
+      </nav>
+    </main>
+  );
+}

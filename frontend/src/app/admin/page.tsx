@@ -121,7 +121,7 @@ export default function AdminPage() {
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search students"
-                  className="h-10 rounded-lg border border-white/12 bg-white/[0.06] pl-10 pr-4 text-sm outline-none focus:border-saffron-400"
+                  className="h-10 rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm outline-none focus:border-saffron-400"
                 />
               </div>
             </div>
@@ -129,12 +129,12 @@ export default function AdminPage() {
               {mounted && (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={analytics}>
-                    <CartesianGrid stroke="rgba(255,255,255,.08)" vertical={false} />
-                    <XAxis dataKey="month" stroke="rgba(255,255,255,.5)" />
-                    <YAxis stroke="rgba(255,255,255,.5)" />
-                    <Tooltip contentStyle={{ background: "#ff8a00", border: "1px solid rgba(255,255,255,.55)", borderRadius: 8 }} />
-                    <Bar dataKey="enrollments" fill="#ff7a00" radius={[8, 8, 0, 0]} />
-                    <Bar dataKey="revenue" fill="rgba(255,255,255,.35)" radius={[8, 8, 0, 0]} />
+                    <CartesianGrid stroke="#dbeafe" vertical={false} />
+                    <XAxis dataKey="month" stroke="#475569" />
+                    <YAxis stroke="#475569" />
+                    <Tooltip contentStyle={{ background: "#ffffff", border: "1px solid #bfdbfe", borderRadius: 8, color: "#0f172a" }} />
+                    <Bar dataKey="enrollments" fill="#2563eb" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="revenue" fill="#0d9488" radius={[8, 8, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -145,7 +145,7 @@ export default function AdminPage() {
             <h2 className="text-xl font-semibold">Management</h2>
             <div className="mt-5 grid grid-cols-2 gap-3">
               {modules.map(([label, Icon]) => (
-                <button key={label} className="rounded-xl border border-white/10 bg-white/[0.045] p-4 text-left transition hover:border-saffron-300/40 hover:bg-white/[0.07]">
+                <button key={label} className="rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-saffron-300/40 hover:bg-blue-50">
                   <Icon className="h-5 w-5 text-saffron-600" />
                   <p className="mt-3 text-sm font-semibold">{label}</p>
                 </button>
@@ -154,8 +154,8 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
-          <div className="grid grid-cols-4 border-b border-white/10 px-4 py-3 text-sm font-semibold text-saffron-900/66">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="grid grid-cols-4 border-b border-slate-200 px-4 py-3 text-sm font-semibold text-saffron-900/66">
             <span>Name</span>
             <span>Email</span>
             <span>Class</span>
@@ -166,7 +166,7 @@ export default function AdminPage() {
             { name: "Mira Iyer", email: "mira@example.com", classLevel: "Class 10", status: "Certified" },
             { name: "Kabir Khan", email: "kabir@example.com", classLevel: "Class 6", status: "Trial" }
           ]).map((student, index) => (
-            <div key={index} className="grid grid-cols-4 px-4 py-3 text-sm text-saffron-900/62 odd:bg-white/[0.025]">
+            <div key={index} className="grid grid-cols-4 px-4 py-3 text-sm text-saffron-900/62 odd:bg-white/70">
               <span>{String(student.name ?? "Student")}</span>
               <span className="truncate">{String(student.email ?? "student@adyapan.com")}</span>
               <span>{String(student.classLevel ?? "Class 8")}</span>
@@ -178,5 +178,7 @@ export default function AdminPage() {
     </main>
   );
 }
+
+
 
 

@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss";
+﻿import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
@@ -6,26 +6,26 @@ const config: Config = {
     extend: {
       colors: {
         saffron: {
-          50: "#fffaf2",
-          100: "#fff2d9",
-          200: "#ffe3ae",
-          300: "#ffc96f",
-          400: "#ffad32",
-          500: "#ff8a00",
-          600: "#f97316",
-          700: "#ea580c",
-          800: "#c2410c",
-          900: "#9a3412"
+          50: "#f0fdfa",
+          100: "#ccfbf1",
+          200: "#99f6e4",
+          300: "#5eead4",
+          400: "#2dd4bf",
+          500: "#0d9488",
+          600: "#0f766e",
+          700: "#115e59",
+          800: "#134e4a",
+          900: "#0f172a"
         },
         ink: "#ffffff",
         panel: "#ffffff"
       },
       boxShadow: {
-        glow: "0 0 42px rgba(255, 122, 0, 0.28)",
-        glass: "0 20px 70px rgba(249, 115, 22, 0.22)"
+        glow: "0 0 42px rgba(13, 148, 136, 0.22)",
+        glass: "0 20px 70px rgba(37, 99, 235, 0.16)"
       },
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"]
+        sans: ["Poppins", "ui-sans-serif", "system-ui", "sans-serif"]
       },
       backgroundImage: {
         "radial-grid": "none"
@@ -36,3 +36,4 @@ const config: Config = {
 };
 
 export default config;
+

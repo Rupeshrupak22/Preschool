@@ -8,7 +8,7 @@ function Field(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className="h-12 w-full rounded-lg border border-white/12 bg-white/[0.06] px-4 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
+      className="h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
     />
   );
 }
@@ -73,7 +73,7 @@ export default function SignupPage() {
           <select
             name="classLevel"
             required
-            className="h-12 w-full rounded-lg border border-white/12 bg-white/[0.06] px-4 text-sm text-saffron-900 outline-none transition focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
+            className="h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-saffron-900 outline-none transition focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
           >
             <option value="">Class</option>
             {Array.from({ length: 8 }).map((_, index) => (
@@ -88,7 +88,7 @@ export default function SignupPage() {
               type={showPassword ? "text" : "password"}
               required
               placeholder="Password with uppercase and number"
-              className="h-12 w-full rounded-lg border border-white/12 bg-white/[0.06] px-4 pr-12 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
+              className="h-12 w-full rounded-lg border border-slate-200 bg-white px-4 pr-12 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
             />
             <button
               type="button"
@@ -101,31 +101,33 @@ export default function SignupPage() {
           </div>
           <div className="flex gap-3 md:col-span-2">
             <Field name="otp" placeholder="OTP code" />
-            <button type="button" onClick={sendOtp} className="inline-flex h-12 min-w-32 items-center justify-center gap-2 rounded-lg border border-white/12 bg-white/8 px-4 font-semibold hover:bg-white/12">
+            <button type="button" onClick={sendOtp} className="inline-flex h-12 min-w-32 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 font-semibold hover:bg-blue-50">
               <MailCheck className="h-4 w-4" /> OTP
             </button>
           </div>
           <Field name="captcha" placeholder="CAPTCHA: type ADYAPAN" required />
-          <input name="interest" placeholder="Interest: AI, coding, robotics..." className="h-12 w-full rounded-lg border border-white/12 bg-white/[0.06] px-4 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15" />
+          <input name="interest" placeholder="Interest: AI, coding, robotics..." className="h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15" />
         </div>
         <button className="mt-5 h-12 w-full rounded-lg bg-saffron-500 font-semibold shadow-glow transition hover:bg-saffron-400">
           Create Account
         </button>
         <div className="mt-3 grid grid-cols-2 gap-3">
-          <button type="button" onClick={() => setStatus("Google OAuth provider ready for production keys.")} className="h-11 rounded-lg border border-white/12 bg-white/8 text-sm font-semibold hover:bg-white/12">
+          <button type="button" onClick={() => setStatus("Google OAuth provider ready for production keys.")} className="h-11 rounded-lg border border-slate-200 bg-white text-sm font-semibold hover:bg-blue-50">
             Google
           </button>
-          <button type="button" onClick={() => setStatus("GitHub OAuth provider ready for production keys.")} className="flex h-11 items-center justify-center gap-2 rounded-lg border border-white/12 bg-white/8 text-sm font-semibold hover:bg-white/12">
+          <button type="button" onClick={() => setStatus("GitHub OAuth provider ready for production keys.")} className="flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white text-sm font-semibold hover:bg-blue-50">
             <Github className="h-4 w-4" /> GitHub
           </button>
         </div>
         <p className="mt-5 text-center text-sm text-saffron-900/56">
           Already have an account? <a href="/login" className="font-semibold text-saffron-700">Login</a>
         </p>
-        {status && <p className="mt-4 rounded-lg border border-white/10 bg-white/[0.05] px-4 py-3 text-center text-sm text-saffron-900/70">{status}</p>}
+        {status && <p className="mt-4 rounded-lg border border-slate-200 bg-white px-4 py-3 text-center text-sm text-saffron-900/70">{status}</p>}
       </form>
     </main>
   );
 }
+
+
 
 
