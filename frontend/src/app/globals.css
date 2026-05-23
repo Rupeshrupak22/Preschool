@@ -28,7 +28,16 @@ body {
 }
 
 body::before {
-  content: none;
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.72)),
+    url("/learning-doodles.svg");
+  background-position: center top;
+  background-size: 1536px auto;
+  background-repeat: repeat;
 }
 
 body > * {
@@ -38,6 +47,7 @@ body > * {
 
 main {
   position: relative;
+  background: transparent !important;
   isolation: isolate;
 }
 

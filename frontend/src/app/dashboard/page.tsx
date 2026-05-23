@@ -180,8 +180,6 @@ export default function LMSPage() {
 
   return (
     <main className="min-h-screen bg-[#f4f8ff] text-slate-950">
-      <div className="fixed inset-0 pointer-events-none bg-[linear-gradient(rgba(37,99,235,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.07)_1px,transparent_1px)] bg-[size:32px_32px]" />
-
       <nav className="fixed left-0 right-0 top-0 z-50 border-b border-blue-100 bg-white/95 shadow-[0_12px_35px_rgba(37,99,235,0.10)] backdrop-blur-xl">
         <div className="mx-auto flex h-[86px] max-w-7xl items-center justify-between gap-6 px-5 md:px-10">
           <a href="/" className="flex items-center gap-3" aria-label="ADYAPAN School home">
