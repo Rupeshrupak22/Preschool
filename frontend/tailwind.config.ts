@@ -6,22 +6,22 @@ const config: Config = {
     extend: {
       colors: {
         saffron: {
-          50: "#eff6ff",
-          100: "#dbeafe",
-          200: "#bfdbfe",
-          300: "#93c5fd",
-          400: "#60a5fa",
-          500: "#2563eb",
-          600: "#1d4ed8",
-          700: "#1e40af",
-          800: "#1e3a8a",
+          50: "#fef2f2",
+          100: "#fee2e2",
+          200: "#fecaca",
+          300: "#fca5a5",
+          400: "#f87171",
+          500: "#dc2626",
+          600: "#b91c1c",
+          700: "#991b1b",
+          800: "#7f1d1d",
           900: "#0f172a"
         },
         ink: "#ffffff",
         panel: "#ffffff"
       },
       boxShadow: {
-        glow: "0 0 42px rgba(37, 99, 235, 0.24)",
+        glow: "0 0 42px rgba(220, 38, 38, 0.22)",
         glass: "0 20px 70px rgba(37, 99, 235, 0.16)"
       },
       fontFamily: {

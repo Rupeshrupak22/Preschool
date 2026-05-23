@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
@@ -172,7 +172,7 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
 function AdyapanLogo() {
   return (
     <a href="#top" className="flex items-center gap-3" aria-label="ADYAPAN School home">
-      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-300 via-blue-600 to-blue-800 text-sm font-black lowercase text-white shadow-[0_10px_24px_rgba(37,99,235,0.28)]">
+      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 via-red-600 to-blue-900 text-sm font-black lowercase text-white shadow-[0_10px_24px_rgba(220,38,38,0.22)]">
         ady.
       </span>
       <span className="leading-none">
@@ -710,6 +710,7 @@ export default function Home() {
     </main>
   );
 }
+
 
 
 

@@ -1,4 +1,4 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -8,7 +8,7 @@
   --panel: rgba(255, 255, 255, 0.9);
   --line: rgba(37, 99, 235, 0.18);
   --muted: rgba(15, 23, 42, 0.72);
-  --saffron: #2563eb;
+  --saffron: #dc2626;
 }
 
 * {
@@ -73,7 +73,7 @@ a {
 }
 
 ::selection {
-  background: rgba(37, 99, 235, 0.24);
+  background: rgba(220, 38, 38, 0.22);
 }
 
 .grid-surface {
@@ -109,7 +109,7 @@ a {
   content: "";
   position: absolute;
   inset: -1px;
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.75), transparent 34%, rgba(255, 255, 255, 0.28));
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.75), transparent 34%, rgba(37, 99, 235, 0.28));
   opacity: 0;
   transition: opacity 220ms ease;
   z-index: -1;
@@ -134,7 +134,7 @@ a {
 }
 
 .scan-line {
-  background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.9), transparent);
+  background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.86), transparent);
   animation: scan 3.5s linear infinite;
 }
 

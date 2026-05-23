@@ -31,7 +31,7 @@ export default function SiteFooter() {
         <div>
           <div className="flex flex-wrap items-end gap-3">
             <span className="text-5xl font-black leading-none tracking-tight text-slate-950">Adyapan</span>
-            <span className="mb-1 rounded bg-blue-700 px-3 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-white">
+            <span className="mb-1 rounded bg-red-600 px-3 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-white">
               Future
               <br />
               Skills
@@ -49,7 +49,7 @@ export default function SiteFooter() {
                   key={String(label)}
                   href="/#top"
                   aria-label={`ADYAPAN ${String(label)}`}
-                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-blue-200 bg-white text-blue-700 shadow-[0_12px_28px_rgba(37,99,235,0.10)] transition hover:-translate-y-1 hover:bg-blue-700 hover:text-white hover:shadow-[0_16px_34px_rgba(37,99,235,0.22)]"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-blue-200 bg-white text-blue-700 shadow-[0_12px_28px_rgba(37,99,235,0.10)] transition hover:-translate-y-1 hover:bg-red-600 hover:text-white hover:shadow-[0_16px_34px_rgba(220,38,38,0.22)]"
                 >
                   <SocialIcon className="h-5 w-5" />
                 </a>
@@ -59,12 +59,12 @@ export default function SiteFooter() {
         </div>
 
         <div>
-          <h3 className="inline-block border-b-2 border-blue-700 pb-2 text-2xl font-black text-slate-950">
+          <h3 className="inline-block border-b-2 border-red-600 pb-2 text-2xl font-black text-slate-950">
             Learning Programs
           </h3>
           <div className="mt-7 grid gap-5 text-base font-semibold leading-7 text-slate-950">
             {learningPrograms.map((item) => (
-              <a key={item} href="/#curriculum" className="transition hover:translate-x-1 hover:text-blue-700">
+              <a key={item} href="/#curriculum" className="transition hover:translate-x-1 hover:text-red-600">
                 {item}
               </a>
             ))}
@@ -72,12 +72,12 @@ export default function SiteFooter() {
         </div>
 
         <div>
-          <h3 className="inline-block border-b-2 border-blue-700 pb-2 text-2xl font-black text-slate-950">
+          <h3 className="inline-block border-b-2 border-red-600 pb-2 text-2xl font-black text-slate-950">
             Quick Links
           </h3>
           <div className="mt-7 grid gap-5 text-base font-semibold text-slate-950">
             {quickLinks.map(([label, href]) => (
-              <a key={label} href={href} className="transition hover:translate-x-1 hover:text-blue-700">
+              <a key={label} href={href} className="transition hover:translate-x-1 hover:text-red-600">
                 {label}
               </a>
             ))}
@@ -85,14 +85,14 @@ export default function SiteFooter() {
         </div>
 
         <div>
-          <h3 className="inline-block border-b-2 border-blue-700 pb-2 text-2xl font-black text-slate-950">
+          <h3 className="inline-block border-b-2 border-red-600 pb-2 text-2xl font-black text-slate-950">
             Get In Touch
           </h3>
           <div className="mt-7 grid gap-5 text-base font-semibold text-slate-950">
-            <a href="mailto:info@adyapan.com" className="flex items-center gap-4 transition hover:text-blue-700">
+            <a href="mailto:info@adyapan.com" className="flex items-center gap-4 transition hover:text-red-600">
               <Mail className="h-5 w-5" /> info@adyapan.com
             </a>
-            <a href="tel:+919000000000" className="flex items-center gap-4 transition hover:text-blue-700">
+            <a href="tel:+919000000000" className="flex items-center gap-4 transition hover:text-red-600">
               <Phone className="h-5 w-5" /> +91 - 90000 00000
             </a>
             <span className="flex items-center gap-4">
@@ -102,7 +102,7 @@ export default function SiteFooter() {
           <div className="mt-8 rounded-lg border border-blue-200 bg-blue-50 p-5 text-base text-slate-950 shadow-[0_20px_50px_rgba(37,99,235,0.12)]">
             <Clock className="mb-4 h-6 w-6 text-blue-700" />
             <p>Mon - Sat: 09:00 AM - 5:00 PM</p>
-            <p className="mt-2 text-blue-700">Sunday: Closed</p>
+            <p className="mt-2 text-red-600">Sunday: Closed</p>
           </div>
         </div>
       </div>
@@ -113,7 +113,7 @@ export default function SiteFooter() {
 
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-blue-700 text-white shadow-[0_18px_38px_rgba(37,99,235,0.30)] transition hover:-translate-y-1 hover:bg-slate-950"
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-blue-700 text-white shadow-[0_18px_38px_rgba(37,99,235,0.30)] transition hover:-translate-y-1 hover:bg-red-600"
         aria-label="Back to top"
       >
         <ArrowUp className="h-6 w-6" />
