@@ -40,7 +40,8 @@ const nav = [
   ["Assignments", FileText],
   ["Attendance", CheckCircle2],
   ["Community", Users],
-  ["Profile", User]
+  ["Profile", User],
+  ["Our App", FileText]
 ] as const;
 
 export default function DashboardPage() {
@@ -80,7 +81,13 @@ export default function DashboardPage() {
             {nav.map(([item, Icon]) => (
               <button
                 key={item}
-                onClick={() => setActive(item)}
+                onClick={() => {
+                  if (item === "Our App") {
+                    router.push("/our.html");
+                  } else {
+                    setActive(item);
+                  }
+                }}
                 className={`flex h-11 items-center gap-3 rounded-lg px-3 text-left text-sm transition ${
                   active === item ? "bg-saffron-500 text-white shadow-glow" : "text-saffron-900/62 hover:bg-white/8 hover:text-saffron-700"
                 }`}
