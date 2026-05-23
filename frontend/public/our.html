@@ -2203,47 +2203,7 @@
   <div class="glow-orb orb-blue" style="top: 10%; left: -10%;"></div>
   <div class="glow-orb orb-cyan" style="top: 40%; right: -10%;"></div>
   <div class="glow-orb orb-pink" style="bottom: 10%; left: 20%;"></div>
-
-  <!-- ==========================================
-     1. NAVIGATION HEADER
-     ========================================== -->
-  <header id="main-header">
-    <div class="nav-container">
-      <a href="#" class="logo">
-        <div class="logo-icon">🚀</div>
-        <span>Adyapan</span>
-      </a>
-      
-      <ul class="nav-menu" id="nav-menu">
-        <li><a class="nav-link active" onclick="scrollToSection('hero')">Home</a></li>
-        <li><a class="nav-link" onclick="scrollToSection('gamified')">Play & Learn</a></li>
-        <li><a class="nav-link" onclick="scrollToSection('planner')">Study Planner</a></li>
-        <li><a class="nav-link" onclick="scrollToSection('roadmaps')">Roadmaps</a></li>
-        <li><a class="nav-link" onclick="scrollToSection('analytics')">Insights</a></li>
-        <li><a class="nav-link" onclick="scrollToSection('focus')">Focus Shield</a></li>
-        <li><a class="nav-link" onclick="scrollToSection('parent')">Parents</a></li>
-      </ul>
-
-      <div style="display: flex; align-items: center; gap: 15px;">
-        <div class="engine-status">
-          <div class="engine-pulse"></div>
-          <span>AI Engine Online</span>
-        </div>
-        <div class="menu-toggle" id="menu-toggle" onclick="toggleMobileMenu()">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Top Scroll Progress bar -->
-    <div class="progress-bar-container">
-      <div class="progress-bar-fill" id="scroll-progress"></div>
-    </div>
-  </header>
-
-  <!-- ==========================================
+<!-- ==========================================
      2. HERO SECTION
      ========================================== -->
   <section class="hero-section" id="hero">
@@ -3312,7 +3272,7 @@
       if (element) {
         const navMenu = document.getElementById("nav-menu");
         const menuToggle = document.getElementById("menu-toggle");
-        if (navMenu.classList.contains("open")) {
+        if (navMenu && menuToggle && navMenu.classList.contains("open")) {
           navMenu.classList.remove("open");
           menuToggle.classList.remove("open");
         }
@@ -3331,6 +3291,7 @@
     function toggleMobileMenu() {
       const navMenu = document.getElementById("nav-menu");
       const menuToggle = document.getElementById("menu-toggle");
+      if (!navMenu || !menuToggle) return;
       navMenu.classList.toggle("open");
       menuToggle.classList.toggle("open");
     }
@@ -3339,14 +3300,16 @@
       const header = document.getElementById("main-header");
       const scrollProgress = document.getElementById("scroll-progress");
       
-      if (window.scrollY > 50) {
-        header.classList.add("scrolled");
-      } else {
-        header.classList.remove("scrolled");
+      if (header) {
+        if (window.scrollY > 50) {
+          header.classList.add("scrolled");
+        } else {
+          header.classList.remove("scrolled");
+        }
       }
 
       const totalScrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalScrollableHeight > 0) {
+      if (scrollProgress && totalScrollableHeight > 0) {
         const scrolledPercentage = (window.scrollY / totalScrollableHeight) * 100;
         scrollProgress.style.width = scrolledPercentage + "%";
       }
