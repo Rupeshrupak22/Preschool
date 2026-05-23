@@ -1,4 +1,4 @@
-﻿import { Award, QrCode, ShieldCheck } from "lucide-react";
+import { Award, QrCode, ShieldCheck } from "lucide-react";
 
 export default function CertificateVerifyPage({ params }: { params: { id: string } }) {
   return (
@@ -27,5 +27,6 @@ export default function CertificateVerifyPage({ params }: { params: { id: string
     </main>
   );
 }
+
 
 

@@ -6,23 +6,23 @@ const config: Config = {
     extend: {
       colors: {
         saffron: {
-          50: "#fffaf2",
-          100: "#fff2d9",
-          200: "#ffe3ae",
-          300: "#ffc96f",
-          400: "#ffad32",
-          500: "#ff8a00",
-          600: "#f97316",
-          700: "#ea580c",
-          800: "#c2410c",
-          900: "#9a3412"
+          50: "#eff6ff",
+          100: "#dbeafe",
+          200: "#bfdbfe",
+          300: "#93c5fd",
+          400: "#60a5fa",
+          500: "#2563eb",
+          600: "#1d4ed8",
+          700: "#1e40af",
+          800: "#1e3a8a",
+          900: "#0f172a"
         },
         ink: "#ffffff",
         panel: "#ffffff"
       },
       boxShadow: {
-        glow: "0 0 42px rgba(255, 122, 0, 0.28)",
-        glass: "0 20px 70px rgba(249, 115, 22, 0.22)"
+        glow: "0 0 42px rgba(37, 99, 235, 0.24)",
+        glass: "0 20px 70px rgba(37, 99, 235, 0.16)"
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"]

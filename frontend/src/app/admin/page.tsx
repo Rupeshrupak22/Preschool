@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -132,8 +132,8 @@ export default function AdminPage() {
                     <CartesianGrid stroke="rgba(255,255,255,.08)" vertical={false} />
                     <XAxis dataKey="month" stroke="rgba(255,255,255,.5)" />
                     <YAxis stroke="rgba(255,255,255,.5)" />
-                    <Tooltip contentStyle={{ background: "#ff8a00", border: "1px solid rgba(255,255,255,.55)", borderRadius: 8 }} />
-                    <Bar dataKey="enrollments" fill="#ff7a00" radius={[8, 8, 0, 0]} />
+                    <Tooltip contentStyle={{ background: "#2563eb", border: "1px solid rgba(255,255,255,.55)", borderRadius: 8 }} />
+                    <Bar dataKey="enrollments" fill="#2563eb" radius={[8, 8, 0, 0]} />
                     <Bar dataKey="revenue" fill="rgba(255,255,255,.35)" radius={[8, 8, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -178,5 +178,6 @@ export default function AdminPage() {
     </main>
   );
 }
+
 
 

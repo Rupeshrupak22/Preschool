@@ -119,7 +119,7 @@ function SectionShell({
     <section id={id} className="px-4 py-16 md:px-6">
       <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[28px] border border-blue-100 bg-white p-8 shadow-[0_22px_70px_rgba(15,23,42,0.10)] md:p-12">
         <div
-          className={`absolute top-0 h-32 w-32 bg-red-200/70 ${
+          className={`absolute top-0 h-32 w-32 bg-blue-100 ${
             accent === "left" ? "left-0 rounded-br-full" : "right-0 rounded-bl-full"
           }`}
         />
@@ -142,7 +142,7 @@ function FeaturePill({ label, active }: { label: string; active?: boolean }) {
         active ? "border-blue-500 bg-blue-50 ring-1 ring-blue-500/25" : "border-slate-200 bg-white"
       }`}
     >
-      <span className={`h-3 w-3 rounded-full ${active ? "bg-blue-600" : "bg-red-600"}`} />
+      <span className={`h-3 w-3 rounded-full ${active ? "bg-blue-600" : "bg-blue-700"}`} />
       {label}
     </div>
   );
@@ -193,7 +193,7 @@ export default function LMSPage() {
       <nav className="fixed left-0 right-0 top-0 z-50 border-b border-blue-100 bg-white/95 shadow-[0_12px_35px_rgba(37,99,235,0.10)] backdrop-blur-xl">
         <div className="mx-auto flex h-[86px] max-w-7xl items-center justify-between gap-6 px-5 md:px-10">
           <a href="/" className="flex items-center gap-3" aria-label="ADYAPAN School home">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 via-orange-500 to-orange-600 text-sm font-black lowercase text-white shadow-[0_10px_24px_rgba(249,115,22,0.28)]">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-300 via-blue-600 to-blue-800 text-sm font-black lowercase text-white shadow-[0_10px_24px_rgba(37,99,235,0.28)]">
               ady.
             </span>
             <span className="leading-none">
@@ -222,7 +222,7 @@ export default function LMSPage() {
       </nav>
 
       <section className="relative overflow-hidden px-4 pb-14 pt-32 md:px-6">
-        <div className="absolute -left-28 -top-36 h-80 w-80 rounded-full bg-gradient-to-br from-red-600 to-blue-950 opacity-80" />
+        <div className="absolute -left-28 -top-36 h-80 w-80 rounded-full bg-gradient-to-br from-blue-700 to-slate-950 opacity-80" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.95fr_1fr]">
           <div>
             <a href="/" className="mb-10 inline-flex items-center gap-3 rounded-full bg-white px-4 py-2 text-sm font-bold text-blue-950 shadow">
@@ -230,23 +230,23 @@ export default function LMSPage() {
               ADYAPAN LMS
             </a>
             <h1 className="text-5xl font-black tracking-tight md:text-7xl">
-              <span className="text-red-600">Adyapan</span> LMS
+              <span className="text-blue-700">Adyapan</span> LMS
             </h1>
             <p className="mt-7 max-w-3xl text-2xl font-medium leading-[1.6] text-slate-600">
               <span className="font-black text-blue-950">AI-powered Learning Management System</span> enriched with
               dynamic features to enhance teaching efficiency and{" "}
-              <span className="font-black text-red-600">student engagement</span>
+              <span className="font-black text-blue-700">student engagement</span>
             </p>
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
               <a
                 href="#demo"
-                className="inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-red-600 px-8 font-black text-white shadow-[0_14px_30px_rgba(220,38,38,0.24)] transition hover:-translate-y-1 hover:bg-blue-700"
+                className="inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-blue-700 px-8 font-black text-white shadow-[0_14px_30px_rgba(37,99,235,0.24)] transition hover:-translate-y-1 hover:bg-slate-950"
               >
                 <Target className="h-5 w-5" /> Book Demo <ArrowRight className="h-5 w-5" />
               </a>
               <a
                 href="tel:+919000000000"
-                className="inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-green-600 px-8 font-black text-white shadow-[0_14px_30px_rgba(22,163,74,0.22)] transition hover:-translate-y-1 hover:bg-blue-700"
+                className="inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-blue-700 px-8 font-black text-white shadow-[0_14px_30px_rgba(37,99,235,0.22)] transition hover:-translate-y-1 hover:bg-slate-950"
               >
                 <MessageCircle className="h-5 w-5" /> Chat on WhatsApp
               </a>
@@ -257,7 +257,7 @@ export default function LMSPage() {
                   key={tile.label}
                   className="group flex h-16 items-center gap-4 rounded-xl border border-slate-200 bg-white px-5 font-bold text-slate-700 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:bg-blue-700 hover:text-white"
                 >
-                  <tile.icon className="h-6 w-6 text-red-600 transition group-hover:text-white" />
+                  <tile.icon className="h-6 w-6 text-blue-700 transition group-hover:text-white" />
                   {tile.label}
                 </div>
               ))}
@@ -268,10 +268,10 @@ export default function LMSPage() {
           </div>
 
           <div className="relative">
-            <div className="absolute -left-8 -top-7 z-10 flex h-14 w-14 items-center justify-center rounded-xl bg-white text-red-600 shadow-xl">
+            <div className="absolute -left-8 -top-7 z-10 flex h-14 w-14 items-center justify-center rounded-xl bg-white text-blue-700 shadow-xl">
               <Users className="h-7 w-7" />
             </div>
-            <div className="overflow-hidden rounded-[28px] border-[8px] border-red-200 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.18)]">
+            <div className="overflow-hidden rounded-[28px] border-[8px] border-blue-200 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.18)]">
               <img
                 src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1000&q=80"
                 alt="Students collaborating on ADYAPAN LMS"
@@ -296,7 +296,7 @@ export default function LMSPage() {
             key={id}
             onClick={() => goTo(id)}
             className={`h-12 flex-1 rounded-xl text-sm font-black transition hover:bg-blue-700 hover:text-white ${
-              index === 0 ? "bg-red-600 text-white" : "text-slate-600"
+              index === 0 ? "bg-blue-700 text-white" : "text-slate-600"
             }`}
           >
             {label}
@@ -313,14 +313,14 @@ export default function LMSPage() {
         <div className="mt-12 grid items-center gap-10 lg:grid-cols-[1fr_0.95fr]">
           <div className="grid gap-5 sm:grid-cols-2">
             {overviewCards.map((card) => (
-              <div key={card.title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:bg-blue-700 hover:text-white">
-                <card.icon className="h-8 w-8 text-red-600" />
+              <div key={card.title} className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:bg-blue-700 hover:text-white">
+                <card.icon className="h-8 w-8 text-blue-700 transition group-hover:text-white" />
                 <h3 className="mt-5 font-black">{card.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-600 group-hover:text-white">{card.copy}</p>
+                <p className="mt-3 text-sm leading-6 text-slate-600 transition group-hover:text-white/90">{card.copy}</p>
               </div>
             ))}
           </div>
-          <div className="rounded-[24px] bg-gradient-to-br from-red-200 to-orange-100 p-8">
+          <div className="rounded-[24px] bg-gradient-to-br from-blue-100 to-white p-8">
             <div className="rounded-2xl bg-white p-10 text-center shadow">
               <Rocket className="mx-auto h-16 w-16 text-blue-950" />
               <h3 className="mt-7 text-2xl font-black">Transform Education</h3>
@@ -362,30 +362,30 @@ export default function LMSPage() {
         title="Create & Conduct Any type of Exam with"
         subtitle="ONLINE EXAM SOFTWARE"
       >
-        <div className="mt-10 rounded-2xl bg-gradient-to-r from-red-50 to-orange-200 p-8 text-center">
+        <div className="mt-10 rounded-2xl bg-gradient-to-r from-blue-50 to-blue-100 p-8 text-center">
           <p className="text-lg font-black">Question Preview</p>
           <div className="mx-auto mt-5 max-w-md rounded-xl border border-slate-200 bg-white p-6 font-mono text-sm shadow">
             <p className="font-bold text-slate-700">1x - 2x - 1 at x = 3</p>
             <hr className="my-4" />
-            <p className="text-red-600">Evaluate at x = 3: f(3) = 1(3) - 2(3) - 1 = -4</p>
+            <p className="text-blue-700">Evaluate at x = 3: f(3) = 1(3) - 2(3) - 1 = -4</p>
           </div>
         </div>
         <div className="mt-8 grid gap-5 lg:grid-cols-3">
           {examCards.map((card, index) => (
             <div
               key={card.title}
-              className={`rounded-2xl border bg-white p-7 text-center shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:bg-blue-700 hover:text-white ${
-                index === 1 ? "border-red-300 ring-1 ring-red-200" : "border-slate-200"
+              className={`group rounded-2xl border bg-white p-7 text-center shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:bg-blue-700 hover:text-white ${
+                index === 1 ? "border-blue-300 ring-1 ring-blue-200" : "border-slate-200"
               }`}
             >
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 bg-white text-red-600">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 bg-white text-blue-700 transition group-hover:border-white/25 group-hover:bg-white/15 group-hover:text-white">
                 <card.icon className="h-8 w-8" />
               </div>
               <h3 className="mt-6 text-xl font-black">{card.title}</h3>
-              <p className="mt-4 min-h-14 text-sm leading-6 text-slate-600">{card.copy}</p>
+              <p className="mt-4 min-h-14 text-sm leading-6 text-slate-600 transition group-hover:text-white/90">{card.copy}</p>
               <div className="mt-5 flex flex-wrap justify-center gap-2">
                 {card.tags.map((tag) => (
-                  <span key={tag} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
+                  <span key={tag} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600 transition group-hover:bg-white/15 group-hover:text-white">
                     {tag}
                   </span>
                 ))}
@@ -401,14 +401,14 @@ export default function LMSPage() {
             ["15+", "Security Features"]
           ].map(([value, label]) => (
             <div key={label}>
-              <p className="text-2xl font-black text-red-600">{value}</p>
+              <p className="text-2xl font-black text-blue-700">{value}</p>
               <p className="text-sm text-slate-600">{label}</p>
             </div>
           ))}
         </div>
       </SectionShell>
 
-      <section id="demo" className="relative mt-10 bg-gradient-to-br from-red-600 via-blue-950 to-orange-600 px-4 py-16 text-white md:px-6">
+      <section id="demo" className="relative mt-10 bg-gradient-to-br from-blue-700 via-slate-950 to-blue-800 px-4 py-16 text-white md:px-6">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:40px_40px]" />
         <div className="relative mx-auto max-w-4xl text-center">
           <h2 className="text-4xl font-black text-blue-100">Book Your Free Demo</h2>
@@ -452,7 +452,7 @@ export default function LMSPage() {
                 <textarea name="message" rows={4} placeholder="Tell us about your requirements..." className="rounded-lg border border-white/10 bg-blue-950/60 px-4 py-3 text-white outline-none placeholder:text-white/40" />
               </label>
             </div>
-            <button className="mt-6 h-14 w-full rounded-xl bg-red-600 font-black text-white transition hover:bg-white hover:text-blue-950">
+            <button className="mt-6 h-14 w-full rounded-xl bg-blue-700 font-black text-white transition hover:bg-white hover:text-blue-950">
               Submit Demo Request <ArrowRight className="ml-2 inline h-4 w-4" />
             </button>
           </form>
@@ -461,7 +461,7 @@ export default function LMSPage() {
 
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-blue-700 text-white shadow-xl transition hover:-translate-y-1 hover:bg-red-600"
+        className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-blue-700 text-white shadow-xl transition hover:-translate-y-1 hover:bg-slate-950"
         aria-label="Back to top"
       >
         <ArrowUp className="h-5 w-5" />
@@ -478,3 +478,4 @@ export default function LMSPage() {
     </main>
   );
 }
+

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
@@ -181,7 +181,7 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
 function AdyapanLogo() {
   return (
     <a href="#top" className="flex items-center gap-3" aria-label="ADYAPAN School home">
-      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 via-orange-500 to-orange-600 text-sm font-black lowercase text-white shadow-[0_10px_24px_rgba(249,115,22,0.28)]">
+      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-300 via-blue-600 to-blue-800 text-sm font-black lowercase text-white shadow-[0_10px_24px_rgba(37,99,235,0.28)]">
         ady.
       </span>
       <span className="leading-none">
@@ -286,12 +286,12 @@ export default function Home() {
       <section id="top" className="relative min-h-[92vh] overflow-hidden px-4 pt-32 md:px-6">
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 pb-16 lg:grid-cols-[1.02fr_.98fr]">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-saffron-500/20 bg-white px-5 py-2.5 text-sm font-semibold text-saffron-700 shadow-[0_12px_32px_rgba(249,115,22,0.14)] transition hover:bg-saffron-500 hover:text-white">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-saffron-500/20 bg-white px-5 py-2.5 text-sm font-semibold text-saffron-700 shadow-[0_12px_32px_rgba(37,99,235,0.14)] transition hover:bg-saffron-500 hover:text-white">
               <Sparkles className="h-4 w-4" />
               India's Future Skills Platform for Classes 5-12
             </div>
             <h1 className="max-w-4xl text-5xl font-black leading-[0.98] tracking-tight text-saffron-900 md:text-7xl">
-              ADYAPAN <span className="rounded-2xl bg-saffron-500 px-3 text-white shadow-[0_18px_36px_rgba(249,115,22,0.22)]">Future</span> Skills Platform
+              ADYAPAN <span className="rounded-2xl bg-saffron-500 px-3 text-white shadow-[0_18px_36px_rgba(37,99,235,0.22)]">Future</span> Skills Platform
             </h1>
             <p className="mt-6 max-w-2xl text-lg font-medium leading-8 text-saffron-900/72 md:text-xl">
               Learn coding, AI, robotics, design, communication, and career skills through mentor-led journeys,
@@ -300,20 +300,20 @@ export default function Home() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
                 href="/signup"
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-saffron-500 px-7 py-3.5 font-bold text-white shadow-[0_16px_34px_rgba(249,115,22,0.28)] transition hover:-translate-y-1 hover:bg-saffron-700 hover:shadow-[0_20px_42px_rgba(249,115,22,0.34)]"
+                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-saffron-500 px-7 py-3.5 font-bold text-white shadow-[0_16px_34px_rgba(37,99,235,0.28)] transition hover:-translate-y-1 hover:bg-saffron-700 hover:shadow-[0_20px_42px_rgba(37,99,235,0.34)]"
               >
                 Start Learning <ArrowRight className="h-4 w-4" />
               </a>
               <a
                 href="#demo"
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border-2 border-saffron-500 bg-white px-7 py-3.5 font-bold text-saffron-700 shadow-[0_14px_32px_rgba(249,115,22,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_38px_rgba(249,115,22,0.25)]"
+                className="inline-flex h-14 items-center justify-center gap-2 rounded-xl border-2 border-saffron-500 bg-white px-7 py-3.5 font-bold text-saffron-700 shadow-[0_14px_32px_rgba(37,99,235,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_38px_rgba(37,99,235,0.25)]"
               >
                 Book Free Demo <CalendarDays className="h-4 w-4" />
               </a>
             </div>
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {stats.map(([value, label]) => (
-                <div key={label} className="group rounded-2xl border border-saffron-500/15 bg-white p-4 shadow-[0_12px_30px_rgba(249,115,22,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:shadow-[0_18px_36px_rgba(249,115,22,0.25)]">
+                <div key={label} className="group rounded-2xl border border-saffron-500/15 bg-white p-4 shadow-[0_12px_30px_rgba(37,99,235,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:shadow-[0_18px_36px_rgba(37,99,235,0.25)]">
                   <p className="text-2xl font-black text-saffron-800 transition group-hover:text-white">{value}</p>
                   <p className="mt-1 text-xs font-bold uppercase tracking-[0.14em] text-saffron-900/52 transition group-hover:text-white/90">{label}</p>
                 </div>
@@ -321,7 +321,7 @@ export default function Home() {
             </div>
             <div className="mt-6 flex flex-wrap gap-3 text-sm text-saffron-900/62">
               {["CBSE aligned", "Project first", "QR verified certificates", "Mentor reviews"].map((badge) => (
-                <span key={badge} className="rounded-full border border-saffron-500/15 bg-white px-4 py-2 font-semibold text-saffron-800 shadow-[0_8px_20px_rgba(249,115,22,0.08)] transition hover:bg-saffron-500 hover:text-white">
+                <span key={badge} className="rounded-full border border-saffron-500/15 bg-white px-4 py-2 font-semibold text-saffron-800 shadow-[0_8px_20px_rgba(37,99,235,0.08)] transition hover:bg-saffron-500 hover:text-white">
                   {badge}
                 </span>
               ))}
@@ -332,7 +332,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1, duration: 0.7 }}
-            className="relative rounded-[28px] border border-saffron-500/20 bg-white p-5 shadow-[0_28px_80px_rgba(249,115,22,0.18)]"
+            className="relative rounded-[28px] border border-saffron-500/20 bg-white p-5 shadow-[0_28px_80px_rgba(37,99,235,0.18)]"
           >
             <div className="absolute left-8 right-8 top-8 h-px scan-line" />
             <div className="grid gap-4 md:grid-cols-2">
@@ -344,7 +344,7 @@ export default function Home() {
               ].map(([label, IconComponent, text]) => {
                 const CardIcon = IconComponent as Icon;
                 return (
-                  <div key={String(label)} className="group rounded-2xl border border-saffron-500/15 bg-saffron-50/60 p-5 transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_36px_rgba(249,115,22,0.22)]">
+                  <div key={String(label)} className="group rounded-2xl border border-saffron-500/15 bg-saffron-50/60 p-5 transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_36px_rgba(37,99,235,0.22)]">
                     <CardIcon className="h-8 w-8 text-saffron-600 transition group-hover:text-white group-hover:scale-110" />
                     <p className="mt-5 text-lg font-bold transition group-hover:text-white">{String(label)}</p>
                     <p className="mt-2 text-sm font-medium leading-6 text-saffron-900/60 transition group-hover:text-white/90">{String(text)}</p>
@@ -352,7 +352,7 @@ export default function Home() {
                 );
               })}
             </div>
-            <div className="group mt-4 rounded-2xl border border-saffron-500/20 bg-saffron-50 p-5 transition hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_38px_rgba(249,115,22,0.24)]">
+            <div className="group mt-4 rounded-2xl border border-saffron-500/20 bg-saffron-50 p-5 transition hover:bg-saffron-500 hover:text-white hover:shadow-[0_18px_38px_rgba(37,99,235,0.24)]">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold text-saffron-900/60 transition group-hover:text-white/85">Live success pulse</p>
@@ -377,7 +377,7 @@ export default function Home() {
               viewport={{ once: true, margin: "-120px" }}
               transition={{ duration: 0.55 }}
             >
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-saffron-500/20 bg-white px-4 py-2 text-xs font-bold text-saffron-800 shadow-[0_10px_28px_rgba(249,115,22,0.1)]">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-saffron-500/20 bg-white px-4 py-2 text-xs font-bold text-saffron-800 shadow-[0_10px_28px_rgba(37,99,235,0.1)]">
                 <span className="h-2 w-2 rounded-full bg-saffron-500" />
                 <span className="h-2 w-2 rounded-full bg-saffron-700" />
                 <span className="h-2 w-2 rounded-full bg-saffron-500" />
@@ -397,7 +397,7 @@ export default function Home() {
                 ].map(([value, label]) => (
                   <div
                     key={label}
-                    className="rounded-2xl border border-saffron-500/15 bg-white p-5 text-center shadow-[0_16px_34px_rgba(249,115,22,0.12)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white"
+                    className="rounded-2xl border border-saffron-500/15 bg-white p-5 text-center shadow-[0_16px_34px_rgba(37,99,235,0.12)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white"
                   >
                     <p className="text-2xl font-black">{value}</p>
                     <p className="mt-1 text-xs font-semibold">{label}</p>
@@ -412,10 +412,10 @@ export default function Home() {
               whileInView="show"
               viewport={{ once: true, margin: "-120px" }}
               transition={{ delay: 0.08, duration: 0.55 }}
-              className="rounded-[24px] border border-saffron-500/12 bg-white p-6 shadow-[0_22px_55px_rgba(154,52,18,0.12)] transition hover:-translate-y-1 hover:border-saffron-500/30"
+              className="rounded-[24px] border border-saffron-500/12 bg-white p-6 shadow-[0_22px_55px_rgba(15,23,42,0.12)] transition hover:-translate-y-1 hover:border-saffron-500/30"
             >
               <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-saffron-500 text-white shadow-[0_14px_30px_rgba(249,115,22,0.26)]">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-saffron-500 text-white shadow-[0_14px_30px_rgba(37,99,235,0.26)]">
                   <Code2 className="h-8 w-8" />
                 </div>
                 <div>
@@ -438,7 +438,7 @@ export default function Home() {
                 whileInView="show"
                 viewport={{ once: true, margin: "-90px" }}
                 transition={{ delay: index * 0.035, duration: 0.45 }}
-                className={`group rounded-2xl border bg-white p-6 shadow-[0_16px_40px_rgba(154,52,18,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_22px_48px_rgba(249,115,22,0.24)] ${
+                className={`group rounded-2xl border bg-white p-6 shadow-[0_16px_40px_rgba(15,23,42,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_22px_48px_rgba(37,99,235,0.24)] ${
                   index === 0 ? "border-saffron-400 ring-2 ring-saffron-300/35" : "border-saffron-500/12"
                 }`}
               >
@@ -459,7 +459,7 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="mt-9 rounded-[22px] border border-saffron-500/16 bg-white p-7 text-center shadow-[0_18px_48px_rgba(154,52,18,0.1)]">
+          <div className="mt-9 rounded-[22px] border border-saffron-500/16 bg-white p-7 text-center shadow-[0_18px_48px_rgba(15,23,42,0.1)]">
             <h3 className="text-2xl font-black text-saffron-900">Ready to transform education?</h3>
             <p className="mx-auto mt-3 max-w-2xl text-sm font-medium leading-6 text-saffron-900/66">
               Join schools and students using ADYAPAN's future skills curriculum to prepare learners for tomorrow.
@@ -467,13 +467,13 @@ export default function Home() {
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <a
                 href="tel:+919000000000"
-                className="inline-flex h-11 items-center justify-center rounded-lg bg-saffron-500 px-6 text-sm font-black text-white shadow-[0_12px_26px_rgba(249,115,22,0.22)] transition hover:-translate-y-1 hover:bg-saffron-700"
+                className="inline-flex h-11 items-center justify-center rounded-lg bg-saffron-500 px-6 text-sm font-black text-white shadow-[0_12px_26px_rgba(37,99,235,0.22)] transition hover:-translate-y-1 hover:bg-saffron-700"
               >
                 WhatsApp
               </a>
               <a
                 href="#demo"
-                className="inline-flex h-11 items-center justify-center rounded-lg bg-saffron-900 px-6 text-sm font-black text-white shadow-[0_12px_26px_rgba(154,52,18,0.16)] transition hover:-translate-y-1 hover:bg-saffron-700"
+                className="inline-flex h-11 items-center justify-center rounded-lg bg-saffron-900 px-6 text-sm font-black text-white shadow-[0_12px_26px_rgba(15,23,42,0.16)] transition hover:-translate-y-1 hover:bg-saffron-700"
               >
                 Schedule a Demo
               </a>
@@ -733,7 +733,7 @@ export default function Home() {
                     key={String(label)}
                     href="#top"
                     aria-label={`ADYAPAN ${String(label)}`}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-saffron-500/20 bg-white text-saffron-700 shadow-[0_10px_24px_rgba(249,115,22,0.08)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_14px_28px_rgba(255,138,0,0.24)]"
+                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-saffron-500/20 bg-white text-saffron-700 shadow-[0_10px_24px_rgba(37,99,235,0.08)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_14px_28px_rgba(37,99,235,0.24)]"
                   >
                     <SocialIcon className="h-4 w-4" />
                   </a>
@@ -789,7 +789,7 @@ export default function Home() {
                 <MapPin className="h-4 w-4" /> India
               </span>
             </div>
-            <div className="mt-7 rounded-lg border border-saffron-500/15 bg-saffron-50 p-4 text-sm text-saffron-900 shadow-[0_12px_28px_rgba(249,115,22,0.1)]">
+            <div className="mt-7 rounded-lg border border-saffron-500/15 bg-saffron-50 p-4 text-sm text-saffron-900 shadow-[0_12px_28px_rgba(37,99,235,0.1)]">
               <Clock className="mb-3 h-5 w-5 text-saffron-600" />
               <p>Mon - Sat: 09:00 AM - 5:00 PM</p>
               <p className="mt-1 text-saffron-700">Sunday: Closed</p>
@@ -803,7 +803,7 @@ export default function Home() {
 
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-saffron-500 text-white shadow-[0_14px_30px_rgba(255,138,0,0.35)] transition hover:-translate-y-1 hover:bg-saffron-600"
+          className="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-saffron-500 text-white shadow-[0_14px_30px_rgba(37,99,235,0.35)] transition hover:-translate-y-1 hover:bg-saffron-600"
           aria-label="Back to top"
         >
           <ArrowUp className="h-5 w-5" />
@@ -821,6 +821,7 @@ export default function Home() {
     </main>
   );
 }
+
 
 
 
