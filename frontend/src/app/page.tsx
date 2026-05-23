@@ -178,6 +178,20 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   );
 }
 
+function AdyapanLogo() {
+  return (
+    <a href="#top" className="flex items-center gap-3" aria-label="ADYAPAN School home">
+      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 via-orange-500 to-orange-600 text-sm font-black lowercase text-white shadow-[0_10px_24px_rgba(249,115,22,0.28)]">
+        ady.
+      </span>
+      <span className="leading-none">
+        <span className="block text-3xl font-black tracking-tight text-slate-950">Adyapan</span>
+        <span className="ml-1 block text-[10px] font-black uppercase tracking-[0.42em] text-slate-500">School</span>
+      </span>
+    </a>
+  );
+}
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
@@ -225,15 +239,16 @@ export default function Home() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-ink text-saffron-900">
-      <nav className="fixed left-0 right-0 top-0 z-50 border-b border-saffron-500/15 bg-white/95 shadow-[0_12px_35px_rgba(249,115,22,0.08)] backdrop-blur-xl">
-        <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-center px-6 md:px-10">
-          <div className="hidden items-center gap-3 rounded-full border border-saffron-500/15 bg-white px-3 py-2 shadow-[0_10px_35px_rgba(249,115,22,0.12)] md:flex">
+      <nav className="fixed left-0 right-0 top-0 z-50 border-b border-blue-100 bg-white/95 shadow-[0_12px_35px_rgba(37,99,235,0.10)] backdrop-blur-xl">
+        <div className="mx-auto flex h-[86px] max-w-7xl items-center justify-between gap-6 px-5 md:px-10">
+          <AdyapanLogo />
+          <div className="hidden items-center gap-2 rounded-full border border-blue-100 bg-white px-3 py-2 shadow-[0_10px_35px_rgba(37,99,235,0.12)] md:flex">
             {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className={`relative rounded-full px-5 py-3 text-base font-bold transition duration-200 hover:-translate-y-0.5 hover:bg-saffron-500 hover:text-white hover:shadow-[0_12px_24px_rgba(249,115,22,0.28)] ${
-                  item.active ? "bg-saffron-500 text-white shadow-[0_12px_24px_rgba(249,115,22,0.26)]" : "text-saffron-900/82"
+                className={`relative rounded-full px-5 py-3 text-base font-black transition duration-200 hover:-translate-y-0.5 hover:bg-blue-700 hover:text-white hover:shadow-[0_12px_24px_rgba(37,99,235,0.24)] ${
+                  item.active ? "bg-blue-700 text-white shadow-[0_12px_24px_rgba(37,99,235,0.22)]" : "text-slate-950"
                 }`}
               >
                 {item.label}
@@ -241,7 +256,7 @@ export default function Home() {
             ))}
           </div>
           <button
-            className="ml-auto rounded-xl border border-saffron-500/30 bg-white p-2 text-saffron-900 shadow-[0_10px_28px_rgba(249,115,22,0.12)] transition hover:bg-saffron-500 hover:text-white md:hidden"
+            className="rounded-xl border border-blue-200 bg-white p-2 text-slate-950 shadow-[0_10px_28px_rgba(37,99,235,0.12)] transition hover:bg-blue-700 hover:text-white md:hidden"
             onClick={() => setMenuOpen((value) => !value)}
             aria-label="Open navigation"
           >
@@ -256,8 +271,8 @@ export default function Home() {
                   key={item.label}
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
-                  className={`rounded-xl px-4 py-3 text-base font-bold transition hover:bg-saffron-500 hover:text-white ${
-                    item.active ? "bg-saffron-500 text-white" : "text-saffron-900/82"
+                  className={`rounded-xl px-4 py-3 text-base font-black transition hover:bg-blue-700 hover:text-white ${
+                    item.active ? "bg-blue-700 text-white" : "text-slate-950"
                   }`}
                 >
                   {item.label}
