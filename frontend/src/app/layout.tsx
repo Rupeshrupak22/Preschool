@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import SiteFooter from "./components/SiteFooter";
+import SiteNavbar from "./components/SiteNavbar";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className={poppins.className}>
+        <SiteNavbar />
         {children}
         <SiteFooter />
       </body>
