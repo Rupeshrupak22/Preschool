@@ -159,6 +159,46 @@
       color: #ffffff;
     }
 
+    .adyapan-fixed-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .adyapan-fixed-action {
+      height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      padding: 0 20px;
+      color: #0f172a;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 900;
+      transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .adyapan-fixed-action-login {
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .adyapan-fixed-action-signup {
+      border: 1px solid #e11d48;
+      background: #e11d48;
+      color: #ffffff;
+      box-shadow: 0 12px 26px rgba(225, 29, 72, 0.22);
+    }
+
+    .adyapan-fixed-action:hover {
+      transform: translateY(-2px);
+      border-color: #1d4ed8;
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+
     @media (max-width: 980px) {
       .adyapan-fixed-navbar {
         height: auto;
@@ -180,8 +220,16 @@
         border-radius: 18px;
       }
 
+      .adyapan-fixed-actions {
+        width: 100%;
+      }
+
+      .adyapan-fixed-action {
+        flex: 1;
+      }
+
       body {
-        padding-top: 144px;
+        padding-top: 206px;
       }
     }
 
@@ -2513,6 +2561,10 @@
         <a href="/dashboard">LMS</a>
         <a href="/our.html">Our App</a>
         <a href="/#footer">Books</a>
+      </div>
+      <div class="adyapan-fixed-actions">
+        <a class="adyapan-fixed-action adyapan-fixed-action-login" href="/login">Login</a>
+        <a class="adyapan-fixed-action adyapan-fixed-action-signup" href="/signup">Sign Up</a>
       </div>
     </div>
   </nav>

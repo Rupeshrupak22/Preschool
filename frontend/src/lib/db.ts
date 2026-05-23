@@ -17,6 +17,7 @@ if (!global.mongooseCache) {
 
 export async function connectDb() {
   const uri = process.env.MONGODB_URI;
+  const dbName = process.env.MONGODB_DB ?? "PRESCHOOL";
 
   if (!uri) {
     return null;
@@ -27,7 +28,7 @@ export async function connectDb() {
   }
 
   cache.promise ??= mongoose.connect(uri, {
-    dbName: "adyapan"
+    dbName
   });
 
   cache.conn = await cache.promise;
