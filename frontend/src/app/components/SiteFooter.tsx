@@ -10,7 +10,7 @@ const learningPrograms = [
 ];
 
 const quickLinks = [
-  ["About ADYAPAN", "/#top"],
+  ["About ADYAPAN", "/about"],
   ["Certifications", "/#certificates"],
   ["School Partnership", "/#schools"],
   ["LMS Dashboard", "/dashboard"],

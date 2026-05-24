@@ -22,7 +22,7 @@ const navItems = [
   { label: "Mentor", href: "/#events" },
   { label: "My App", href: "/our.html" },
   { label: "LMS", href: "/dashboard" },
-  { label: "About Us", href: "/#footer" }
+  { label: "About Us", href: "/about" }
 ];
 
 type NavUser = {
