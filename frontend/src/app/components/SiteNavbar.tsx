@@ -44,6 +44,12 @@ export default function SiteNavbar() {
 
         <div className="hidden shrink-0 items-center gap-3 xl:flex">
           <a
+            href="/student-dashboard"
+            className="inline-flex h-12 min-w-[92px] items-center justify-center whitespace-nowrap rounded-xl border border-purple-200 bg-purple-50 px-5 text-[15px] font-black text-purple-700 shadow-[0_10px_24px_rgba(139,92,246,0.10)] transition hover:-translate-y-0.5 hover:bg-purple-700 hover:text-white hover:border-purple-700"
+          >
+            My Dashboard
+          </a>
+          <a
             href="/login"
             className="inline-flex h-12 min-w-[92px] items-center justify-center whitespace-nowrap rounded-xl border border-slate-300 bg-white px-5 text-[15px] font-black text-slate-950 shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:border-blue-700 hover:bg-blue-700 hover:text-white"
           >
@@ -80,6 +86,13 @@ export default function SiteNavbar() {
               </a>
             ))}
             <div className="mt-2 grid grid-cols-2 gap-2">
+              <a
+                href="/student-dashboard"
+                onClick={() => setMenuOpen(false)}
+                className="col-span-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 text-center text-base font-black text-purple-700 transition hover:bg-purple-700 hover:text-white"
+              >
+                My Dashboard
+              </a>
               <a
                 href="/login"
                 onClick={() => setMenuOpen(false)}
