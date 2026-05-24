@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import mysql, { type Pool, type PoolOptions, type RowDataPacket } from "mysql2/promise";
 import { id } from "@/lib/store";
 
@@ -25,6 +26,24 @@ declare global {
   var mysqlSchemaReady: Promise<void> | undefined;
 }
 
+function mysqlSslConfig(): PoolOptions["ssl"] {
+  const caPath = process.env.MYSQL_SSL_CA_PATH;
+  const ca =
+    process.env.MYSQL_SSL_CA ||
+    (caPath && fs.existsSync(caPath) ? fs.readFileSync(caPath, "utf8") : undefined);
+  const host = process.env.MYSQL_HOST || "";
+  const enabled =
+    process.env.MYSQL_SSL === "true" ||
+    Boolean(ca) ||
+    host.includes("tidbcloud.com");
+
+  if (!enabled) return undefined;
+
+  return ca
+    ? { ca, minVersion: "TLSv1.2", rejectUnauthorized: true }
+    : { minVersion: "TLSv1.2", rejectUnauthorized: true };
+}
+
 function mysqlConfig(): PoolOptions {
   return {
     host: process.env.MYSQL_HOST || "127.0.0.1",
@@ -32,6 +51,7 @@ function mysqlConfig(): PoolOptions {
     user: process.env.MYSQL_USER || "root",
     password: process.env.MYSQL_PASSWORD || "",
     database: process.env.MYSQL_DATABASE || "preschool",
+    ssl: mysqlSslConfig(),
     waitForConnections: true,
     connectionLimit: 10
   };

@@ -32,6 +32,7 @@ Open `http://localhost:4000/api/health`.
 Copy `.env.example` to `.env.local` and configure:
 
 - `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`
+- `MYSQL_SSL=true` for TiDB Cloud or any hosted MySQL that requires TLS
 - `JWT_SECRET`
 - `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `NEXT_PUBLIC_RAZORPAY_KEY_ID`
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`
