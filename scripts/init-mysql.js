@@ -24,12 +24,25 @@ for (const file of envFiles) {
 async function main() {
   const sqlPath = path.join(rootDir, "scripts", "mysql-schema.sql");
   const schema = fs.readFileSync(sqlPath, "utf8");
+  const caPath = process.env.MYSQL_SSL_CA_PATH;
+  const ca =
+    process.env.MYSQL_SSL_CA ||
+    (caPath && fs.existsSync(caPath) ? fs.readFileSync(caPath, "utf8") : undefined);
+  const sslEnabled =
+    process.env.MYSQL_SSL === "true" ||
+    Boolean(ca) ||
+    String(process.env.MYSQL_HOST || "").includes("tidbcloud.com");
 
   const connection = await mysql.createConnection({
     host: process.env.MYSQL_HOST || "127.0.0.1",
     port: Number(process.env.MYSQL_PORT || 3306),
     user: process.env.MYSQL_USER || "root",
     password: process.env.MYSQL_PASSWORD || "",
+    ssl: sslEnabled
+      ? ca
+        ? { ca, minVersion: "TLSv1.2", rejectUnauthorized: true }
+        : { minVersion: "TLSv1.2", rejectUnauthorized: true }
+      : undefined,
     multipleStatements: true
   });
 
