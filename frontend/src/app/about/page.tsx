@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
   Award,
@@ -25,6 +26,12 @@ const fadeUp = {
   hidden: { opacity: 0, y: 22 },
   visible: { opacity: 1, y: 0 }
 };
+
+const rotatingWords = [
+  { text: "creators", className: "from-blue-700 to-cyan-600" },
+  { text: "problem solvers", className: "from-rose-600 to-amber-500" },
+  { text: "brave", className: "from-violet-700 to-fuchsia-500" }
+];
 
 const metrics: { value: string; label: string; icon: Icon; accent: string }[] = [
   { value: "5-12", label: "Classes", icon: GraduationCap, accent: "from-blue-600 to-cyan-500" },
@@ -77,6 +84,18 @@ const timeline = [
 ];
 
 export default function AboutPage() {
+  const [wordIndex, setWordIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setWordIndex((current) => (current + 1) % rotatingWords.length);
+    }, 1600);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const activeWord = rotatingWords[wordIndex];
+
   return (
     <main className="min-h-screen overflow-hidden text-slate-950">
       <section className="relative min-h-[calc(100vh-80px)] overflow-hidden px-4 pb-12 pt-10 md:px-6">
@@ -98,19 +117,26 @@ export default function AboutPage() {
               </span>
               Future skills for confident students
             </motion.div>
-            <motion.h1 variants={fadeUp} className="mt-7 max-w-4xl text-4xl font-black leading-[1.04] text-slate-950 sm:text-5xl md:text-6xl">
+            <motion.h1 variants={fadeUp} className="mt-7 max-w-4xl text-3xl font-black leading-[1.08] text-slate-950 sm:text-4xl md:text-5xl">
               <span className="bg-gradient-to-r from-slate-950 via-blue-900 to-slate-950 bg-clip-text text-transparent">
                 ADYAPAN
               </span>{" "}
-              helps students become{" "}
-              <span className="bg-gradient-to-r from-blue-700 to-cyan-600 bg-clip-text text-transparent">
-                creators
+              helps students become
+              <span className="relative mt-3 block min-h-[1.18em] overflow-hidden sm:mt-4">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={activeWord.text}
+                    initial={{ opacity: 0, y: 18, filter: "blur(10px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -18, filter: "blur(10px)" }}
+                    transition={{ duration: 0.38, ease: "easeOut" }}
+                    className={`inline-block bg-gradient-to-r ${activeWord.className} bg-clip-text text-transparent`}
+                  >
+                    {activeWord.text}
+                  </motion.span>
+                </AnimatePresence>
+                <span className="ml-2 text-slate-950">.</span>
               </span>
-              ,{" "}
-              <span className="bg-gradient-to-r from-rose-600 to-amber-500 bg-clip-text text-transparent">
-                problem solvers
-              </span>
-              , and brave presenters.
             </motion.h1>
             <motion.p variants={fadeUp} className="mt-6 max-w-2xl text-lg font-semibold leading-8 text-slate-700">
               We bring{" "}
