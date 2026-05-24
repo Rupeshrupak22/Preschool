@@ -26,11 +26,11 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 }
 };
 
-const metrics = [
-  ["5-12", "Classes"],
-  ["10+", "Future skills"],
-  ["100%", "Project-first learning"],
-  ["24/7", "Digital access"]
+const metrics: { value: string; label: string; icon: Icon; accent: string }[] = [
+  { value: "5-12", label: "Classes", icon: GraduationCap, accent: "from-blue-600 to-cyan-500" },
+  { value: "10+", label: "Future skills", icon: Brain, accent: "from-violet-600 to-fuchsia-500" },
+  { value: "100%", label: "Project-first learning", icon: Target, accent: "from-emerald-600 to-teal-500" },
+  { value: "24/7", label: "Digital access", icon: Rocket, accent: "from-amber-500 to-rose-500" }
 ];
 
 const values: { title: string; copy: string; icon: Icon; tone: string }[] = [
@@ -82,38 +82,63 @@ export default function AboutPage() {
       <section className="relative min-h-[calc(100vh-80px)] overflow-hidden px-4 pb-12 pt-10 md:px-6">
         <div className="absolute inset-0">
           <img src="/bg-hero.jpg" alt="" className="h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.96)_0%,rgba(255,255,255,0.86)_44%,rgba(255,255,255,0.40)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.98)_0%,rgba(255,255,255,0.90)_45%,rgba(239,246,255,0.58)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.045)_1px,transparent_1px)] bg-[size:64px_64px] opacity-60" />
         </div>
 
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.92fr_1fr]">
           <motion.div initial="hidden" animate="visible" transition={{ staggerChildren: 0.12 }}>
             <motion.div
               variants={fadeUp}
-              className="inline-flex items-center gap-3 rounded-full border border-blue-200 bg-white/86 px-4 py-2 text-sm font-black text-blue-800 shadow-[0_14px_34px_rgba(37,99,235,0.12)]"
+              whileHover={{ y: -2, scale: 1.02 }}
+              className="inline-flex items-center gap-3 rounded-full border border-blue-200 bg-white/88 px-4 py-2 text-sm font-black text-blue-800 shadow-[0_14px_34px_rgba(37,99,235,0.12)] backdrop-blur"
             >
-              <Sparkles className="h-4 w-4" />
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-700 text-white">
+                <Sparkles className="h-4 w-4" />
+              </span>
               Future skills for confident students
             </motion.div>
-            <motion.h1 variants={fadeUp} className="mt-7 max-w-4xl text-4xl font-black leading-[1.05] sm:text-5xl md:text-6xl">
-              ADYAPAN helps students become creators, problem solvers, and brave presenters.
+            <motion.h1 variants={fadeUp} className="mt-7 max-w-4xl text-4xl font-black leading-[1.04] text-slate-950 sm:text-5xl md:text-6xl">
+              <span className="bg-gradient-to-r from-slate-950 via-blue-900 to-slate-950 bg-clip-text text-transparent">
+                ADYAPAN
+              </span>{" "}
+              helps students become{" "}
+              <span className="bg-gradient-to-r from-blue-700 to-cyan-600 bg-clip-text text-transparent">
+                creators
+              </span>
+              ,{" "}
+              <span className="bg-gradient-to-r from-rose-600 to-amber-500 bg-clip-text text-transparent">
+                problem solvers
+              </span>
+              , and brave presenters.
             </motion.h1>
             <motion.p variants={fadeUp} className="mt-6 max-w-2xl text-lg font-semibold leading-8 text-slate-700">
-              We bring coding, AI, robotics, communication, and certification into one joyful learning ecosystem for
-              schools and young learners.
+              We bring{" "}
+              <span className="font-black text-blue-700">coding</span>,{" "}
+              <span className="font-black text-violet-700">AI</span>,{" "}
+              <span className="font-black text-emerald-700">robotics</span>, communication, and certification into one
+              joyful learning ecosystem for schools and young learners.
             </motion.p>
             <motion.div variants={fadeUp} className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a
                 href="/signup"
-                className="inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-slate-950 px-7 font-black text-white shadow-[0_18px_38px_rgba(15,23,42,0.22)] transition hover:-translate-y-1"
+                className="group inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-slate-950 px-7 font-black text-white shadow-[0_18px_38px_rgba(15,23,42,0.22)] transition hover:-translate-y-1 hover:bg-blue-700 hover:shadow-[0_22px_44px_rgba(37,99,235,0.28)]"
               >
-                Start Learning <ArrowRight className="h-5 w-5" />
+                Start Learning <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
               </a>
               <a
                 href="/#schools"
-                className="inline-flex h-14 items-center justify-center gap-3 rounded-xl border border-blue-200 bg-white px-7 font-black text-blue-800 shadow-[0_18px_38px_rgba(37,99,235,0.12)] transition hover:-translate-y-1"
+                className="inline-flex h-14 items-center justify-center gap-3 rounded-xl border border-blue-200 bg-white/90 px-7 font-black text-blue-800 shadow-[0_18px_38px_rgba(37,99,235,0.12)] backdrop-blur transition hover:-translate-y-1 hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-800"
               >
                 Partner With Us
               </a>
+            </motion.div>
+            <motion.div variants={fadeUp} className="mt-7 grid max-w-xl gap-3 sm:grid-cols-3">
+              {["Live projects", "Mentor support", "Skill reports"].map((item) => (
+                <div key={item} className="rounded-xl border border-blue-100 bg-white/82 px-4 py-3 text-sm font-black text-slate-700 shadow-sm backdrop-blur transition hover:-translate-y-1 hover:border-blue-300 hover:text-blue-800">
+                  {item}
+                </div>
+              ))}
             </motion.div>
           </motion.div>
 
@@ -121,19 +146,35 @@ export default function AboutPage() {
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
-            className="relative min-h-[420px] rounded-[28px] border border-white/70 bg-white/74 p-5 shadow-[0_28px_80px_rgba(37,99,235,0.18)] backdrop-blur"
+            className="relative min-h-[430px] overflow-hidden rounded-[30px] border border-white/80 bg-white/76 p-5 shadow-[0_28px_80px_rgba(37,99,235,0.18)] backdrop-blur"
           >
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-blue-100 bg-white/88 px-4 py-3 shadow-sm">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-700">Impact board</p>
+                <p className="mt-1 text-sm font-bold text-slate-500">Designed for measurable student growth</p>
+              </div>
+              <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">Live ready</span>
+            </div>
             <div className="grid h-full gap-4 sm:grid-cols-2">
-              {metrics.map(([value, label], index) => (
+              {metrics.map((metric, index) => (
                 <motion.div
-                  key={label}
+                  key={metric.label}
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
                   transition={{ delay: 0.15 + index * 0.08 }}
-                  className="flex min-h-40 flex-col justify-end rounded-2xl border border-blue-100 bg-white p-5 shadow-sm"
+                  className="group relative flex min-h-40 flex-col justify-between overflow-hidden rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-[0_22px_48px_rgba(37,99,235,0.16)]"
                 >
-                  <p className="text-4xl font-black text-blue-700">{value}</p>
-                  <p className="mt-2 text-sm font-black uppercase tracking-[0.12em] text-slate-500">{label}</p>
+                  <div className={`absolute left-0 top-0 h-1.5 w-full bg-gradient-to-r ${metric.accent}`} />
+                  <span className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${metric.accent} text-white shadow-[0_14px_28px_rgba(37,99,235,0.18)] transition group-hover:scale-110`}>
+                    <metric.icon className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <p className={`bg-gradient-to-r ${metric.accent} bg-clip-text text-4xl font-black text-transparent`}>
+                      {metric.value}
+                    </p>
+                    <p className="mt-2 text-sm font-black uppercase tracking-[0.12em] text-slate-500">{metric.label}</p>
+                  </div>
                 </motion.div>
               ))}
             </div>
