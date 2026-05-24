@@ -1,96 +1,120 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sparkles } from "lucide-react";
 
 // Main permanent navbar for every Next.js page. Keep page-level navbars out of routes.
 const navItems = [
   { label: "Home", href: "/#top" },
-  { label: "Coding", href: "/#curriculum" },
-  { label: "Robotics & AI", href: "/#curriculum" },
-  { label: "VR/AR Lab", href: "/#projects" },
+  { label: "Overview", href: "/#overview" },
+  { label: "Mentor", href: "/#mentor" },
+  { label: "My App", href: "/dashboard" },
   { label: "LMS", href: "/dashboard" },
-  { label: "Our App", href: "/our.html" },
-  { label: "Books", href: "/#footer" }
+  { label: "About Us", href: "/#about" }
 ];
 
 export default function SiteNavbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   return (
-    <nav className="fixed left-0 right-0 top-0 z-[100] border-b border-blue-100 bg-white/98 shadow-[0_8px_28px_rgba(37,99,235,0.08)] backdrop-blur-xl">
-      <div className="mx-auto flex h-[72px] max-w-[1500px] items-center justify-between gap-5 px-5 md:px-8">
-        <a href="/#top" className="flex shrink-0 items-center gap-3" aria-label="ADYAPAN School home">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-700 via-cyan-600 to-blue-950 text-sm font-black lowercase text-white shadow-[0_10px_24px_rgba(13,148,136,0.22)]">
-            ady.
-          </span>
+    <nav className="fixed left-0 right-0 top-0 z-[100] bg-gradient-to-r from-purple-400 via-pink-300 to-blue-300 shadow-[0_8px_32px_rgba(168,85,247,0.3)] backdrop-blur-md">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-2 left-10 w-3 h-3 bg-yellow-300 rounded-full animate-bounce" style={{ animationDelay: "0s" }} />
+        <div className="absolute top-4 right-20 w-2 h-2 bg-green-300 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
+        <div className="absolute top-3 left-1/3 w-2.5 h-2.5 bg-red-300 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
+      </div>
+
+      <div className="mx-auto flex h-[80px] max-w-[1500px] items-center justify-between gap-5 px-5 md:px-8 relative z-10">
+        {/* Logo with playful animation */}
+        <a href="/#top" className="flex shrink-0 items-center gap-3 group" aria-label="ADYAPAN School home">
+          <div className="relative">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-orange-400 to-red-500 text-sm font-black lowercase text-white shadow-[0_10px_24px_rgba(249,115,22,0.4)] group-hover:scale-110 transition-transform duration-300 animate-pulse">
+              ady.
+            </span>
+            <Sparkles className="absolute -top-1 -right-1 h-4 w-4 text-yellow-300 animate-spin" style={{ animationDuration: "3s" }} />
+          </div>
           <span className="leading-none">
-            <span className="block text-3xl font-black tracking-tight text-slate-950">Adyapan</span>
-            <span className="ml-1 block text-[10px] font-black uppercase tracking-[0.42em] text-slate-500">School</span>
+            <span className="block text-3xl font-black tracking-tight bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">Adyapan</span>
+            <span className="ml-1 block text-[10px] font-black uppercase tracking-[0.42em] bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">School</span>
           </span>
         </a>
 
-        <div className="hidden flex-1 items-center justify-center gap-1.5 rounded-full border border-blue-100 bg-white px-4 py-2 shadow-[0_10px_35px_rgba(37,99,235,0.12)] xl:flex">
+        {/* Desktop Navigation */}
+        <div className="hidden flex-1 items-center justify-center gap-2 rounded-full bg-white/40 backdrop-blur-md px-6 py-3 shadow-[0_10px_35px_rgba(168,85,247,0.2)] xl:flex border-2 border-white/60">
           {navItems.map((item) => (
             <a
               key={item.label}
               href={item.href}
-              className="relative inline-flex h-11 min-w-[92px] items-center justify-center whitespace-nowrap rounded-full px-4 text-[15px] font-black text-slate-950 transition duration-200 hover:-translate-y-0.5 hover:bg-blue-700 hover:text-white hover:shadow-[0_12px_24px_rgba(37,99,235,0.24)]"
+              onMouseEnter={() => setHoveredItem(item.label)}
+              onMouseLeave={() => setHoveredItem(null)}
+              className={`relative inline-flex h-12 min-w-[100px] items-center justify-center whitespace-nowrap rounded-full px-4 text-[18px] font-bold transition-all duration-300 transform ${
+                hoveredItem === item.label
+                  ? "bg-gradient-to-r from-yellow-300 to-orange-400 text-slate-900 scale-110 shadow-[0_8px_20px_rgba(249,115,22,0.4)] -translate-y-1"
+                  : "text-slate-900 hover:scale-105 hover:-translate-y-0.5"
+              }`}
             >
-              {item.label}
+              <span className="drop-shadow-lg">{item.label}</span>
+              {hoveredItem === item.label && (
+                <span className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-300 to-orange-400 opacity-0 animate-pulse" />
+              )}
             </a>
           ))}
         </div>
 
+        {/* Auth Buttons */}
         <div className="hidden shrink-0 items-center gap-3 xl:flex">
           <a
             href="/login"
-            className="inline-flex h-12 min-w-[92px] items-center justify-center whitespace-nowrap rounded-xl border border-slate-300 bg-white px-5 text-[15px] font-black text-slate-950 shadow-[0_10px_24px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:border-blue-700 hover:bg-blue-700 hover:text-white"
+            className="inline-flex h-12 min-w-[100px] items-center justify-center whitespace-nowrap rounded-full bg-white/80 backdrop-blur px-6 text-[16px] font-bold text-slate-900 shadow-[0_8px_20px_rgba(255,255,255,0.3)] transition-all duration-300 hover:scale-110 hover:-translate-y-1 hover:bg-white hover:shadow-[0_12px_28px_rgba(255,255,255,0.5)] border-2 border-white"
           >
             Login
           </a>
           <a
             href="/signup"
-            className="inline-flex h-12 min-w-[96px] items-center justify-center whitespace-nowrap rounded-xl bg-rose-600 px-5 text-[15px] font-black text-white shadow-[0_12px_26px_rgba(225,29,72,0.22)] transition hover:-translate-y-0.5 hover:bg-blue-800"
+            className="inline-flex h-12 min-w-[110px] items-center justify-center whitespace-nowrap rounded-full bg-gradient-to-r from-green-400 to-emerald-500 px-6 text-[16px] font-bold text-slate-900 shadow-[0_10px_28px_rgba(34,197,94,0.4)] transition-all duration-300 hover:scale-110 hover:-translate-y-1 hover:shadow-[0_14px_35px_rgba(34,197,94,0.6)] border-2 border-white/50"
           >
             Sign Up
           </a>
         </div>
 
+        {/* Mobile Menu Button */}
         <button
-          className="rounded-xl border border-blue-200 bg-white p-2 text-slate-950 shadow-[0_10px_28px_rgba(37,99,235,0.12)] transition hover:bg-blue-700 hover:text-white xl:hidden"
+          className="rounded-full border-2 border-white bg-white/40 backdrop-blur p-2.5 text-white shadow-[0_8px_20px_rgba(255,255,255,0.3)] transition-all duration-300 hover:bg-white/60 hover:scale-110 xl:hidden"
           onClick={() => setMenuOpen((value) => !value)}
           aria-label="Open navigation"
         >
-          {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
+      {/* Mobile Menu */}
       {menuOpen && (
-        <div className="border-t border-slate-200 bg-white px-4 py-4 xl:hidden">
-          <div className="grid gap-2">
+        <div className="border-t-2 border-white/40 bg-gradient-to-b from-purple-300 via-pink-200 to-blue-200 px-4 py-6 xl:hidden backdrop-blur-md">
+          <div className="grid gap-3">
             {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
-                className="rounded-xl px-4 py-3 text-base font-black text-slate-950 transition hover:bg-blue-700 hover:text-white"
+                className="rounded-full px-6 py-4 text-xl font-bold text-slate-900 bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_20px_rgba(168,85,247,0.4)] transform hover:-translate-y-1 drop-shadow-lg"
               >
                 {item.label}
               </a>
             ))}
-            <div className="mt-2 grid grid-cols-2 gap-2">
+            <div className="mt-4 grid grid-cols-2 gap-3">
               <a
                 href="/login"
                 onClick={() => setMenuOpen(false)}
-                className="rounded-xl border border-slate-200 px-4 py-3 text-center text-base font-black text-slate-950 transition hover:bg-blue-700 hover:text-white"
+                className="rounded-full px-4 py-3 text-center text-lg font-bold text-slate-900 bg-white/80 transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_20px_rgba(255,255,255,0.4)] border-2 border-white"
               >
                 Login
               </a>
               <a
                 href="/signup"
                 onClick={() => setMenuOpen(false)}
-                className="rounded-xl bg-rose-600 px-4 py-3 text-center text-base font-black text-white transition hover:bg-blue-800"
+                className="rounded-full px-4 py-3 text-center text-lg font-bold text-slate-900 bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-300 hover:scale-105 hover:shadow-[0_10px_24px_rgba(34,197,94,0.4)] border-2 border-white/50"
               >
                 Sign Up
               </a>
