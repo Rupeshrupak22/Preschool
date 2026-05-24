@@ -127,33 +127,37 @@ const testimonials = [
   }
 ];
 
-const heroPrograms: { title: string; range: string; icon: Icon; accent: string; avatar: string }[] = [
+const heroPrograms: { title: string; range: string; icon: Icon; ring: string; glow: string; avatar: string }[] = [
   {
     title: "Pre School",
     range: "Nursery to KG",
     icon: Sparkles,
-    accent: "from-rose-50 to-rose-100 border-rose-100",
+    ring: "border-pink-200/90",
+    glow: "from-pink-400/24 via-rose-300/16 to-yellow-300/20",
     avatar: "PS"
   },
   {
     title: "Primary",
     range: "Class 1-5",
     icon: BookOpen,
-    accent: "from-amber-50 to-yellow-100 border-amber-100",
+    ring: "border-amber-200/90",
+    glow: "from-amber-300/24 via-yellow-200/18 to-orange-300/20",
     avatar: "P"
   },
   {
     title: "Middle",
     range: "Class 6 to 8",
     icon: School,
-    accent: "from-cyan-50 to-teal-100 border-cyan-100",
+    ring: "border-cyan-200/90",
+    glow: "from-cyan-300/24 via-teal-200/18 to-blue-300/20",
     avatar: "M"
   },
   {
     title: "High School",
     range: "Class 9-12",
     icon: GraduationCap,
-    accent: "from-indigo-50 to-violet-100 border-indigo-100",
+    ring: "border-violet-200/90",
+    glow: "from-violet-300/24 via-indigo-200/18 to-purple-300/20",
     avatar: "HS"
   }
 ];
@@ -279,33 +283,39 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1, duration: 0.7 }}
-            className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+            className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4"
           >
             {heroPrograms.map((program, index) => (
               <a
                 key={program.title}
                 href="#curriculum"
-                className={`group min-h-[360px] overflow-hidden rounded-[28px] border-2 bg-gradient-to-b from-white/80 to-white/60 backdrop-blur p-5 text-center shadow-[0_20px_55px_rgba(168,85,247,0.2)] transition hover:-translate-y-2 hover:shadow-[0_28px_70px_rgba(168,85,247,0.3)] border-white/50 sm:min-h-[430px] sm:rounded-[36px] sm:p-6`}
+                className={`group relative min-h-[390px] overflow-hidden rounded-[30px] border-2 ${program.ring} bg-white/82 p-5 text-center shadow-[0_20px_60px_rgba(99,102,241,0.18)] backdrop-blur-xl transition duration-300 hover:-translate-y-3 hover:border-purple-300 hover:bg-white hover:shadow-[0_34px_80px_rgba(168,85,247,0.28)] sm:min-h-[455px] sm:rounded-[34px] sm:p-6`}
               >
-                <program.icon className="mx-auto h-14 w-14 text-purple-600 transition group-hover:scale-110 group-hover:text-pink-600" />
-                <h3 className="mt-6 text-2xl font-black text-slate-900">{program.title}</h3>
-                <p className="mt-2 text-lg font-bold text-slate-700">({program.range})</p>
-                <div className="relative mx-auto mt-8 flex h-44 w-32 items-end justify-center sm:mt-10 sm:h-52 sm:w-36">
-                  <div className="absolute bottom-0 h-32 w-28 rounded-t-[46px] rounded-b-[24px] bg-gradient-to-b from-purple-500 to-pink-600 shadow-xl transition group-hover:scale-105" />
-                  <div className="absolute bottom-24 h-24 w-24 rounded-full bg-gradient-to-b from-yellow-200 to-orange-300 shadow-lg" />
-                  <div className="absolute bottom-[138px] h-9 w-24 rounded-t-full bg-slate-900" />
-                  <div className="absolute bottom-[110px] flex gap-6">
-                    <span className="h-2.5 w-2.5 rounded-full bg-slate-950" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-slate-950" />
+                <div className={`absolute inset-x-4 bottom-3 top-28 rounded-[28px] bg-gradient-to-b ${program.glow} opacity-80 transition duration-300 group-hover:scale-105 group-hover:opacity-100`} />
+                <div className="absolute inset-0 rounded-[30px] ring-1 ring-inset ring-white/80" />
+                <div className="relative z-10">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-purple-100 bg-white text-purple-600 shadow-[0_14px_34px_rgba(168,85,247,0.18)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white">
+                    <program.icon className="h-9 w-9" />
                   </div>
-                  <div className="absolute bottom-[92px] h-2 w-8 rounded-full bg-green-400" />
-                  <div className="absolute bottom-8 rounded-xl bg-white/95 px-3 py-2 text-sm font-black text-purple-600 shadow">
-                    {program.avatar}
-                  </div>
-                  <div
-                    className={`absolute ${index % 2 === 0 ? "left-0" : "right-0"} bottom-2 h-14 w-14 rounded-2xl bg-white/80 shadow-md`}
-                  />
+                  <h3 className="mt-5 text-2xl font-black leading-tight text-slate-950">{program.title}</h3>
+                  <p className="mt-2 text-base font-black text-slate-600">({program.range})</p>
                 </div>
+                <div className="relative z-10 mx-auto mt-6 flex h-48 max-w-[168px] items-end justify-center sm:h-56">
+                  <div className="absolute bottom-0 h-28 w-36 rounded-[32px] bg-white/72 shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition duration-300 group-hover:scale-105" />
+                  <img
+                    src="/assets/school-boy.png"
+                    alt={`${program.title} student`}
+                    className="relative z-10 h-full w-auto object-contain drop-shadow-[0_22px_26px_rgba(88,28,135,0.20)] transition duration-300 group-hover:scale-110"
+                  />
+                  <span
+                    className={`absolute ${index % 2 === 0 ? "left-0" : "right-0"} bottom-8 z-20 rounded-2xl border border-white bg-white/92 px-3 py-2 text-sm font-black text-purple-700 shadow-[0_12px_28px_rgba(168,85,247,0.20)] transition duration-300 group-hover:-translate-y-1`}
+                  >
+                    {program.avatar}
+                  </span>
+                </div>
+                <span className="relative z-10 mt-5 inline-flex h-10 items-center justify-center rounded-full border border-purple-100 bg-white/82 px-4 text-sm font-black text-purple-700 shadow-sm transition duration-300 group-hover:border-purple-200 group-hover:bg-purple-600 group-hover:text-white">
+                  View Program
+                </span>
               </a>
             ))}
           </motion.div>
@@ -315,11 +325,14 @@ export default function Home() {
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.22, duration: 0.7 }}
-          className="relative mx-auto mb-10 grid max-w-6xl gap-4 rounded-[32px] border-2 border-white/60 bg-white/70 backdrop-blur p-5 shadow-[0_26px_70px_rgba(168,85,247,0.15)] sm:grid-cols-2 lg:grid-cols-4"
+          className="relative mx-auto mb-10 grid max-w-6xl gap-4 rounded-[32px] border-2 border-white/70 bg-white/78 p-5 shadow-[0_26px_70px_rgba(99,102,241,0.16)] backdrop-blur-xl sm:grid-cols-2 lg:grid-cols-4"
         >
           {heroBenefits.map((benefit) => (
-            <div key={benefit.title} className="flex items-center gap-4 rounded-2xl p-3 transition hover:bg-purple-100">
-              <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${benefit.color}`}>
+            <div
+              key={benefit.title}
+              className="group flex min-h-24 items-center gap-4 rounded-2xl border border-white/80 bg-white/64 p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-purple-200 hover:bg-white hover:shadow-[0_18px_36px_rgba(168,85,247,0.18)]"
+            >
+              <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${benefit.color} transition duration-300 group-hover:scale-110`}>
                 <benefit.icon className="h-7 w-7" />
               </span>
               <p className="text-base font-bold leading-6 text-slate-900">{benefit.title}</p>
