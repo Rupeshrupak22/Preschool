@@ -26,6 +26,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className={outfit.className}>
+        {/* Global shell: all App Router pages must keep this navbar and footer here. */}
         <SiteNavbar />
         {children}
         <SiteFooter />

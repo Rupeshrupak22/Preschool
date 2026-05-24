@@ -15,6 +15,13 @@
   box-sizing: border-box;
 }
 
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -47,7 +54,7 @@ body > * {
 
 main {
   position: relative;
-  padding-top: 72px;
+  padding-top: 80px;
   background: transparent !important;
   isolation: isolate;
 }
@@ -61,11 +68,24 @@ main > * {
   z-index: 1;
 }
 
+h1,
+h2,
+h3,
+h4,
+p,
+a,
+button,
+label,
+span {
+  overflow-wrap: break-word;
+}
+
 button,
 input,
 select,
 textarea {
   font: inherit;
+  min-width: 0;
 }
 
 button,

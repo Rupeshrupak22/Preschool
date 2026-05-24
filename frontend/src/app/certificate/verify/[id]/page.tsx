@@ -8,7 +8,7 @@ export default function CertificateVerifyPage({ params }: { params: { id: string
         <p className="mt-5 text-sm uppercase tracking-[0.22em] text-saffron-700">QR verification</p>
         <h1 className="mt-3 text-4xl font-semibold">Certificate verified</h1>
         <p className="mt-4 text-saffron-900/62">
-          Credential {params.id} is formatted for ADYAPAN QR verification and can be backed by MongoDB Atlas certificate records.
+          Credential {params.id} is formatted for ADYAPAN QR verification and can be backed by MySQL certificate records.
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="rounded-xl border border-slate-200 bg-white p-5">

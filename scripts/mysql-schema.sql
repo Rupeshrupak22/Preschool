@@ -1,0 +1,160 @@
+CREATE DATABASE IF NOT EXISTS preschool
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE preschool;
+
+CREATE TABLE IF NOT EXISTS users (
+  id VARCHAR(64) PRIMARY KEY,
+  name VARCHAR(160) NOT NULL,
+  email VARCHAR(190) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  phone VARCHAR(30),
+  class_level VARCHAR(80),
+  school_name VARCHAR(190),
+  role VARCHAR(30) NOT NULL DEFAULT 'student',
+  otp_verified BOOLEAN NOT NULL DEFAULT FALSE,
+  unlocked_courses JSON,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS students (
+  id VARCHAR(64) PRIMARY KEY,
+  user_id VARCHAR(64),
+  name VARCHAR(160) NOT NULL,
+  email VARCHAR(190) NOT NULL UNIQUE,
+  phone VARCHAR(30),
+  class_level VARCHAR(80),
+  school_name VARCHAR(190),
+  parent_name VARCHAR(160),
+  parent_phone VARCHAR(30),
+  status VARCHAR(40) NOT NULL DEFAULT 'active',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_students_user_id (user_id),
+  CONSTRAINT fk_students_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS schools (
+  id VARCHAR(64) PRIMARY KEY,
+  name VARCHAR(190) NOT NULL,
+  email VARCHAR(190),
+  phone VARCHAR(30),
+  city VARCHAR(120),
+  address TEXT,
+  contact_person VARCHAR(160),
+  status VARCHAR(40) NOT NULL DEFAULT 'lead',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS courses (
+  id VARCHAR(64) PRIMARY KEY,
+  title VARCHAR(190) NOT NULL,
+  slug VARCHAR(190) NOT NULL UNIQUE,
+  description TEXT,
+  level VARCHAR(80),
+  category VARCHAR(120),
+  duration VARCHAR(80),
+  price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  currency VARCHAR(10) NOT NULL DEFAULT 'INR',
+  status VARCHAR(40) NOT NULL DEFAULT 'active',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS leads (
+  id VARCHAR(64) PRIMARY KEY,
+  type VARCHAR(40) NOT NULL,
+  name VARCHAR(160),
+  email VARCHAR(190) NOT NULL,
+  phone VARCHAR(30),
+  school VARCHAR(190),
+  city VARCHAR(120),
+  message TEXT,
+  class_level VARCHAR(80),
+  interest VARCHAR(190),
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_leads_email (email)
+);
+
+CREATE TABLE IF NOT EXISTS payments (
+  id VARCHAR(64) PRIMARY KEY,
+  user_email VARCHAR(190) NOT NULL,
+  plan VARCHAR(160) NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  currency VARCHAR(10) NOT NULL DEFAULT 'INR',
+  razorpay_order_id VARCHAR(190) UNIQUE,
+  razorpay_payment_id VARCHAR(190),
+  status VARCHAR(40) NOT NULL DEFAULT 'created',
+  receipt_url TEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_payments_user_email (user_email)
+);
+
+CREATE TABLE IF NOT EXISTS enrollments (
+  id VARCHAR(64) PRIMARY KEY,
+  user_email VARCHAR(190) NOT NULL,
+  course_id VARCHAR(64),
+  course_title VARCHAR(190) NOT NULL,
+  payment_id VARCHAR(64),
+  status VARCHAR(40) NOT NULL DEFAULT 'active',
+  enrolled_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  completed_at DATETIME,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_enrollments_user_email (user_email),
+  CONSTRAINT fk_enrollments_course FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL,
+  CONSTRAINT fk_enrollments_payment FOREIGN KEY (payment_id) REFERENCES payments(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS certificates (
+  credential_id VARCHAR(90) PRIMARY KEY,
+  student_name VARCHAR(160) NOT NULL,
+  user_email VARCHAR(190) NOT NULL,
+  course VARCHAR(190) NOT NULL,
+  qr_code LONGTEXT,
+  issued_at DATETIME,
+  status VARCHAR(40) NOT NULL DEFAULT 'active',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_certificates_user_email (user_email)
+);
+
+CREATE TABLE IF NOT EXISTS notifications (
+  id VARCHAR(64) PRIMARY KEY,
+  user_email VARCHAR(190),
+  title VARCHAR(190) NOT NULL,
+  message TEXT NOT NULL,
+  channel VARCHAR(40) NOT NULL DEFAULT 'email',
+  status VARCHAR(40) NOT NULL DEFAULT 'queued',
+  read_at DATETIME,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_notifications_user_email (user_email)
+);
+
+CREATE TABLE IF NOT EXISTS otps (
+  id VARCHAR(64) PRIMARY KEY,
+  email VARCHAR(190) NOT NULL,
+  code VARCHAR(20) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  consumed_at DATETIME,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_otps_email (email)
+);
+
+CREATE TABLE IF NOT EXISTS login_events (
+  id VARCHAR(64) PRIMARY KEY,
+  user_id VARCHAR(64),
+  email VARCHAR(190) NOT NULL,
+  name VARCHAR(160),
+  role VARCHAR(30),
+  ip_address VARCHAR(80),
+  user_agent TEXT,
+  status VARCHAR(40) NOT NULL DEFAULT 'success',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_login_events_email (email)
+);
+
+SHOW TABLES;

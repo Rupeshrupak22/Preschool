@@ -31,11 +31,17 @@ Open `http://localhost:4000/api/health`.
 
 Copy `.env.example` to `.env.local` and configure:
 
-- `MONGODB_URI`
+- `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`
 - `JWT_SECRET`
 - `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `NEXT_PUBLIC_RAZORPAY_KEY_ID`
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`
 - `NEXT_PUBLIC_APP_URL`
+
+Initialize the MySQL database and tables:
+
+```bash
+npm run db:init
+```
 
 ## Main Frontend Routes
 

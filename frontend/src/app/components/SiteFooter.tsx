@@ -26,11 +26,11 @@ const socials = [
 
 export default function SiteFooter() {
   return (
-    <footer id="footer" className="relative overflow-hidden border-t border-blue-100 bg-white px-4 py-12 text-slate-950 md:px-6">
-      <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.15fr_1.1fr_.9fr_1.1fr]">
+    <footer id="footer" className="relative overflow-hidden border-t border-blue-100 bg-white px-4 py-10 text-slate-950 md:px-6 md:py-12">
+      <div className="mx-auto grid max-w-7xl gap-8 sm:grid-cols-2 lg:grid-cols-[1.15fr_1.1fr_.9fr_1.1fr] lg:gap-10">
         <div>
           <div className="flex flex-wrap items-end gap-3">
-            <span className="text-5xl font-black leading-none tracking-tight text-slate-950">Adyapan</span>
+            <span className="text-4xl font-black leading-none tracking-tight text-slate-950 sm:text-5xl">Adyapan</span>
             <span className="mb-1 rounded bg-cyan-600 px-3 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-white">
               Future
               <br />
@@ -62,7 +62,7 @@ export default function SiteFooter() {
           <h3 className="inline-block border-b-2 border-cyan-600 pb-2 text-2xl font-black text-slate-950">
             Learning Programs
           </h3>
-          <div className="mt-7 grid gap-5 text-base font-semibold leading-7 text-slate-950">
+          <div className="mt-6 grid gap-4 text-base font-semibold leading-7 text-slate-950 md:mt-7 md:gap-5">
             {learningPrograms.map((item) => (
               <a key={item} href="/#curriculum" className="transition hover:translate-x-1 hover:text-cyan-700">
                 {item}
@@ -75,7 +75,7 @@ export default function SiteFooter() {
           <h3 className="inline-block border-b-2 border-cyan-600 pb-2 text-2xl font-black text-slate-950">
             Quick Links
           </h3>
-          <div className="mt-7 grid gap-5 text-base font-semibold text-slate-950">
+          <div className="mt-6 grid gap-4 text-base font-semibold text-slate-950 md:mt-7 md:gap-5">
             {quickLinks.map(([label, href]) => (
               <a key={label} href={href} className="transition hover:translate-x-1 hover:text-cyan-700">
                 {label}
@@ -88,7 +88,7 @@ export default function SiteFooter() {
           <h3 className="inline-block border-b-2 border-cyan-600 pb-2 text-2xl font-black text-slate-950">
             Get In Touch
           </h3>
-          <div className="mt-7 grid gap-5 text-base font-semibold text-slate-950">
+          <div className="mt-6 grid gap-4 text-base font-semibold text-slate-950 md:mt-7 md:gap-5">
             <a href="mailto:info@adyapan.com" className="flex items-center gap-4 transition hover:text-cyan-700">
               <Mail className="h-5 w-5" /> info@adyapan.com
             </a>
@@ -113,7 +113,7 @@ export default function SiteFooter() {
 
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-blue-700 text-white shadow-[0_18px_38px_rgba(37,99,235,0.30)] transition hover:-translate-y-1 hover:bg-cyan-600"
+        className="fixed bottom-4 right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-blue-700 text-white shadow-[0_18px_38px_rgba(37,99,235,0.30)] transition hover:-translate-y-1 hover:bg-cyan-600 sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"
         aria-label="Back to top"
       >
         <ArrowUp className="h-6 w-6" />

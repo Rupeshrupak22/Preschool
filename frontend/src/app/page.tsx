@@ -251,15 +251,15 @@ export default function Home() {
               </span>
               Nurturing Minds. Building Futures.
             </div>
-            <h1 className="max-w-3xl text-6xl font-black leading-[0.96] tracking-tight bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent md:text-8xl">
+            <h1 className="max-w-3xl text-5xl font-black leading-[0.96] tracking-tight bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent sm:text-6xl md:text-8xl">
               Big Dreams <span className="block">Start Small</span>
             </h1>
-            <p className="mt-7 max-w-2xl text-xl font-bold leading-9 text-slate-900 md:text-2xl">
+            <p className="mt-7 max-w-2xl text-lg font-bold leading-8 text-slate-900 sm:text-xl md:text-2xl md:leading-9">
               Nurturing young minds from <span className="font-black text-purple-600">Pre School</span> and guiding them
               all the way to <span className="font-black text-purple-600">Class 12</span>.
             </p>
             <div className="mt-8 h-3 w-44 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 to-blue-400 shadow-lg" />
-            <div className="mt-9 flex flex-col gap-4 sm:flex-row">
+            <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
               <a
                 href="#curriculum"
                 className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 px-7 font-bold text-white shadow-[0_18px_34px_rgba(34,197,94,0.3)] transition hover:-translate-y-1 hover:shadow-[0_22px_42px_rgba(34,197,94,0.4)]"
@@ -285,12 +285,12 @@ export default function Home() {
               <a
                 key={program.title}
                 href="#curriculum"
-                className={`group min-h-[430px] overflow-hidden rounded-[36px] border-2 bg-gradient-to-b from-white/80 to-white/60 backdrop-blur p-6 text-center shadow-[0_20px_55px_rgba(168,85,247,0.2)] transition hover:-translate-y-2 hover:shadow-[0_28px_70px_rgba(168,85,247,0.3)] border-white/50`}
+                className={`group min-h-[360px] overflow-hidden rounded-[28px] border-2 bg-gradient-to-b from-white/80 to-white/60 backdrop-blur p-5 text-center shadow-[0_20px_55px_rgba(168,85,247,0.2)] transition hover:-translate-y-2 hover:shadow-[0_28px_70px_rgba(168,85,247,0.3)] border-white/50 sm:min-h-[430px] sm:rounded-[36px] sm:p-6`}
               >
                 <program.icon className="mx-auto h-14 w-14 text-purple-600 transition group-hover:scale-110 group-hover:text-pink-600" />
                 <h3 className="mt-6 text-2xl font-black text-slate-900">{program.title}</h3>
                 <p className="mt-2 text-lg font-bold text-slate-700">({program.range})</p>
-                <div className="relative mx-auto mt-10 flex h-52 w-36 items-end justify-center">
+                <div className="relative mx-auto mt-8 flex h-44 w-32 items-end justify-center sm:mt-10 sm:h-52 sm:w-36">
                   <div className="absolute bottom-0 h-32 w-28 rounded-t-[46px] rounded-b-[24px] bg-gradient-to-b from-purple-500 to-pink-600 shadow-xl transition group-hover:scale-105" />
                   <div className="absolute bottom-24 h-24 w-24 rounded-full bg-gradient-to-b from-yellow-200 to-orange-300 shadow-lg" />
                   <div className="absolute bottom-[138px] h-9 w-24 rounded-t-full bg-slate-900" />
@@ -351,7 +351,7 @@ export default function Home() {
                 Comprehensive learning pathways designed to equip students with essential 21st-century skills
                 through interactive, practical, and engaging classroom methodology.
               </p>
-              <div className="mt-7 grid max-w-md grid-cols-2 gap-4">
+          <div className="mt-7 grid max-w-md gap-4 sm:grid-cols-2">
                 {[
                   ["20K+", "Students enrolled"],
                   ["250+", "School workshops"]
