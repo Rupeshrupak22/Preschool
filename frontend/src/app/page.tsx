@@ -180,9 +180,9 @@ function SectionTitle({ eyebrow, title, copy }: { eyebrow: string; title: string
       transition={{ duration: 0.55 }}
       className="mx-auto mb-10 max-w-3xl text-center"
     >
-      <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-saffron-600">{eyebrow}</p>
-      <h2 className="text-3xl font-semibold leading-tight text-saffron-900 md:text-5xl">{title}</h2>
-      <p className="mt-4 text-base leading-7 text-saffron-900/68 md:text-lg">{copy}</p>
+      <p className="mb-3 text-sm font-bold uppercase tracking-[0.22em] text-purple-700">{eyebrow}</p>
+      <h2 className="text-3xl font-black leading-tight bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent md:text-5xl">{title}</h2>
+      <p className="mt-4 text-base font-bold leading-7 text-slate-800 md:text-lg">{copy}</p>
     </motion.div>
   );
 }
@@ -191,7 +191,7 @@ function Field(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className="h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-saffron-900 outline-none transition placeholder:text-saffron-900/40 focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
+      className="h-12 w-full rounded-lg border-2 border-white/60 bg-white/70 backdrop-blur px-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-600 focus:border-purple-400 focus:ring-4 focus:ring-purple-500/15"
     />
   );
 }
@@ -200,7 +200,7 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}
-      className="h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-saffron-900 outline-none transition focus:border-saffron-400 focus:ring-4 focus:ring-saffron-500/15"
+      className="h-12 w-full rounded-lg border-2 border-white/60 bg-white/70 backdrop-blur px-4 text-sm text-slate-900 outline-none transition focus:border-purple-400 focus:ring-4 focus:ring-purple-500/15"
     />
   );
 }
@@ -232,36 +232,43 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-ink text-saffron-900">
+    <main className="min-h-screen overflow-hidden bg-gradient-to-b from-purple-200 via-pink-100 to-blue-200 text-slate-900 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/bg-hero.jpg')" }}>
+      {/* Animated background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
+        <div className="absolute top-40 right-10 w-32 h-32 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
+        <div className="absolute -bottom-8 left-20 w-32 h-32 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
+      </div>
+
       <section id="top" className="relative min-h-[92vh] overflow-hidden px-4 pt-10 md:px-6">
-        <div className="absolute left-10 top-20 hidden h-20 w-20 rounded-full border border-amber-200 md:block" />
-        <div className="absolute right-8 top-28 hidden h-16 w-16 rounded-full border border-blue-200 md:block" />
+        <div className="absolute left-10 top-20 hidden h-20 w-20 rounded-full border-2 border-yellow-300 md:block animate-pulse" />
+        <div className="absolute right-8 top-28 hidden h-16 w-16 rounded-full border-2 border-green-300 md:block animate-pulse" style={{ animationDelay: "0.5s" }} />
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 pb-10 lg:grid-cols-[0.95fr_1.18fr]">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <div className="mb-7 inline-flex items-center gap-3 rounded-full border border-blue-100 bg-white px-4 py-2 text-sm font-black text-blue-950 shadow-[0_12px_32px_rgba(37,99,235,0.12)]">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 via-yellow-500 to-orange-500 text-white shadow-lg">
+            <div className="mb-7 inline-flex items-center gap-3 rounded-full border-2 border-white bg-white/60 backdrop-blur px-4 py-2 text-sm font-bold text-slate-900 shadow-[0_12px_32px_rgba(168,85,247,0.2)]">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-orange-400 to-red-500 text-white shadow-lg font-bold">
                 ady.
               </span>
               Nurturing Minds. Building Futures.
             </div>
-            <h1 className="max-w-3xl text-6xl font-black leading-[0.96] tracking-tight text-blue-950 md:text-8xl">
-              Big Dreams <span className="block text-rose-600">Start Small</span>
+            <h1 className="max-w-3xl text-6xl font-black leading-[0.96] tracking-tight bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent md:text-8xl">
+              Big Dreams <span className="block">Start Small</span>
             </h1>
-            <p className="mt-7 max-w-2xl text-xl font-semibold leading-9 text-blue-950/78 md:text-2xl">
-              Nurturing young minds from <span className="font-black text-blue-950">Pre School</span> and guiding them
-              all the way to <span className="font-black text-blue-950">Class 12</span>.
+            <p className="mt-7 max-w-2xl text-xl font-bold leading-9 text-slate-900 md:text-2xl">
+              Nurturing young minds from <span className="font-black text-purple-600">Pre School</span> and guiding them
+              all the way to <span className="font-black text-purple-600">Class 12</span>.
             </p>
-            <div className="mt-8 h-3 w-44 rounded-full bg-gradient-to-r from-amber-300 via-yellow-400 to-transparent" />
+            <div className="mt-8 h-3 w-44 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 to-blue-400 shadow-lg" />
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
               <a
                 href="#curriculum"
-                className="inline-flex h-14 items-center justify-center gap-3 rounded-2xl bg-rose-600 px-7 font-black text-white shadow-[0_18px_34px_rgba(225,29,72,0.24)] transition hover:-translate-y-1 hover:bg-blue-800"
+                className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 px-7 font-bold text-white shadow-[0_18px_34px_rgba(34,197,94,0.3)] transition hover:-translate-y-1 hover:shadow-[0_22px_42px_rgba(34,197,94,0.4)]"
               >
                 Explore Programs <ArrowRight className="h-5 w-5" />
               </a>
               <a
                 href="#demo"
-                className="inline-flex h-14 items-center justify-center gap-3 rounded-2xl border-2 border-slate-200 bg-white px-7 font-black text-slate-950 shadow-[0_14px_30px_rgba(15,23,42,0.08)] transition hover:-translate-y-1 hover:border-blue-700 hover:bg-blue-700 hover:text-white"
+                className="inline-flex h-14 items-center justify-center gap-3 rounded-full border-2 border-white bg-white/70 backdrop-blur px-7 font-bold text-slate-900 shadow-[0_14px_30px_rgba(255,255,255,0.3)] transition hover:-translate-y-1 hover:bg-white"
               >
                 <CalendarDays className="h-5 w-5" /> Book a Free Class
               </a>
@@ -278,21 +285,21 @@ export default function Home() {
               <a
                 key={program.title}
                 href="#curriculum"
-                className={`group min-h-[430px] overflow-hidden rounded-[36px] border bg-gradient-to-b ${program.accent} p-6 text-center shadow-[0_20px_55px_rgba(37,99,235,0.12)] transition hover:-translate-y-2 hover:shadow-[0_28px_70px_rgba(37,99,235,0.18)]`}
+                className={`group min-h-[430px] overflow-hidden rounded-[36px] border-2 bg-gradient-to-b from-white/80 to-white/60 backdrop-blur p-6 text-center shadow-[0_20px_55px_rgba(168,85,247,0.2)] transition hover:-translate-y-2 hover:shadow-[0_28px_70px_rgba(168,85,247,0.3)] border-white/50`}
               >
-                <program.icon className="mx-auto h-14 w-14 text-blue-700 transition group-hover:scale-110 group-hover:text-rose-600" />
-                <h3 className="mt-6 text-2xl font-black text-blue-950">{program.title}</h3>
-                <p className="mt-2 text-lg font-bold text-slate-950">({program.range})</p>
+                <program.icon className="mx-auto h-14 w-14 text-purple-600 transition group-hover:scale-110 group-hover:text-pink-600" />
+                <h3 className="mt-6 text-2xl font-black text-slate-900">{program.title}</h3>
+                <p className="mt-2 text-lg font-bold text-slate-700">({program.range})</p>
                 <div className="relative mx-auto mt-10 flex h-52 w-36 items-end justify-center">
-                  <div className="absolute bottom-0 h-32 w-28 rounded-t-[46px] rounded-b-[24px] bg-gradient-to-b from-blue-600 to-blue-800 shadow-xl transition group-hover:scale-105" />
-                  <div className="absolute bottom-24 h-24 w-24 rounded-full bg-gradient-to-b from-amber-100 to-orange-200 shadow-lg" />
+                  <div className="absolute bottom-0 h-32 w-28 rounded-t-[46px] rounded-b-[24px] bg-gradient-to-b from-purple-500 to-pink-600 shadow-xl transition group-hover:scale-105" />
+                  <div className="absolute bottom-24 h-24 w-24 rounded-full bg-gradient-to-b from-yellow-200 to-orange-300 shadow-lg" />
                   <div className="absolute bottom-[138px] h-9 w-24 rounded-t-full bg-slate-900" />
                   <div className="absolute bottom-[110px] flex gap-6">
                     <span className="h-2.5 w-2.5 rounded-full bg-slate-950" />
                     <span className="h-2.5 w-2.5 rounded-full bg-slate-950" />
                   </div>
-                  <div className="absolute bottom-[92px] h-2 w-8 rounded-full bg-rose-500" />
-                  <div className="absolute bottom-8 rounded-xl bg-white/92 px-3 py-2 text-sm font-black text-blue-950 shadow">
+                  <div className="absolute bottom-[92px] h-2 w-8 rounded-full bg-green-400" />
+                  <div className="absolute bottom-8 rounded-xl bg-white/95 px-3 py-2 text-sm font-black text-purple-600 shadow">
                     {program.avatar}
                   </div>
                   <div
@@ -308,20 +315,20 @@ export default function Home() {
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.22, duration: 0.7 }}
-          className="relative mx-auto mb-10 grid max-w-6xl gap-4 rounded-[32px] border border-blue-100 bg-white/92 p-5 shadow-[0_26px_70px_rgba(37,99,235,0.14)] backdrop-blur sm:grid-cols-2 lg:grid-cols-4"
+          className="relative mx-auto mb-10 grid max-w-6xl gap-4 rounded-[32px] border-2 border-white/60 bg-white/70 backdrop-blur p-5 shadow-[0_26px_70px_rgba(168,85,247,0.15)] sm:grid-cols-2 lg:grid-cols-4"
         >
           {heroBenefits.map((benefit) => (
-            <div key={benefit.title} className="flex items-center gap-4 rounded-2xl p-3 transition hover:bg-blue-50">
+            <div key={benefit.title} className="flex items-center gap-4 rounded-2xl p-3 transition hover:bg-purple-100">
               <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${benefit.color}`}>
                 <benefit.icon className="h-7 w-7" />
               </span>
-              <p className="text-base font-black leading-6 text-slate-950">{benefit.title}</p>
+              <p className="text-base font-bold leading-6 text-slate-900">{benefit.title}</p>
             </div>
           ))}
         </motion.div>
       </section>
 
-      <section id="curriculum" className="px-4 py-20 md:px-6">
+      <section id="curriculum" className="px-4 py-20 md:px-6 relative">
         <div className="mx-auto max-w-7xl">
           <div className="grid items-start gap-8 lg:grid-cols-[0.72fr_1fr]">
             <motion.div
@@ -331,16 +338,16 @@ export default function Home() {
               viewport={{ once: true, margin: "-120px" }}
               transition={{ duration: 0.55 }}
             >
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-saffron-500/20 bg-white px-4 py-2 text-xs font-bold text-saffron-800 shadow-[0_10px_28px_rgba(37,99,235,0.1)]">
-                <span className="h-2 w-2 rounded-full bg-saffron-500" />
-                <span className="h-2 w-2 rounded-full bg-saffron-700" />
-                <span className="h-2 w-2 rounded-full bg-saffron-500" />
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border-2 border-purple-300 bg-white/70 backdrop-blur px-4 py-2 text-xs font-bold text-purple-700 shadow-[0_10px_28px_rgba(168,85,247,0.15)]">
+                <span className="h-2 w-2 rounded-full bg-yellow-400" />
+                <span className="h-2 w-2 rounded-full bg-pink-400" />
+                <span className="h-2 w-2 rounded-full bg-blue-400" />
                 ADYAPAN Curriculum
               </div>
-              <h2 className="text-4xl font-black leading-tight text-saffron-900 md:text-5xl">
-                Skilling Curriculum <span className="text-saffron-500">for classrooms</span>
+              <h2 className="text-4xl font-black leading-tight bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent md:text-5xl">
+                Skilling Curriculum <span className="text-blue-600">for classrooms</span>
               </h2>
-              <p className="mt-5 max-w-lg text-base font-medium leading-7 text-saffron-900/70">
+              <p className="mt-5 max-w-lg text-base font-bold leading-7 text-slate-800">
                 Comprehensive learning pathways designed to equip students with essential 21st-century skills
                 through interactive, practical, and engaging classroom methodology.
               </p>
@@ -351,10 +358,10 @@ export default function Home() {
                 ].map(([value, label]) => (
                   <div
                     key={label}
-                    className="rounded-2xl border border-saffron-500/15 bg-white p-5 text-center shadow-[0_16px_34px_rgba(37,99,235,0.12)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white"
+                    className="rounded-2xl border-2 border-white/60 bg-white/70 backdrop-blur p-5 text-center shadow-[0_16px_34px_rgba(168,85,247,0.15)] transition hover:-translate-y-1 hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 hover:text-white hover:border-white"
                   >
                     <p className="text-2xl font-black">{value}</p>
-                    <p className="mt-1 text-xs font-semibold">{label}</p>
+                    <p className="mt-1 text-xs font-bold">{label}</p>
                   </div>
                 ))}
               </div>
@@ -366,15 +373,15 @@ export default function Home() {
               whileInView="show"
               viewport={{ once: true, margin: "-120px" }}
               transition={{ delay: 0.08, duration: 0.55 }}
-              className="rounded-[24px] border border-saffron-500/12 bg-white p-6 shadow-[0_22px_55px_rgba(15,23,42,0.12)] transition hover:-translate-y-1 hover:border-saffron-500/30"
+              className="rounded-[24px] border-2 border-white/60 bg-white/70 backdrop-blur p-6 shadow-[0_22px_55px_rgba(168,85,247,0.15)] transition hover:-translate-y-1 hover:border-white"
             >
               <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-saffron-500 text-white shadow-[0_14px_30px_rgba(37,99,235,0.26)]">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-[0_14px_30px_rgba(168,85,247,0.3)] font-bold">
                   <Code2 className="h-8 w-8" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-saffron-900">Coding</h3>
-                  <p className="mt-2 max-w-2xl text-sm font-medium leading-7 text-saffron-900/68">
+                  <h3 className="text-2xl font-black text-slate-900">Coding</h3>
+                  <p className="mt-2 max-w-2xl text-sm font-bold leading-7 text-slate-800">
                     Introduce coding skills to young learners, promoting logical thinking, computational skills,
                     and confidence to build real digital projects.
                   </p>
@@ -392,48 +399,48 @@ export default function Home() {
                 whileInView="show"
                 viewport={{ once: true, margin: "-90px" }}
                 transition={{ delay: index * 0.035, duration: 0.45 }}
-                className={`group rounded-2xl border bg-white p-6 shadow-[0_16px_40px_rgba(15,23,42,0.1)] transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white hover:shadow-[0_22px_48px_rgba(37,99,235,0.24)] ${
-                  index === 0 ? "border-saffron-400 ring-2 ring-saffron-300/35" : "border-saffron-500/12"
+                className={`group rounded-2xl border-2 bg-white/70 backdrop-blur p-6 shadow-[0_16px_40px_rgba(168,85,247,0.15)] transition hover:-translate-y-1 hover:bg-gradient-to-br hover:from-purple-400 hover:to-pink-400 hover:text-white hover:shadow-[0_22px_48px_rgba(168,85,247,0.3)] hover:border-white ${
+                  index === 0 ? "border-purple-300 ring-2 ring-purple-200/50" : "border-white/60"
                 }`}
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-saffron-500/20 bg-saffron-50 text-saffron-600 transition group-hover:border-white/25 group-hover:bg-white/20 group-hover:text-white">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-purple-200 bg-purple-100 text-purple-600 transition group-hover:border-white/25 group-hover:bg-white/20 group-hover:text-white">
                   <program.icon className="h-6 w-6" />
                 </div>
-                <h3 className="mt-5 text-lg font-black text-saffron-900 transition group-hover:text-white">
+                <h3 className="mt-5 text-lg font-black text-slate-900 transition group-hover:text-white">
                   {program.title}
                 </h3>
-                <p className="mt-4 min-h-16 text-sm font-medium leading-6 text-saffron-900/68 transition group-hover:text-white/90">
+                <p className="mt-4 min-h-16 text-sm font-bold leading-6 text-slate-800 transition group-hover:text-white/90">
                   {program.copy}
                 </p>
-                <p className="mt-5 flex items-center gap-2 text-xs font-bold text-saffron-800 transition group-hover:text-white">
-                  <span className="h-2 w-2 rounded-full bg-saffron-500 transition group-hover:bg-white" />
+                <p className="mt-5 flex items-center gap-2 text-xs font-bold text-purple-700 transition group-hover:text-white">
+                  <span className="h-2 w-2 rounded-full bg-gradient-to-r from-yellow-400 to-pink-400 transition group-hover:bg-white" />
                   Available
                 </p>
               </motion.div>
             ))}
           </div>
 
-          <div className="mt-9 rounded-[22px] border border-saffron-500/16 bg-white p-7 text-center shadow-[0_18px_48px_rgba(15,23,42,0.1)]">
-            <h3 className="text-2xl font-black text-saffron-900">Ready to transform education?</h3>
-            <p className="mx-auto mt-3 max-w-2xl text-sm font-medium leading-6 text-saffron-900/66">
+          <div className="mt-9 rounded-[22px] border-2 border-white/60 bg-white/70 backdrop-blur p-7 text-center shadow-[0_18px_48px_rgba(168,85,247,0.15)]">
+            <h3 className="text-2xl font-black text-slate-900">Ready to transform education?</h3>
+            <p className="mx-auto mt-3 max-w-2xl text-sm font-bold leading-6 text-slate-800">
               Join schools and students using ADYAPAN's future skills curriculum to prepare learners for tomorrow.
             </p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <a
                 href="tel:+919000000000"
-                className="inline-flex h-11 items-center justify-center rounded-lg bg-saffron-500 px-6 text-sm font-black text-white shadow-[0_12px_26px_rgba(37,99,235,0.22)] transition hover:-translate-y-1 hover:bg-saffron-700"
+                className="inline-flex h-11 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 text-sm font-bold text-white shadow-[0_12px_26px_rgba(168,85,247,0.3)] transition hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(168,85,247,0.4)]"
               >
                 WhatsApp
               </a>
               <a
                 href="#demo"
-                className="inline-flex h-11 items-center justify-center rounded-lg bg-saffron-900 px-6 text-sm font-black text-white shadow-[0_12px_26px_rgba(15,23,42,0.16)] transition hover:-translate-y-1 hover:bg-saffron-700"
+                className="inline-flex h-11 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 px-6 text-sm font-bold text-white shadow-[0_12px_26px_rgba(59,130,246,0.3)] transition hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(59,130,246,0.4)]"
               >
                 Schedule a Demo
               </a>
               <button
                 onClick={() => setStatus("ADYAPAN brochure download will be connected with the final PDF.")}
-                className="inline-flex h-11 items-center justify-center rounded-lg border border-saffron-500/25 bg-white px-6 text-sm font-black text-saffron-800 transition hover:-translate-y-1 hover:bg-saffron-500 hover:text-white"
+                className="inline-flex h-11 items-center justify-center rounded-full border-2 border-white/60 bg-white/70 backdrop-blur px-6 text-sm font-bold text-slate-900 transition hover:-translate-y-1 hover:bg-white hover:border-white"
               >
                 Download Brochure
               </button>
@@ -442,7 +449,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="path" className="bg-white/70 px-4 py-20 md:px-6">
+      <section id="path" className="bg-gradient-to-r from-purple-200/50 via-pink-100/50 to-blue-200/50 px-4 py-20 md:px-6">
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Learning path"
@@ -451,29 +458,29 @@ export default function Home() {
           />
           <div className="grid gap-6 lg:grid-cols-2">
             {paths.map((path) => (
-              <div key={path.title} className="glass rounded-2xl p-6">
+              <div key={path.title} className="rounded-2xl border-2 border-white/60 bg-white/70 backdrop-blur p-6 shadow-[0_16px_40px_rgba(168,85,247,0.15)] transition hover:-translate-y-1">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-sm text-saffron-700">{path.level}</p>
-                    <h3 className="mt-1 text-2xl font-semibold">{path.title}</h3>
+                    <p className="text-sm font-bold text-purple-700">{path.level}</p>
+                    <h3 className="mt-1 text-2xl font-black text-slate-900">{path.title}</h3>
                   </div>
-                  <GraduationCap className="h-10 w-10 text-saffron-600" />
+                  <GraduationCap className="h-10 w-10 text-pink-600" />
                 </div>
                 <div className="mt-8 grid gap-4">
                   {path.steps.map((step, index) => (
                     <div key={step} className="grid grid-cols-[2.5rem_1fr] items-center gap-4">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-saffron-300/30 bg-saffron-500/15 text-sm font-semibold">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-purple-200 bg-gradient-to-br from-purple-300 to-pink-300 text-sm font-bold text-white">
                         {index + 1}
                       </span>
-                      <div className="rounded-lg border border-slate-200 bg-white px-4 py-3">
-                        <p className="font-medium">{step}</p>
+                      <div className="rounded-lg border-2 border-white/60 bg-white/70 backdrop-blur px-4 py-3">
+                        <p className="font-bold text-slate-900">{step}</p>
                       </div>
                     </div>
                   ))}
                 </div>
                 <div className="mt-6 flex flex-wrap gap-2">
                   {path.courses.map((course) => (
-                    <span key={course} className="rounded-full bg-blue-50 px-3 py-1 text-sm text-saffron-900/70">
+                    <span key={course} className="rounded-full bg-gradient-to-r from-purple-200 to-pink-200 px-3 py-1 text-sm font-bold text-slate-900">
                       {course}
                     </span>
                   ))}
@@ -492,15 +499,15 @@ export default function Home() {
             copy="Premium credentials with QR verification, downloadable records, and exam enrollment workflows."
           />
           <div className="grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
-            <div className="glass rounded-2xl p-6">
-              <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-saffron-500/30 via-white/8 to-saffron-900/24 p-6">
-                <div className="absolute right-4 top-4 rounded-lg bg-white p-2">
-                  <QrCode className="h-8 w-8 text-saffron-900" />
+            <div className="rounded-2xl border-2 border-white/60 bg-white/70 backdrop-blur p-6 shadow-[0_16px_40px_rgba(168,85,247,0.15)]">
+              <div className="relative overflow-hidden rounded-xl border-2 border-white/60 bg-gradient-to-br from-purple-300/30 via-white/8 to-pink-300/24 p-6">
+                <div className="absolute right-4 top-4 rounded-lg bg-white/80 p-2">
+                  <QrCode className="h-8 w-8 text-purple-600" />
                 </div>
-                <p className="text-sm uppercase tracking-[0.22em] text-saffron-700">ADYAPAN Credential</p>
-                <h3 className="mt-12 text-3xl font-semibold">AI Builder Certificate</h3>
-                <p className="mt-3 text-saffron-900/64">Awarded for project mastery, exam performance, and mentor review.</p>
-                <div className="mt-10 flex items-center justify-between border-t border-slate-200 pt-4 text-sm text-saffron-900/62">
+                <p className="text-sm font-bold uppercase tracking-[0.22em] text-purple-700">ADYAPAN Credential</p>
+                <h3 className="mt-12 text-3xl font-black text-slate-900">AI Builder Certificate</h3>
+                <p className="mt-3 text-slate-800 font-bold">Awarded for project mastery, exam performance, and mentor review.</p>
+                <div className="mt-10 flex items-center justify-between border-t-2 border-white/60 pt-4 text-sm font-bold text-slate-800">
                   <span>ID ADY-CERT-2026</span>
                   <span>QR Verified</span>
                 </div>
@@ -508,13 +515,13 @@ export default function Home() {
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 <button
                   onClick={() => setStatus("Certificate preview downloaded as a production-ready flow placeholder.")}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-50 font-semibold hover:bg-blue-100"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white/70 backdrop-blur border-2 border-white/60 font-bold text-slate-900 hover:bg-white transition"
                 >
                   <Download className="h-4 w-4" /> Download
                 </button>
                 <a
                   href="/signup"
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-saffron-500 font-semibold shadow-glow hover:bg-saffron-400"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 font-bold text-white shadow-[0_12px_26px_rgba(34,197,94,0.3)] hover:-translate-y-1 transition"
                 >
                   Exam Enrollment <ArrowRight className="h-4 w-4" />
                 </a>
@@ -522,11 +529,11 @@ export default function Home() {
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               {certificates.map((certificate) => (
-                <div key={certificate} className="rounded-xl border border-slate-200 bg-white p-5 transition hover:-translate-y-1 hover:border-saffron-300/40">
-                  <ShieldCheck className="h-8 w-8 text-saffron-600" />
-                  <h3 className="mt-5 text-xl font-semibold">{certificate}</h3>
-                  <p className="mt-3 text-sm leading-6 text-saffron-900/58">Exam, QR credential, mentor remark, and portfolio linkage.</p>
-                  <a href="/signup" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-saffron-700">
+                <div key={certificate} className="rounded-xl border-2 border-white/60 bg-white/70 backdrop-blur p-5 transition hover:-translate-y-1 hover:border-purple-300">
+                  <ShieldCheck className="h-8 w-8 text-purple-600" />
+                  <h3 className="mt-5 text-xl font-black text-slate-900">{certificate}</h3>
+                  <p className="mt-3 text-sm font-bold leading-6 text-slate-800">Exam, QR credential, mentor remark, and portfolio linkage.</p>
+                  <a href="/signup" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-purple-700">
                     Enroll <ArrowRight className="h-4 w-4" />
                   </a>
                 </div>
@@ -536,7 +543,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="projects" className="bg-white/70 px-4 py-20 md:px-6">
+      <section id="projects" className="bg-gradient-to-r from-purple-200/50 via-pink-100/50 to-blue-200/50 px-4 py-20 md:px-6">
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Student projects"
@@ -545,23 +552,23 @@ export default function Home() {
           />
           <div className="no-scrollbar flex snap-x gap-4 overflow-x-auto pb-4">
             {projects.map((project) => (
-              <div key={project.title} className="glass min-w-[280px] snap-start rounded-2xl p-5 md:min-w-[360px]">
-                <div className="flex aspect-video items-center justify-center rounded-xl border border-blue-100 bg-blue-50">
-                  <Play className="h-12 w-12 text-saffron-600" />
+              <div key={project.title} className="min-w-[280px] snap-start rounded-2xl border-2 border-white/60 bg-white/70 backdrop-blur p-5 shadow-[0_16px_40px_rgba(168,85,247,0.15)] md:min-w-[360px] transition hover:-translate-y-1">
+                <div className="flex aspect-video items-center justify-center rounded-xl border-2 border-purple-200 bg-gradient-to-br from-purple-100 to-pink-100">
+                  <Play className="h-12 w-12 text-purple-600" />
                 </div>
-                <p className="mt-5 text-sm text-saffron-700">{project.type}</p>
-                <h3 className="mt-1 text-xl font-semibold">{project.title}</h3>
-                <p className="mt-3 text-saffron-900/58">{project.stat}</p>
+                <p className="mt-5 text-sm font-bold text-purple-700">{project.type}</p>
+                <h3 className="mt-1 text-xl font-black text-slate-900">{project.title}</h3>
+                <p className="mt-3 font-bold text-slate-800">{project.stat}</p>
                 <div className="mt-5 flex gap-3">
                   <button
                     onClick={() => setStatus(`${project.title} GitHub workspace opened.`)}
-                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-blue-50 text-sm font-semibold hover:bg-blue-100"
+                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-full bg-purple-100 text-sm font-bold text-purple-700 hover:bg-purple-200 transition"
                   >
                     <Github className="h-4 w-4" /> GitHub
                   </button>
                   <button
                     onClick={() => setStatus(`${project.title} demo launched.`)}
-                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-saffron-500 text-sm font-semibold hover:bg-saffron-400"
+                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 text-sm font-bold text-white hover:shadow-lg transition"
                   >
                     <ExternalLink className="h-4 w-4" /> Demo
                   </button>
@@ -582,23 +589,23 @@ export default function Home() {
             />
             <div className="grid gap-4 sm:grid-cols-2">
               {["AI Curriculum", "Coding Labs", "Robotics Workshops", "Teacher Training", "Future Skills Programs", "Analytics"].map((item) => (
-                <div key={item} className="rounded-xl border border-slate-200 bg-white p-5">
-                  <School className="h-7 w-7 text-saffron-600" />
-                  <p className="mt-4 font-semibold">{item}</p>
+                <div key={item} className="rounded-xl border-2 border-white/60 bg-white/70 backdrop-blur p-5 transition hover:-translate-y-1 hover:border-purple-300">
+                  <School className="h-7 w-7 text-purple-600" />
+                  <p className="mt-4 font-bold text-slate-900">{item}</p>
                 </div>
               ))}
             </div>
           </div>
-          <form id="demo" onSubmit={(event) => submitLead(event, "school")} className="glass rounded-2xl p-6">
-            <p className="text-sm uppercase tracking-[0.2em] text-saffron-700">Partnership CTA</p>
-            <h3 className="mt-3 text-2xl font-semibold">School onboarding form</h3>
+          <form id="demo" onSubmit={(event) => submitLead(event, "school")} className="rounded-2xl border-2 border-white/60 bg-white/70 backdrop-blur p-6 shadow-[0_16px_40px_rgba(168,85,247,0.15)]">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-700">Partnership CTA</p>
+            <h3 className="mt-3 text-2xl font-black text-slate-900">School onboarding form</h3>
             <div className="mt-6 grid gap-3">
               <Field name="name" placeholder="Coordinator name" required />
               <Field name="email" type="email" placeholder="Work email" required />
               <Field name="phone" placeholder="Phone" required />
               <Field name="school" placeholder="School name" required />
               <Field name="city" placeholder="City" required />
-              <button className="mt-2 h-12 rounded-lg bg-saffron-500 font-semibold shadow-glow transition hover:bg-saffron-400">
+              <button className="mt-2 h-12 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white shadow-[0_12px_26px_rgba(168,85,247,0.3)] transition hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(168,85,247,0.4)]">
                 Request Partnership
               </button>
             </div>
