@@ -85,12 +85,8 @@ export default function AdminPage() {
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
-            <a href="/" className="mb-6 inline-flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-saffron-500 font-black shadow-glow">A</span>
-              <span className="font-bold">ADYAPAN</span>
-            </a>
             <p className="text-sm uppercase tracking-[0.2em] text-saffron-700">Admin panel</p>
-            <h1 className="mt-2 text-3xl font-semibold md:text-5xl">Operations command center</h1>
+            <h1 className="mt-2 text-3xl font-semibold sm:text-4xl md:text-5xl">Operations command center</h1>
           </div>
           <button onClick={exportCsv} className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-saffron-500 px-5 font-semibold shadow-glow">
             <Download className="h-4 w-4" /> Export
@@ -115,13 +111,13 @@ export default function AdminPage() {
           <div className="glass rounded-2xl p-5">
             <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
               <h2 className="text-xl font-semibold">Analytics</h2>
-              <div className="relative">
+              <div className="relative w-full md:w-auto">
                 <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-saffron-900/38" />
                 <input
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search students"
-                  className="h-10 rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm outline-none focus:border-saffron-400"
+                  className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm outline-none focus:border-saffron-400 md:w-64"
                 />
               </div>
             </div>
@@ -154,25 +150,27 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-          <div className="grid grid-cols-4 border-b border-slate-200 px-4 py-3 text-sm font-semibold text-saffron-900/66">
-            <span>Name</span>
-            <span>Email</span>
-            <span>Class</span>
-            <span>Status</span>
-          </div>
-          {(filteredStudents.length ? filteredStudents : [
-            { name: "Aarav Sharma", email: "aarav@example.com", classLevel: "Class 8", status: "Active" },
-            { name: "Mira Iyer", email: "mira@example.com", classLevel: "Class 10", status: "Certified" },
-            { name: "Kabir Khan", email: "kabir@example.com", classLevel: "Class 6", status: "Trial" }
-          ]).map((student, index) => (
-            <div key={index} className="grid grid-cols-4 px-4 py-3 text-sm text-saffron-900/62 odd:bg-white/70">
-              <span>{String(student.name ?? "Student")}</span>
-              <span className="truncate">{String(student.email ?? "student@adyapan.com")}</span>
-              <span>{String(student.classLevel ?? "Class 8")}</span>
-              <span>{String(student.status ?? "Active")}</span>
+        <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+          <div className="min-w-[680px]">
+            <div className="grid grid-cols-4 border-b border-slate-200 px-4 py-3 text-sm font-semibold text-saffron-900/66">
+              <span>Name</span>
+              <span>Email</span>
+              <span>Class</span>
+              <span>Status</span>
             </div>
-          ))}
+            {(filteredStudents.length ? filteredStudents : [
+              { name: "Aarav Sharma", email: "aarav@example.com", classLevel: "Class 8", status: "Active" },
+              { name: "Mira Iyer", email: "mira@example.com", classLevel: "Class 10", status: "Certified" },
+              { name: "Kabir Khan", email: "kabir@example.com", classLevel: "Class 6", status: "Trial" }
+            ]).map((student, index) => (
+              <div key={index} className="grid grid-cols-4 px-4 py-3 text-sm text-saffron-900/62 odd:bg-white/70">
+                <span>{String(student.name ?? "Student")}</span>
+                <span className="truncate">{String(student.email ?? "student@adyapan.com")}</span>
+                <span>{String(student.classLevel ?? "Class 8")}</span>
+                <span>{String(student.status ?? "Active")}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </main>

@@ -1,7 +1,6 @@
-﻿import QRCode from "qrcode";
+import QRCode from "qrcode";
 import { NextResponse } from "next/server";
-import { connectDb, isMongoConfigured } from "@/lib/db";
-import { Certificate } from "@/lib/models";
+import { createCertificate, isMysqlConfigured } from "@/lib/db";
 import { id, store } from "@/lib/store";
 
 export async function POST(request: Request) {
@@ -24,14 +23,11 @@ export async function POST(request: Request) {
     status: "active"
   };
 
-  if (isMongoConfigured()) {
-    await connectDb();
-    await Certificate.create(certificate);
+  if (isMysqlConfigured()) {
+    await createCertificate(certificate);
   } else {
     store.certificates.push(certificate);
   }
 
   return NextResponse.json({ certificate, verifyUrl });
 }
-
-

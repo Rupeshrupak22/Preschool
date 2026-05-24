@@ -6,6 +6,7 @@
     "dev": "next dev frontend -p 3000",
     "dev:frontend": "next dev frontend -p 3000",
     "dev:backend": "node backend/server.js",
+    "db:init": "node scripts/init-mysql.js",
     "build": "next build frontend",
     "start": "next start frontend -p 3000",
     "lint": "next lint frontend"
@@ -16,7 +17,7 @@
     "framer-motion": "^12.23.24",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.468.0",
-    "mongoose": "^8.19.3",
+    "mysql2": "^3.22.3",
     "next": "^16.0.3",
     "nodemailer": "^8.0.7",
     "qrcode": "^1.5.4",

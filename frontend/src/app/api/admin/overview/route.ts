@@ -1,6 +1,5 @@
-﻿import { NextResponse } from "next/server";
-import { connectDb, isMongoConfigured } from "@/lib/db";
-import { Lead, Payment, User } from "@/lib/models";
+import { NextResponse } from "next/server";
+import { getAdminOverview, isMysqlConfigured } from "@/lib/db";
 import { currentUser } from "@/lib/security";
 import { store } from "@/lib/store";
 
@@ -11,15 +10,9 @@ export async function GET() {
     return NextResponse.json({ error: "Admin access required." }, { status: 403 });
   }
 
-  if (isMongoConfigured()) {
-    await connectDb();
-    const [students, leads, payments] = await Promise.all([
-      User.find({ role: "student" }).sort({ createdAt: -1 }).limit(50),
-      Lead.find({}).sort({ createdAt: -1 }).limit(50),
-      Payment.find({}).sort({ createdAt: -1 }).limit(50)
-    ]);
-
-    return NextResponse.json({ students, leads, payments, mode: "mongo" });
+  if (isMysqlConfigured()) {
+    const overview = await getAdminOverview();
+    return NextResponse.json({ ...overview, mode: "mysql" });
   }
 
   return NextResponse.json({
@@ -29,5 +22,3 @@ export async function GET() {
     mode: "dev"
   });
 }
-
-

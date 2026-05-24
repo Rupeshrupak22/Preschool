@@ -15,6 +15,13 @@
   box-sizing: border-box;
 }
 
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -47,7 +54,7 @@ body > * {
 
 main {
   position: relative;
-  padding-top: 72px;
+  padding-top: 80px;
   background: transparent !important;
   isolation: isolate;
 }
@@ -61,11 +68,24 @@ main > * {
   z-index: 1;
 }
 
+h1,
+h2,
+h3,
+h4,
+p,
+a,
+button,
+label,
+span {
+  overflow-wrap: break-word;
+}
+
 button,
 input,
 select,
 textarea {
   font: inherit;
+  min-width: 0;
 }
 
 button,
@@ -132,6 +152,30 @@ a {
   50% {
     transform: translate3d(18px, -24px, 0) scale(1.24);
   }
+}
+
+@keyframes blob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
 }
 
 .scan-line {

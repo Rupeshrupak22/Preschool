@@ -1,7 +1,6 @@
-﻿import bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import { connectDb, isMongoConfigured } from "@/lib/db";
-import { User } from "@/lib/models";
+import { createUser, findUserByEmail, isMysqlConfigured, recordLoginEvent } from "@/lib/db";
 import { sendEmail } from "@/lib/mail";
 import { signToken, strongPassword } from "@/lib/security";
 import { id, publicUser, store } from "@/lib/store";
@@ -21,24 +20,39 @@ export async function POST(request: Request) {
   const passwordHash = await bcrypt.hash(payload.data.password, 12);
   const role = payload.data.email.endsWith("@adyapan.com") ? "admin" : "student";
 
-  if (isMongoConfigured()) {
-    await connectDb();
-    const exists = await User.findOne({ email: payload.data.email });
+  if (isMysqlConfigured()) {
+    const exists = await findUserByEmail(payload.data.email);
 
     if (exists) {
       return NextResponse.json({ error: "An account already exists for this email." }, { status: 409 });
     }
 
-    const user = await User.create({ ...payload.data, passwordHash, role });
+    const user = await createUser({ ...payload.data, passwordHash, role });
+
+    if (!user) {
+      return NextResponse.json({ error: "MySQL is not configured correctly." }, { status: 500 });
+    }
+
     const token = signToken({ id: user.id, email: user.email, role, name: user.name });
+    await recordLoginEvent({
+      user,
+      ipAddress: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? request.headers.get("x-real-ip"),
+      userAgent: request.headers.get("user-agent"),
+      status: "signup"
+    });
     await sendEmail({
       to: user.email,
       subject: "Welcome to ADYAPAN Future Skills",
       html: `<p>Hi ${user.name}, your future skills account is ready.</p>`
     });
 
-    const response = NextResponse.json({ user: publicUser(user.toObject()), token });
-    response.cookies.set("adyapan_token", token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
+    const response = NextResponse.json({ user: publicUser(user), token, mode: "mysql" });
+    response.cookies.set("adyapan_token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/"
+    });
     return response;
   }
 
@@ -69,5 +83,3 @@ export async function POST(request: Request) {
   response.cookies.set("adyapan_token", token, { httpOnly: true, sameSite: "lax", secure: false, path: "/" });
   return response;
 }
-
-

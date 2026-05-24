@@ -1,7 +1,6 @@
-﻿import bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import { connectDb, isMongoConfigured } from "@/lib/db";
-import { User } from "@/lib/models";
+import { findUserByEmail, isMysqlConfigured, recordLoginEvent } from "@/lib/db";
 import { signToken } from "@/lib/security";
 import { publicUser, store } from "@/lib/store";
 import { loginSchema } from "@/lib/validators";
@@ -13,18 +12,27 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Enter a valid email, password, and CAPTCHA." }, { status: 400 });
   }
 
-  if (isMongoConfigured()) {
-    await connectDb();
-    const user = await User.findOne({ email: payload.data.email });
+  if (isMysqlConfigured()) {
+    const user = await findUserByEmail(payload.data.email);
     const valid = user ? await bcrypt.compare(payload.data.password, user.passwordHash) : false;
 
-    if (!valid) {
+    if (!valid || !user) {
       return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
     }
 
     const token = signToken({ id: user.id, email: user.email, role: user.role, name: user.name });
-    const response = NextResponse.json({ user: publicUser(user.toObject()), token });
-    response.cookies.set("adyapan_token", token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
+    await recordLoginEvent({
+      user,
+      ipAddress: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? request.headers.get("x-real-ip"),
+      userAgent: request.headers.get("user-agent")
+    });
+    const response = NextResponse.json({ user: publicUser(user), token, mode: "mysql" });
+    response.cookies.set("adyapan_token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/"
+    });
     return response;
   }
 
@@ -41,5 +49,3 @@ export async function POST(request: Request) {
   response.cookies.set("adyapan_token", token, { httpOnly: true, sameSite: "lax", secure: false, path: "/" });
   return response;
 }
-
-

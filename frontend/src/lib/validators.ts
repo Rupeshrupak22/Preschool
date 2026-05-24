@@ -5,8 +5,16 @@ export const signupSchema = z.object({
   email: z.string().email(),
   phone: z.string().min(8).max(15),
   classLevel: z.string().min(1),
+  schoolName: z.string().optional(),
   password: z.string().min(8),
   captcha: z.literal("ADYAPAN")
+});
+
+export const profileSchema = z.object({
+  name: z.string().min(2),
+  phone: z.string().min(8).max(15).optional().or(z.literal("")),
+  classLevel: z.string().min(1).optional().or(z.literal("")),
+  schoolName: z.string().max(190).optional().or(z.literal(""))
 });
 
 export const loginSchema = z.object({

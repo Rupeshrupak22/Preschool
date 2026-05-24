@@ -1,6 +1,5 @@
-﻿import { NextResponse } from "next/server";
-import { connectDb, isMongoConfigured } from "@/lib/db";
-import { Payment } from "@/lib/models";
+import { NextResponse } from "next/server";
+import { createPayment, isMysqlConfigured } from "@/lib/db";
 import { createPaymentOrder } from "@/lib/payments";
 import { id, store } from "@/lib/store";
 import { paymentOrderSchema } from "@/lib/validators";
@@ -23,14 +22,11 @@ export async function POST(request: Request) {
     createdAt: new Date().toISOString()
   };
 
-  if (isMongoConfigured()) {
-    await connectDb();
-    await Payment.create(payment);
+  if (isMysqlConfigured()) {
+    await createPayment(payment);
   } else {
     store.payments.push(payment);
   }
 
   return NextResponse.json({ order, payment, key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "dev_key" });
 }
-
-

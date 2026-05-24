@@ -1,4 +1,5 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { createOtp, isMysqlConfigured } from "@/lib/db";
 import { sendEmail } from "@/lib/mail";
 import { id, store } from "@/lib/store";
 
@@ -10,7 +11,13 @@ export async function POST(request: Request) {
   }
 
   const code = Math.floor(100000 + Math.random() * 900000).toString();
-  store.otps.push({ id: id("otp"), email, code, expiresAt: Date.now() + 10 * 60 * 1000 });
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+  if (isMysqlConfigured()) {
+    await createOtp({ email, code, expiresAt });
+  } else {
+    store.otps.push({ id: id("otp"), email, code, expiresAt: expiresAt.getTime() });
+  }
 
   await sendEmail({
     to: email,
@@ -20,5 +27,3 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ ok: true, devOtp: process.env.NODE_ENV === "production" ? undefined : code });
 }
-
-

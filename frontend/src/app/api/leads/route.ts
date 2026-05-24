@@ -1,6 +1,5 @@
-﻿import { NextResponse } from "next/server";
-import { connectDb, isMongoConfigured } from "@/lib/db";
-import { Lead } from "@/lib/models";
+import { NextResponse } from "next/server";
+import { createLead, isMysqlConfigured } from "@/lib/db";
 import { sendEmail } from "@/lib/mail";
 import { id, store } from "@/lib/store";
 import { leadSchema } from "@/lib/validators";
@@ -14,9 +13,8 @@ export async function POST(request: Request) {
 
   const lead = { id: id("lead"), ...payload.data, createdAt: new Date().toISOString() };
 
-  if (isMongoConfigured()) {
-    await connectDb();
-    await Lead.create(payload.data);
+  if (isMysqlConfigured()) {
+    await createLead(payload.data);
   } else {
     store.leads.push(lead);
   }
@@ -27,7 +25,5 @@ export async function POST(request: Request) {
     html: `<p>Thanks for reaching out. Our future skills team will contact you soon.</p>`
   });
 
-  return NextResponse.json({ ok: true, lead, mode: isMongoConfigured() ? "mongo" : "dev" });
+  return NextResponse.json({ ok: true, lead, mode: isMysqlConfigured() ? "mysql" : "dev" });
 }
-
-

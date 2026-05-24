@@ -63,7 +63,7 @@
       font-family: var(--font-sans);
       overflow-x: hidden;
       line-height: 1.6;
-      padding-top: 72px;
+      padding-top: 80px;
     }
 
     .adyapan-fixed-navbar {
@@ -72,16 +72,38 @@
       left: 0;
       right: 0;
       z-index: 9999;
-      height: 72px;
-      border-bottom: 1px solid rgba(191, 219, 254, 0.9);
-      background: rgba(255, 255, 255, 0.98);
-      box-shadow: 0 8px 28px rgba(37, 99, 235, 0.08);
+      height: 80px;
+      border-bottom: 0;
+      background: linear-gradient(90deg, #b565f2 0%, #efb7df 52%, #8ec9f6 100%);
+      box-shadow: 0 12px 36px rgba(99, 102, 241, 0.24);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
     }
 
+    .adyapan-fixed-navbar::before {
+      content: "";
+      position: absolute;
+      left: 36px;
+      top: 13px;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: #f6d748;
+    }
+
+    .adyapan-fixed-navbar::after {
+      content: "✦";
+      position: absolute;
+      left: 82px;
+      top: 8px;
+      color: #fde68a;
+      font-weight: 900;
+    }
+
     .adyapan-fixed-navbar-inner {
-      width: min(1500px, calc(100% - 40px));
+      position: relative;
+      z-index: 1;
+      width: min(1500px, calc(100% - 32px));
       height: 100%;
       margin: 0 auto;
       display: flex;
@@ -106,10 +128,10 @@
       align-items: center;
       justify-content: center;
       border-radius: 999px;
-      background: linear-gradient(135deg, #1d4ed8, #0891b2, #172554);
+      background: linear-gradient(135deg, #f8c44f, #ff7d65, #b65df3);
       color: #ffffff;
       font: 900 14px var(--font-sans);
-      box-shadow: 0 10px 24px rgba(13, 148, 136, 0.22);
+      box-shadow: 0 12px 26px rgba(234, 88, 12, 0.28);
     }
 
     .adyapan-fixed-brand {
@@ -120,7 +142,7 @@
     .adyapan-fixed-brand strong {
       font-size: 30px;
       letter-spacing: -0.03em;
-      color: #0f172a;
+      color: #8b2ed3;
     }
 
     .adyapan-fixed-brand span {
@@ -130,25 +152,27 @@
       font-weight: 900;
       letter-spacing: 0.42em;
       text-transform: uppercase;
-      color: #64748b;
+      color: #9f6fd0;
     }
 
     .adyapan-fixed-links {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
+      gap: 12px;
       flex: 1;
-      padding: 8px 16px;
-      border: 1px solid rgba(191, 219, 254, 0.9);
+      padding: 8px 20px;
+      border: 2px solid rgba(255, 255, 255, 0.65);
       border-radius: 999px;
-      background: #ffffff;
-      box-shadow: 0 10px 35px rgba(37, 99, 235, 0.12);
+      background: rgba(255, 255, 255, 0.36);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 12px 30px rgba(124, 58, 237, 0.14);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
 
     .adyapan-fixed-links a {
-      min-width: 92px;
-      height: 44px;
+      min-width: 108px;
+      height: 56px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -156,16 +180,21 @@
       border-radius: 999px;
       color: #0f172a;
       text-decoration: none;
-      font-size: 15px;
+      font-size: 17px;
       font-weight: 900;
       white-space: nowrap;
-      transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .adyapan-fixed-links a:first-child {
+      background: linear-gradient(90deg, #ffd84d, #ff9f2f);
+      box-shadow: 0 12px 24px rgba(249, 158, 47, 0.35);
     }
 
     .adyapan-fixed-links a:hover {
       transform: translateY(-2px);
-      background: #1d4ed8;
-      color: #ffffff;
+      background: rgba(255, 255, 255, 0.65);
+      color: #0f172a;
     }
 
     .adyapan-fixed-actions {
@@ -192,23 +221,153 @@
     }
 
     .adyapan-fixed-action-login {
-      border: 1px solid #cbd5e1;
-      background: #ffffff;
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+      border: 2px solid #ffffff;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 10px 22px rgba(255, 255, 255, 0.24);
     }
 
     .adyapan-fixed-action-signup {
-      border: 1px solid #e11d48;
-      background: #e11d48;
-      color: #ffffff;
-      box-shadow: 0 12px 26px rgba(225, 29, 72, 0.22);
+      border: 2px solid rgba(110, 231, 183, 0.7);
+      border-radius: 999px;
+      background: linear-gradient(90deg, #37e286, #19c87d);
+      color: #0f172a;
+      box-shadow: 0 12px 30px rgba(16, 185, 129, 0.36);
     }
 
     .adyapan-fixed-action:hover {
       transform: translateY(-2px);
-      border-color: #1d4ed8;
-      background: #1d4ed8;
-      color: #ffffff;
+      background: rgba(255, 255, 255, 0.88);
+      color: #0f172a;
+    }
+
+    .adyapan-user-menu {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .adyapan-user-trigger {
+      max-width: 230px;
+      height: 48px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 2px solid #ffffff;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.78);
+      padding: 0 14px 0 8px;
+      color: #0f172a;
+      font: 900 14px var(--font-sans);
+      box-shadow: 0 10px 22px rgba(255, 255, 255, 0.24);
+      cursor: pointer;
+    }
+
+    .adyapan-user-avatar {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ffd84d, #ff5b55);
+      font-weight: 900;
+    }
+
+    .adyapan-user-text {
+      min-width: 0;
+      display: grid;
+      text-align: left;
+      line-height: 1.1;
+    }
+
+    .adyapan-user-text strong,
+    .adyapan-user-text span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .adyapan-user-text span {
+      margin-top: 3px;
+      color: #475569;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .adyapan-user-dropdown {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 12px);
+      width: 280px;
+      display: none;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 20px;
+      background: #ffffff;
+      padding: 8px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+    }
+
+    .adyapan-user-menu.open .adyapan-user-dropdown {
+      display: block;
+    }
+
+    .adyapan-user-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #f1f5f9;
+      padding: 10px;
+      color: #0f172a;
+    }
+
+    .adyapan-user-head strong,
+    .adyapan-user-head span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .adyapan-user-head span {
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .adyapan-user-dropdown a,
+    .adyapan-user-dropdown button {
+      width: 100%;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      padding: 10px 12px;
+      color: #0f172a;
+      text-align: left;
+      text-decoration: none;
+      font: 900 14px var(--font-sans);
+      cursor: pointer;
+    }
+
+    .adyapan-user-dropdown a:hover {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .adyapan-user-dropdown button {
+      border-top: 1px solid #f1f5f9;
+      color: #e11d48;
+    }
+
+    .adyapan-user-dropdown button:hover {
+      background: #fff1f2;
     }
 
     @media (max-width: 1240px) {
@@ -218,7 +377,7 @@
 
       .adyapan-fixed-navbar-inner {
         width: min(100% - 24px, 720px);
-        min-height: 72px;
+        min-height: 80px;
         align-items: flex-start;
         flex-direction: column;
         justify-content: center;
@@ -240,8 +399,19 @@
         flex: 1;
       }
 
+      .adyapan-user-menu,
+      .adyapan-user-trigger {
+        width: 100%;
+      }
+
+      .adyapan-user-dropdown {
+        position: static;
+        width: 100%;
+        margin-top: 10px;
+      }
+
       body {
-        padding-top: 206px;
+        padding-top: 214px;
       }
     }
 
@@ -2567,19 +2737,101 @@
 
       <div class="adyapan-fixed-links">
         <a href="/#top">Home</a>
-        <a href="/#curriculum">Coding</a>
-        <a href="/#curriculum">Robotics &amp; AI</a>
-        <a href="/#projects">VR/AR Lab</a>
+        <a href="/#curriculum">Overview</a>
+        <a href="/#events">Mentor</a>
+        <a href="/our.html">My App</a>
         <a href="/dashboard">LMS</a>
-        <a href="/our.html">Our App</a>
-        <a href="/#footer">Books</a>
+        <a href="/about">About Us</a>
       </div>
-      <div class="adyapan-fixed-actions">
+      <div class="adyapan-fixed-actions" id="adyapan-auth-actions">
         <a class="adyapan-fixed-action adyapan-fixed-action-login" href="/login">Login</a>
         <a class="adyapan-fixed-action adyapan-fixed-action-signup" href="/signup">Sign Up</a>
       </div>
     </div>
   </nav>
+
+  <script>
+    (function () {
+      var actions = document.getElementById("adyapan-auth-actions");
+      if (!actions) return;
+
+      function renderLoggedOut() {
+        actions.innerHTML =
+          '<a class="adyapan-fixed-action adyapan-fixed-action-login" href="/login">Login</a>' +
+          '<a class="adyapan-fixed-action adyapan-fixed-action-signup" href="/signup">Sign Up</a>';
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function (match) {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+          }[match];
+        });
+      }
+
+      function renderLoggedIn(user) {
+        var dashboardHref = user && user.role === "admin" ? "/admin" : "/dashboard";
+        var name = escapeHtml(user && user.name ? user.name : "Student");
+        var email = escapeHtml(user && user.email ? user.email : "ADYAPAN learner");
+        var role = user && user.role === "admin" ? "Admin" : "Student";
+        var initial = name.charAt(0).toUpperCase();
+        actions.innerHTML =
+          '<div class="adyapan-user-menu" id="adyapan-static-user-menu">' +
+            '<button class="adyapan-user-trigger" type="button" id="adyapan-static-user-trigger" aria-haspopup="menu" aria-expanded="false">' +
+              '<span class="adyapan-user-avatar">' + initial + '</span>' +
+              '<span class="adyapan-user-text"><strong>' + name.split(" ")[0] + '</strong><span>' + role + '</span></span>' +
+              '<span aria-hidden="true">v</span>' +
+            '</button>' +
+            '<div class="adyapan-user-dropdown" role="menu">' +
+              '<div class="adyapan-user-head"><span class="adyapan-user-avatar">' + initial + '</span><span><strong>' + name + '</strong><span>' + email + '</span></span></div>' +
+              '<a href="' + dashboardHref + '">Dashboard</a>' +
+              '<a href="/dashboard#profile">Edit Profile</a>' +
+              '<a href="/dashboard#courses">My Courses</a>' +
+              '<a href="/dashboard#results">Track Result</a>' +
+              '<a href="/dashboard#certificates">Certificates</a>' +
+              '<a href="/dashboard#settings">Settings</a>' +
+              '<button type="button" id="adyapan-static-logout">Logout</button>' +
+            '</div>' +
+          '</div>';
+        var menu = document.getElementById("adyapan-static-user-menu");
+        var trigger = document.getElementById("adyapan-static-user-trigger");
+        if (menu && trigger) {
+          trigger.addEventListener("click", function () {
+            menu.classList.toggle("open");
+            trigger.setAttribute("aria-expanded", menu.classList.contains("open") ? "true" : "false");
+          });
+          document.addEventListener("click", function (event) {
+            if (!menu.contains(event.target)) {
+              menu.classList.remove("open");
+              trigger.setAttribute("aria-expanded", "false");
+            }
+          });
+        }
+        var logout = document.getElementById("adyapan-static-logout");
+        if (logout) {
+          logout.addEventListener("click", function () {
+            fetch("/api/auth/logout", { method: "POST" }).finally(function () {
+              window.location.href = "/login";
+            });
+          });
+        }
+      }
+
+      fetch("/api/auth/me", { cache: "no-store" })
+        .then(function (response) {
+          return response.ok ? response.json() : null;
+        })
+        .then(function (data) {
+          if (data && data.user) renderLoggedIn(data.user);
+          else renderLoggedOut();
+        })
+        .catch(renderLoggedOut);
+    })();
+  </script>
 
   <!-- Background Glowing Orbs -->
   <div class="glow-orb orb-blue" style="top: 10%; left: -10%;"></div>
