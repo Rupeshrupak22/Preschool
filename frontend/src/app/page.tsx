@@ -201,6 +201,7 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
 export default function Home() {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [status, setStatus] = useState("");
+  const [leadSuccess, setLeadSuccess] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -220,8 +221,15 @@ export default function Home() {
       body: JSON.stringify({ ...body, type })
     });
     const data = await response.json();
-    setStatus(response.ok ? "Request received. ADYAPAN will contact you soon." : data.error);
-    if (response.ok) event.currentTarget.reset();
+
+    if (!response.ok) {
+      setStatus(data.error);
+      return;
+    }
+
+    setStatus("");
+    setLeadSuccess(true);
+    event.currentTarget.reset();
   }
 
   return (
@@ -669,7 +677,56 @@ export default function Home() {
       </section>
 
 
-      {status && (
+      {leadSuccess && (
+        <div className="fixed inset-0 z-[70] grid place-items-center bg-slate-950/35 px-4 backdrop-blur-sm">
+          <motion.button
+            type="button"
+            onClick={() => setLeadSuccess(false)}
+            initial={{ opacity: 0, scale: 0.55, rotate: -8 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 260, damping: 16 }}
+            className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-white/80 bg-white p-7 text-center shadow-[0_30px_90px_rgba(168,85,247,0.35)]"
+          >
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(250,204,21,0.28),transparent_25%),radial-gradient(circle_at_85%_20%,rgba(34,211,238,0.22),transparent_24%),radial-gradient(circle_at_50%_100%,rgba(236,72,153,0.22),transparent_30%)]" />
+            {[
+              "left-8 top-8 bg-yellow-300",
+              "left-16 bottom-10 bg-cyan-300",
+              "right-10 top-10 bg-pink-400",
+              "right-20 bottom-12 bg-purple-400",
+              "left-1/2 top-5 bg-emerald-300",
+            ].map((className, index) => (
+              <motion.span
+                key={className}
+                initial={{ y: 18, opacity: 0, scale: 0.4 }}
+                animate={{ y: [-8, -34, -10], opacity: [0, 1, 0.75], scale: [0.6, 1.1, 0.8] }}
+                transition={{ delay: index * 0.08, duration: 1.2, repeat: 1 }}
+                className={`absolute h-3 w-3 rounded-full ${className}`}
+              />
+            ))}
+            <div className="relative">
+              <motion.div
+                initial={{ scale: 0.4 }}
+                animate={{ scale: [0.4, 1.2, 1] }}
+                transition={{ duration: 0.45 }}
+                className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-amber-300 text-white shadow-[0_18px_34px_rgba(217,70,239,0.35)]"
+              >
+                <Sparkles className="h-10 w-10" />
+              </motion.div>
+              <p className="mt-5 text-sm font-black uppercase tracking-[0.28em] text-purple-700">Boom</p>
+              <h3 className="mt-2 text-4xl font-black text-slate-950">Congrats!</h3>
+              <p className="mx-auto mt-3 max-w-xs text-sm font-bold leading-6 text-slate-600">
+                Request received. ADYAPAN team will contact you soon.
+              </p>
+              <span className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 text-sm font-black text-white shadow-[0_14px_30px_rgba(168,85,247,0.28)]">
+                Done
+              </span>
+            </div>
+          </motion.button>
+        </div>
+      )}
+
+      {status && !leadSuccess && (
         <button
           onClick={() => setStatus("")}
           className="fixed bottom-5 left-1/2 z-50 max-w-[92vw] -translate-x-1/2 rounded-lg border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-saffron-900 shadow-glass"
