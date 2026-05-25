@@ -2,8 +2,7 @@
 
 import { motion } from "framer-motion";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer, Area, AreaChart,
+  Tooltip, ResponsiveContainer, Area, AreaChart, XAxis, YAxis, CartesianGrid,
 } from "recharts";
 import type { PerformanceTrend } from "@/lib/dashboard/dashboard-data";
 
@@ -18,13 +17,13 @@ function CustomTooltip({ active, payload, label }: {
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-xl border border-slate-100 bg-white p-3 shadow-xl">
-      <p className="mb-2 text-xs font-black text-slate-950">{label}</p>
+    <div className="rounded-2xl border-2 border-purple-100 bg-white/95 p-3 shadow-xl backdrop-blur">
+      <p className="mb-2 text-xs font-black text-slate-900">{label}</p>
       {payload.map((p) => (
         <div key={p.name} className="flex items-center gap-2 text-xs font-semibold">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: p.color }} />
           <span className="text-slate-500">{p.name}:</span>
-          <span className="font-black text-slate-950">{p.value}</span>
+          <span className="font-black text-slate-900">{p.value}</span>
         </div>
       ))}
     </div>
@@ -37,20 +36,20 @@ export default function PerformanceTrendChart({ data }: Props) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className="flex flex-col rounded-2xl border border-slate-100 bg-white p-5 shadow-[0_4px_24px_rgba(15,23,42,0.08)]"
+      className="flex flex-col rounded-3xl border-2 border-white/80 bg-white/70 p-5 shadow-[0_8px_32px_rgba(168,85,247,0.10)] backdrop-blur-sm"
     >
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="text-sm font-black text-slate-950">Performance Trend</h3>
-          <p className="mt-0.5 text-xs text-slate-400">Jan – Jun 2026 monthly growth</p>
+          <h3 className="text-sm font-black text-slate-900">Performance Trend</h3>
+          <p className="mt-0.5 text-xs font-semibold text-slate-500">Jan – Jun 2026 monthly growth</p>
         </div>
         <div className="flex items-center gap-3 text-[10px] font-bold">
-          <span className="flex items-center gap-1">
-            <span className="h-2 w-4 rounded-full bg-blue-600" />
+          <span className="flex items-center gap-1.5">
+            <span className="h-2.5 w-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
             <span className="text-slate-500">You</span>
           </span>
-          <span className="flex items-center gap-1">
-            <span className="h-2 w-4 rounded-full bg-slate-300" />
+          <span className="flex items-center gap-1.5">
+            <span className="h-2.5 w-4 rounded-full bg-slate-200" />
             <span className="text-slate-500">Class Avg</span>
           </span>
         </div>
@@ -61,8 +60,8 @@ export default function PerformanceTrendChart({ data }: Props) {
           <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="avgGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.15} />
@@ -87,7 +86,7 @@ export default function PerformanceTrendChart({ data }: Props) {
               type="monotone"
               dataKey="classAvg"
               name="Class Avg"
-              stroke="#94a3b8"
+              stroke="#cbd5e1"
               strokeWidth={2}
               fill="url(#avgGrad)"
               dot={false}
@@ -97,11 +96,11 @@ export default function PerformanceTrendChart({ data }: Props) {
               type="monotone"
               dataKey="score"
               name="Your Score"
-              stroke="#3b82f6"
+              stroke="#a855f7"
               strokeWidth={2.5}
               fill="url(#scoreGrad)"
-              dot={{ fill: "#3b82f6", r: 4, strokeWidth: 2, stroke: "#fff" }}
-              activeDot={{ r: 6, fill: "#3b82f6", stroke: "#fff", strokeWidth: 2 }}
+              dot={{ fill: "#a855f7", r: 4, strokeWidth: 2, stroke: "#fff" }}
+              activeDot={{ r: 6, fill: "#a855f7", stroke: "#fff", strokeWidth: 2 }}
               animationDuration={1200}
             />
           </AreaChart>
@@ -109,8 +108,8 @@ export default function PerformanceTrendChart({ data }: Props) {
       </div>
 
       {/* Growth indicator */}
-      <div className="mt-3 flex items-center gap-2 rounded-xl bg-blue-50 px-3 py-2">
-        <span className="text-xs font-black text-blue-700">+17 points</span>
+      <div className="mt-3 flex items-center gap-2 rounded-2xl bg-gradient-to-r from-purple-50 to-pink-50 px-4 py-2.5 border border-purple-100">
+        <span className="text-xs font-black text-purple-700">🚀 +17 points</span>
         <span className="text-xs text-slate-500">growth from Jan to Jun 2026</span>
       </div>
     </motion.div>

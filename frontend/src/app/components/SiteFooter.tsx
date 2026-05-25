@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { ArrowUp, Clock, Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react";
+import { Clock, Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react";
 
 const learningPrograms = [
   "Future Skills Foundation (Class 5 to 8)",
@@ -111,13 +111,7 @@ export default function SiteFooter() {
         <span>Copyright 2026 ADYAPAN Future Skills Platform. All rights reserved.</span>
       </div>
 
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="fixed bottom-4 right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-blue-700 text-white shadow-[0_18px_38px_rgba(37,99,235,0.30)] transition hover:-translate-y-1 hover:bg-cyan-600 sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"
-        aria-label="Back to top"
-      >
-        <ArrowUp className="h-6 w-6" />
-      </button>
+
     </footer>
   );
 }

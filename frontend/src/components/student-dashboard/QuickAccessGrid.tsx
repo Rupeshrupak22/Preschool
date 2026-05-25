@@ -3,19 +3,20 @@
 import { motion, type Variants } from "framer-motion";
 import {
   CalendarCheck, BookOpen, Video, FileText,
-  ClipboardCheck, PenTool, Award, Zap, ArrowRight,
+  PenTool, Zap, ArrowRight, Gamepad2, HelpCircle, PlayCircle,
 } from "lucide-react";
 import type { QuickAccessCard } from "@/lib/dashboard/dashboard-data";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   "calendar-check": CalendarCheck,
-  "book-open": BookOpen,
-  "video": Video,
-  "file-text": FileText,
-  "clipboard-list": ClipboardCheck,
-  "pen-tool": PenTool,
-  "award": Award,
-  "zap": Zap,
+  "book-open":      BookOpen,
+  "video":          Video,
+  "file-text":      FileText,
+  "pen-tool":       PenTool,
+  "zap":            Zap,
+  "gamepad-2":      Gamepad2,
+  "help-circle":    HelpCircle,
+  "play-circle":    PlayCircle,
 };
 
 interface Props {
@@ -24,20 +25,25 @@ interface Props {
 
 const container: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.07 } },
+  show: { transition: { staggerChildren: 0.06 } },
 };
 
 const item: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" as const } },
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: "easeOut" as const } },
 };
 
 export default function QuickAccessGrid({ cards }: Props) {
   return (
     <section>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-black text-slate-950">Quick Access</h2>
-        <span className="text-xs font-semibold text-slate-400">8 modules</span>
+      <div className="mb-5 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-black text-slate-900">Quick Access</h2>
+          <p className="mt-0.5 text-xs font-semibold text-slate-500">Jump to any module instantly</p>
+        </div>
+        <span className="rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-black text-purple-700">
+          8 modules
+        </span>
       </div>
 
       <motion.div
@@ -53,20 +59,20 @@ export default function QuickAccessGrid({ cards }: Props) {
               key={card.id}
               href={card.href}
               variants={item}
-              whileHover={{ y: -4, scale: 1.02 }}
+              whileHover={{ y: -6, scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="group relative flex flex-col items-center gap-2 overflow-hidden rounded-2xl border border-white/60 bg-white p-4 text-center shadow-[0_4px_20px_rgba(15,23,42,0.08)] transition-shadow hover:shadow-[0_8px_32px_rgba(15,23,42,0.14)]"
+              className="group relative flex flex-col items-center gap-3 overflow-hidden rounded-3xl border-2 border-white/80 bg-white/70 p-5 text-center shadow-[0_8px_32px_rgba(168,85,247,0.10)] backdrop-blur-sm transition-all hover:border-purple-200 hover:shadow-[0_16px_48px_rgba(168,85,247,0.22)]"
             >
-              {/* Gradient bg on hover */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 transition-opacity duration-300 group-hover:opacity-100`} />
+              {/* Hover gradient fill */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-3xl`} />
 
               {/* Badge */}
               {card.badge && (
                 <span
-                  className={`absolute right-2 top-2 z-10 rounded-full px-1.5 py-0.5 text-[9px] font-black ${
+                  className={`absolute right-2.5 top-2.5 z-10 rounded-full px-2 py-0.5 text-[9px] font-black shadow ${
                     card.badge === "LIVE"
                       ? "animate-pulse bg-rose-500 text-white"
-                      : "bg-slate-950 text-white"
+                      : "bg-gradient-to-r from-purple-600 to-pink-600 text-white"
                   }`}
                 >
                   {card.badge}
@@ -74,25 +80,24 @@ export default function QuickAccessGrid({ cards }: Props) {
               )}
 
               {/* Icon */}
-              <div className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${card.gradient} text-white shadow-md transition-transform duration-300 group-hover:scale-110`}>
-                <Icon className="h-5 w-5" />
+              <div className={`relative z-10 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${card.gradient} text-white shadow-[0_6px_20px_rgba(168,85,247,0.3)] transition-transform duration-300 group-hover:scale-110 group-hover:shadow-[0_8px_28px_rgba(255,255,255,0.3)]`}>
+                <Icon className="h-6 w-6" />
               </div>
 
               {/* Text */}
               <div className="relative z-10">
-                <p className="text-xs font-black text-slate-950 transition-colors group-hover:text-white">
+                <p className="text-xs font-black text-slate-900 transition-colors group-hover:text-white">
                   {card.title}
                 </p>
-                <p className="mt-0.5 text-lg font-black leading-none text-slate-950 transition-colors group-hover:text-white">
+                <p className="mt-0.5 text-xl font-black leading-none text-slate-900 transition-colors group-hover:text-white">
                   {card.stat}
                 </p>
-                <p className="text-[10px] font-semibold text-slate-400 transition-colors group-hover:text-white/70">
+                <p className="mt-0.5 text-[10px] font-semibold text-slate-400 transition-colors group-hover:text-white/80">
                   {card.statLabel}
                 </p>
               </div>
 
-              {/* Arrow */}
-              <ArrowRight className="relative z-10 h-3 w-3 text-slate-300 transition-all group-hover:translate-x-1 group-hover:text-white" />
+              <ArrowRight className="relative z-10 h-3.5 w-3.5 text-slate-300 transition-all group-hover:translate-x-1 group-hover:text-white" />
             </motion.a>
           );
         })}
