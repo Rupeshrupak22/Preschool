@@ -193,7 +193,7 @@ export default function MentorsPage() {
                 Book Mentor Call <ArrowRight className="h-5 w-5" />
               </a>
               <a
-                href="tel:+919000000000"
+                href="tel:+918292244709"
                 className="inline-flex h-14 items-center justify-center gap-3 rounded-full border border-white/16 bg-white/8 px-7 font-black text-white transition hover:-translate-y-1 hover:border-fuchsia-300/70 hover:bg-fuchsia-400/14 hover:shadow-[0_0_38px_rgba(217,70,239,0.24)]"
               >
                 <MessageCircle className="h-5 w-5" /> Talk to Counsellor

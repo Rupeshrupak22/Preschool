@@ -197,7 +197,7 @@ export default function LMSPage() {
                 <Target className="h-5 w-5" /> Book Demo <ArrowRight className="h-5 w-5" />
               </a>
               <a
-                href="tel:+919000000000"
+                href="tel:+918292244709"
                 className="inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-blue-700 px-8 font-black text-white shadow-[0_14px_30px_rgba(37,99,235,0.22)] transition hover:-translate-y-1 hover:bg-slate-950"
               >
                 <MessageCircle className="h-5 w-5" /> Chat on WhatsApp

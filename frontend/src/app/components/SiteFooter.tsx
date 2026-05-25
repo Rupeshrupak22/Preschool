@@ -89,11 +89,11 @@ export default function SiteFooter() {
             Get In Touch
           </h3>
           <div className="mt-6 grid gap-4 text-base font-semibold text-slate-950 md:mt-7 md:gap-5">
-            <a href="mailto:info@adyapan.com" className="flex items-center gap-4 transition hover:text-cyan-700">
-              <Mail className="h-5 w-5" /> info@adyapan.com
+            <a href="mailto:support@adyapan.com" className="flex items-center gap-4 transition hover:text-cyan-700">
+              <Mail className="h-5 w-5" /> support@adyapan.com
             </a>
-            <a href="tel:+919000000000" className="flex items-center gap-4 transition hover:text-cyan-700">
-              <Phone className="h-5 w-5" /> +91 - 90000 00000
+            <a href="tel:+918292244709" className="flex items-center gap-4 transition hover:text-cyan-700">
+              <Phone className="h-5 w-5" /> +91 82922 44709
             </a>
             <span className="flex items-center gap-4">
               <MapPin className="h-5 w-5" /> India

@@ -24,7 +24,7 @@ export async function sendEmail(input: EmailInput) {
   });
 
   await transporter.sendMail({
-    from: process.env.MAIL_FROM ?? "ADYAPAN <hello@adyapan.com>",
+    from: process.env.MAIL_FROM ?? "ADYAPAN <support@adyapan.com>",
     ...input
   });
 
