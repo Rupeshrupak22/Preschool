@@ -55,8 +55,8 @@ export default function LoginPage() {
           <div className="absolute right-20 top-[205px] rotate-[-10deg] rounded-full border-2 border-rose-400 px-4 py-3 text-4xl font-black text-rose-500">A+</div>
           <div className="absolute right-0 top-[345px] text-5xl">⚛️</div>
           <div className="absolute left-1/2 top-[210px] -translate-x-1/2 text-center">
-            <p className="font-[cursive] text-6xl font-black leading-none text-[#08133f]">Welcome</p>
-            <p className="font-[cursive] text-8xl font-black leading-none text-[#4057c9] drop-shadow-[3px_4px_0_rgba(8,19,63,0.16)]">
+            <p className="text-6xl font-black leading-none text-[#08133f]">Welcome</p>
+            <p className="text-8xl font-black leading-none text-[#4057c9] drop-shadow-[3px_4px_0_rgba(8,19,63,0.16)]">
               Back
             </p>
             <p className="mx-auto mt-3 w-max rotate-[-6deg] bg-[#ff3d81] px-9 py-3 text-3xl font-black uppercase tracking-wide text-white shadow-[0_8px_0_rgba(15,23,42,0.12)]">

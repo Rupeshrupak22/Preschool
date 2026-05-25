@@ -75,10 +75,10 @@ export default function SignupPage() {
           <div className="absolute left-0 top-[175px] text-4xl">☁️</div>
           <div className="absolute right-8 top-[145px] text-4xl text-yellow-400">⭐</div>
           <div className="absolute left-[115px] top-[250px] text-center">
-            <p className="font-[cursive] text-6xl font-black leading-tight text-[#08133f]">Unfold your</p>
-            <p className="font-[cursive] text-6xl font-black leading-tight text-[#ff2d72]">potential.</p>
-            <p className="mt-4 font-[cursive] text-6xl font-black leading-tight text-[#08133f]">Create your</p>
-            <p className="font-[cursive] text-7xl font-black leading-tight text-[#ff2d72]">future!</p>
+            <p className="text-6xl font-black leading-tight text-[#08133f]">Unfold your</p>
+            <p className="text-6xl font-black leading-tight text-[#ff2d72]">potential.</p>
+            <p className="mt-4 text-6xl font-black leading-tight text-[#08133f]">Create your</p>
+            <p className="text-7xl font-black leading-tight text-[#ff2d72]">future!</p>
             <div className="mx-auto mt-4 h-2 w-56 rounded-full bg-[#ffc400]" />
           </div>
 

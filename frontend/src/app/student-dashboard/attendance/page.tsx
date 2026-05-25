@@ -3,25 +3,11 @@
 import { motion } from "framer-motion";
 import { CalendarCheck, TrendingUp, AlertCircle, CheckCircle2 } from "lucide-react";
 import DashboardLayout from "@/components/student-dashboard/DashboardLayout";
-
-const months = [
-  { month: "January",  present: 22, total: 24, pct: 92 },
-  { month: "February", present: 19, total: 20, pct: 95 },
-  { month: "March",    present: 23, total: 26, pct: 88 },
-  { month: "April",    present: 21, total: 22, pct: 95 },
-  { month: "May",      present: 18, total: 19, pct: 95 },
-];
-
-const subjectAttendance = [
-  { subject: "Mathematics",     pct: 96, color: "bg-blue-500" },
-  { subject: "Science",         pct: 88, color: "bg-emerald-500" },
-  { subject: "English",         pct: 100, color: "bg-rose-500" },
-  { subject: "Computer Science",pct: 94, color: "bg-cyan-500" },
-  { subject: "AI Basics",       pct: 90, color: "bg-purple-500" },
-  { subject: "Social Studies",  pct: 85, color: "bg-orange-500" },
-];
+import { useDashboardData } from "@/lib/dashboard/use-dashboard-data";
 
 export default function AttendancePage() {
+  const data = useDashboardData();
+  const months = data.attendanceMonths;
   const overall = Math.round(months.reduce((s, m) => s + m.pct, 0) / months.length);
 
   return (
@@ -83,7 +69,7 @@ export default function AttendancePage() {
         <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-[0_4px_24px_rgba(15,23,42,0.06)]">
           <h2 className="mb-4 text-sm font-black text-slate-950">Subject-wise Attendance</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            {subjectAttendance.map((s, i) => (
+            {data.subjectAttendance.map((s, i) => (
               <div key={s.subject} className="flex items-center gap-3">
                 <span className="w-36 shrink-0 text-xs font-semibold text-slate-600">{s.subject}</span>
                 <div className="flex-1 h-2 overflow-hidden rounded-full bg-slate-100">

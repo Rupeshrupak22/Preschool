@@ -133,6 +133,24 @@ export interface PerformanceTrend {
   classAvg: number;
 }
 
+export interface AttendanceMonth {
+  month: string;
+  present: number;
+  total: number;
+  pct: number;
+}
+
+export interface SubjectAttendance {
+  subject: string;
+  pct: number;
+  color: string;
+}
+
+export interface WeeklyScheduleDay {
+  day: string;
+  classes: string[];
+}
+
 // ============================================================
 // DATA
 // ============================================================
@@ -157,7 +175,7 @@ export const quickAccessCards: QuickAccessCard[] = [
     statLabel: "This Month",
     icon: "calendar-check",
     gradient: "from-emerald-500 to-teal-600",
-    href: "#attendance",
+    href: "/student-dashboard/attendance",
   },
   {
     id: "homework",
@@ -166,7 +184,7 @@ export const quickAccessCards: QuickAccessCard[] = [
     statLabel: "Pending",
     icon: "book-open",
     gradient: "from-orange-500 to-amber-600",
-    href: "#homework",
+    href: "/student-dashboard/homework",
     badge: "3",
   },
   {
@@ -176,7 +194,7 @@ export const quickAccessCards: QuickAccessCard[] = [
     statLabel: "Today",
     icon: "video",
     gradient: "from-rose-500 to-pink-600",
-    href: "#live-classes",
+    href: "/student-dashboard/live-classes",
     badge: "LIVE",
   },
   {
@@ -186,35 +204,35 @@ export const quickAccessCards: QuickAccessCard[] = [
     statLabel: "Files",
     icon: "file-text",
     gradient: "from-blue-500 to-indigo-600",
-    href: "#notes",
+    href: "/student-dashboard/notes",
   },
   {
-    id: "tests",
-    title: "Tests & Quiz",
-    stat: "2",
-    statLabel: "Upcoming",
-    icon: "clipboard-list",
+    id: "gamified",
+    title: "Gamified",
+    stat: "3",
+    statLabel: "Games",
+    icon: "gamepad-2",
     gradient: "from-purple-500 to-violet-600",
-    href: "#tests",
-    badge: "2",
+    href: "/student-dashboard/gamified",
+    badge: "NEW",
   },
   {
-    id: "assignments",
-    title: "Assignments",
-    stat: "5",
-    statLabel: "Active",
-    icon: "pen-tool",
-    gradient: "from-cyan-500 to-sky-600",
-    href: "#assignments",
+    id: "doubt-section",
+    title: "Doubt Section",
+    stat: "Ask",
+    statLabel: "Mentors",
+    icon: "help-circle",
+    gradient: "from-orange-500 to-pink-500",
+    href: "/student-dashboard/homework",
   },
   {
-    id: "certificates",
-    title: "Certificates",
-    stat: "7",
-    statLabel: "Earned",
-    icon: "award",
-    gradient: "from-yellow-500 to-orange-500",
-    href: "#achievements",
+    id: "recorded-classes",
+    title: "Recorded Classes",
+    stat: "42",
+    statLabel: "Videos",
+    icon: "play-circle",
+    gradient: "from-cyan-500 to-teal-500",
+    href: "/student-dashboard/recorded-classes",
   },
   {
     id: "skills",
@@ -223,7 +241,7 @@ export const quickAccessCards: QuickAccessCard[] = [
     statLabel: "Overall",
     icon: "zap",
     gradient: "from-fuchsia-500 to-purple-600",
-    href: "#skills",
+    href: "/student-dashboard/skill-progress",
   },
 ];
 
@@ -366,6 +384,31 @@ export const performanceTrend: PerformanceTrend[] = [
   { month: "Jun", score: 85, classAvg: 70 },
 ];
 
+export const attendanceMonths: AttendanceMonth[] = [
+  { month: "January",  present: 22, total: 24, pct: 92 },
+  { month: "February", present: 19, total: 20, pct: 95 },
+  { month: "March",    present: 23, total: 26, pct: 88 },
+  { month: "April",    present: 21, total: 22, pct: 95 },
+  { month: "May",      present: 18, total: 19, pct: 95 },
+];
+
+export const subjectAttendance: SubjectAttendance[] = [
+  { subject: "Mathematics",      pct: 96, color: "bg-blue-500" },
+  { subject: "Science",          pct: 88, color: "bg-emerald-500" },
+  { subject: "English",          pct: 100, color: "bg-rose-500" },
+  { subject: "Computer Science", pct: 94, color: "bg-cyan-500" },
+  { subject: "AI Basics",        pct: 90, color: "bg-purple-500" },
+  { subject: "Social Studies",   pct: 85, color: "bg-orange-500" },
+];
+
+export const weeklySchedule: WeeklyScheduleDay[] = [
+  { day: "Monday",    classes: ["Mathematics 10:30 AM", "Science 12:00 PM"] },
+  { day: "Tuesday",   classes: ["English 9:00 AM", "Computer Science 11:00 AM"] },
+  { day: "Wednesday", classes: ["AI Basics 10:00 AM", "Social Studies 2:00 PM"] },
+  { day: "Thursday",  classes: ["Mathematics 10:30 AM", "Hindi 12:30 PM"] },
+  { day: "Friday",    classes: ["Science 9:30 AM", "English 11:30 AM"] },
+];
+
 export const circularPerformanceData = [
   { name: "Excellent (≥85%)", value: 7, color: "#10b981" },
   { name: "Good (70–84%)", value: 4, color: "#f59e0b" },
@@ -378,3 +421,27 @@ export const weeklyProgress = {
   streak: 14,
   classPercentile: 64,
 };
+
+export const dashboardData = {
+  studentData,
+  quickAccessCards,
+  liveClasses,
+  metricCards,
+  subjectPerformance,
+  testResults,
+  upcomingQuizzes,
+  homeworkItems,
+  notesLibrary,
+  skillsData,
+  futureSkills,
+  extracurricular,
+  achievements,
+  performanceTrend,
+  circularPerformanceData,
+  weeklyProgress,
+  attendanceMonths,
+  subjectAttendance,
+  weeklySchedule,
+};
+
+export type DashboardData = typeof dashboardData;

@@ -353,43 +353,6 @@ export default function MentorsPage() {
         </div>
       </section>
 
-      {/* CTA SECTION */}
-      <section className="py-20 bg-white">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="rounded-3xl bg-gradient-to-r from-purple-600 to-pink-600 p-12 text-center shadow-2xl"
-          >
-            <h2 className="text-4xl font-black text-white sm:text-5xl">
-              Ready to Transform Education?
-            </h2>
-            <p className="mt-4 text-xl text-purple-100">
-              Join 500+ schools and 25,000+ students already learning smarter
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="rounded-full bg-white px-10 py-4 font-bold text-purple-600 shadow-xl transition"
-              >
-                Start Free Trial
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="rounded-full border-2 border-white bg-transparent px-10 py-4 font-bold text-white transition hover:bg-white/10"
-              >
-                Schedule Demo
-              </motion.button>
-            </div>
-            <p className="mt-6 text-sm text-purple-200">
-              No credit card required • 14-day free trial • Cancel anytime
-            </p>
-          </motion.div>
-        </div>
-      </section>
     </main>
   );
 }

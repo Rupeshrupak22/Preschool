@@ -1,20 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Video, Calendar, Clock, User, Play, Bell } from "lucide-react";
+import { Calendar } from "lucide-react";
 import DashboardLayout from "@/components/student-dashboard/DashboardLayout";
 import LiveClassesSection from "@/components/student-dashboard/LiveClassesSection";
-import { liveClasses } from "@/lib/dashboard/dashboard-data";
-
-const schedule = [
-  { day: "Monday",    classes: ["Mathematics 10:30 AM", "Science 12:00 PM"] },
-  { day: "Tuesday",   classes: ["English 9:00 AM", "Computer Science 11:00 AM"] },
-  { day: "Wednesday", classes: ["AI Basics 10:00 AM", "Social Studies 2:00 PM"] },
-  { day: "Thursday",  classes: ["Mathematics 10:30 AM", "Hindi 12:30 PM"] },
-  { day: "Friday",    classes: ["Science 9:30 AM", "English 11:30 AM"] },
-];
+import { useDashboardData } from "@/lib/dashboard/use-dashboard-data";
 
 export default function LiveClassesPage() {
+  const data = useDashboardData();
+
   return (
     <DashboardLayout activeSection="/student-dashboard/live-classes">
       <div className="space-y-8">
@@ -24,13 +18,13 @@ export default function LiveClassesPage() {
         </div>
 
         {/* Today's classes */}
-        <LiveClassesSection classes={liveClasses} />
+        <LiveClassesSection classes={data.liveClasses} />
 
         {/* Weekly Schedule */}
         <section>
           <h2 className="mb-4 text-lg font-black text-slate-950">Weekly Schedule</h2>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-            {schedule.map((day, i) => (
+            {data.weeklySchedule.map((day, i) => (
               <motion.div
                 key={day.day}
                 initial={{ opacity: 0, y: 12 }}

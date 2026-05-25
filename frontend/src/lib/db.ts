@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import mysql, { type Pool, type PoolOptions, type RowDataPacket } from "mysql2/promise";
+import { dashboardData, type DashboardData } from "@/lib/dashboard/dashboard-data";
 import { id } from "@/lib/store";
 
 type UserRecord = {
@@ -257,9 +258,27 @@ async function ensureSchema(pool: Pool) {
     )
   `);
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS dashboard_snapshots (
+      id VARCHAR(64) PRIMARY KEY,
+      user_email VARCHAR(190) NOT NULL UNIQUE,
+      snapshot JSON NOT NULL,
+      source VARCHAR(40) NOT NULL DEFAULT 'seed',
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )
+  `);
+
   await ensureColumn(pool, "users", "signup_source", "VARCHAR(40) NOT NULL DEFAULT 'web'");
   await ensureColumn(pool, "students", "signup_source", "VARCHAR(40) NOT NULL DEFAULT 'web'");
   await ensureColumn(pool, "login_events", "source", "VARCHAR(40) NOT NULL DEFAULT 'web'");
+
+  await pool.query(
+    `INSERT INTO dashboard_snapshots (id, user_email, snapshot, source)
+     VALUES (?, '__default__', ?, 'seed')
+     ON DUPLICATE KEY UPDATE user_email = user_email`,
+    [id("dashboard"), JSON.stringify(dashboardData)]
+  );
 }
 
 async function ensureColumn(pool: Pool, tableName: string, columnName: string, definition: string) {
@@ -292,6 +311,41 @@ function parseCourses(value: unknown): string[] {
 
 function dateValue(value: unknown) {
   return (value as { toISOString?: () => string })?.toISOString?.() ?? value;
+}
+
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  return parts
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+function parseDashboardSnapshot(value: unknown): DashboardData {
+  if (!value) return dashboardData;
+  if (typeof value === "object") return value as DashboardData;
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value) as DashboardData;
+    } catch {
+      return dashboardData;
+    }
+  }
+  return dashboardData;
+}
+
+function personalizeDashboard(snapshot: DashboardData, user?: UserRecord | null): DashboardData {
+  if (!user) return snapshot;
+
+  return {
+    ...snapshot,
+    studentData: {
+      ...snapshot.studentData,
+      name: user.name,
+      class: user.classLevel || snapshot.studentData.class,
+      avatar: initials(user.name) || snapshot.studentData.avatar
+    }
+  };
 }
 
 function mapUser(row: RowDataPacket): UserRecord {
@@ -544,6 +598,61 @@ export async function createCertificate(data: CertificateRecord) {
   );
 }
 
+export async function getCertificateById(credentialId: string) {
+  const pool = await connectDb();
+  if (!pool) return null;
+
+  const [rows] = await pool.query<RowDataPacket[]>(
+    `SELECT credential_id, student_name, user_email, course, qr_code, issued_at, status, created_at
+     FROM certificates
+     WHERE credential_id = ?
+     LIMIT 1`,
+    [credentialId]
+  );
+
+  const row = rows[0];
+  if (!row) return null;
+
+  return {
+    credentialId: row.credential_id,
+    studentName: row.student_name,
+    userEmail: row.user_email,
+    course: row.course,
+    qrCode: row.qr_code,
+    issuedAt: dateValue(row.issued_at),
+    status: row.status,
+    createdAt: dateValue(row.created_at)
+  };
+}
+
+export async function getStudentDashboardData(email?: string) {
+  const pool = await connectDb();
+
+  if (!pool) {
+    return {
+      dashboard: dashboardData,
+      mode: "dev"
+    };
+  }
+
+  const [rows] = await pool.query<RowDataPacket[]>(
+    `SELECT snapshot
+     FROM dashboard_snapshots
+     WHERE user_email IN (?, '__default__')
+     ORDER BY user_email = ? DESC
+     LIMIT 1`,
+    [email ?? "__default__", email ?? "__default__"]
+  );
+
+  const user = email ? await findUserByEmail(email) : null;
+  const snapshot = parseDashboardSnapshot(rows[0]?.snapshot);
+
+  return {
+    dashboard: personalizeDashboard(snapshot, user),
+    mode: "mysql"
+  };
+}
+
 export async function getAdminOverview() {
   const pool = await connectDb();
   if (!pool) return null;
@@ -558,6 +667,9 @@ export async function getAdminOverview() {
   );
   const [loginRows] = await pool.query<RowDataPacket[]>(
     "SELECT * FROM login_events ORDER BY created_at DESC LIMIT 100"
+  );
+  const [dashboardRows] = await pool.query<RowDataPacket[]>(
+    "SELECT id, user_email, source, created_at, updated_at FROM dashboard_snapshots ORDER BY updated_at DESC LIMIT 50"
   );
 
   const students = studentRows.map(mapUser);
@@ -607,6 +719,13 @@ export async function getAdminOverview() {
     status: row.status,
     createdAt: dateValue(row.created_at)
   }));
+  const dashboardSnapshots = dashboardRows.map((row) => ({
+    id: row.id,
+    userEmail: row.user_email,
+    source: row.source,
+    createdAt: dateValue(row.created_at),
+    updatedAt: dateValue(row.updated_at)
+  }));
 
   return {
     students,
@@ -614,12 +733,14 @@ export async function getAdminOverview() {
     payments,
     certificates,
     loginEvents,
+    dashboardSnapshots,
     tables: [
       { name: "students", label: "Students", rows: students },
       { name: "leads", label: "Leads", rows: leads },
       { name: "payments", label: "Payments", rows: payments },
       { name: "certificates", label: "Certificates", rows: certificates },
-      { name: "login_events", label: "Login Events", rows: loginEvents }
+      { name: "login_events", label: "Login Events", rows: loginEvents },
+      { name: "dashboard_snapshots", label: "Dashboard Snapshots", rows: dashboardSnapshots }
     ]
   };
 }

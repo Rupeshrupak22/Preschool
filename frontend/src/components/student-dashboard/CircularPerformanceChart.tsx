@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import type { circularPerformanceData } from "@/lib/dashboard/dashboard-data";
+import type { PieLabelRenderProps } from "recharts";
 
 type DataItem = { name: string; value: number; color: string };
 
@@ -13,20 +13,11 @@ interface Props {
 
 const RADIAN = Math.PI / 180;
 
-import type { PieLabelRenderProps } from "recharts";
-
 function CustomLabel(props: PieLabelRenderProps) {
   const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props;
-  if (
-    cx == null || cy == null || midAngle == null ||
-    innerRadius == null || outerRadius == null || percent == null
-  ) return null;
-  const cxN = Number(cx);
-  const cyN = Number(cy);
-  const midN = Number(midAngle);
-  const irN = Number(innerRadius);
-  const orN = Number(outerRadius);
-  const pctN = Number(percent);
+  if (cx == null || cy == null || midAngle == null || innerRadius == null || outerRadius == null || percent == null) return null;
+  const cxN = Number(cx), cyN = Number(cy), midN = Number(midAngle);
+  const irN = Number(innerRadius), orN = Number(outerRadius), pctN = Number(percent);
   const radius = irN + (orN - irN) * 0.5;
   const x = cxN + radius * Math.cos(-midN * RADIAN);
   const y = cyN + radius * Math.sin(-midN * RADIAN);
@@ -44,10 +35,17 @@ export default function CircularPerformanceChart({ data, overallScore }: Props) 
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      className="flex flex-col rounded-2xl border border-slate-100 bg-white p-5 shadow-[0_4px_24px_rgba(15,23,42,0.08)]"
+      className="flex flex-col rounded-3xl border-2 border-white/80 bg-white/70 p-5 shadow-[0_8px_32px_rgba(168,85,247,0.10)] backdrop-blur-sm"
     >
-      <h3 className="text-sm font-black text-slate-950">360° Performance</h3>
-      <p className="mt-0.5 text-xs text-slate-400">Subject distribution by performance tier</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h3 className="text-sm font-black text-slate-900">360° Performance</h3>
+          <p className="mt-0.5 text-xs font-semibold text-slate-500">Subject distribution by tier</p>
+        </div>
+        <span className="rounded-full bg-gradient-to-r from-purple-100 to-pink-100 px-3 py-1 text-xs font-black text-purple-700">
+          {overallScore}% avg
+        </span>
+      </div>
 
       <div className="relative mt-4 flex-1">
         <ResponsiveContainer width="100%" height={220}>
@@ -58,7 +56,7 @@ export default function CircularPerformanceChart({ data, overallScore }: Props) 
               cy="50%"
               innerRadius={60}
               outerRadius={95}
-              paddingAngle={3}
+              paddingAngle={4}
               dataKey="value"
               labelLine={false}
               label={CustomLabel}
@@ -72,10 +70,12 @@ export default function CircularPerformanceChart({ data, overallScore }: Props) 
             <Tooltip
               formatter={(value, name) => [`${value} subjects`, String(name)]}
               contentStyle={{
-                borderRadius: "12px",
-                border: "1px solid #e2e8f0",
+                borderRadius: "16px",
+                border: "2px solid #e9d5ff",
                 fontSize: "12px",
                 fontWeight: 600,
+                background: "rgba(255,255,255,0.95)",
+                backdropFilter: "blur(8px)",
               }}
             />
           </PieChart>
@@ -87,7 +87,7 @@ export default function CircularPerformanceChart({ data, overallScore }: Props) 
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.6, duration: 0.5 }}
-            className="text-3xl font-black text-slate-950"
+            className="text-3xl font-black text-slate-900"
           >
             {overallScore}%
           </motion.span>
@@ -98,12 +98,12 @@ export default function CircularPerformanceChart({ data, overallScore }: Props) 
       {/* Legend */}
       <div className="mt-3 space-y-2">
         {data.map((item) => (
-          <div key={item.name} className="flex items-center justify-between">
+          <div key={item.name} className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-2">
             <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+              <span className="h-3 w-3 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
               <span className="text-xs font-semibold text-slate-600">{item.name}</span>
             </div>
-            <span className="text-xs font-black text-slate-950">{item.value} subjects</span>
+            <span className="text-xs font-black text-slate-900">{item.value} subjects</span>
           </div>
         ))}
       </div>

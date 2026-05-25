@@ -17,3 +17,9 @@ Run from project root:
 ```bash
 npm run dev:backend
 ```
+
+It loads MySQL settings from `.env` or `frontend/.env.local`.
+
+- `GET /api/health` checks the MySQL connection.
+- `GET /api/modules` lists backend modules.
+- `POST /api/leads` stores lead form submissions in the MySQL `leads` table.
