@@ -82,34 +82,12 @@ export default function OverviewPage() {
           />
         </div>
         
-        {/* Floating Icons */}
-        <div className="absolute left-10 top-20 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg">
-          <School className="h-8 w-8 text-purple-600" />
-        </div>
-        <div className="absolute right-20 top-32 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg">
-          <BarChart3 className="h-8 w-8 text-blue-600" />
-        </div>
-        <div className="absolute bottom-32 left-20 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg">
-          <Users className="h-8 w-8 text-purple-600" />
-        </div>
-        <div className="absolute bottom-40 right-32 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg">
-          <Trophy className="h-8 w-8 text-pink-600" />
-        </div>
-        
         {/* Decorative stars */}
         <div className="absolute left-1/4 top-16">
           <Sparkles className="h-8 w-8 text-yellow-400 fill-yellow-400" />
         </div>
         <div className="absolute right-1/4 top-20">
           <Sparkles className="h-6 w-6 text-yellow-400 fill-yellow-400" />
-        </div>
-        
-        {/* Paper plane illustration */}
-        <div className="absolute right-16 top-16">
-          <svg className="h-20 w-20 text-purple-400" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4">
-            <path d="M20 80 Q 40 60, 60 40 T 80 20" />
-            <path d="M75 15 L 85 25 L 75 25 Z" fill="currentColor" />
-          </svg>
         </div>
 
         <div className="relative mx-auto max-w-5xl text-center">
