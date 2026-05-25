@@ -70,63 +70,95 @@ const stats = [
 
 export default function OverviewPage() {
   return (
-    <main className="min-h-screen overflow-hidden px-4 pb-16 pt-10 text-slate-950 md:px-6">
-      <section className="relative mx-auto grid max-w-7xl items-center gap-10 py-10 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="absolute -left-20 top-10 h-52 w-52 rounded-full bg-cyan-200/45 blur-3xl" />
-        <div className="absolute right-10 top-16 h-56 w-56 rounded-full bg-pink-200/50 blur-3xl" />
+    <main className="min-h-screen overflow-hidden text-slate-950">
+      {/* HERO SECTION - Matching Reference Image */}
+      <section className="relative overflow-hidden px-4 py-20 md:px-6">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img 
+            src="/overview_bg.png" 
+            alt="Background" 
+            className="h-full w-full object-cover"
+          />
+        </div>
+        
+        {/* Floating Icons */}
+        <div className="absolute left-10 top-20 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg">
+          <School className="h-8 w-8 text-purple-600" />
+        </div>
+        <div className="absolute right-20 top-32 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg">
+          <BarChart3 className="h-8 w-8 text-blue-600" />
+        </div>
+        <div className="absolute bottom-32 left-20 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg">
+          <Users className="h-8 w-8 text-purple-600" />
+        </div>
+        <div className="absolute bottom-40 right-32 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg">
+          <Trophy className="h-8 w-8 text-pink-600" />
+        </div>
+        
+        {/* Decorative stars */}
+        <div className="absolute left-1/4 top-16">
+          <Sparkles className="h-8 w-8 text-yellow-400 fill-yellow-400" />
+        </div>
+        <div className="absolute right-1/4 top-20">
+          <Sparkles className="h-6 w-6 text-yellow-400 fill-yellow-400" />
+        </div>
+        
+        {/* Paper plane illustration */}
+        <div className="absolute right-16 top-16">
+          <svg className="h-20 w-20 text-purple-400" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4">
+            <path d="M20 80 Q 40 60, 60 40 T 80 20" />
+            <path d="M75 15 L 85 25 L 75 25 Z" fill="currentColor" />
+          </svg>
+        </div>
 
-        <div className="relative">
-          <div className="mb-6 inline-flex items-center gap-3 rounded-full border-2 border-white/70 bg-white/76 px-4 py-2 text-sm font-black text-purple-700 shadow-[0_14px_36px_rgba(168,85,247,0.18)] backdrop-blur">
-            <Sparkles className="h-5 w-5" />
+        <div className="relative mx-auto max-w-5xl text-center">
+          {/* Badge */}
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-purple-200 bg-white/80 px-4 py-2 text-sm font-bold text-slate-700 shadow-sm backdrop-blur">
+            <Sparkles className="h-4 w-4 text-purple-600" />
             ADYAPAN Platform Overview
           </div>
-          <h1 className="max-w-4xl text-5xl font-black leading-[0.98] tracking-tight md:text-7xl">
-            One connected system for{" "}
+
+          {/* Main Heading */}
+          <h1 className="text-5xl font-black leading-tight text-slate-900 md:text-6xl lg:text-7xl">
+            One connected
+            <br />
+            system for
+            <br />
             <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
               school growth
             </span>
           </h1>
-          <p className="mt-6 max-w-2xl text-lg font-bold leading-8 text-slate-700 md:text-xl">
-            ADYAPAN combines academics, future skills, LMS, live classes, mentors, progress tracking, AI insights, and
-            school partnerships into one clean learning ecosystem.
-          </p>
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+
+          {/* Description */}
+          <div className="mx-auto mt-6 max-w-3xl rounded-2xl border-2 border-white/50 bg-white/80 px-6 py-4 shadow-lg backdrop-blur-sm">
+            <p className="text-lg font-semibold leading-relaxed text-slate-700 md:text-xl">
+              ADYAPAN combines academics, future skills, LMS, live classes, mentors, progress tracking, AI insights, and school partnerships into one smart learning ecosystem.
+            </p>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
               href="/student-dashboard"
-              className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-7 font-black text-white shadow-[0_18px_36px_rgba(168,85,247,0.28)] transition hover:-translate-y-1 hover:shadow-[0_24px_48px_rgba(168,85,247,0.38)]"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-4 font-bold text-white shadow-xl transition hover:scale-105"
             >
-              View Student Dashboard <ArrowRight className="h-5 w-5" />
+              View Student Dashboard
+              <ArrowRight className="h-5 w-5" />
             </a>
             <a
               href="/mentors"
-              className="inline-flex h-14 items-center justify-center gap-3 rounded-full border-2 border-white bg-white/78 px-7 font-black text-slate-950 shadow-[0_16px_32px_rgba(255,255,255,0.32)] transition hover:-translate-y-1 hover:bg-white"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-slate-300 bg-white/80 px-8 py-4 font-bold text-slate-900 backdrop-blur transition hover:bg-white"
             >
-              Explore Mentors <MessageCircle className="h-5 w-5" />
+              Explore Features
+              <MessageCircle className="h-5 w-5" />
             </a>
-          </div>
-        </div>
-
-        <div className="relative">
-          <div className="absolute -inset-3 rounded-[34px] bg-gradient-to-r from-cyan-300/40 via-pink-300/36 to-amber-200/35 blur-2xl" />
-          <div className="relative overflow-hidden rounded-[34px] border-2 border-white/70 bg-white/70 p-3 shadow-[0_30px_90px_rgba(124,58,237,0.22)] backdrop-blur">
-            <img
-              src="/assets/mentors-group.png"
-              alt="ADYAPAN mentors and technology classroom"
-              className="aspect-[16/10] w-full rounded-[26px] object-cover"
-            />
-            <div className="absolute bottom-6 left-6 right-6 grid gap-3 rounded-3xl border border-white/30 bg-slate-950/68 p-4 text-white backdrop-blur-xl sm:grid-cols-3">
-              {stats.slice(0, 3).map(([value, label]) => (
-                <div key={label}>
-                  <p className="text-xl font-black">{value}</p>
-                  <p className="text-xs font-bold text-white/62">{label}</p>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl py-10">
+      {/* Platform Cards Section */}
+      <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           {platformCards.map((card) => (
             <article
@@ -143,7 +175,8 @@ export default function OverviewPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-6 py-10 lg:grid-cols-[0.86fr_1.14fr]">
+      {/* Journey Section */}
+      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-10 md:px-6 lg:grid-cols-[0.86fr_1.14fr]">
         <div className="rounded-[28px] border-2 border-white/70 bg-slate-950 p-7 text-white shadow-[0_28px_80px_rgba(15,23,42,0.24)]">
           <p className="text-sm font-black uppercase tracking-[0.22em] text-cyan-200">How it works</p>
           <h2 className="mt-4 text-4xl font-black leading-tight">A complete student journey, not only a class.</h2>
@@ -180,7 +213,8 @@ export default function OverviewPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-6 py-10 lg:grid-cols-[1.1fr_0.9fr]">
+      {/* Outcomes Section */}
+      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-10 md:px-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="rounded-[28px] border-2 border-white/70 bg-white/78 p-7 shadow-[0_20px_58px_rgba(99,102,241,0.14)] backdrop-blur">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
@@ -201,18 +235,26 @@ export default function OverviewPage() {
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-[28px] border-2 border-white/70 bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 p-7 text-white shadow-[0_24px_70px_rgba(168,85,247,0.24)]">
-          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/18 blur-2xl" />
-          <img src="/assets/school-boy.png" alt="ADYAPAN student character" className="mx-auto h-72 w-auto object-contain drop-shadow-2xl" />
-          <h2 className="mt-4 text-3xl font-black">Built around the student</h2>
-          <p className="mt-3 text-sm font-bold leading-6 text-white/82">
+        <div className="relative overflow-hidden rounded-[28px] border-2 border-blue-300 bg-blue-100 p-7 shadow-[0_24px_70px_rgba(59,130,246,0.2)]">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="mx-auto h-72 w-auto rounded-xl object-contain"
+          >
+            <source src="/overview_video.mp4" type="video/mp4" />
+          </video>
+          <h2 className="mt-4 text-3xl font-black text-slate-900">Built around the student</h2>
+          <p className="mt-3 text-sm font-bold leading-6 text-slate-700">
             Each child sees the right subjects, right reports, right classes, and right improvement plan based on their
             class and learning journey.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl py-10">
+      {/* Final CTA Section */}
+      <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
         <div className="rounded-[30px] border-2 border-white/70 bg-white/80 p-7 text-center shadow-[0_24px_70px_rgba(37,99,235,0.14)] backdrop-blur md:p-10">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 to-rose-500 text-white shadow-lg">
             <Lightbulb className="h-8 w-8" />
