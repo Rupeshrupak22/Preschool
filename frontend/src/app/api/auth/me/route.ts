@@ -3,8 +3,8 @@ import { findUserByEmail, isMysqlConfigured } from "@/lib/db";
 import { currentUser } from "@/lib/security";
 import { publicUser, store } from "@/lib/store";
 
-export async function GET() {
-  const user = await currentUser();
+export async function GET(request: Request) {
+  const user = await currentUser(request);
 
   if (!user) {
     return NextResponse.json({ error: "Authentication required." }, { status: 401 });

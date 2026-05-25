@@ -5,7 +5,7 @@ import { publicUser, store } from "@/lib/store";
 import { profileSchema } from "@/lib/validators";
 
 export async function PATCH(request: Request) {
-  const authUser = await currentUser();
+  const authUser = await currentUser(request);
 
   if (!authUser) {
     return NextResponse.json({ error: "Authentication required." }, { status: 401 });

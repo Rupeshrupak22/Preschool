@@ -24,7 +24,7 @@ export default function LoginPage() {
     }
 
     window.dispatchEvent(new Event("adyapan-auth-change"));
-    window.location.href = data.user.role === "admin" ? "/admin" : "/dashboard";
+    window.location.href = data.user.role === "admin" ? "/admin" : "/student-dashboard";
   }
 
   return (
@@ -35,10 +35,11 @@ export default function LoginPage() {
       <div className="relative mx-auto grid min-h-[calc(100vh-160px)] max-w-7xl items-center gap-10 xl:grid-cols-[0.86fr_1fr]">
         <section className="relative hidden min-h-[660px] xl:block">
           <div className="flex items-center gap-5">
-            <div className="relative flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-[#ffe55a] via-[#ffbf24] to-[#ff8c1a] text-4xl font-black text-slate-950 shadow-[0_18px_0_#111827,0_28px_40px_rgba(15,23,42,0.18)]">
-              ady.
-              <span className="absolute bottom-7 text-[10px] font-black uppercase tracking-[0.18em]">ADYAPAN</span>
-            </div>
+            <img
+              src="/adyapan-logo.svg"
+              alt="ADYAPAN"
+              className="h-32 w-32 rounded-full object-contain drop-shadow-[0_22px_28px_rgba(15,23,42,0.2)]"
+            />
             <div>
               <p className="text-5xl font-black tracking-tight text-[#08133f]">Adyapan</p>
               <p className="mt-2 text-right text-lg font-black tracking-wide text-[#08133f]">SCHOOL</p>
@@ -65,7 +66,11 @@ export default function LoginPage() {
 
           <div className="absolute bottom-8 left-[72px] h-28 w-44 rounded-xl bg-[#233c89] shadow-[0_18px_28px_rgba(15,23,42,0.18)]">
             <div className="absolute -top-20 left-7 h-28 w-32 rounded-t-[48px] bg-[#1f2f76]" />
-            <div className="absolute -top-6 left-14 h-16 w-16 rounded-full bg-[#ffcc26] text-center text-xl font-black leading-[3.7rem] text-slate-950">ady.</div>
+            <img
+              src="/adyapan-logo.svg"
+              alt="ADYAPAN"
+              className="absolute -top-6 left-14 h-16 w-16 rounded-full object-contain drop-shadow-[0_8px_12px_rgba(15,23,42,0.18)]"
+            />
             <div className="absolute -top-28 left-4 h-24 w-20 rotate-[-10deg] rounded-lg bg-[#f04e72]" />
             <div className="absolute -top-32 left-24 h-28 w-20 rotate-[10deg] rounded-lg bg-[#f7c948]" />
             <div className="absolute -top-24 right-1 h-24 w-14 rotate-[18deg] rounded-lg bg-[#6ac76a]" />

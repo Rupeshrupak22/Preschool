@@ -3,8 +3,8 @@ import { getAdminOverview, isMysqlConfigured } from "@/lib/db";
 import { currentUser } from "@/lib/security";
 import { store } from "@/lib/store";
 
-export async function GET() {
-  const auth = await currentUser();
+export async function GET(request: Request) {
+  const auth = await currentUser(request);
 
   if (!auth || auth.role !== "admin") {
     return NextResponse.json({ error: "Admin access required." }, { status: 403 });

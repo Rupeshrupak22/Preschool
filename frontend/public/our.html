@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light">
+  <link rel="icon" href="/adyapan-logo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/adyapan-logo.svg">
   <title>Adyapan Smart Learning Ecosystem – Study Smarter, Play Better</title>
   
   <!-- Google Fonts: Rounded Fredoka for cute playful elements & Outfit for sleek futuristic typography -->
@@ -124,13 +126,8 @@
     .adyapan-fixed-logo-mark {
       width: 48px;
       height: 48px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
       border-radius: 999px;
-      background: linear-gradient(135deg, #f8c44f, #ff7d65, #b65df3);
-      color: #ffffff;
-      font: 900 14px var(--font-sans);
+      object-fit: contain;
       box-shadow: 0 12px 26px rgba(234, 88, 12, 0.28);
     }
 
@@ -2521,6 +2518,14 @@
       gap: 12px;
     }
 
+    .adyapan-static-footer-logo {
+      width: 64px;
+      height: 64px;
+      border-radius: 999px;
+      object-fit: contain;
+      filter: drop-shadow(0 12px 18px rgba(234, 88, 12, 0.2));
+    }
+
     .adyapan-static-footer-brand strong {
       font-size: 50px;
       line-height: 1;
@@ -2728,7 +2733,7 @@
   <nav class="adyapan-fixed-navbar" aria-label="ADYAPAN main navigation">
     <div class="adyapan-fixed-navbar-inner">
       <a href="/#top" class="adyapan-fixed-logo" aria-label="ADYAPAN School home">
-        <span class="adyapan-fixed-logo-mark">ady.</span>
+        <img src="/adyapan-logo.svg" alt="ADYAPAN" class="adyapan-fixed-logo-mark">
         <span class="adyapan-fixed-brand">
           <strong>Adyapan</strong>
           <span>School</span>
@@ -2740,7 +2745,7 @@
         <a href="/#curriculum">Overview</a>
         <a href="/#events">Mentor</a>
         <a href="/our.html">My App</a>
-        <a href="/dashboard">LMS</a>
+        <a href="/student-dashboard">LMS</a>
         <a href="/about">About Us</a>
       </div>
       <div class="adyapan-fixed-actions" id="adyapan-auth-actions">
@@ -2774,7 +2779,7 @@
       }
 
       function renderLoggedIn(user) {
-        var dashboardHref = user && user.role === "admin" ? "/admin" : "/dashboard";
+        var dashboardHref = user && user.role === "admin" ? "/admin" : "/student-dashboard";
         var name = escapeHtml(user && user.name ? user.name : "Student");
         var email = escapeHtml(user && user.email ? user.email : "ADYAPAN learner");
         var role = user && user.role === "admin" ? "Admin" : "Student";
@@ -2789,11 +2794,11 @@
             '<div class="adyapan-user-dropdown" role="menu">' +
               '<div class="adyapan-user-head"><span class="adyapan-user-avatar">' + initial + '</span><span><strong>' + name + '</strong><span>' + email + '</span></span></div>' +
               '<a href="' + dashboardHref + '">Dashboard</a>' +
-              '<a href="/dashboard#profile">Edit Profile</a>' +
-              '<a href="/dashboard#courses">My Courses</a>' +
-              '<a href="/dashboard#results">Track Result</a>' +
-              '<a href="/dashboard#certificates">Certificates</a>' +
-              '<a href="/dashboard#settings">Settings</a>' +
+              '<a href="/student-dashboard#profile">Edit Profile</a>' +
+              '<a href="/student-dashboard#courses">My Courses</a>' +
+              '<a href="/student-dashboard#results">Track Result</a>' +
+              '<a href="/student-dashboard#certificates">Certificates</a>' +
+              '<a href="/student-dashboard#settings">Settings</a>' +
               '<button type="button" id="adyapan-static-logout">Logout</button>' +
             '</div>' +
           '</div>';
@@ -3825,6 +3830,7 @@
     <div class="adyapan-static-footer-grid">
       <div>
         <div class="adyapan-static-footer-brand">
+          <img src="/adyapan-logo.svg" alt="ADYAPAN" class="adyapan-static-footer-logo">
           <strong>Adyapan</strong>
           <span class="adyapan-static-footer-badge">Future<br>Skills</span>
         </div>
@@ -3855,7 +3861,7 @@
           <a href="/#top">About ADYAPAN</a>
           <a href="/#certificates">Certifications</a>
           <a href="/#schools">School Partnership</a>
-          <a href="/dashboard">LMS Dashboard</a>
+          <a href="/student-dashboard">LMS Dashboard</a>
           <a href="/login">Login</a>
           <a href="/#demo">Contact Us</a>
         </div>

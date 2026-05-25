@@ -48,7 +48,7 @@ export default function SignupPage() {
     }
 
     window.dispatchEvent(new Event("adyapan-auth-change"));
-    window.location.href = data.user.role === "admin" ? "/admin" : "/dashboard";
+    window.location.href = data.user.role === "admin" ? "/admin" : "/student-dashboard";
   }
 
   return (
@@ -59,10 +59,11 @@ export default function SignupPage() {
       <div className="relative mx-auto grid min-h-[calc(100vh-160px)] max-w-7xl items-center gap-10 xl:grid-cols-[0.86fr_1fr]">
         <section className="relative hidden min-h-[720px] xl:block">
           <div className="flex items-center gap-5">
-            <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[#ffe55a] via-[#ffbf24] to-[#ff8c1a] text-3xl font-black text-slate-950 shadow-[0_12px_26px_rgba(15,23,42,0.16)]">
-              ady.
-              <span className="absolute bottom-5 text-[9px] font-black uppercase tracking-[0.12em]">ADYAPAN</span>
-            </div>
+            <img
+              src="/adyapan-logo.svg"
+              alt="ADYAPAN"
+              className="h-24 w-24 rounded-full object-contain drop-shadow-[0_12px_20px_rgba(15,23,42,0.16)]"
+            />
             <div>
               <p className="text-5xl font-black tracking-tight text-[#08133f]">Adyapan</p>
               <p className="mt-2 text-right text-lg font-black tracking-wide text-[#08133f]">SCHOOL</p>

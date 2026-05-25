@@ -28,7 +28,19 @@ export function verifyToken(token?: string): AuthPayload | null {
   }
 }
 
-export async function currentUser() {
+function bearerToken(request?: Request) {
+  const header = request?.headers.get("authorization");
+  const [scheme, token] = header?.split(" ") ?? [];
+  return scheme?.toLowerCase() === "bearer" ? token : undefined;
+}
+
+export async function currentUser(request?: Request) {
+  const authUser = verifyToken(bearerToken(request));
+
+  if (authUser) {
+    return authUser;
+  }
+
   const cookieStore = await cookies();
   return verifyToken(cookieStore.get("adyapan_token")?.value);
 }

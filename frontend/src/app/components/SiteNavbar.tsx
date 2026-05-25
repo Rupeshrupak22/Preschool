@@ -19,7 +19,7 @@ const navItems = [
   { label: "Overview", href: "/overview" },
   { label: "Mentor", href: "/mentors" },
   { label: "My App", href: "/our.html" },
-  { label: "LMS", href: "/dashboard" },
+  { label: "LMS", href: "/student-dashboard" },
   { label: "About Us", href: "/about" }
 ];
 
@@ -112,9 +112,11 @@ export default function SiteNavbar() {
 
       <div className="relative z-10 mx-auto flex h-20 max-w-[1500px] items-center justify-between gap-3 px-3 sm:px-4 md:px-6">
         <a href="/#top" className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3" aria-label="ADYAPAN School home">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#f8c44f] via-[#ff7d65] to-[#b65df3] text-xs font-black lowercase text-white shadow-[0_12px_26px_rgba(234,88,12,0.28)] sm:h-14 sm:w-14 sm:text-sm">
-            ady.
-          </span>
+          <img
+            src="/adyapan-logo.svg"
+            alt="ADYAPAN"
+            className="h-12 w-12 shrink-0 rounded-full object-contain drop-shadow-[0_12px_18px_rgba(234,88,12,0.26)] sm:h-14 sm:w-14"
+          />
           <span className="min-w-0 leading-none">
             <span className="block text-[24px] font-black tracking-tight text-[#8b2ed3] sm:text-[28px] md:text-[32px]">
               Adyapan

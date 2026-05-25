@@ -13,7 +13,7 @@ const quickLinks = [
   ["About ADYAPAN", "/about"],
   ["Certifications", "/#certificates"],
   ["School Partnership", "/#schools"],
-  ["LMS Dashboard", "/dashboard"],
+  ["LMS Dashboard", "/student-dashboard"],
   ["Login", "/login"],
   ["Contact Us", "/#demo"]
 ];
@@ -30,6 +30,11 @@ export default function SiteFooter() {
       <div className="mx-auto grid max-w-7xl gap-8 sm:grid-cols-2 lg:grid-cols-[1.15fr_1.1fr_.9fr_1.1fr] lg:gap-10">
         <div>
           <div className="flex flex-wrap items-end gap-3">
+            <img
+              src="/adyapan-logo.svg"
+              alt="ADYAPAN"
+              className="h-16 w-16 shrink-0 rounded-full object-contain drop-shadow-[0_12px_18px_rgba(234,88,12,0.2)]"
+            />
             <span className="text-4xl font-black leading-none tracking-tight text-slate-950 sm:text-5xl">Adyapan</span>
             <span className="mb-1 rounded bg-cyan-600 px-3 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-white">
               Future
