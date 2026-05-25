@@ -127,33 +127,26 @@ const testimonials = [
   }
 ];
 
-const heroPrograms: { title: string; range: string; icon: Icon; accent: string; avatar: string }[] = [
-  {
-    title: "Pre School",
-    range: "Nursery to KG",
-    icon: Sparkles,
-    accent: "from-rose-50 to-rose-100 border-rose-100",
-    avatar: "PS"
-  },
+const heroPrograms: { title: string; range: string; icon: Icon; glow: string; avatar: string }[] = [
   {
     title: "Primary",
     range: "Class 1-5",
     icon: BookOpen,
-    accent: "from-amber-50 to-yellow-100 border-amber-100",
+    glow: "from-fuchsia-400/25 via-purple-300/18 to-cyan-300/22",
     avatar: "P"
   },
   {
     title: "Middle",
     range: "Class 6 to 8",
     icon: School,
-    accent: "from-cyan-50 to-teal-100 border-cyan-100",
+    glow: "from-purple-400/25 via-pink-300/18 to-emerald-300/22",
     avatar: "M"
   },
   {
     title: "High School",
     range: "Class 9-12",
     icon: GraduationCap,
-    accent: "from-indigo-50 to-violet-100 border-indigo-100",
+    glow: "from-cyan-400/25 via-blue-300/18 to-fuchsia-300/22",
     avatar: "HS"
   }
 ];
@@ -243,7 +236,7 @@ export default function Home() {
       <section id="top" className="relative min-h-[92vh] overflow-hidden px-4 pt-10 md:px-6">
         <div className="absolute left-10 top-20 hidden h-20 w-20 rounded-full border-2 border-yellow-300 md:block animate-pulse" />
         <div className="absolute right-8 top-28 hidden h-16 w-16 rounded-full border-2 border-green-300 md:block animate-pulse" style={{ animationDelay: "0.5s" }} />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-10 pb-10 lg:grid-cols-[0.95fr_1.18fr]">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-10 pb-8 lg:grid-cols-[0.9fr_1.1fr]">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <div className="mb-7 inline-flex items-center gap-3 rounded-full border-2 border-white bg-white/60 backdrop-blur px-4 py-2 text-sm font-bold text-slate-900 shadow-[0_12px_32px_rgba(168,85,247,0.2)]">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-orange-400 to-red-500 text-white shadow-lg font-bold">
@@ -255,7 +248,7 @@ export default function Home() {
               Big Dreams <span className="block">Start Small</span>
             </h1>
             <p className="mt-7 max-w-2xl text-lg font-bold leading-8 text-slate-900 sm:text-xl md:text-2xl md:leading-9">
-              Nurturing young minds from <span className="font-black text-purple-600">Pre School</span> and guiding them
+              Nurturing young minds from <span className="font-black text-purple-600">Class 1</span> and guiding them
               all the way to <span className="font-black text-purple-600">Class 12</span>.
             </p>
             <div className="mt-8 h-3 w-44 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 to-blue-400 shadow-lg" />
@@ -279,32 +272,36 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1, duration: 0.7 }}
-            className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+            className="grid gap-5 sm:grid-cols-3"
           >
             {heroPrograms.map((program, index) => (
               <a
                 key={program.title}
                 href="#curriculum"
-                className={`group min-h-[360px] overflow-hidden rounded-[28px] border-2 bg-gradient-to-b from-white/80 to-white/60 backdrop-blur p-5 text-center shadow-[0_20px_55px_rgba(168,85,247,0.2)] transition hover:-translate-y-2 hover:shadow-[0_28px_70px_rgba(168,85,247,0.3)] border-white/50 sm:min-h-[430px] sm:rounded-[36px] sm:p-6`}
+                className="group relative min-h-[390px] overflow-hidden rounded-[30px] border-2 border-white/90 bg-white/88 p-5 text-center shadow-[0_20px_60px_rgba(99,102,241,0.18)] backdrop-blur-xl transition duration-300 hover:-translate-y-3 hover:border-fuchsia-300 hover:bg-white hover:shadow-[0_0_34px_rgba(217,70,239,0.30),0_34px_80px_rgba(168,85,247,0.28)] sm:min-h-[455px] sm:rounded-[34px] sm:p-6"
               >
-                <program.icon className="mx-auto h-14 w-14 text-purple-600 transition group-hover:scale-110 group-hover:text-pink-600" />
-                <h3 className="mt-6 text-2xl font-black text-slate-900">{program.title}</h3>
-                <p className="mt-2 text-lg font-bold text-slate-700">({program.range})</p>
-                <div className="relative mx-auto mt-8 flex h-44 w-32 items-end justify-center sm:mt-10 sm:h-52 sm:w-36">
-                  <div className="absolute bottom-0 h-32 w-28 rounded-t-[46px] rounded-b-[24px] bg-gradient-to-b from-purple-500 to-pink-600 shadow-xl transition group-hover:scale-105" />
-                  <div className="absolute bottom-24 h-24 w-24 rounded-full bg-gradient-to-b from-yellow-200 to-orange-300 shadow-lg" />
-                  <div className="absolute bottom-[138px] h-9 w-24 rounded-t-full bg-slate-900" />
-                  <div className="absolute bottom-[110px] flex gap-6">
-                    <span className="h-2.5 w-2.5 rounded-full bg-slate-950" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-slate-950" />
+                <div className={`absolute inset-x-4 bottom-4 top-24 rounded-[28px] bg-gradient-to-b ${program.glow} opacity-75 blur-sm transition duration-300 group-hover:scale-105 group-hover:opacity-100`} />
+                <div className="absolute inset-0 rounded-[30px] ring-1 ring-inset ring-white/90 transition duration-300 group-hover:ring-fuchsia-300/70" />
+                <div className="absolute inset-0 rounded-[30px] opacity-0 shadow-[inset_0_0_28px_rgba(168,85,247,0.24),0_0_34px_rgba(34,211,238,0.22)] transition duration-300 group-hover:opacity-100" />
+                <div className="relative z-10">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center text-purple-600 drop-shadow-[0_0_16px_rgba(168,85,247,0.28)] transition duration-300 group-hover:-translate-y-1 group-hover:scale-110 group-hover:text-fuchsia-600 group-hover:drop-shadow-[0_0_22px_rgba(217,70,239,0.55)]">
+                    <program.icon className="h-12 w-12 stroke-[2.4]" />
                   </div>
-                  <div className="absolute bottom-[92px] h-2 w-8 rounded-full bg-green-400" />
-                  <div className="absolute bottom-8 rounded-xl bg-white/95 px-3 py-2 text-sm font-black text-purple-600 shadow">
-                    {program.avatar}
-                  </div>
-                  <div
-                    className={`absolute ${index % 2 === 0 ? "left-0" : "right-0"} bottom-2 h-14 w-14 rounded-2xl bg-white/80 shadow-md`}
+                  <h3 className="mt-5 text-2xl font-black leading-tight text-slate-950">{program.title}</h3>
+                  <p className="mt-2 text-base font-black text-slate-600">({program.range})</p>
+                </div>
+                <div className="relative z-10 mx-auto mt-6 flex h-48 max-w-[168px] items-end justify-center sm:h-56">
+                  <div className="absolute bottom-0 h-28 w-36 rounded-[32px] bg-white/72 shadow-[0_18px_40px_rgba(15,23,42,0.12)] transition duration-300 group-hover:scale-105 group-hover:shadow-[0_0_34px_rgba(34,211,238,0.30)]" />
+                  <img
+                    src="/assets/school-boy.png"
+                    alt={`${program.title} student`}
+                    className="relative z-10 h-full w-auto object-contain drop-shadow-[0_22px_26px_rgba(88,28,135,0.20)] transition duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_24px_rgba(168,85,247,0.40)]"
                   />
+                  <span
+                    className={`absolute ${index % 2 === 0 ? "left-0" : "right-0"} bottom-8 z-20 rounded-2xl border border-white bg-white/92 px-3 py-2 text-sm font-black text-purple-700 shadow-[0_12px_28px_rgba(168,85,247,0.20)] transition duration-300 group-hover:-translate-y-1`}
+                  >
+                    {program.avatar}
+                  </span>
                 </div>
               </a>
             ))}
@@ -315,11 +312,14 @@ export default function Home() {
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.22, duration: 0.7 }}
-          className="relative mx-auto mb-10 grid max-w-6xl gap-4 rounded-[32px] border-2 border-white/60 bg-white/70 backdrop-blur p-5 shadow-[0_26px_70px_rgba(168,85,247,0.15)] sm:grid-cols-2 lg:grid-cols-4"
+          className="relative mx-auto mb-10 grid max-w-6xl gap-4 rounded-[32px] border-2 border-white/70 bg-white/78 p-5 shadow-[0_26px_70px_rgba(99,102,241,0.16)] backdrop-blur-xl sm:grid-cols-2 lg:grid-cols-4"
         >
           {heroBenefits.map((benefit) => (
-            <div key={benefit.title} className="flex items-center gap-4 rounded-2xl p-3 transition hover:bg-purple-100">
-              <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${benefit.color}`}>
+            <div
+              key={benefit.title}
+              className="group flex min-h-24 items-center gap-4 rounded-2xl border border-white/80 bg-white/64 p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-purple-200 hover:bg-white hover:shadow-[0_18px_36px_rgba(168,85,247,0.18)]"
+            >
+              <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${benefit.color} transition duration-300 group-hover:scale-110`}>
                 <benefit.icon className="h-7 w-7" />
               </span>
               <p className="text-base font-bold leading-6 text-slate-900">{benefit.title}</p>
@@ -427,7 +427,7 @@ export default function Home() {
             </p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <a
-                href="tel:+919000000000"
+                href="tel:+918292244709"
                 className="inline-flex h-11 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 text-sm font-bold text-white shadow-[0_12px_26px_rgba(168,85,247,0.3)] transition hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(168,85,247,0.4)]"
               >
                 WhatsApp

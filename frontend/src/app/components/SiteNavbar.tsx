@@ -10,16 +10,14 @@ import {
   LogOut,
   Menu,
   Settings,
-  UserPen,
-  UserRound,
   X
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 const navItems = [
   { label: "Home", href: "/#top" },
-  { label: "Overview", href: "/#curriculum" },
-  { label: "Mentor", href: "/#events" },
+  { label: "Overview", href: "/overview" },
+  { label: "Mentor", href: "/mentors" },
   { label: "My App", href: "/our.html" },
   { label: "LMS", href: "/dashboard" },
   { label: "About Us", href: "/about" }
@@ -93,17 +91,19 @@ export default function SiteNavbar() {
     window.location.href = "/login";
   }
 
-  const dashboardHref = user?.role === "admin" ? "/admin" : "/dashboard";
+  const dashboardHref = user?.role === "admin" ? "/admin" : "/student-dashboard";
   const shortName = user?.name?.split(" ")[0] || "Student";
   const initial = (user?.name?.trim()?.[0] || "A").toUpperCase();
-  const menuItems = [
-    { label: user?.role === "admin" ? "Admin Dashboard" : "Dashboard", href: dashboardHref, icon: LayoutDashboard },
-    { label: "Edit Profile", href: "/dashboard#profile", icon: UserPen },
-    { label: "My Courses", href: "/dashboard#courses", icon: BookOpen },
-    { label: "Track Result", href: "/dashboard#results", icon: BarChart3 },
-    { label: "Certificates", href: "/dashboard#certificates", icon: Award },
-    { label: "Settings", href: "/dashboard#settings", icon: Settings }
-  ];
+  const menuItems =
+    user?.role === "admin"
+      ? [{ label: "Admin Dashboard", href: dashboardHref, icon: LayoutDashboard }]
+      : [
+          { label: "Dashboard", href: dashboardHref, icon: LayoutDashboard },
+          { label: "My Courses", href: "/student-dashboard#courses", icon: BookOpen },
+          { label: "Track Result", href: "/student-dashboard#results", icon: BarChart3 },
+          { label: "Certificates", href: "/student-dashboard#certificates", icon: Award },
+          { label: "Settings", href: "/student-dashboard#settings", icon: Settings }
+        ];
 
   return (
     <nav className="fixed left-0 right-0 top-0 z-[100] bg-gradient-to-r from-[#b565f2] via-[#efb7df] to-[#8ec9f6] shadow-[0_12px_36px_rgba(99,102,241,0.24)] backdrop-blur-xl">

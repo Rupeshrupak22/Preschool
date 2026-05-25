@@ -1,449 +1,421 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
 import {
-  Award,
+  ArrowRight,
   BarChart3,
-  CalendarDays,
-  CheckCircle2,
-  Clock3,
-  Download,
-  FileText,
+  BookOpen,
+  Brain,
+  Code2,
+  Cpu,
   GraduationCap,
-  LayoutDashboard,
-  Lock,
+  Laptop,
   MessageCircle,
-  PlayCircle,
-  Save,
+  Rocket,
   ShieldCheck,
-  Star,
   Target,
-  TrendingUp,
-  UserPen
+  Users,
+  Wifi,
+  Zap
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 
-type DashboardUser = {
-  id?: string;
-  name: string;
-  email: string;
-  phone?: string | null;
-  classLevel?: string | null;
-  schoolName?: string | null;
-  role: "student" | "admin";
-  unlockedCourses?: string[];
-};
+type Icon = React.ComponentType<{ className?: string }>;
 
-const courseCatalog = [
+const skillTiles: { label: string; icon: Icon }[] = [
+  { label: "Robotics", icon: Cpu },
+  { label: "Coding", icon: Laptop },
+  { label: "IoT", icon: Wifi },
+  { label: "Electronics", icon: Zap },
+  { label: "AI/ML", icon: Brain },
+  { label: "Programming", icon: Code2 }
+];
+
+const overviewCards: { title: string; copy: string; icon: Icon }[] = [
+  { title: "Progress Tracking", copy: "Real-time monitoring of student performance", icon: BarChart3 },
+  { title: "AI-Powered Tools", copy: "Smart recommendations and automated tasks", icon: Brain },
+  { title: "Curriculum Management", copy: "Organized and structured learning paths", icon: BookOpen },
+  { title: "Collaborative Learning", copy: "Interactive tools for group activities", icon: GraduationCap }
+];
+
+const studentFeatures = [
+  "Personalized Learning Path",
+  "Interactive Quizzes & Games",
+  "Doubt Solver (AI Chatbot)",
+  "AI Notes & Summaries",
+  "Practice Question Bank",
+  "Exam Preparation Mode",
+  "Study Planner & Reminders",
+  "Progress Reports & Report Cards",
+  "Project & Idea Suggestions",
+  "Language Translation & Simplification",
+  "Gamification & Leaderboards",
+  "Collaborative Tools",
+  "AI Voice Narration",
+  "Adaptive Revision Plans",
+  "E-Library Access"
+];
+
+const teacherFeatures = [
+  "AI Lesson Plan Generator",
+  "Unit Plan Creation",
+  "Exam & Question Paper Generator",
+  "AI Quiz Maker",
+  "Automatic PPT Maker",
+  "Assignment & Worksheet Generator",
+  "Auto-Grading System",
+  "Homework Allocation",
+  "Content Recommendation",
+  "Progress Dashboard",
+  "AI Teaching Assistant (Chatbot)",
+  "Curriculum Mapping",
+  "Plagiarism Check & Report",
+  "Parent Communication Tools",
+  "AI Notes Generator"
+];
+
+const examCards: { title: string; copy: string; icon: Icon; tags: string[] }[] = [
   {
-    title: "Future Skills Starter",
-    level: "Foundation",
-    progress: 64,
-    color: "from-blue-600 to-cyan-500",
-    next: "Skill map and learning habits"
+    title: "Multiple Formats",
+    copy: "Support for MCQs, essays, coding challenges, and descriptive questions.",
+    icon: BookOpen,
+    tags: ["MCQs", "Essays", "Coding", "True/False"]
   },
   {
-    title: "Robotics Lab",
-    level: "Hands-on",
-    progress: 28,
-    color: "from-amber-500 to-rose-500",
-    next: "Sensors and Arduino basics"
+    title: "Auto Evaluation",
+    copy: "Instant grading and detailed feedback with AI-powered analysis.",
+    icon: BarChart3,
+    tags: ["Instant Grading", "AI Analysis", "Reports"]
   },
   {
-    title: "AI Coding",
-    level: "Advanced",
-    progress: 12,
-    color: "from-violet-600 to-fuchsia-500",
-    next: "Prompt logic and Python practice"
+    title: "Secure Platform",
+    copy: "Protected exam environment with anti-cheating and monitoring measures.",
+    icon: ShieldCheck,
+    tags: ["Anti-Cheating", "Secure Browser", "Time Limits"]
   }
 ];
 
-const resultRows = [
-  { subject: "Coding Logic", score: 92, status: "Excellent" },
-  { subject: "Robotics", score: 78, status: "Improving" },
-  { subject: "AI Basics", score: 84, status: "Strong" }
-];
+function SectionShell({
+  id,
+  title,
+  subtitle,
+  children,
+  accent = "right"
+}: {
+  id: string;
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+  accent?: "left" | "right";
+}) {
+  return (
+    <section id={id} className="px-4 py-16 md:px-6">
+      <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[28px] border border-blue-100 bg-white p-8 shadow-[0_22px_70px_rgba(15,23,42,0.10)] md:p-12">
+        <div
+          className={`absolute top-0 h-32 w-32 bg-blue-100 ${
+            accent === "left" ? "left-0 rounded-br-full" : "right-0 rounded-bl-full"
+          }`}
+        />
+        <div className="relative">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-3xl font-black text-slate-950 md:text-4xl">{title}</h2>
+            <p className="mt-4 text-base leading-7 text-slate-600">{subtitle}</p>
+          </div>
+          {children}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-const quickActions = [
-  { label: "Continue Lesson", href: "#courses", icon: PlayCircle, color: "bg-blue-600" },
-  { label: "Track Result", href: "#results", icon: BarChart3, color: "bg-emerald-600" },
-  { label: "Edit Profile", href: "#profile", icon: UserPen, color: "bg-rose-600" },
-  { label: "Ask Mentor", href: "tel:+919000000000", icon: MessageCircle, color: "bg-slate-950" }
-];
+function FeaturePill({ label, active }: { label: string; active?: boolean }) {
+  return (
+    <div
+      className={`flex min-h-14 items-center gap-3 rounded-xl border px-4 font-semibold text-slate-950 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-500 hover:bg-blue-600 hover:text-white ${
+        active ? "border-cyan-500 bg-cyan-50 ring-1 ring-cyan-500/25" : "border-slate-200 bg-white"
+      }`}
+    >
+      <span className={`h-3 w-3 rounded-full ${active ? "bg-cyan-600" : "bg-blue-700"}`} />
+      {label}
+    </div>
+  );
+}
 
-const studyPlan: { time: string; label: string; icon: LucideIcon }[] = [
-  { time: "4:00 PM", label: "Robotics live practice", icon: CalendarDays },
-  { time: "20 min", label: "AI quiz revision", icon: Clock3 },
-  { time: "1 task", label: "Submit mini project", icon: FileText }
-];
-
-const settingsCards: { title: string; copy: string; icon: LucideIcon }[] = [
-  { title: "Account Security", copy: "Password, session and login protection.", icon: ShieldCheck },
-  { title: "Mentor Support", copy: "Raise course doubt and request callback.", icon: GraduationCap },
-  { title: "Goals", copy: "Weekly targets and learning milestones.", icon: Target }
-];
-
-const recentUpdates: { title: string; copy: string; icon: LucideIcon }[] = [
-  { title: "Lesson completed", copy: "Coding Logic - Variables", icon: CheckCircle2 },
-  { title: "Badge earned", copy: "7 day study streak", icon: Star },
-  { title: "Report generated", copy: "May learning summary", icon: FileText }
-];
-
-export default function DashboardPage() {
-  const router = useRouter();
-  const [user, setUser] = useState<DashboardUser | null>(null);
+export default function LMSPage() {
   const [status, setStatus] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [profile, setProfile] = useState({
-    name: "",
-    phone: "",
-    classLevel: "",
-    schoolName: ""
-  });
 
-  useEffect(() => {
-    fetch("/api/auth/me", { cache: "no-store" })
-      .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
-      .then(({ ok, data }) => {
-        if (!ok || !data.user) {
-          router.replace("/login");
-          return;
-        }
+  function goTo(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
-        if (data.user.role === "admin") {
-          router.replace("/admin");
-          return;
-        }
-
-        setUser(data.user);
-        setProfile({
-          name: data.user.name ?? "",
-          phone: data.user.phone ?? "",
-          classLevel: data.user.classLevel ?? "",
-          schoolName: data.user.schoolName ?? ""
-        });
-      })
-      .catch(() => router.replace("/login"))
-      .finally(() => setLoading(false));
-  }, [router]);
-
-  const unlocked = useMemo(() => new Set(user?.unlockedCourses ?? ["Future Skills Starter"]), [user]);
-  const averageScore = Math.round(resultRows.reduce((sum, row) => sum + row.score, 0) / resultRows.length);
-
-  async function saveProfile(event: FormEvent<HTMLFormElement>) {
+  async function submitDemo(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSaving(true);
-    setStatus("Saving profile...");
-
-    const response = await fetch("/api/auth/profile", {
-      method: "PATCH",
+    setStatus("Submitting demo request...");
+    const form = new FormData(event.currentTarget);
+    const body = Object.fromEntries(form.entries());
+    const response = await fetch("/api/leads", {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(profile)
+      body: JSON.stringify({
+        type: "school",
+        name: body.name,
+        email: body.email,
+        phone: body.phone,
+        school: body.school,
+        city: body.city,
+        message: `${body.schedule || ""} ${body.message || ""}`.trim()
+      })
     });
     const data = await response.json();
-
-    if (!response.ok) {
-      setStatus(data.error || "Profile update failed.");
-      setSaving(false);
-      return;
-    }
-
-    setUser(data.user);
-    window.dispatchEvent(new Event("adyapan-auth-change"));
-    setStatus("Profile updated.");
-    setSaving(false);
-  }
-
-  if (loading) {
-    return (
-      <main className="grid min-h-screen place-items-center px-4 text-slate-950">
-        <div className="rounded-2xl border border-blue-100 bg-white px-6 py-5 text-sm font-black shadow-glass">
-          Opening your dashboard...
-        </div>
-      </main>
-    );
-  }
-
-  if (!user) {
-    return <main className="min-h-screen" />;
+    setStatus(response.ok ? "Demo request submitted. ADYAPAN team will contact you." : data.error);
+    if (response.ok) event.currentTarget.reset();
   }
 
   return (
-    <main className="min-h-screen px-4 pb-14 pt-8 text-slate-950 md:px-6">
-      <div className="mx-auto max-w-7xl">
-        <section className="rounded-[28px] border border-blue-100 bg-white/95 p-5 shadow-[0_24px_70px_rgba(37,99,235,0.14)] md:p-8">
-          <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
-            <div>
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-[#ffd84d] to-[#ff5b55] text-base font-black text-slate-950">
-                  {user.name?.[0]?.toUpperCase() || "A"}
-                </span>
-                <div>
-                  <p className="text-sm font-black uppercase tracking-[0.22em] text-blue-700">Student dashboard</p>
-                  <h1 className="mt-1 text-3xl font-black tracking-tight sm:text-4xl md:text-5xl">
-                    Welcome, {user.name}
-                  </h1>
-                </div>
-              </div>
-              <p className="mt-5 max-w-3xl text-base font-medium leading-7 text-slate-600 md:text-lg">
-                Continue courses, track results, update profile, and download certificates from one clean dashboard.
-              </p>
+    <main className="min-h-screen bg-[#f4f8ff] text-slate-950">
 
-              <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                {quickActions.map((action) => (
-                  <a
-                    key={action.label}
-                    href={action.href}
-                    className="flex min-h-16 items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 font-black shadow-sm transition hover:-translate-y-1 hover:border-blue-300 hover:shadow-glass"
-                  >
-                    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white ${action.color}`}>
-                      <action.icon className="h-5 w-5" />
-                    </span>
-                    {action.label}
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-2xl bg-slate-950 p-5 text-white">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-bold text-white/62">Learning score</p>
-                  <p className="mt-1 text-5xl font-black">{averageScore}%</p>
-                </div>
-                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-cyan-200">
-                  <TrendingUp className="h-8 w-8" />
-                </span>
-              </div>
-              <div className="mt-6 grid grid-cols-3 gap-3">
-                {[
-                  ["Courses", courseCatalog.length],
-                  ["Badges", 6],
-                  ["Streak", "12d"]
-                ].map(([label, value]) => (
-                  <div key={label} className="rounded-xl bg-white/10 p-3 text-center">
-                    <p className="text-xl font-black">{value}</p>
-                    <p className="mt-1 text-xs font-bold text-white/62">{label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
-          <div id="courses" className="rounded-[24px] border border-blue-100 bg-white/95 p-5 shadow-glass md:p-6">
-            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-              <div>
-                <p className="text-sm font-black uppercase tracking-[0.18em] text-cyan-700">Courses</p>
-                <h2 className="mt-1 text-2xl font-black">My Courses</h2>
-              </div>
-              <a href="/#curriculum" className="inline-flex h-11 items-center justify-center rounded-xl bg-blue-600 px-5 text-sm font-black text-white">
-                Explore More
+      <section className="relative overflow-hidden px-4 pb-14 pt-12 md:px-6">
+        <div className="absolute -left-28 -top-36 h-80 w-80 rounded-full bg-gradient-to-br from-blue-700 to-cyan-700 opacity-80" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.95fr_1fr]">
+          <div>
+            <a href="/" className="mb-10 inline-flex items-center gap-3 rounded-full bg-white px-4 py-2 text-sm font-bold text-blue-950 shadow">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-700 text-white">A</span>
+              ADYAPAN LMS
+            </a>
+            <h1 className="text-5xl font-black tracking-tight md:text-7xl">
+              <span className="text-cyan-700">Adyapan</span> LMS
+            </h1>
+            <p className="mt-7 max-w-3xl text-2xl font-medium leading-[1.6] text-slate-600">
+              <span className="font-black text-blue-950">AI-powered Learning Management System</span> enriched with
+              dynamic features to enhance teaching efficiency and{" "}
+              <span className="font-black text-cyan-700">student engagement</span>
+            </p>
+            <div className="mt-9 flex flex-col gap-4 sm:flex-row">
+              <a
+                href="#demo"
+                className="inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-cyan-600 px-8 font-black text-white shadow-[0_14px_30px_rgba(13,148,136,0.24)] transition hover:-translate-y-1 hover:bg-blue-700"
+              >
+                <Target className="h-5 w-5" /> Book Demo <ArrowRight className="h-5 w-5" />
+              </a>
+              <a
+                href="tel:+918292244709"
+                className="inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-blue-700 px-8 font-black text-white shadow-[0_14px_30px_rgba(37,99,235,0.22)] transition hover:-translate-y-1 hover:bg-slate-950"
+              >
+                <MessageCircle className="h-5 w-5" /> Chat on WhatsApp
               </a>
             </div>
-
-            <div className="mt-5 grid gap-4 xl:grid-cols-3">
-              {courseCatalog.map((course) => {
-                const active = unlocked.has(course.title);
-                return (
-                  <article key={course.title} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                    <div className={`flex h-32 items-end rounded-xl bg-gradient-to-br ${course.color} p-4 text-white`}>
-                      <div>
-                        <p className="text-xs font-black uppercase tracking-[0.16em] text-white/75">{course.level}</p>
-                        <h3 className="mt-1 text-xl font-black">{course.title}</h3>
-                      </div>
-                    </div>
-                    <div className="mt-4 flex items-center justify-between gap-3">
-                      <span className="text-sm font-bold text-slate-600">Progress</span>
-                      <span className="text-sm font-black">{active ? `${course.progress}%` : "Locked"}</span>
-                    </div>
-                    <div className="mt-2 h-2 rounded-full bg-slate-100">
-                      <div className="h-full rounded-full bg-slate-950" style={{ width: active ? `${course.progress}%` : "8%" }} />
-                    </div>
-                    <p className="mt-4 min-h-12 text-sm font-semibold leading-6 text-slate-600">{course.next}</p>
-                    <button
-                      className={`mt-4 flex h-11 w-full items-center justify-center gap-2 rounded-xl text-sm font-black ${
-                        active ? "bg-slate-950 text-white" : "bg-slate-100 text-slate-500"
-                      }`}
-                    >
-                      {active ? <PlayCircle className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
-                      {active ? "Open Course" : "Unlock Course"}
-                    </button>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-
-          <aside className="grid gap-6">
-            <div className="rounded-[24px] border border-blue-100 bg-white/95 p-5 shadow-glass">
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-rose-600">Today</p>
-              <h2 className="mt-1 text-2xl font-black">Study Plan</h2>
-              <div className="mt-5 grid gap-3">
-                {studyPlan.map((item) => (
-                  <div key={item.label} className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-blue-700 shadow-sm">
-                      <item.icon className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <p className="text-xs font-black uppercase tracking-[0.14em] text-slate-400">{item.time}</p>
-                      <p className="text-sm font-black">{item.label}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div id="certificates" className="rounded-[24px] border border-blue-100 bg-white/95 p-5 shadow-glass">
-              <div className="flex items-center gap-3">
-                <Award className="h-8 w-8 text-amber-500" />
-                <div>
-                  <p className="text-sm font-black uppercase tracking-[0.18em] text-amber-600">Certificates</p>
-                  <h2 className="text-2xl font-black">Achievements</h2>
-                </div>
-              </div>
-              <div className="mt-5 rounded-2xl border border-dashed border-amber-300 bg-amber-50 p-4">
-                <p className="font-black">Future Skills Starter</p>
-                <p className="mt-2 text-sm font-semibold text-slate-600">Complete 80% to generate certificate.</p>
-                <button className="mt-4 inline-flex h-10 items-center gap-2 rounded-xl bg-amber-500 px-4 text-sm font-black text-white">
-                  <Download className="h-4 w-4" /> Download
-                </button>
-              </div>
-            </div>
-          </aside>
-        </section>
-
-        <section className="mt-6 grid gap-6 lg:grid-cols-[0.95fr_1fr]">
-          <div id="results" className="rounded-[24px] border border-blue-100 bg-white/95 p-5 shadow-glass md:p-6">
-            <div className="flex items-center gap-3">
-              <BarChart3 className="h-8 w-8 text-emerald-600" />
-              <div>
-                <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-700">Track Result</p>
-                <h2 className="text-2xl font-black">Performance Report</h2>
-              </div>
-            </div>
-            <div className="mt-5 grid gap-3">
-              {resultRows.map((row) => (
-                <div key={row.subject} className="rounded-2xl border border-slate-200 bg-white p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="font-black">{row.subject}</p>
-                      <p className="mt-1 text-sm font-semibold text-slate-500">{row.status}</p>
-                    </div>
-                    <span className="text-2xl font-black text-emerald-600">{row.score}%</span>
-                  </div>
-                  <div className="mt-3 h-2 rounded-full bg-slate-100">
-                    <div className="h-full rounded-full bg-emerald-500" style={{ width: `${row.score}%` }} />
-                  </div>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:max-w-3xl lg:grid-cols-3">
+              {skillTiles.map((tile) => (
+                <div
+                  key={tile.label}
+                  className="group flex h-16 items-center gap-4 rounded-xl border border-slate-200 bg-white px-5 font-bold text-slate-700 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:bg-blue-700 hover:text-white"
+                >
+                  <tile.icon className="h-6 w-6 text-cyan-700 transition group-hover:text-white" />
+                  {tile.label}
                 </div>
               ))}
             </div>
+            <p className="mt-8 max-w-3xl text-lg font-bold leading-8 text-slate-600">
+              Learn from expert faculties of Robotics, Arduino, IoT, Coding, Electronics, AI and modern classroom tools.
+            </p>
           </div>
 
-          <div id="profile" className="rounded-[24px] border border-blue-100 bg-white/95 p-5 shadow-glass md:p-6">
-            <div className="flex items-center gap-3">
-              <UserPen className="h-8 w-8 text-rose-600" />
-              <div>
-                <p className="text-sm font-black uppercase tracking-[0.18em] text-rose-700">Edit Profile</p>
-                <h2 className="text-2xl font-black">Student Details</h2>
-              </div>
+          <div className="relative">
+            <div className="absolute -left-8 -top-7 z-10 flex h-14 w-14 items-center justify-center rounded-xl bg-white text-cyan-700 shadow-xl">
+              <Users className="h-7 w-7" />
             </div>
-            <form onSubmit={saveProfile} className="mt-5 grid gap-4 md:grid-cols-2">
-              <label className="grid gap-2 text-sm font-black text-slate-700">
-                Name
-                <input
-                  value={profile.name}
-                  onChange={(event) => setProfile((value) => ({ ...value, name: event.target.value }))}
-                  className="h-12 rounded-xl border border-slate-200 bg-white px-4 font-semibold outline-none focus:border-blue-500"
-                  required
-                />
-              </label>
-              <label className="grid gap-2 text-sm font-black text-slate-700">
-                Phone
-                <input
-                  value={profile.phone}
-                  onChange={(event) => setProfile((value) => ({ ...value, phone: event.target.value }))}
-                  className="h-12 rounded-xl border border-slate-200 bg-white px-4 font-semibold outline-none focus:border-blue-500"
-                />
-              </label>
-              <label className="grid gap-2 text-sm font-black text-slate-700">
-                Class
-                <select
-                  value={profile.classLevel}
-                  onChange={(event) => setProfile((value) => ({ ...value, classLevel: event.target.value }))}
-                  className="h-12 rounded-xl border border-slate-200 bg-white px-4 font-semibold outline-none focus:border-blue-500"
-                >
-                  <option value="">Select class</option>
-                  {Array.from({ length: 8 }).map((_, index) => (
-                    <option key={index + 5} value={`Class ${index + 5}`}>
-                      Class {index + 5}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-2 text-sm font-black text-slate-700">
-                School
-                <input
-                  value={profile.schoolName}
-                  onChange={(event) => setProfile((value) => ({ ...value, schoolName: event.target.value }))}
-                  className="h-12 rounded-xl border border-slate-200 bg-white px-4 font-semibold outline-none focus:border-blue-500"
-                />
-              </label>
-              <label className="grid gap-2 text-sm font-black text-slate-700 md:col-span-2">
-                Email
-                <input
-                  value={user.email}
-                  className="h-12 rounded-xl border border-slate-200 bg-slate-50 px-4 font-semibold text-slate-500 outline-none"
-                  disabled
-                />
-              </label>
-              <button
-                disabled={saving}
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-rose-600 px-5 font-black text-white transition hover:-translate-y-0.5 disabled:opacity-60 md:col-span-2"
-              >
-                <Save className="h-4 w-4" /> {saving ? "Saving..." : "Save Profile"}
-              </button>
-            </form>
-          </div>
-        </section>
-
-        <section id="settings" className="mt-6 grid gap-6 lg:grid-cols-3">
-          {settingsCards.map((card) => (
-            <div key={card.title} className="rounded-[24px] border border-blue-100 bg-white/95 p-5 shadow-glass">
-              <card.icon className="h-8 w-8 text-blue-700" />
-              <h3 className="mt-4 text-xl font-black">{card.title}</h3>
-              <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">{card.copy}</p>
+            <div className="overflow-hidden rounded-[28px] border-[8px] border-blue-200 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.18)]">
+              <img
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1000&q=80"
+                alt="Students collaborating on ADYAPAN LMS"
+                className="h-[380px] w-full object-cover"
+              />
             </div>
-          ))}
-        </section>
-
-        <section className="mt-6 rounded-[24px] border border-blue-100 bg-white/95 p-5 shadow-glass md:p-6">
-          <div className="flex items-center gap-3">
-            <LayoutDashboard className="h-8 w-8 text-blue-700" />
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-700">Activity</p>
-              <h2 className="text-2xl font-black">Recent Updates</h2>
+            <div className="absolute -bottom-6 -right-5 flex h-14 w-14 items-center justify-center rounded-xl bg-white text-blue-950 shadow-xl">
+              <GraduationCap className="h-7 w-7" />
             </div>
           </div>
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
-            {recentUpdates.map((update) => (
-              <div key={update.title} className="rounded-2xl bg-slate-50 p-4">
-                <update.icon className="h-6 w-6 text-cyan-700" />
-                <p className="mt-3 font-black">{update.title}</p>
-                <p className="mt-1 text-sm font-semibold text-slate-600">{update.copy}</p>
+        </div>
+      </section>
+
+      <div className="sticky top-24 z-40 mx-auto flex max-w-3xl gap-3 rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_14px_34px_rgba(15,23,42,0.10)]">
+        {[
+          ["Overview", "overview"],
+          ["Student Features", "student-features"],
+          ["Teacher Features", "teacher-features"],
+          ["Exam Software", "exam-software"]
+        ].map(([label, id], index) => (
+          <button
+            key={id}
+            onClick={() => goTo(id)}
+            className={`h-12 flex-1 rounded-xl text-sm font-black transition hover:bg-blue-700 hover:text-white ${
+              index === 0 ? "bg-cyan-600 text-white" : "text-slate-600"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <SectionShell
+        id="overview"
+        title="Comprehensive Digital Platform"
+        subtitle="ADYAPAN LMS provides schools with class management, curriculum delivery, online/offline assessments, student progress tracking, and teacher support in one integrated platform."
+        accent="left"
+      >
+        <div className="mt-12 grid items-center gap-10 lg:grid-cols-[1fr_0.95fr]">
+          <div className="grid gap-5 sm:grid-cols-2">
+            {overviewCards.map((card) => (
+              <div key={card.title} className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:bg-blue-700 hover:text-white">
+                <card.icon className="h-8 w-8 text-cyan-700 transition group-hover:text-white" />
+                <h3 className="mt-5 font-black">{card.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-600 transition group-hover:text-white/90">{card.copy}</p>
               </div>
             ))}
           </div>
-        </section>
-      </div>
+          <div className="rounded-[24px] bg-gradient-to-br from-blue-100 to-white p-8">
+            <div className="rounded-2xl bg-white p-10 text-center shadow">
+              <Rocket className="mx-auto h-16 w-16 text-blue-950" />
+              <h3 className="mt-7 text-2xl font-black">Transform Education</h3>
+              <p className="mt-4 leading-7 text-slate-600">
+                Empowering educators and engaging students through innovative technology.
+              </p>
+            </div>
+          </div>
+        </div>
+      </SectionShell>
+
+      <SectionShell
+        id="student-features"
+        title="Student Features"
+        subtitle="Empowering students with personalized learning experiences and cutting-edge educational tools."
+      >
+        <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {studentFeatures.map((feature, index) => (
+            <FeaturePill key={feature} label={feature} active={index === 8} />
+          ))}
+        </div>
+      </SectionShell>
+
+      <SectionShell
+        id="teacher-features"
+        title="Teacher Features"
+        subtitle="Streamlining teaching workflows with AI-powered tools and comprehensive classroom management."
+        accent="left"
+      >
+        <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {teacherFeatures.map((feature, index) => (
+            <FeaturePill key={feature} label={feature} active={index === 10} />
+          ))}
+        </div>
+      </SectionShell>
+
+      <SectionShell
+        id="exam-software"
+        title="Create & Conduct Any type of Exam with"
+        subtitle="ONLINE EXAM SOFTWARE"
+      >
+        <div className="mt-10 rounded-2xl bg-gradient-to-r from-blue-50 to-blue-100 p-8 text-center">
+          <p className="text-lg font-black">Question Preview</p>
+          <div className="mx-auto mt-5 max-w-md rounded-xl border border-slate-200 bg-white p-6 font-mono text-sm shadow">
+            <p className="font-bold text-slate-700">1x - 2x - 1 at x = 3</p>
+            <hr className="my-4" />
+            <p className="text-cyan-700">Evaluate at x = 3: f(3) = 1(3) - 2(3) - 1 = -4</p>
+          </div>
+        </div>
+        <div className="mt-8 grid gap-5 lg:grid-cols-3">
+          {examCards.map((card, index) => (
+            <div
+              key={card.title}
+              className={`group rounded-2xl border bg-white p-7 text-center shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:bg-blue-700 hover:text-white ${
+                index === 1 ? "border-blue-300 ring-1 ring-blue-200" : "border-slate-200"
+              }`}
+            >
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 bg-white text-cyan-700 transition group-hover:border-white/25 group-hover:bg-white/15 group-hover:text-white">
+                <card.icon className="h-8 w-8" />
+              </div>
+              <h3 className="mt-6 text-xl font-black">{card.title}</h3>
+              <p className="mt-4 min-h-14 text-sm leading-6 text-slate-600 transition group-hover:text-white/90">{card.copy}</p>
+              <div className="mt-5 flex flex-wrap justify-center gap-2">
+                {card.tags.map((tag) => (
+                  <span key={tag} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600 transition group-hover:bg-white/15 group-hover:text-white">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-8 grid gap-6 text-center sm:grid-cols-4">
+          {[
+            ["100%", "Real-time Monitoring"],
+            ["Instant", "Auto Grading"],
+            ["20+", "Question Types"],
+            ["15+", "Security Features"]
+          ].map(([value, label]) => (
+            <div key={label}>
+              <p className="text-2xl font-black text-cyan-700">{value}</p>
+              <p className="text-sm text-slate-600">{label}</p>
+            </div>
+          ))}
+        </div>
+      </SectionShell>
+
+      <section id="demo" className="relative mt-10 bg-gradient-to-br from-blue-800 via-slate-950 to-cyan-700 px-4 py-16 text-white md:px-6">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="relative mx-auto max-w-4xl text-center">
+          <h2 className="text-4xl font-black text-blue-100">Book Your Free Demo</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-white/85">
+            Experience the future of education. Schedule a personalized demo tailored to your school needs.
+          </p>
+          <form onSubmit={submitDemo} className="mt-8 rounded-3xl border border-white/18 bg-white/10 p-6 text-left shadow-2xl backdrop-blur md:p-8">
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="grid gap-2 text-sm font-bold">
+                Full Name *
+                <input name="name" required placeholder="John Doe" className="h-12 rounded-lg border border-white/10 bg-blue-950/60 px-4 text-white outline-none placeholder:text-white/40" />
+              </label>
+              <label className="grid gap-2 text-sm font-bold">
+                Email Address *
+                <input name="email" type="email" required placeholder="john@example.com" className="h-12 rounded-lg border border-white/10 bg-blue-950/60 px-4 text-white outline-none placeholder:text-white/40" />
+              </label>
+              <label className="grid gap-2 text-sm font-bold md:col-span-2">
+                Phone Number *
+                <input name="phone" required placeholder="Enter 10 digit phone number" className="h-12 rounded-lg border border-white/10 bg-blue-950/60 px-4 text-white outline-none placeholder:text-white/40" />
+              </label>
+              <label className="grid gap-2 text-sm font-bold">
+                School Name *
+                <input name="school" required placeholder="Springfield High School" className="h-12 rounded-lg border border-white/10 bg-blue-950/60 px-4 text-white outline-none placeholder:text-white/40" />
+              </label>
+              <label className="grid gap-2 text-sm font-bold">
+                City *
+                <input name="city" required placeholder="Jaipur" className="h-12 rounded-lg border border-white/10 bg-blue-950/60 px-4 text-white outline-none placeholder:text-white/40" />
+              </label>
+              <label className="grid gap-2 text-sm font-bold md:col-span-2">
+                Schedule Call For *
+                <select name="schedule" required className="h-12 rounded-lg border border-white/10 bg-blue-950/60 px-4 text-white outline-none">
+                  <option value="">Select Option</option>
+                  <option>School LMS Demo</option>
+                  <option>Robotics & AI Lab</option>
+                  <option>Exam Software</option>
+                  <option>Teacher Training</option>
+                </select>
+              </label>
+              <label className="grid gap-2 text-sm font-bold md:col-span-2">
+                Additional Message
+                <textarea name="message" rows={4} placeholder="Tell us about your requirements..." className="rounded-lg border border-white/10 bg-blue-950/60 px-4 py-3 text-white outline-none placeholder:text-white/40" />
+              </label>
+            </div>
+            <button className="mt-6 h-14 w-full rounded-xl bg-cyan-600 font-black text-white transition hover:bg-white hover:text-blue-950">
+              Submit Demo Request <ArrowRight className="ml-2 inline h-4 w-4" />
+            </button>
+          </form>
+        </div>
+      </section>
+
 
       {status && (
         <button
           onClick={() => setStatus("")}
-          className="fixed bottom-6 left-1/2 z-50 max-w-[92vw] -translate-x-1/2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white shadow-2xl"
+          className="fixed bottom-6 left-1/2 z-50 max-w-[92vw] -translate-x-1/2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-950 shadow-2xl"
         >
           {status}
         </button>
@@ -451,3 +423,9 @@ export default function DashboardPage() {
     </main>
   );
 }
+
+
+
+
+
+
