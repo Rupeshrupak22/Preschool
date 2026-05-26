@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { ArrowUp, Clock, Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react";
+import { ArrowUp, Clock, Instagram, Linkedin, Mail, MapPin, Phone, Youtube } from "lucide-react";
 
 const learningPrograms = [
   "Future Skills Foundation (Class 5 to 8)",
@@ -19,9 +19,9 @@ const quickLinks = [
 ];
 
 const socials = [
-  ["Instagram", Instagram],
-  ["LinkedIn", Linkedin],
-  ["Facebook", Facebook]
+  ["Instagram", "https://www.instagram.com/adyapanschool/", Instagram],
+  ["LinkedIn", "https://www.linkedin.com/company/adyapan-edutech-pvt-ltd/posts/?feedView=all", Linkedin],
+  ["YouTube", "https://www.youtube.com/@adyapan21", Youtube]
 ];
 
 export default function SiteFooter() {
@@ -47,12 +47,14 @@ export default function SiteFooter() {
             communication, design, and career-ready future skills.
           </p>
           <div className="mt-8 flex gap-3">
-            {socials.map(([label, Icon]) => {
+            {socials.map(([label, href, Icon]) => {
               const SocialIcon = Icon as React.ComponentType<{ className?: string }>;
               return (
                 <a
                   key={String(label)}
-                  href="/#top"
+                  href={String(href)}
+                  target="_blank"
+                  rel="noreferrer"
                   aria-label={`ADYAPAN ${String(label)}`}
                   className="flex h-11 w-11 items-center justify-center rounded-lg border border-blue-200 bg-white text-blue-700 shadow-[0_12px_28px_rgba(37,99,235,0.10)] transition hover:-translate-y-1 hover:bg-cyan-600 hover:text-white hover:shadow-[0_16px_34px_rgba(13,148,136,0.22)]"
                 >

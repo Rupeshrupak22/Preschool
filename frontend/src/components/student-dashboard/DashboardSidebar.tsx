@@ -52,6 +52,7 @@ const sidebarItems: SidebarItem[] = [
 interface Props {
   activeSection?: string;
   collapsed: boolean;
+  underMainNav?: boolean;
   onCollapse: (v: boolean) => void;
   mobileOpen: boolean;
   onMobileClose: () => void;
@@ -60,6 +61,7 @@ interface Props {
 
 export default function DashboardSidebar({
   collapsed,
+  underMainNav = false,
   onCollapse,
   mobileOpen,
   onMobileClose,
@@ -144,7 +146,9 @@ export default function DashboardSidebar({
       <motion.aside
         animate={{ width: collapsed ? 72 : 240 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="fixed left-0 top-20 z-40 hidden h-[calc(100vh-80px)] overflow-hidden lg:flex lg:flex-col"
+        className={`fixed left-0 z-40 hidden overflow-hidden lg:flex lg:flex-col ${
+          underMainNav ? "top-20 h-[calc(100vh-80px)]" : "top-0 h-screen"
+        }`}
         style={{
           background: "linear-gradient(180deg, #1e1040 0%, #2d1b69 50%, #1a0f3c 100%)",
           boxShadow: "4px 0 32px rgba(168,85,247,0.2)",
@@ -192,7 +196,9 @@ export default function DashboardSidebar({
       {/* ── MOBILE OPEN BUTTON ────────────────────────────────────── */}
       <button
         onClick={onMobileOpen}
-        className="fixed left-4 top-[86px] z-40 flex h-9 w-9 items-center justify-center rounded-xl border border-purple-200 bg-white/90 text-purple-600 shadow-md backdrop-blur-sm transition hover:bg-gradient-to-br hover:from-purple-500 hover:to-pink-500 hover:text-white hover:border-transparent lg:hidden"
+        className={`fixed left-4 z-40 flex h-9 w-9 items-center justify-center rounded-xl border border-purple-200 bg-white/90 text-purple-600 shadow-md backdrop-blur-sm transition hover:bg-gradient-to-br hover:from-purple-500 hover:to-pink-500 hover:text-white hover:border-transparent lg:hidden ${
+          underMainNav ? "top-[86px]" : "top-4"
+        }`}
         aria-label="Open navigation"
       >
         <Menu className="h-4 w-4" />

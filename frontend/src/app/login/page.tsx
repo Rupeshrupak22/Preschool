@@ -10,6 +10,7 @@ export default function LoginPage() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("Checking credentials...");
+    const lmsWindow = window.open("about:blank", "_blank");
     const body = Object.fromEntries(new FormData(event.currentTarget).entries());
     const response = await fetch("/api/auth/login", {
       method: "POST",
@@ -19,12 +20,28 @@ export default function LoginPage() {
     const data = await response.json();
 
     if (!response.ok) {
+      lmsWindow?.close();
       setStatus(data.error);
       return;
     }
 
     window.dispatchEvent(new Event("adyapan-auth-change"));
-    window.location.href = data.user.role === "admin" ? "/admin" : "/student-dashboard";
+    const searchParams = new URLSearchParams(window.location.search);
+    const next = searchParams.get("next");
+    const target = next && next.startsWith("/") ? next : data.user.role === "admin" ? "/admin" : "/student-dashboard";
+
+    if (lmsWindow) {
+      lmsWindow.location.href = target;
+      lmsWindow.opener = null;
+      lmsWindow.focus();
+      setStatus("Dashboard opened in a new tab.");
+      window.setTimeout(() => {
+        window.location.replace("/");
+      }, 300);
+      return;
+    }
+
+    window.location.href = target;
   }
 
   return (

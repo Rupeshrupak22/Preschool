@@ -202,6 +202,8 @@ export default function Home() {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [status, setStatus] = useState("");
   const [leadSuccess, setLeadSuccess] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [alreadyLoggedInNotice, setAlreadyLoggedInNotice] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -210,8 +212,41 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    let active = true;
+
+    async function loadUser() {
+      try {
+        const response = await fetch("/api/auth/me", { cache: "no-store" });
+        if (active) setIsLoggedIn(response.ok);
+      } catch {
+        if (active) setIsLoggedIn(false);
+      }
+    }
+
+    loadUser();
+    window.addEventListener("adyapan-auth-change", loadUser);
+    return () => {
+      active = false;
+      window.removeEventListener("adyapan-auth-change", loadUser);
+    };
+  }, []);
+
+  function showAlreadyLoggedIn(event?: React.MouseEvent<HTMLElement>) {
+    event?.preventDefault();
+    setStatus("");
+    setLeadSuccess(false);
+    setAlreadyLoggedInNotice(true);
+  }
+
   async function submitLead(event: FormEvent<HTMLFormElement>, type: "demo" | "school" | "newsletter") {
     event.preventDefault();
+
+    if (isLoggedIn) {
+      showAlreadyLoggedIn();
+      return;
+    }
+
     setStatus("Submitting...");
     const form = new FormData(event.currentTarget);
     const body = Object.fromEntries(form.entries());
@@ -269,6 +304,9 @@ export default function Home() {
               </a>
               <a
                 href="#demo"
+                onClick={(event) => {
+                  if (isLoggedIn) showAlreadyLoggedIn(event);
+                }}
                 className="inline-flex h-14 items-center justify-center gap-3 rounded-full border border-white/80 bg-white/76 backdrop-blur-md px-7 font-bold text-slate-900 shadow-[0_14px_30px_rgba(15,23,42,0.10)] transition hover:-translate-y-1 hover:bg-white"
               >
                 <CalendarDays className="h-5 w-5" /> Book a Free Class
@@ -442,6 +480,9 @@ export default function Home() {
               </a>
               <a
                 href="#demo"
+                onClick={(event) => {
+                  if (isLoggedIn) showAlreadyLoggedIn(event);
+                }}
                 className="inline-flex h-11 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 px-6 text-sm font-bold text-white shadow-[0_12px_26px_rgba(59,130,246,0.3)] transition hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(59,130,246,0.4)]"
               >
                 Schedule a Demo
@@ -529,6 +570,9 @@ export default function Home() {
                 </button>
                 <a
                   href="/signup"
+                  onClick={(event) => {
+                    if (isLoggedIn) showAlreadyLoggedIn(event);
+                  }}
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 font-bold text-white shadow-[0_12px_26px_rgba(34,197,94,0.3)] hover:-translate-y-1 transition"
                 >
                   Exam Enrollment <ArrowRight className="h-4 w-4" />
@@ -541,7 +585,13 @@ export default function Home() {
                   <ShieldCheck className="h-8 w-8 text-purple-600" />
                   <h3 className="mt-5 text-xl font-black text-slate-900">{certificate}</h3>
                   <p className="mt-3 text-sm font-bold leading-6 text-slate-800">Exam, QR credential, mentor remark, and portfolio linkage.</p>
-                  <a href="/signup" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-purple-700">
+                  <a
+                    href="/signup"
+                    onClick={(event) => {
+                      if (isLoggedIn) showAlreadyLoggedIn(event);
+                    }}
+                    className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-purple-700"
+                  >
                     Enroll <ArrowRight className="h-4 w-4" />
                   </a>
                 </div>
@@ -608,11 +658,11 @@ export default function Home() {
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-700">Partnership CTA</p>
             <h3 className="mt-3 text-2xl font-black text-slate-900">School onboarding form</h3>
             <div className="mt-6 grid gap-3">
-              <Field name="name" placeholder="Coordinator name" required />
-              <Field name="email" type="email" placeholder="Work email" required />
-              <Field name="phone" placeholder="Phone" required />
-              <Field name="school" placeholder="School name" required />
-              <Field name="city" placeholder="City" required />
+              <Field name="name" placeholder="Coordinator name" required disabled={isLoggedIn} />
+              <Field name="email" type="email" placeholder="Work email" required disabled={isLoggedIn} />
+              <Field name="phone" placeholder="Phone" required disabled={isLoggedIn} />
+              <Field name="school" placeholder="School name" required disabled={isLoggedIn} />
+              <Field name="city" placeholder="City" required disabled={isLoggedIn} />
               <button className="mt-2 h-12 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 font-bold text-white shadow-[0_12px_26px_rgba(168,85,247,0.3)] transition hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(168,85,247,0.4)]">
                 Request Partnership
               </button>
@@ -723,6 +773,30 @@ export default function Home() {
               </span>
             </div>
           </motion.button>
+        </div>
+      )}
+
+      {alreadyLoggedInNotice && (
+        <div className="fixed inset-0 z-[75] grid place-items-center bg-slate-950/35 px-4 backdrop-blur-sm">
+          <button
+            type="button"
+            onClick={() => setAlreadyLoggedInNotice(false)}
+            className="relative w-full max-w-sm overflow-hidden rounded-[26px] border border-white/80 bg-white p-7 text-center shadow-[0_30px_90px_rgba(37,99,235,0.25)]"
+          >
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(34,211,238,0.18),transparent_25%),radial-gradient(circle_at_80%_100%,rgba(236,72,153,0.16),transparent_30%)]" />
+            <div className="relative">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-[0_16px_34px_rgba(37,99,235,0.26)]">
+                <ShieldCheck className="h-8 w-8" />
+              </div>
+              <h3 className="mt-5 text-2xl font-black text-slate-950">You are already logged in</h3>
+              <p className="mx-auto mt-3 max-w-xs text-sm font-bold leading-6 text-slate-600">
+                Demo and partnership forms are disabled for logged-in students.
+              </p>
+              <span className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-slate-950 px-6 text-sm font-black text-white">
+                OK
+              </span>
+            </div>
+          </button>
         </div>
       )}
 

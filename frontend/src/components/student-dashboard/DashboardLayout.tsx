@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowLeft, LogOut } from "lucide-react";
+import { usePathname } from "next/navigation";
 import DashboardSidebar from "./DashboardSidebar";
 import FloatingAIBuddy from "./FloatingAIBuddy";
 
@@ -10,12 +12,20 @@ interface Props {
 }
 
 export default function DashboardLayout({ children, activeSection }: Props) {
+  const pathname = usePathname();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isPublicLms = pathname === "/dashboard";
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.dispatchEvent(new Event("adyapan-auth-change"));
+    window.location.href = "/";
+  }
 
   return (
     <div
-      className="min-h-screen pt-20"
+      className={`min-h-screen ${isPublicLms ? "pt-20" : ""}`}
       style={{
         background:
           "radial-gradient(circle at 0% 0%, rgba(168,85,247,0.18) 0%, transparent 40%), " +
@@ -34,6 +44,7 @@ export default function DashboardLayout({ children, activeSection }: Props) {
       <DashboardSidebar
         activeSection={activeSection}
         collapsed={sidebarCollapsed}
+        underMainNav={isPublicLms}
         onCollapse={setSidebarCollapsed}
         mobileOpen={mobileMenuOpen}
         onMobileClose={() => setMobileMenuOpen(false)}
@@ -41,12 +52,31 @@ export default function DashboardLayout({ children, activeSection }: Props) {
       />
 
       <div
-        className={`relative flex min-h-[calc(100vh-80px)] flex-col transition-[margin] duration-300 ${
+        className={`relative flex ${isPublicLms ? "min-h-[calc(100vh-80px)]" : "min-h-screen"} flex-col transition-[margin] duration-300 ${
           sidebarCollapsed ? "lg:ml-[72px]" : "lg:ml-[240px]"
         }`}
       >
         <div className="flex-1 px-4 py-6 md:px-6 lg:px-8">
           <div className="mx-auto max-w-[1400px]">
+            {!isPublicLms && (
+              <div className="mb-5 flex flex-wrap justify-end gap-3">
+                <a
+                  href="/"
+                  className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-white/90 px-4 py-2 text-sm font-black text-purple-700 shadow-[0_10px_24px_rgba(124,58,237,0.12)] transition hover:-translate-y-0.5 hover:bg-white"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Go to Main Web
+                </a>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="inline-flex items-center gap-2 rounded-xl border border-rose-200 bg-white/90 px-4 py-2 text-sm font-black text-rose-600 shadow-[0_10px_24px_rgba(244,63,94,0.12)] transition hover:-translate-y-0.5 hover:bg-rose-50"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </button>
+              </div>
+            )}
             {children}
           </div>
         </div>

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import SiteFooter from "./components/SiteFooter";
-import SiteNavbar from "./components/SiteNavbar";
+import AppShell from "./components/AppShell";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,10 +25,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        {/* Global shell: all App Router pages must keep this navbar and footer here. */}
-        <SiteNavbar />
-        {children}
-        <SiteFooter />
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

@@ -19,7 +19,7 @@ const navItems = [
   { label: "Overview", href: "/overview" },
   { label: "Mentor", href: "/mentors" },
   { label: "My App", href: "/our.html" },
-  { label: "LMS", href: "/student-dashboard" },
+  { label: "LMS", href: "/dashboard" },
   { label: "About Us", href: "/about" }
 ];
 
@@ -91,6 +91,14 @@ export default function SiteNavbar() {
     window.location.href = "/login";
   }
 
+  function openDashboardWindow(href: string) {
+    const target = href.includes("#") ? href.replace("#", "/") : href;
+    const dashboardWindow = window.open(target, "_blank");
+    dashboardWindow?.focus();
+    setMenuOpen(false);
+    setProfileOpen(false);
+  }
+
   const dashboardHref = user?.role === "admin" ? "/admin" : "/student-dashboard";
   const shortName = user?.name?.split(" ")[0] || "Student";
   const initial = (user?.name?.trim()?.[0] || "A").toUpperCase();
@@ -133,7 +141,7 @@ export default function SiteNavbar() {
             return (
               <a
                 key={item.label}
-                href={item.href}
+                href={item.label === "LMS" ? "/dashboard" : item.href}
                 className={`inline-flex h-12 min-w-[94px] items-center justify-center whitespace-nowrap rounded-full px-3 text-[15px] font-black text-slate-950 transition hover:-translate-y-0.5 hover:bg-white/65 2xl:h-14 2xl:min-w-[108px] 2xl:px-5 2xl:text-[17px] ${
                   active
                     ? "bg-gradient-to-r from-[#ffd84d] to-[#ff9f2f] shadow-[0_12px_24px_rgba(249,158,47,0.35)]"
@@ -185,14 +193,15 @@ export default function SiteNavbar() {
 
                   <div className="py-2">
                     {menuItems.map((item) => (
-                      <a
+                      <button
                         key={item.label}
-                        href={item.href}
-                        className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-black transition hover:bg-blue-50 hover:text-blue-700"
+                        type="button"
+                        onClick={() => openDashboardWindow(item.href)}
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-black transition hover:bg-blue-50 hover:text-blue-700"
                       >
                         <item.icon className="h-4 w-4" />
                         {item.label}
-                      </a>
+                      </button>
                     ))}
                   </div>
 
@@ -240,7 +249,7 @@ export default function SiteNavbar() {
             {navItems.map((item) => (
               <a
                 key={item.label}
-                href={item.href}
+                href={item.label === "LMS" ? "/dashboard" : item.href}
                 onClick={() => setMenuOpen(false)}
                 className={`rounded-full px-6 py-4 text-lg font-black text-slate-950 transition hover:bg-white/70 ${
                   isActive(item.href) ? "bg-gradient-to-r from-[#ffd84d] to-[#ff9f2f]" : "bg-white/36"
@@ -264,15 +273,15 @@ export default function SiteNavbar() {
                 </div>
                 <div className="grid gap-2">
                   {menuItems.map((item) => (
-                    <a
+                    <button
                       key={item.label}
-                      href={item.href}
-                      onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-3 rounded-2xl bg-white/76 px-4 py-3 text-base font-black text-slate-950"
+                      type="button"
+                      onClick={() => openDashboardWindow(item.href)}
+                      className="flex items-center gap-3 rounded-2xl bg-white/76 px-4 py-3 text-left text-base font-black text-slate-950"
                     >
                       <item.icon className="h-5 w-5" />
                       {item.label}
-                    </a>
+                    </button>
                   ))}
                   <button
                     type="button"
