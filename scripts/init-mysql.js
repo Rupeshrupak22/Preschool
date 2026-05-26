@@ -49,6 +49,11 @@ async function main() {
   try {
     await connection.query(schema);
     const database = process.env.MYSQL_DATABASE || "preschool";
+    await ensureColumn(connection, database, "users", "class_name", "VARCHAR(80)");
+    await ensureColumn(connection, database, "users", "school", "VARCHAR(190)");
+    await ensureColumn(connection, database, "students", "class_name", "VARCHAR(80)");
+    await ensureColumn(connection, database, "students", "school", "VARCHAR(190)");
+    await ensureColumn(connection, database, "leads", "class_name", "VARCHAR(80)");
     const [tables] = await connection.query(`SHOW TABLES FROM \`${database}\``);
 
     console.log(`MySQL schema initialized for database '${database}'.`);
@@ -57,6 +62,21 @@ async function main() {
     }
   } finally {
     await connection.end();
+  }
+}
+
+async function ensureColumn(connection, database, tableName, columnName, definition) {
+  const [rows] = await connection.query(
+    `SELECT COUNT(*) AS count
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = ?
+       AND TABLE_NAME = ?
+       AND COLUMN_NAME = ?`,
+    [database, tableName, columnName]
+  );
+
+  if (Number(rows[0]?.count ?? 0) === 0) {
+    await connection.query(`ALTER TABLE \`${database}\`.\`${tableName}\` ADD COLUMN \`${columnName}\` ${definition}`);
   }
 }
 

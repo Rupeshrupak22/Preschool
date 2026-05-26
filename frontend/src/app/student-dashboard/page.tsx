@@ -14,10 +14,14 @@ import { useDashboardData } from "@/lib/dashboard/use-dashboard-data";
 export default function StudentDashboardHome() {
   const data = useDashboardData();
 
-  const overallScore = Math.round(
-    data.subjectPerformance.reduce((sum: number, s: { score: number }) => sum + s.score, 0) /
-      data.subjectPerformance.length
-  );
+  const overallScore = data.subjectPerformance.length
+    ? Math.round(
+        data.subjectPerformance.reduce((sum: number, s: { score: number }) => sum + s.score, 0) /
+          data.subjectPerformance.length
+      )
+    : 0;
+  const attendanceCard = data.quickAccessCards.find((card) => card.id === "attendance");
+  const earnedBadges = data.achievements.filter((achievement) => achievement.earned).length;
 
   return (
     <DashboardLayout activeSection="/student-dashboard">
@@ -49,15 +53,15 @@ export default function StudentDashboardHome() {
               <div className="mb-4 flex flex-wrap items-center gap-2">
                 <span className="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-black backdrop-blur-sm">
                   <Star className="h-3 w-3 fill-yellow-300 text-yellow-300" />
-                  Rank #{data.studentData.rank} of {data.studentData.totalStudents}
+                  {data.studentData.rank > 0 ? `Rank #${data.studentData.rank}` : "No rank yet"} of {data.studentData.totalStudents}
                 </span>
                 <span className="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-black backdrop-blur-sm">
                   <Flame className="h-3 w-3 text-orange-300" />
-                  14-day streak
+                  {data.weeklyProgress.streak}-day streak
                 </span>
                 <span className="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-black backdrop-blur-sm">
                   <Trophy className="h-3 w-3 text-yellow-300" />
-                  Active Learner
+                  {earnedBadges > 0 ? `${earnedBadges} badges earned` : "New learner"}
                 </span>
               </div>
 
@@ -80,8 +84,8 @@ export default function StudentDashboardHome() {
             <div className="flex gap-3 sm:flex-col sm:gap-3">
               {[
                 { label: "Overall Score", value: `${overallScore}%`, emoji: "📊" },
-                { label: "Attendance",    value: "94%",              emoji: "✅" },
-                { label: "Badges Earned", value: "5",                emoji: "🏆" },
+                { label: "Attendance", value: attendanceCard?.stat ?? "0%", emoji: "OK" },
+                { label: "Badges Earned", value: String(earnedBadges), emoji: "Trophy" },
               ].map((stat) => (
                 <div
                   key={stat.label}
@@ -103,7 +107,7 @@ export default function StudentDashboardHome() {
         <LiveClassesSection classes={data.liveClasses} />
 
         {/* ── Performance Overview (new premium analytics) ─────────── */}
-        <PerformanceOverview />
+        <PerformanceOverview data={data} />
 
         {/* ── 360° Analytics Charts ────────────────────────────────── */}
         <section>
@@ -124,3 +128,4 @@ export default function StudentDashboardHome() {
     </DashboardLayout>
   );
 }
+

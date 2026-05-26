@@ -66,7 +66,9 @@ export default function SubjectPerformanceTable({ subjects }: Props) {
 
         {/* Rows */}
         <div className="divide-y divide-slate-50">
-          {subjects.map((sub, i) => (
+          {subjects.length === 0 ? (
+            <div className="px-5 py-6 text-sm font-semibold text-slate-500">No subject performance has been recorded yet.</div>
+          ) : subjects.map((sub, i) => (
             <motion.div
               key={sub.subject}
               initial={{ opacity: 0, x: -10 }}

@@ -32,7 +32,11 @@ export default function NotesLibrary({ notes }: Props) {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {notes.map((note, i) => {
+        {notes.length === 0 ? (
+          <div className="rounded-2xl border border-slate-100 bg-white p-6 text-sm font-semibold text-slate-500 shadow-[0_4px_16px_rgba(15,23,42,0.06)] sm:col-span-2 xl:col-span-3">
+            No notes or PDFs have been uploaded yet.
+          </div>
+        ) : notes.map((note, i) => {
           const gradient = subjectColors[note.subject] ?? "from-slate-500 to-slate-600";
           const typeStyle = typeConfig[note.type];
 

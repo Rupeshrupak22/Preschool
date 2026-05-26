@@ -4,18 +4,18 @@ import { motion } from "framer-motion";
 import { Zap, TrendingUp, Star } from "lucide-react";
 import DashboardLayout from "@/components/student-dashboard/DashboardLayout";
 import RadarSkillsChart from "@/components/student-dashboard/RadarSkillsChart";
-import { skillsData } from "@/lib/dashboard/dashboard-data";
-
-const skillCards = [
-  { title: "Communication",    score: 85, level: "Advanced",     color: "from-blue-500 to-indigo-600",   bar: "bg-blue-500" },
-  { title: "Coding",           score: 92, level: "Expert",       color: "from-cyan-500 to-blue-600",     bar: "bg-cyan-500" },
-  { title: "Leadership",       score: 78, level: "Intermediate", color: "from-purple-500 to-violet-600", bar: "bg-purple-500" },
-  { title: "Creativity",       score: 88, level: "Advanced",     color: "from-fuchsia-500 to-pink-600",  bar: "bg-fuchsia-500" },
-  { title: "Critical Thinking",score: 82, level: "Advanced",     color: "from-orange-500 to-amber-600",  bar: "bg-orange-500" },
-  { title: "Collaboration",    score: 90, level: "Expert",       color: "from-emerald-500 to-teal-600",  bar: "bg-emerald-500" },
-];
+import { useDashboardData } from "@/lib/dashboard/use-dashboard-data";
 
 export default function SkillProgressPage() {
+  const data = useDashboardData();
+  const skillCards = data.skillsData.map((skill, index) => ({
+    title: skill.skill,
+    score: skill.value,
+    level: skill.value >= 85 ? "Advanced" : skill.value >= 60 ? "Intermediate" : "Beginner",
+    color: ["from-blue-500 to-indigo-600", "from-cyan-500 to-blue-600", "from-purple-500 to-violet-600"][index % 3],
+    bar: ["bg-blue-500", "bg-cyan-500", "bg-purple-500"][index % 3],
+  }));
+
   return (
     <DashboardLayout activeSection="/student-dashboard/skill-progress">
       <div className="space-y-6">
@@ -25,10 +25,14 @@ export default function SkillProgressPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
-          <RadarSkillsChart data={skillsData} />
+          <RadarSkillsChart data={data.skillsData} />
 
           <div className="grid gap-3 sm:grid-cols-2">
-            {skillCards.map((skill, i) => (
+            {skillCards.length === 0 ? (
+              <div className="rounded-2xl border border-slate-100 bg-white p-5 text-sm font-semibold text-slate-500 shadow-[0_4px_16px_rgba(15,23,42,0.06)] sm:col-span-2">
+                No skill progress has been recorded yet.
+              </div>
+            ) : skillCards.map((skill, i) => (
               <motion.div
                 key={skill.title}
                 initial={{ opacity: 0, y: 12 }}

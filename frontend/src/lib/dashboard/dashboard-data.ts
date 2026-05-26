@@ -445,3 +445,131 @@ export const dashboardData = {
 };
 
 export type DashboardData = typeof dashboardData;
+
+export function createEmptyDashboardData(student?: Partial<Student>): DashboardData {
+  const name = student?.name || "Student";
+  const avatar =
+    student?.avatar ||
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? "")
+      .join("") ||
+    "S";
+
+  return {
+    studentData: {
+      name,
+      rollNumber: student?.rollNumber || "Not assigned",
+      class: student?.class || "Not assigned",
+      section: student?.section || "Not assigned",
+      academicYear: student?.academicYear || "2025-26",
+      avatar,
+      aiInsight: "No learning activity has been recorded yet.",
+      rank: student?.rank ?? 0,
+      totalStudents: student?.totalStudents ?? 0,
+    },
+    quickAccessCards: [
+      {
+        id: "attendance",
+        title: "Attendance",
+        stat: "0%",
+        statLabel: "Recorded",
+        icon: "calendar-check",
+        gradient: "from-emerald-500 to-teal-600",
+        href: "/student-dashboard/attendance",
+      },
+      {
+        id: "homework",
+        title: "Homework",
+        stat: "0",
+        statLabel: "Pending",
+        icon: "book-open",
+        gradient: "from-orange-500 to-amber-600",
+        href: "/student-dashboard/homework",
+      },
+      {
+        id: "live-classes",
+        title: "Live Classes",
+        stat: "0",
+        statLabel: "Today",
+        icon: "video",
+        gradient: "from-rose-500 to-pink-600",
+        href: "/student-dashboard/live-classes",
+      },
+      {
+        id: "notes",
+        title: "Notes & PDFs",
+        stat: "0",
+        statLabel: "Files",
+        icon: "file-text",
+        gradient: "from-blue-500 to-indigo-600",
+        href: "/student-dashboard/notes",
+      },
+      {
+        id: "gamified",
+        title: "Gamified",
+        stat: "0",
+        statLabel: "Games",
+        icon: "gamepad-2",
+        gradient: "from-purple-500 to-violet-600",
+        href: "/student-dashboard/gamified",
+      },
+      {
+        id: "doubt-section",
+        title: "Doubt Section",
+        stat: "0",
+        statLabel: "Queries",
+        icon: "help-circle",
+        gradient: "from-orange-500 to-pink-500",
+        href: "/student-dashboard/homework",
+      },
+      {
+        id: "recorded-classes",
+        title: "Recorded Classes",
+        stat: "0",
+        statLabel: "Videos",
+        icon: "play-circle",
+        gradient: "from-cyan-500 to-teal-500",
+        href: "/student-dashboard/recorded-classes",
+      },
+      {
+        id: "skills",
+        title: "Skill Progress",
+        stat: "0%",
+        statLabel: "Recorded",
+        icon: "zap",
+        gradient: "from-fuchsia-500 to-purple-600",
+        href: "/student-dashboard/skill-progress",
+      },
+    ],
+    liveClasses: [],
+    metricCards: [
+      { id: "overall", title: "Overall Score", value: "0%", trend: 0, icon: "trending-up", color: "blue" },
+      { id: "test-avg", title: "Test Average", value: "0/100", trend: 0, icon: "bar-chart-2", color: "purple" },
+      { id: "attendance", title: "Attendance", value: "0%", trend: 0, icon: "calendar", color: "emerald" },
+      { id: "rank", title: "Class Rank", value: "-", trend: 0, icon: "trophy", color: "rose" },
+    ],
+    subjectPerformance: [],
+    testResults: [],
+    upcomingQuizzes: [],
+    homeworkItems: [],
+    notesLibrary: [],
+    skillsData: [],
+    futureSkills: [],
+    extracurricular: [],
+    achievements: [],
+    performanceTrend: [],
+    circularPerformanceData: [],
+    weeklyProgress: {
+      score: 0,
+      consistency: 0,
+      streak: 0,
+      classPercentile: 0,
+    },
+    attendanceMonths: [],
+    subjectAttendance: [],
+    weeklySchedule: [],
+  };
+}

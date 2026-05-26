@@ -54,9 +54,20 @@ body > * {
 
 main {
   position: relative;
-  padding-top: 80px;
   background: transparent !important;
   isolation: isolate;
+}
+
+.site-page-with-nav {
+  padding-top: 80px;
+}
+
+.site-page-with-nav > main > section:first-of-type {
+  padding-top: clamp(1.25rem, 2.5vw, 2.5rem);
+}
+
+section[id] {
+  scroll-margin-top: 96px;
 }
 
 main::before {

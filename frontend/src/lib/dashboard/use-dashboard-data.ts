@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { dashboardData, type DashboardData } from "@/lib/dashboard/dashboard-data";
+import { createEmptyDashboardData, type DashboardData } from "@/lib/dashboard/dashboard-data";
 
 export function useDashboardData() {
-  const [data, setData] = useState<DashboardData>(dashboardData);
+  const [data, setData] = useState<DashboardData>(() => createEmptyDashboardData());
 
   useEffect(() => {
     let active = true;

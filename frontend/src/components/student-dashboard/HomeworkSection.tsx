@@ -78,7 +78,11 @@ export default function HomeworkSection({ items }: Props) {
 
       {/* Items */}
       <div className="space-y-2.5">
-        {items.map((hw, i) => {
+        {items.length === 0 ? (
+          <div className="rounded-xl border border-slate-100 bg-white px-4 py-6 text-sm font-semibold text-slate-500">
+            No homework has been assigned yet.
+          </div>
+        ) : items.map((hw, i) => {
           const cfg = statusConfig[hw.status];
           const StatusIcon = cfg.icon;
           return (

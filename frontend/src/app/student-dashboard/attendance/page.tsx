@@ -8,7 +8,11 @@ import { useDashboardData } from "@/lib/dashboard/use-dashboard-data";
 export default function AttendancePage() {
   const data = useDashboardData();
   const months = data.attendanceMonths;
-  const overall = Math.round(months.reduce((s, m) => s + m.pct, 0) / months.length);
+  const overall = months.length ? Math.round(months.reduce((s, m) => s + m.pct, 0) / months.length) : 0;
+  const presentDays = months.reduce((sum, month) => sum + month.present, 0);
+  const totalDays = months.reduce((sum, month) => sum + month.total, 0);
+  const absentDays = Math.max(0, totalDays - presentDays);
+  const thisMonth = months.at(-1)?.pct ?? 0;
 
   return (
     <DashboardLayout activeSection="/student-dashboard/attendance">
@@ -22,9 +26,9 @@ export default function AttendancePage() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {[
             { label: "Overall", value: `${overall}%`, icon: CalendarCheck, color: "text-blue-600", bg: "bg-blue-50" },
-            { label: "Present Days", value: "103", icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
-            { label: "Absent Days", value: "8", icon: AlertCircle, color: "text-red-600", bg: "bg-red-50" },
-            { label: "This Month", value: "95%", icon: TrendingUp, color: "text-purple-600", bg: "bg-purple-50" },
+            { label: "Present Days", value: String(presentDays), icon: CheckCircle2, color: "text-emerald-600", bg: "bg-emerald-50" },
+            { label: "Absent Days", value: String(absentDays), icon: AlertCircle, color: "text-red-600", bg: "bg-red-50" },
+            { label: "This Month", value: `${thisMonth}%`, icon: TrendingUp, color: "text-purple-600", bg: "bg-purple-50" },
           ].map((card, i) => (
             <motion.div
               key={card.label}
@@ -46,7 +50,9 @@ export default function AttendancePage() {
         <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-[0_4px_24px_rgba(15,23,42,0.06)]">
           <h2 className="mb-4 text-sm font-black text-slate-950">Monthly Breakdown</h2>
           <div className="space-y-3">
-            {months.map((m, i) => (
+            {months.length === 0 ? (
+              <p className="text-sm font-semibold text-slate-500">No attendance has been recorded yet.</p>
+            ) : months.map((m, i) => (
               <div key={m.month} className="flex items-center gap-4">
                 <span className="w-20 shrink-0 text-xs font-semibold text-slate-500">{m.month}</span>
                 <div className="flex-1 h-2 overflow-hidden rounded-full bg-slate-100">
@@ -69,7 +75,9 @@ export default function AttendancePage() {
         <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-[0_4px_24px_rgba(15,23,42,0.06)]">
           <h2 className="mb-4 text-sm font-black text-slate-950">Subject-wise Attendance</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            {data.subjectAttendance.map((s, i) => (
+            {data.subjectAttendance.length === 0 ? (
+              <p className="text-sm font-semibold text-slate-500">No subject-wise attendance has been recorded yet.</p>
+            ) : data.subjectAttendance.map((s, i) => (
               <div key={s.subject} className="flex items-center gap-3">
                 <span className="w-36 shrink-0 text-xs font-semibold text-slate-600">{s.subject}</span>
                 <div className="flex-1 h-2 overflow-hidden rounded-full bg-slate-100">

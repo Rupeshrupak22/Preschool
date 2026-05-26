@@ -30,6 +30,8 @@ function CustomLabel(props: PieLabelRenderProps) {
 }
 
 export default function CircularPerformanceChart({ data, overallScore }: Props) {
+  const hasData = data.some((item) => item.value > 0);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -39,7 +41,7 @@ export default function CircularPerformanceChart({ data, overallScore }: Props) 
     >
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="text-sm font-black text-slate-900">360° Performance</h3>
+          <h3 className="text-sm font-black text-slate-900">360 Performance</h3>
           <p className="mt-0.5 text-xs font-semibold text-slate-500">Subject distribution by tier</p>
         </div>
         <span className="rounded-full bg-gradient-to-r from-purple-100 to-pink-100 px-3 py-1 text-xs font-black text-purple-700">
@@ -47,66 +49,72 @@ export default function CircularPerformanceChart({ data, overallScore }: Props) 
         </span>
       </div>
 
-      <div className="relative mt-4 flex-1">
-        <ResponsiveContainer width="100%" height={220}>
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={95}
-              paddingAngle={4}
-              dataKey="value"
-              labelLine={false}
-              label={CustomLabel}
-              animationBegin={200}
-              animationDuration={1000}
-            >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
-              ))}
-            </Pie>
-            <Tooltip
-              formatter={(value, name) => [`${value} subjects`, String(name)]}
-              contentStyle={{
-                borderRadius: "16px",
-                border: "2px solid #e9d5ff",
-                fontSize: "12px",
-                fontWeight: 600,
-                background: "rgba(255,255,255,0.95)",
-                backdropFilter: "blur(8px)",
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
+      {hasData ? (
+        <>
+          <div className="relative mt-4 flex-1">
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={95}
+                  paddingAngle={4}
+                  dataKey="value"
+                  labelLine={false}
+                  label={CustomLabel}
+                  animationBegin={200}
+                  animationDuration={1000}
+                >
+                  {data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value, name) => [`${value} subjects`, String(name)]}
+                  contentStyle={{
+                    borderRadius: "16px",
+                    border: "2px solid #e9d5ff",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    background: "rgba(255,255,255,0.95)",
+                    backdropFilter: "blur(8px)",
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
 
-        {/* Center Score */}
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-          <motion.span
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-            className="text-3xl font-black text-slate-900"
-          >
-            {overallScore}%
-          </motion.span>
-          <span className="text-[10px] font-bold text-slate-400">Overall</span>
-        </div>
-      </div>
-
-      {/* Legend */}
-      <div className="mt-3 space-y-2">
-        {data.map((item) => (
-          <div key={item.name} className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-2">
-            <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
-              <span className="text-xs font-semibold text-slate-600">{item.name}</span>
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+              <motion.span
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                className="text-3xl font-black text-slate-900"
+              >
+                {overallScore}%
+              </motion.span>
+              <span className="text-[10px] font-bold text-slate-400">Overall</span>
             </div>
-            <span className="text-xs font-black text-slate-900">{item.value} subjects</span>
           </div>
-        ))}
-      </div>
+
+          <div className="mt-3 space-y-2">
+            {data.map((item) => (
+              <div key={item.name} className="flex items-center justify-between rounded-xl bg-white/60 px-3 py-2">
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
+                  <span className="text-xs font-semibold text-slate-600">{item.name}</span>
+                </div>
+                <span className="text-xs font-black text-slate-900">{item.value} subjects</span>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="mt-4 flex min-h-[220px] items-center justify-center rounded-2xl bg-white/60 text-sm font-semibold text-slate-500">
+          No performance records yet.
+        </div>
+      )}
     </motion.div>
   );
 }

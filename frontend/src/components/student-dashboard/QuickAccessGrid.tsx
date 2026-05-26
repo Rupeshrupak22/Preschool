@@ -42,7 +42,7 @@ export default function QuickAccessGrid({ cards }: Props) {
           <p className="mt-0.5 text-xs font-semibold text-slate-500">Jump to any module instantly</p>
         </div>
         <span className="rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-black text-purple-700">
-          8 modules
+          {cards.length} modules
         </span>
       </div>
 

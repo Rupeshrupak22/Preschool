@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import mysql, { type Pool, type PoolOptions, type RowDataPacket } from "mysql2/promise";
-import { dashboardData, type DashboardData } from "@/lib/dashboard/dashboard-data";
+import { createEmptyDashboardData, type DashboardData, type Achievement, type FutureSkill } from "@/lib/dashboard/dashboard-data";
 import { id } from "@/lib/store";
 
 type UserRecord = {
@@ -88,7 +88,9 @@ async function ensureSchema(pool: Pool) {
       password_hash VARCHAR(255) NOT NULL,
       phone VARCHAR(30),
       class_level VARCHAR(80),
+      class_name VARCHAR(80),
       school_name VARCHAR(190),
+      school VARCHAR(190),
       role VARCHAR(30) NOT NULL DEFAULT 'student',
       signup_source VARCHAR(40) NOT NULL DEFAULT 'web',
       otp_verified BOOLEAN NOT NULL DEFAULT FALSE,
@@ -106,7 +108,9 @@ async function ensureSchema(pool: Pool) {
       email VARCHAR(190) NOT NULL UNIQUE,
       phone VARCHAR(30),
       class_level VARCHAR(80),
+      class_name VARCHAR(80),
       school_name VARCHAR(190),
+      school VARCHAR(190),
       parent_name VARCHAR(160),
       parent_phone VARCHAR(30),
       signup_source VARCHAR(40) NOT NULL DEFAULT 'web',
@@ -161,6 +165,7 @@ async function ensureSchema(pool: Pool) {
       city VARCHAR(120),
       message TEXT,
       class_level VARCHAR(80),
+      class_name VARCHAR(80),
       interest VARCHAR(190),
       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       KEY idx_leads_email (email)
@@ -270,15 +275,13 @@ async function ensureSchema(pool: Pool) {
   `);
 
   await ensureColumn(pool, "users", "signup_source", "VARCHAR(40) NOT NULL DEFAULT 'web'");
+  await ensureColumn(pool, "users", "class_name", "VARCHAR(80)");
+  await ensureColumn(pool, "users", "school", "VARCHAR(190)");
   await ensureColumn(pool, "students", "signup_source", "VARCHAR(40) NOT NULL DEFAULT 'web'");
+  await ensureColumn(pool, "students", "class_name", "VARCHAR(80)");
+  await ensureColumn(pool, "students", "school", "VARCHAR(190)");
+  await ensureColumn(pool, "leads", "class_name", "VARCHAR(80)");
   await ensureColumn(pool, "login_events", "source", "VARCHAR(40) NOT NULL DEFAULT 'web'");
-
-  await pool.query(
-    `INSERT INTO dashboard_snapshots (id, user_email, snapshot, source)
-     VALUES (?, '__default__', ?, 'seed')
-     ON DUPLICATE KEY UPDATE user_email = user_email`,
-    [id("dashboard"), JSON.stringify(dashboardData)]
-  );
 }
 
 async function ensureColumn(pool: Pool, tableName: string, columnName: string, definition: string) {
@@ -321,33 +324,6 @@ function initials(name: string) {
     .join("");
 }
 
-function parseDashboardSnapshot(value: unknown): DashboardData {
-  if (!value) return dashboardData;
-  if (typeof value === "object") return value as DashboardData;
-  if (typeof value === "string") {
-    try {
-      return JSON.parse(value) as DashboardData;
-    } catch {
-      return dashboardData;
-    }
-  }
-  return dashboardData;
-}
-
-function personalizeDashboard(snapshot: DashboardData, user?: UserRecord | null): DashboardData {
-  if (!user) return snapshot;
-
-  return {
-    ...snapshot,
-    studentData: {
-      ...snapshot.studentData,
-      name: user.name,
-      class: user.classLevel || snapshot.studentData.class,
-      avatar: initials(user.name) || snapshot.studentData.avatar
-    }
-  };
-}
-
 function mapUser(row: RowDataPacket): UserRecord {
   return {
     id: String(row.id),
@@ -355,8 +331,8 @@ function mapUser(row: RowDataPacket): UserRecord {
     email: String(row.email),
     passwordHash: String(row.password_hash),
     phone: row.phone,
-    classLevel: row.class_level,
-    schoolName: row.school_name,
+    classLevel: row.class_level ?? row.class_name,
+    schoolName: row.school_name ?? row.school,
     role: row.role === "admin" ? "admin" : "student",
     signupSource: row.signup_source ?? "web",
     otpVerified: Boolean(row.otp_verified),
@@ -383,16 +359,16 @@ export async function updateUserProfile(
 
   await pool.query(
     `UPDATE users
-     SET name = ?, phone = ?, class_level = ?, school_name = ?
+     SET name = ?, phone = ?, class_level = ?, class_name = ?, school_name = ?, school = ?
      WHERE email = ?`,
-    [data.name, data.phone ?? null, data.classLevel ?? null, data.schoolName ?? null, email]
+    [data.name, data.phone ?? null, data.classLevel ?? null, data.classLevel ?? null, data.schoolName ?? null, data.schoolName ?? null, email]
   );
 
   await pool.query(
     `UPDATE students
-     SET name = ?, phone = ?, class_level = ?, school_name = ?
+     SET name = ?, phone = ?, class_level = ?, class_name = ?, school_name = ?, school = ?
      WHERE email = ?`,
-    [data.name, data.phone ?? null, data.classLevel ?? null, data.schoolName ?? null, email]
+    [data.name, data.phone ?? null, data.classLevel ?? null, data.classLevel ?? null, data.schoolName ?? null, data.schoolName ?? null, email]
   );
 
   return findUserByEmail(email);
@@ -425,8 +401,8 @@ export async function createUser(data: {
   };
 
   await pool.query(
-    `INSERT INTO users (id, name, email, password_hash, phone, class_level, school_name, role, signup_source, unlocked_courses)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO users (id, name, email, password_hash, phone, class_level, class_name, school_name, school, role, signup_source, unlocked_courses)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       user.id,
       user.name,
@@ -434,6 +410,8 @@ export async function createUser(data: {
       user.passwordHash,
       user.phone,
       user.classLevel,
+      user.classLevel,
+      user.schoolName,
       user.schoolName,
       user.role,
       user.signupSource,
@@ -443,16 +421,18 @@ export async function createUser(data: {
 
   if (user.role === "student") {
     await pool.query(
-      `INSERT INTO students (id, user_id, name, email, phone, class_level, school_name, signup_source)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO students (id, user_id, name, email, phone, class_level, class_name, school_name, school, signup_source)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
          user_id = VALUES(user_id),
          name = VALUES(name),
          phone = VALUES(phone),
          class_level = VALUES(class_level),
+         class_name = VALUES(class_name),
          school_name = VALUES(school_name),
+         school = VALUES(school),
          signup_source = VALUES(signup_source)`,
-      [id("student"), user.id, user.name, user.email, user.phone, user.classLevel, user.schoolName, user.signupSource]
+      [id("student"), user.id, user.name, user.email, user.phone, user.classLevel, user.classLevel, user.schoolName, user.schoolName, user.signupSource]
     );
   }
 
@@ -506,8 +486,8 @@ export async function createLead(data: LeadRecord) {
 
   const lead = { id: id("lead"), ...data, createdAt: new Date().toISOString() };
   await pool.query(
-    `INSERT INTO leads (id, type, name, email, phone, school, city, message, class_level, interest)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO leads (id, type, name, email, phone, school, city, message, class_level, class_name, interest)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       lead.id,
       data.type,
@@ -517,6 +497,7 @@ export async function createLead(data: LeadRecord) {
       data.school ?? null,
       data.city ?? null,
       data.message ?? null,
+      data.classLevel ?? null,
       data.classLevel ?? null,
       data.interest ?? null
     ]
@@ -630,27 +611,123 @@ export async function getStudentDashboardData(email?: string) {
 
   if (!pool) {
     return {
-      dashboard: dashboardData,
+      dashboard: createEmptyDashboardData(),
       mode: "dev"
     };
   }
 
-  const [rows] = await pool.query<RowDataPacket[]>(
-    `SELECT snapshot
-     FROM dashboard_snapshots
-     WHERE user_email IN (?, '__default__')
-     ORDER BY user_email = ? DESC
-     LIMIT 1`,
-    [email ?? "__default__", email ?? "__default__"]
-  );
-
   const user = email ? await findUserByEmail(email) : null;
-  const snapshot = parseDashboardSnapshot(rows[0]?.snapshot);
+  const dashboard = await buildLiveStudentDashboard(pool, user);
 
   return {
-    dashboard: personalizeDashboard(snapshot, user),
+    dashboard,
     mode: "mysql"
   };
+}
+
+async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): Promise<DashboardData> {
+  const [studentCountRows] = await pool.query<RowDataPacket[]>(
+    "SELECT COUNT(*) AS count FROM users WHERE role = 'student'"
+  );
+
+  const totalStudents = Number(studentCountRows[0]?.count ?? 0);
+  const dashboard = createEmptyDashboardData({
+    name: user?.name ?? "Student",
+    class: user?.classLevel || "Not assigned",
+    avatar: user?.name ? initials(user.name) : "S",
+    totalStudents,
+  });
+
+  dashboard.studentData.aiInsight = "No learning activity has been recorded yet.";
+  dashboard.metricCards = dashboard.metricCards.map((card) =>
+    card.id === "rank" ? { ...card, value: totalStudents > 0 ? "-" : "0" } : card
+  );
+
+  if (!user?.email) return dashboard;
+
+  const [enrollmentRows, certificateRows, loginRows, paidPaymentRows] = await Promise.all([
+    pool.query<RowDataPacket[]>(
+      `SELECT id, course_title, status, enrolled_at, created_at
+       FROM enrollments
+       WHERE user_email = ?
+       ORDER BY enrolled_at DESC, created_at DESC`,
+      [user.email]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT credential_id, course, issued_at, status, created_at
+       FROM certificates
+       WHERE user_email = ?
+       ORDER BY created_at DESC`,
+      [user.email]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT created_at
+       FROM login_events
+       WHERE email = ? AND status IN ('success', 'signup')
+       ORDER BY created_at DESC
+       LIMIT 30`,
+      [user.email]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT COUNT(*) AS count
+       FROM payments
+       WHERE user_email = ? AND status = 'paid'`,
+      [user.email]
+    )
+  ]);
+
+  const enrollments = enrollmentRows[0];
+  const certificates = certificateRows[0];
+  const loginEvents = loginRows[0];
+  const paidPayments = Number(paidPaymentRows[0][0]?.count ?? 0);
+  const earnedCount = certificates.length;
+
+  dashboard.studentData.rollNumber = user.id;
+  dashboard.studentData.aiInsight =
+    loginEvents.length > 0
+      ? "Your activity has started. More reports will appear when classes, homework, tests, and attendance are recorded."
+      : "No learning activity has been recorded yet.";
+  dashboard.weeklyProgress = {
+    score: 0,
+    consistency: loginEvents.length > 0 ? Math.min(100, loginEvents.length * 10) : 0,
+    streak: 0,
+    classPercentile: 0,
+  };
+
+  dashboard.futureSkills = enrollments.map<FutureSkill>((row, index) => ({
+    id: String(row.id ?? `enrollment-${index}`),
+    title: String(row.course_title ?? "Course"),
+    progress: 0,
+    level: String(row.status ?? "active"),
+    badges: certificates.filter((certificate) => certificate.course === row.course_title).length,
+    nextMilestone: "Start learning activity",
+    color: ["blue", "purple", "emerald", "orange"][index % 4],
+    icon: "book-open",
+  }));
+
+  dashboard.achievements = certificates.map<Achievement>((row, index) => ({
+    id: String(row.credential_id ?? `certificate-${index}`),
+    title: String(row.course ?? "Certificate"),
+    description: "Certificate issued from ADYAPAN records.",
+    icon: "trophy",
+    color: "yellow",
+    earned: true,
+    date: dateValue(row.issued_at ?? row.created_at) as string,
+  }));
+
+  dashboard.quickAccessCards = dashboard.quickAccessCards.map((card) => {
+    if (card.id === "skills") {
+      return { ...card, stat: earnedCount > 0 ? `${earnedCount}` : "0", statLabel: "Certificates" };
+    }
+
+    if (card.id === "gamified") {
+      return { ...card, stat: String(paidPayments), statLabel: "Paid Plans" };
+    }
+
+    return card;
+  });
+
+  return dashboard;
 }
 
 export async function getAdminOverview() {

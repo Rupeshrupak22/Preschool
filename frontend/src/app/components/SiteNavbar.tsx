@@ -20,7 +20,8 @@ const navItems = [
   { label: "Mentor", href: "/mentors" },
   { label: "My App", href: "/our.html" },
   { label: "LMS", href: "/dashboard" },
-  { label: "About Us", href: "/about" }
+  { label: "About Us", href: "/about" },
+  { label: "Contact Us", href: "/#demo" }
 ];
 
 type NavUser = {

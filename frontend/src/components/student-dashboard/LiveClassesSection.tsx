@@ -58,10 +58,12 @@ export default function LiveClassesSection({ classes }: Props) {
             <h2 className="text-xl font-black text-slate-900">Today's Live Classes</h2>
             <p className="text-xs font-semibold text-slate-500">Join your sessions</p>
           </div>
-          <span className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 px-3 py-1 text-[10px] font-black text-white shadow-sm">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
-            LIVE NOW
-          </span>
+          {classes.some((cls) => cls.isLive) && (
+            <span className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 px-3 py-1 text-[10px] font-black text-white shadow-sm">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
+              LIVE NOW
+            </span>
+          )}
         </div>
         <a
           href="/student-dashboard/live-classes"
@@ -71,6 +73,11 @@ export default function LiveClassesSection({ classes }: Props) {
         </a>
       </div>
 
+      {classes.length === 0 ? (
+        <div className="rounded-3xl border-2 border-white/80 bg-white/70 p-6 text-sm font-semibold text-slate-500 shadow-[0_4px_20px_rgba(168,85,247,0.08)] backdrop-blur-sm">
+          No live classes are scheduled yet.
+        </div>
+      ) : (
       <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
         {classes.map((cls, i) => {
           const colors = colorMap[cls.color] ?? colorMap.blue;
@@ -135,6 +142,7 @@ export default function LiveClassesSection({ classes }: Props) {
           );
         })}
       </div>
+      )}
     </section>
   );
 }

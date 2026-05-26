@@ -31,7 +31,9 @@ export default function TestResultsPanel({ results, upcoming }: Props) {
             <h3 className="text-sm font-black text-slate-950">Recent Results</h3>
           </div>
           <div className="divide-y divide-slate-50">
-            {results.map((test, i) => {
+            {results.length === 0 ? (
+              <div className="px-5 py-6 text-sm font-semibold text-slate-500">No test results have been recorded yet.</div>
+            ) : results.map((test, i) => {
               const pct = Math.round((test.obtained / test.total) * 100);
               const status = statusConfig[test.status];
               return (
@@ -91,7 +93,9 @@ export default function TestResultsPanel({ results, upcoming }: Props) {
               <h3 className="text-sm font-black text-slate-950">Upcoming Quizzes</h3>
             </div>
             <div className="divide-y divide-slate-50">
-              {upcoming.map((quiz, i) => (
+              {upcoming.length === 0 ? (
+                <div className="px-4 py-6 text-sm font-semibold text-slate-500">No upcoming quizzes.</div>
+              ) : upcoming.map((quiz, i) => (
                 <motion.div
                   key={quiz.id}
                   initial={{ opacity: 0, x: 10 }}

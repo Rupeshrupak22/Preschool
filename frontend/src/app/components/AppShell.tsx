@@ -11,7 +11,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       {!isLmsRoute && <SiteNavbar />}
-      {children}
+      <div className={isLmsRoute ? undefined : "site-page-with-nav"}>{children}</div>
       {!isLmsRoute && <SiteFooter />}
     </>
   );

@@ -47,6 +47,11 @@ export default function AchievementsPanel({ achievements }: Props) {
         </span>
       </div>
 
+      {earned.length === 0 ? (
+        <div className="rounded-3xl border-2 border-white/80 bg-white/70 p-6 text-sm font-semibold text-slate-500 shadow-[0_4px_20px_rgba(168,85,247,0.08)]">
+          No earned badges yet. Certificates and achievements will appear here after real activity is recorded.
+        </div>
+      ) : (
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
         {earned.map((ach, i) => {
           const Icon = iconMap[ach.icon] ?? Star;
@@ -75,6 +80,7 @@ export default function AchievementsPanel({ achievements }: Props) {
           );
         })}
       </div>
+      )}
     </section>
   );
 }

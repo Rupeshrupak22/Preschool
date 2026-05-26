@@ -31,6 +31,8 @@ function CustomTooltip({ active, payload, label }: {
 }
 
 export default function PerformanceTrendChart({ data }: Props) {
+  const hasData = data.length > 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -41,7 +43,7 @@ export default function PerformanceTrendChart({ data }: Props) {
       <div className="flex items-start justify-between">
         <div>
           <h3 className="text-sm font-black text-slate-900">Performance Trend</h3>
-          <p className="mt-0.5 text-xs font-semibold text-slate-500">Jan – Jun 2026 monthly growth</p>
+          <p className="mt-0.5 text-xs font-semibold text-slate-500">Live growth from recorded tests</p>
         </div>
         <div className="flex items-center gap-3 text-[10px] font-bold">
           <span className="flex items-center gap-1.5">
@@ -55,63 +57,70 @@ export default function PerformanceTrendChart({ data }: Props) {
         </div>
       </div>
 
-      <div className="mt-4 flex-1">
-        <ResponsiveContainer width="100%" height={200}>
-          <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-            <defs>
-              <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="avgGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.15} />
-                <stop offset="95%" stopColor="#94a3b8" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-            <XAxis
-              dataKey="month"
-              tick={{ fontSize: 11, fontWeight: 600, fill: "#94a3b8" }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              domain={[55, 95]}
-              tick={{ fontSize: 11, fontWeight: 600, fill: "#94a3b8" }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Area
-              type="monotone"
-              dataKey="classAvg"
-              name="Class Avg"
-              stroke="#cbd5e1"
-              strokeWidth={2}
-              fill="url(#avgGrad)"
-              dot={false}
-              animationDuration={1200}
-            />
-            <Area
-              type="monotone"
-              dataKey="score"
-              name="Your Score"
-              stroke="#a855f7"
-              strokeWidth={2.5}
-              fill="url(#scoreGrad)"
-              dot={{ fill: "#a855f7", r: 4, strokeWidth: 2, stroke: "#fff" }}
-              activeDot={{ r: 6, fill: "#a855f7", stroke: "#fff", strokeWidth: 2 }}
-              animationDuration={1200}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
+      {hasData ? (
+        <>
+          <div className="mt-4 flex-1">
+            <ResponsiveContainer width="100%" height={200}>
+              <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="avgGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#94a3b8" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <XAxis
+                  dataKey="month"
+                  tick={{ fontSize: 11, fontWeight: 600, fill: "#94a3b8" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  domain={[0, 100]}
+                  tick={{ fontSize: 11, fontWeight: 600, fill: "#94a3b8" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Area
+                  type="monotone"
+                  dataKey="classAvg"
+                  name="Class Avg"
+                  stroke="#cbd5e1"
+                  strokeWidth={2}
+                  fill="url(#avgGrad)"
+                  dot={false}
+                  animationDuration={1200}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="score"
+                  name="Your Score"
+                  stroke="#a855f7"
+                  strokeWidth={2.5}
+                  fill="url(#scoreGrad)"
+                  dot={{ fill: "#a855f7", r: 4, strokeWidth: 2, stroke: "#fff" }}
+                  activeDot={{ r: 6, fill: "#a855f7", stroke: "#fff", strokeWidth: 2 }}
+                  animationDuration={1200}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
 
-      {/* Growth indicator */}
-      <div className="mt-3 flex items-center gap-2 rounded-2xl bg-gradient-to-r from-purple-50 to-pink-50 px-4 py-2.5 border border-purple-100">
-        <span className="text-xs font-black text-purple-700">🚀 +17 points</span>
-        <span className="text-xs text-slate-500">growth from Jan to Jun 2026</span>
-      </div>
+          <div className="mt-3 flex items-center gap-2 rounded-2xl border border-purple-100 bg-gradient-to-r from-purple-50 to-pink-50 px-4 py-2.5">
+            <span className="text-xs font-black text-purple-700">Live trend</span>
+            <span className="text-xs text-slate-500">based on recorded tests</span>
+          </div>
+        </>
+      ) : (
+        <div className="mt-4 flex min-h-[240px] items-center justify-center rounded-2xl bg-white/60 text-sm font-semibold text-slate-500">
+          No test trend data yet.
+        </div>
+      )}
     </motion.div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { TrendingUp, Target, CheckCircle2, BarChart3, Zap, ExternalLink } from "lucide-react";
+import type { DashboardData } from "@/lib/dashboard/dashboard-data";
 
 interface Metric {
   label: string;
@@ -13,49 +14,6 @@ interface Metric {
   glow: string;
   trend: string;
 }
-
-const metrics: Metric[] = [
-  {
-    label: "Overall Score",
-    value: "86%",
-    percent: 86,
-    icon: BarChart3,
-    gradient: "from-blue-500 to-indigo-500",
-    ring: "stroke-blue-500",
-    glow: "shadow-[0_8px_28px_rgba(59,130,246,0.3)]",
-    trend: "+5%",
-  },
-  {
-    label: "Consistency",
-    value: "72%",
-    percent: 72,
-    icon: Zap,
-    gradient: "from-purple-500 to-violet-500",
-    ring: "stroke-purple-500",
-    glow: "shadow-[0_8px_28px_rgba(139,92,246,0.3)]",
-    trend: "+3%",
-  },
-  {
-    label: "Accuracy",
-    value: "91%",
-    percent: 91,
-    icon: Target,
-    gradient: "from-emerald-500 to-teal-500",
-    ring: "stroke-emerald-500",
-    glow: "shadow-[0_8px_28px_rgba(16,185,129,0.3)]",
-    trend: "+8%",
-  },
-  {
-    label: "Attendance",
-    value: "94%",
-    percent: 94,
-    icon: CheckCircle2,
-    gradient: "from-rose-500 to-pink-500",
-    ring: "stroke-rose-500",
-    glow: "shadow-[0_8px_28px_rgba(244,63,94,0.3)]",
-    trend: "+2%",
-  },
-];
 
 const RADIUS = 36;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -84,7 +42,67 @@ function RingChart({ percent, gradient, ring }: { percent: number; gradient: str
   );
 }
 
-export default function PerformanceOverview() {
+function buildMetrics(data: DashboardData): Metric[] {
+  const overall = data.subjectPerformance.length
+    ? Math.round(data.subjectPerformance.reduce((sum, subject) => sum + subject.score, 0) / data.subjectPerformance.length)
+    : 0;
+  const attendance = data.attendanceMonths.length
+    ? Math.round(data.attendanceMonths.reduce((sum, month) => sum + month.pct, 0) / data.attendanceMonths.length)
+    : 0;
+  const accuracy = data.testResults.length
+    ? Math.round(
+        data.testResults.reduce((sum, result) => sum + (result.total > 0 ? (result.obtained / result.total) * 100 : 0), 0) /
+          data.testResults.length
+      )
+    : 0;
+
+  return [
+    {
+      label: "Overall Score",
+      value: `${overall}%`,
+      percent: overall,
+      icon: BarChart3,
+      gradient: "from-blue-500 to-indigo-500",
+      ring: "stroke-blue-500",
+      glow: "shadow-[0_8px_28px_rgba(59,130,246,0.3)]",
+      trend: "0%",
+    },
+    {
+      label: "Consistency",
+      value: `${data.weeklyProgress.consistency}%`,
+      percent: data.weeklyProgress.consistency,
+      icon: Zap,
+      gradient: "from-purple-500 to-violet-500",
+      ring: "stroke-purple-500",
+      glow: "shadow-[0_8px_28px_rgba(139,92,246,0.3)]",
+      trend: "0%",
+    },
+    {
+      label: "Accuracy",
+      value: `${accuracy}%`,
+      percent: accuracy,
+      icon: Target,
+      gradient: "from-emerald-500 to-teal-500",
+      ring: "stroke-emerald-500",
+      glow: "shadow-[0_8px_28px_rgba(16,185,129,0.3)]",
+      trend: "0%",
+    },
+    {
+      label: "Attendance",
+      value: `${attendance}%`,
+      percent: attendance,
+      icon: CheckCircle2,
+      gradient: "from-rose-500 to-pink-500",
+      ring: "stroke-rose-500",
+      glow: "shadow-[0_8px_28px_rgba(244,63,94,0.3)]",
+      trend: "0%",
+    },
+  ];
+}
+
+export default function PerformanceOverview({ data }: { data: DashboardData }) {
+  const metrics = buildMetrics(data);
+  const goalScore = data.weeklyProgress.score;
   return (
     <section>
       <div className="mb-5 flex items-center justify-between">
@@ -152,21 +170,22 @@ export default function PerformanceOverview() {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1.5">
             <p className="text-xs font-black text-slate-900">Weekly Goal Progress</p>
-            <span className="text-xs font-black text-amber-600">78 / 100 pts</span>
+            <span className="text-xs font-black text-amber-600">{goalScore} / 100 pts</span>
           </div>
           <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
             <motion.div
               initial={{ width: 0 }}
-              animate={{ width: "78%" }}
+              animate={{ width: `${goalScore}%` }}
               transition={{ duration: 1.2, ease: "easeOut", delay: 0.5 }}
               className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500"
             />
           </div>
         </div>
         <span className="shrink-0 rounded-full bg-amber-50 px-3 py-1 text-xs font-black text-amber-700">
-          22 pts to go 🎯
+          {Math.max(0, 100 - goalScore)} pts to go
         </span>
       </motion.div>
     </section>
   );
 }
+
