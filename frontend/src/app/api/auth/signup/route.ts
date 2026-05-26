@@ -38,7 +38,8 @@ export async function POST(request: Request) {
       user,
       ipAddress: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? request.headers.get("x-real-ip"),
       userAgent: request.headers.get("user-agent"),
-      status: "signup"
+      status: "signup",
+      source: payload.data.source
     });
     await sendEmail({
       to: user.email,
@@ -67,6 +68,7 @@ export async function POST(request: Request) {
     ...payload.data,
     role,
     passwordHash,
+    signupSource: payload.data.source === "app" ? "mobile" : payload.data.source,
     unlockedCourses: ["Future Skills Starter"],
     createdAt: new Date().toISOString()
   };

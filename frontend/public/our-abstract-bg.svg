@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2560 760" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <filter id="blurA">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+    <linearGradient id="wash" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e8fff1"/>
+      <stop offset="42%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <linearGradient id="deepWave" x1="0" x2="1">
+      <stop offset="0%" stop-color="#173447"/>
+      <stop offset="26%" stop-color="#0f3950"/>
+      <stop offset="52%" stop-color="#144875"/>
+      <stop offset="76%" stop-color="#1d2f9d"/>
+      <stop offset="100%" stop-color="#0d7e8f"/>
+    </linearGradient>
+    <linearGradient id="mintWave" x1="0" x2="1">
+      <stop offset="0%" stop-color="#a8f2b9"/>
+      <stop offset="46%" stop-color="#82e8b1"/>
+      <stop offset="100%" stop-color="#35d9b3"/>
+    </linearGradient>
+    <linearGradient id="violetWave" x1="0" x2="1">
+      <stop offset="0%" stop-color="#152e5a" stop-opacity="0.1"/>
+      <stop offset="52%" stop-color="#3430a2" stop-opacity="0.88"/>
+      <stop offset="100%" stop-color="#0b376e" stop-opacity="0.64"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="2560" height="760" fill="url(#wash)"/>
+  <g filter="url(#blurA)" opacity="0.92">
+    <path d="M-180 78 C260 56 560 80 916 196 C1218 294 1406 284 1634 255 C1842 228 1996 296 2192 440 C2338 548 2460 614 2740 638 L2740 796 L-180 796 Z" fill="#d7f8e3" opacity="0.62"/>
+    <path d="M-160 118 C246 82 602 88 925 210 C1214 320 1392 304 1605 286 C1830 258 1989 340 2205 500 C2340 600 2502 650 2740 675" fill="none" stroke="url(#deepWave)" stroke-width="112" stroke-linecap="round" opacity="0.82"/>
+    <path d="M-120 85 C338 58 706 91 1040 235 C1278 337 1475 333 1658 302 C1848 270 2024 358 2235 520 C2370 625 2515 688 2700 708" fill="none" stroke="url(#violetWave)" stroke-width="52" stroke-linecap="round" opacity="0.72"/>
+    <path d="M-150 28 C328 14 709 46 1045 174 C1298 270 1512 255 1686 235 C1888 212 2054 286 2245 430 C2402 548 2548 608 2710 626" fill="none" stroke="url(#mintWave)" stroke-width="28" stroke-linecap="round" opacity="0.7"/>
+    <path d="M-200 174 C206 146 560 170 936 258 C1224 326 1420 318 1662 318 C1838 318 2004 410 2208 552 C2382 674 2535 724 2730 734" fill="none" stroke="#0f2834" stroke-width="62" stroke-linecap="round" opacity="0.28"/>
+    <path d="M1308 282 C1510 272 1698 250 1898 318 C2052 370 2170 474 2328 598 C2440 686 2578 708 2720 704" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity="0.48"/>
+    <path d="M1392 318 C1598 304 1795 306 2002 406 C2140 474 2246 584 2388 668" fill="none" stroke="#d5fff0" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+  </g>
+  <rect width="2560" height="760" fill="#ffffff" opacity="0.22"/>
+</svg>

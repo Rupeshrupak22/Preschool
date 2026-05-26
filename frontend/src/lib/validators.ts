@@ -7,7 +7,8 @@ export const signupSchema = z.object({
   classLevel: z.string().min(1),
   schoolName: z.string().optional(),
   password: z.string().min(8),
-  captcha: z.literal("ADYAPAN")
+  captcha: z.literal("ADYAPAN"),
+  source: z.enum(["web", "mobile", "app"]).optional().default("web")
 });
 
 export const profileSchema = z.object({
@@ -20,7 +21,8 @@ export const profileSchema = z.object({
 export const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
-  captcha: z.literal("ADYAPAN")
+  captcha: z.literal("ADYAPAN"),
+  source: z.enum(["web", "mobile", "app"]).optional().default("web")
 });
 
 export const leadSchema = z.object({

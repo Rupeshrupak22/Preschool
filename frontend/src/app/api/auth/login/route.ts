@@ -24,7 +24,8 @@ export async function POST(request: Request) {
     await recordLoginEvent({
       user,
       ipAddress: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? request.headers.get("x-real-ip"),
-      userAgent: request.headers.get("user-agent")
+      userAgent: request.headers.get("user-agent"),
+      source: payload.data.source
     });
     const response = NextResponse.json({ user: publicUser(user), token, mode: "mysql" });
     response.cookies.set("adyapan_token", token, {

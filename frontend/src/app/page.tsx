@@ -225,43 +225,43 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-gradient-to-b from-purple-200 via-pink-100 to-blue-200 text-slate-900 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/bg-hero.jpg')" }}>
-      {/* Animated background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
-        <div className="absolute top-40 right-10 w-32 h-32 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-        <div className="absolute -bottom-8 left-20 w-32 h-32 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
+    <main className="min-h-screen overflow-hidden text-slate-900">
+      <div className="pointer-events-none fixed inset-0 !z-0 bg-[url('/classroom-bg.svg')] bg-cover bg-center bg-no-repeat" />
+      <div className="pointer-events-none fixed inset-0 !z-0 bg-gradient-to-b from-white/50 via-white/72 to-white/92" />
+      <div className="pointer-events-none fixed inset-0 !z-0 bg-[radial-gradient(circle_at_17%_18%,rgba(245,158,11,0.20),transparent_22%),radial-gradient(circle_at_83%_24%,rgba(37,99,235,0.16),transparent_24%)]" />
+
+      {/* Soft classroom overlays */}
+      <div className="fixed inset-0 !z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-24 left-10 w-32 h-32 rounded-full border border-amber-300/40 bg-white/10 blur-[1px]" />
+        <div className="absolute right-8 top-28 hidden h-16 w-16 rounded-full border border-sky-300/35 bg-white/10 md:block" />
+        <div className="absolute -bottom-8 left-20 w-36 h-36 rounded-full bg-blue-200/20 blur-3xl" />
       </div>
 
-      <section id="top" className="relative min-h-[92vh] overflow-hidden px-4 pt-10 md:px-6">
-        <div className="absolute left-10 top-20 hidden h-20 w-20 rounded-full border-2 border-yellow-300 md:block animate-pulse" />
-        <div className="absolute right-8 top-28 hidden h-16 w-16 rounded-full border-2 border-green-300 md:block animate-pulse" style={{ animationDelay: "0.5s" }} />
+      <section id="top" className="relative !z-10 min-h-[92vh] overflow-hidden px-4 pt-10 md:px-6">
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 pb-8 lg:grid-cols-[0.9fr_1.1fr]">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <div className="mb-7 inline-flex items-center gap-3 rounded-full border-2 border-white bg-white/60 backdrop-blur px-4 py-2 text-sm font-bold text-slate-900 shadow-[0_12px_32px_rgba(168,85,247,0.2)]">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-yellow-300 via-orange-400 to-red-500 text-white shadow-lg font-bold">
-                ady.
-              </span>
+            <div className="mb-7 inline-flex items-center gap-3 rounded-full border border-white/75 bg-white/76 backdrop-blur-md px-4 py-2 text-sm font-bold text-slate-900 shadow-[0_14px_36px_rgba(15,23,42,0.12)]">
+              <img src="/adyapan-logo.svg" alt="ADYAPAN" className="h-10 w-10 rounded-full object-contain shadow-lg" />
               Nurturing Minds. Building Futures.
             </div>
-            <h1 className="max-w-3xl text-5xl font-black leading-[0.96] tracking-tight bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent sm:text-6xl md:text-8xl">
-              Big Dreams <span className="block">Start Small</span>
+            <h1 className="max-w-3xl text-5xl font-black leading-[0.96] tracking-tight text-slate-950 drop-shadow-[0_2px_0_rgba(255,255,255,0.9)] sm:text-6xl md:text-8xl">
+              Big Dreams <span className="block text-blue-700">Start Small</span>
             </h1>
-            <p className="mt-7 max-w-2xl text-lg font-bold leading-8 text-slate-900 sm:text-xl md:text-2xl md:leading-9">
-              Nurturing young minds from <span className="font-black text-purple-600">Class 1</span> and guiding them
-              all the way to <span className="font-black text-purple-600">Class 12</span>.
+            <p className="mt-7 max-w-2xl rounded-3xl border border-white/70 bg-white/62 p-5 text-lg font-bold leading-8 text-slate-900 shadow-[0_16px_40px_rgba(15,23,42,0.10)] backdrop-blur-md sm:text-xl md:text-2xl md:leading-9">
+              Nurturing young minds from <span className="font-black text-blue-700">Class 1</span> and guiding them
+              all the way to <span className="font-black text-blue-700">Class 12</span>.
             </p>
-            <div className="mt-8 h-3 w-44 rounded-full bg-gradient-to-r from-yellow-300 via-pink-400 to-blue-400 shadow-lg" />
+            <div className="mt-8 h-3 w-44 rounded-full bg-gradient-to-r from-amber-300 via-sky-300 to-blue-500 shadow-lg" />
             <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
               <a
                 href="#curriculum"
-                className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 px-7 font-bold text-white shadow-[0_18px_34px_rgba(34,197,94,0.3)] transition hover:-translate-y-1 hover:shadow-[0_22px_42px_rgba(34,197,94,0.4)]"
+                className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-blue-700 to-sky-500 px-7 font-bold text-white shadow-[0_18px_34px_rgba(37,99,235,0.28)] transition hover:-translate-y-1 hover:shadow-[0_22px_42px_rgba(37,99,235,0.36)]"
               >
                 Explore Programs <ArrowRight className="h-5 w-5" />
               </a>
               <a
                 href="#demo"
-                className="inline-flex h-14 items-center justify-center gap-3 rounded-full border-2 border-white bg-white/70 backdrop-blur px-7 font-bold text-slate-900 shadow-[0_14px_30px_rgba(255,255,255,0.3)] transition hover:-translate-y-1 hover:bg-white"
+                className="inline-flex h-14 items-center justify-center gap-3 rounded-full border border-white/80 bg-white/76 backdrop-blur-md px-7 font-bold text-slate-900 shadow-[0_14px_30px_rgba(15,23,42,0.10)] transition hover:-translate-y-1 hover:bg-white"
               >
                 <CalendarDays className="h-5 w-5" /> Book a Free Class
               </a>
@@ -278,7 +278,7 @@ export default function Home() {
               <a
                 key={program.title}
                 href="#curriculum"
-                className="group relative min-h-[390px] overflow-hidden rounded-[30px] border-2 border-white/90 bg-white/88 p-5 text-center shadow-[0_20px_60px_rgba(99,102,241,0.18)] backdrop-blur-xl transition duration-300 hover:-translate-y-3 hover:border-fuchsia-300 hover:bg-white hover:shadow-[0_0_34px_rgba(217,70,239,0.30),0_34px_80px_rgba(168,85,247,0.28)] sm:min-h-[455px] sm:rounded-[34px] sm:p-6"
+                className="group relative min-h-[390px] overflow-hidden rounded-[30px] border border-white/80 bg-white/70 p-5 text-center shadow-[0_24px_70px_rgba(15,23,42,0.13)] backdrop-blur-xl transition duration-300 hover:-translate-y-3 hover:border-blue-200 hover:bg-white/86 hover:shadow-[0_30px_90px_rgba(37,99,235,0.20)] sm:min-h-[455px] sm:rounded-[34px] sm:p-6"
               >
                 <div className={`absolute inset-x-4 bottom-4 top-24 rounded-[28px] bg-gradient-to-b ${program.glow} opacity-75 blur-sm transition duration-300 group-hover:scale-105 group-hover:opacity-100`} />
                 <div className="absolute inset-0 rounded-[30px] ring-1 ring-inset ring-white/90 transition duration-300 group-hover:ring-fuchsia-300/70" />
@@ -312,12 +312,12 @@ export default function Home() {
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.22, duration: 0.7 }}
-          className="relative mx-auto mb-10 grid max-w-6xl gap-4 rounded-[32px] border-2 border-white/70 bg-white/78 p-5 shadow-[0_26px_70px_rgba(99,102,241,0.16)] backdrop-blur-xl sm:grid-cols-2 lg:grid-cols-4"
+          className="relative mx-auto mb-10 grid max-w-6xl gap-4 rounded-[32px] border border-white/75 bg-white/72 p-5 shadow-[0_26px_70px_rgba(15,23,42,0.12)] backdrop-blur-xl sm:grid-cols-2 lg:grid-cols-4"
         >
           {heroBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="group flex min-h-24 items-center gap-4 rounded-2xl border border-white/80 bg-white/64 p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-purple-200 hover:bg-white hover:shadow-[0_18px_36px_rgba(168,85,247,0.18)]"
+              className="group flex min-h-24 items-center gap-4 rounded-2xl border border-white/80 bg-white/68 p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:bg-white hover:shadow-[0_18px_36px_rgba(37,99,235,0.14)]"
             >
               <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${benefit.color} transition duration-300 group-hover:scale-110`}>
                 <benefit.icon className="h-7 w-7" />

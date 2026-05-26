@@ -151,22 +151,24 @@ export default function AdminPage() {
         </div>
 
         <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
-          <div className="min-w-[680px]">
-            <div className="grid grid-cols-4 border-b border-slate-200 px-4 py-3 text-sm font-semibold text-saffron-900/66">
+          <div className="min-w-[820px]">
+            <div className="grid grid-cols-5 border-b border-slate-200 px-4 py-3 text-sm font-semibold text-saffron-900/66">
               <span>Name</span>
               <span>Email</span>
               <span>Class</span>
+              <span>Source</span>
               <span>Status</span>
             </div>
             {(filteredStudents.length ? filteredStudents : [
-              { name: "Aarav Sharma", email: "aarav@example.com", classLevel: "Class 8", status: "Active" },
-              { name: "Mira Iyer", email: "mira@example.com", classLevel: "Class 10", status: "Certified" },
-              { name: "Kabir Khan", email: "kabir@example.com", classLevel: "Class 6", status: "Trial" }
+              { name: "Aarav Sharma", email: "aarav@example.com", classLevel: "Class 8", signupSource: "web", status: "Active" },
+              { name: "Mira Iyer", email: "mira@example.com", classLevel: "Class 10", signupSource: "mobile", status: "Certified" },
+              { name: "Kabir Khan", email: "kabir@example.com", classLevel: "Class 6", signupSource: "web", status: "Trial" }
             ]).map((student, index) => (
-              <div key={index} className="grid grid-cols-4 px-4 py-3 text-sm text-saffron-900/62 odd:bg-white/70">
+              <div key={index} className="grid grid-cols-5 px-4 py-3 text-sm text-saffron-900/62 odd:bg-white/70">
                 <span>{String(student.name ?? "Student")}</span>
                 <span className="truncate">{String(student.email ?? "student@adyapan.com")}</span>
                 <span>{String(student.classLevel ?? "Class 8")}</span>
+                <span>{String(student.signupSource ?? "web")}</span>
                 <span>{String(student.status ?? "Active")}</span>
               </div>
             ))}

@@ -29,7 +29,7 @@ Open `http://localhost:4000/api/health`.
 
 ## Environment
 
-Copy `.env.example` to `.env.local` and configure:
+Copy `.env.example` to `frontend/.env.local` and configure:
 
 - `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`
 - `MYSQL_SSL=true` for TiDB Cloud or any hosted MySQL that requires TLS
@@ -43,6 +43,8 @@ Initialize the MySQL database and tables:
 ```bash
 npm run db:init
 ```
+
+The Next API routes under `frontend/src/app/api/*` are the backend used by the website. Signup, login, profile updates, lead forms, OTPs, payments, certificates, admin overview, and the LMS dashboard snapshot are stored/read through MySQL when the environment variables are present. The standalone `backend/` service also loads the same env file and exposes DB-aware health/leads endpoints for future separation.
 
 ## Main Frontend Routes
 

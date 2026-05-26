@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import mysql, { type Pool, type PoolOptions, type RowDataPacket } from "mysql2/promise";
+import { dashboardData, type DashboardData } from "@/lib/dashboard/dashboard-data";
 import { id } from "@/lib/store";
 
 type UserRecord = {
@@ -11,6 +12,7 @@ type UserRecord = {
   classLevel?: string | null;
   schoolName?: string | null;
   role: "student" | "admin";
+  signupSource?: string | null;
   otpVerified?: boolean;
   unlockedCourses?: string[];
   createdAt?: string;
@@ -88,6 +90,7 @@ async function ensureSchema(pool: Pool) {
       class_level VARCHAR(80),
       school_name VARCHAR(190),
       role VARCHAR(30) NOT NULL DEFAULT 'student',
+      signup_source VARCHAR(40) NOT NULL DEFAULT 'web',
       otp_verified BOOLEAN NOT NULL DEFAULT FALSE,
       unlocked_courses JSON,
       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -106,6 +109,7 @@ async function ensureSchema(pool: Pool) {
       school_name VARCHAR(190),
       parent_name VARCHAR(160),
       parent_phone VARCHAR(30),
+      signup_source VARCHAR(40) NOT NULL DEFAULT 'web',
       status VARCHAR(40) NOT NULL DEFAULT 'active',
       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -245,6 +249,7 @@ async function ensureSchema(pool: Pool) {
       email VARCHAR(190) NOT NULL,
       name VARCHAR(160),
       role VARCHAR(30),
+      source VARCHAR(40) NOT NULL DEFAULT 'web',
       ip_address VARCHAR(80),
       user_agent TEXT,
       status VARCHAR(40) NOT NULL DEFAULT 'success',
@@ -252,6 +257,43 @@ async function ensureSchema(pool: Pool) {
       KEY idx_login_events_email (email)
     )
   `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS dashboard_snapshots (
+      id VARCHAR(64) PRIMARY KEY,
+      user_email VARCHAR(190) NOT NULL UNIQUE,
+      snapshot JSON NOT NULL,
+      source VARCHAR(40) NOT NULL DEFAULT 'seed',
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )
+  `);
+
+  await ensureColumn(pool, "users", "signup_source", "VARCHAR(40) NOT NULL DEFAULT 'web'");
+  await ensureColumn(pool, "students", "signup_source", "VARCHAR(40) NOT NULL DEFAULT 'web'");
+  await ensureColumn(pool, "login_events", "source", "VARCHAR(40) NOT NULL DEFAULT 'web'");
+
+  await pool.query(
+    `INSERT INTO dashboard_snapshots (id, user_email, snapshot, source)
+     VALUES (?, '__default__', ?, 'seed')
+     ON DUPLICATE KEY UPDATE user_email = user_email`,
+    [id("dashboard"), JSON.stringify(dashboardData)]
+  );
+}
+
+async function ensureColumn(pool: Pool, tableName: string, columnName: string, definition: string) {
+  const [rows] = await pool.query<RowDataPacket[]>(
+    `SELECT COUNT(*) AS count
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = ?
+       AND COLUMN_NAME = ?`,
+    [tableName, columnName]
+  );
+
+  if (Number(rows[0]?.count ?? 0) === 0) {
+    await pool.query(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
+  }
 }
 
 function parseCourses(value: unknown): string[] {
@@ -271,6 +313,41 @@ function dateValue(value: unknown) {
   return (value as { toISOString?: () => string })?.toISOString?.() ?? value;
 }
 
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  return parts
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+function parseDashboardSnapshot(value: unknown): DashboardData {
+  if (!value) return dashboardData;
+  if (typeof value === "object") return value as DashboardData;
+  if (typeof value === "string") {
+    try {
+      return JSON.parse(value) as DashboardData;
+    } catch {
+      return dashboardData;
+    }
+  }
+  return dashboardData;
+}
+
+function personalizeDashboard(snapshot: DashboardData, user?: UserRecord | null): DashboardData {
+  if (!user) return snapshot;
+
+  return {
+    ...snapshot,
+    studentData: {
+      ...snapshot.studentData,
+      name: user.name,
+      class: user.classLevel || snapshot.studentData.class,
+      avatar: initials(user.name) || snapshot.studentData.avatar
+    }
+  };
+}
+
 function mapUser(row: RowDataPacket): UserRecord {
   return {
     id: String(row.id),
@@ -281,6 +358,7 @@ function mapUser(row: RowDataPacket): UserRecord {
     classLevel: row.class_level,
     schoolName: row.school_name,
     role: row.role === "admin" ? "admin" : "student",
+    signupSource: row.signup_source ?? "web",
     otpVerified: Boolean(row.otp_verified),
     unlockedCourses: parseCourses(row.unlocked_courses),
     createdAt: dateValue(row.created_at) as string,
@@ -328,6 +406,7 @@ export async function createUser(data: {
   schoolName?: string;
   passwordHash: string;
   role: "student" | "admin";
+  source?: "web" | "mobile" | "app";
 }) {
   const pool = await connectDb();
   if (!pool) return null;
@@ -341,12 +420,13 @@ export async function createUser(data: {
     schoolName: data.schoolName ?? null,
     passwordHash: data.passwordHash,
     role: data.role,
+    signupSource: data.source === "app" ? "mobile" : data.source ?? "web",
     unlockedCourses: ["Future Skills Starter"]
   };
 
   await pool.query(
-    `INSERT INTO users (id, name, email, password_hash, phone, class_level, school_name, role, unlocked_courses)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO users (id, name, email, password_hash, phone, class_level, school_name, role, signup_source, unlocked_courses)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       user.id,
       user.name,
@@ -356,21 +436,23 @@ export async function createUser(data: {
       user.classLevel,
       user.schoolName,
       user.role,
+      user.signupSource,
       JSON.stringify(user.unlockedCourses)
     ]
   );
 
   if (user.role === "student") {
     await pool.query(
-      `INSERT INTO students (id, user_id, name, email, phone, class_level, school_name)
-       VALUES (?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO students (id, user_id, name, email, phone, class_level, school_name, signup_source)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
          user_id = VALUES(user_id),
          name = VALUES(name),
          phone = VALUES(phone),
          class_level = VALUES(class_level),
-         school_name = VALUES(school_name)`,
-      [id("student"), user.id, user.name, user.email, user.phone, user.classLevel, user.schoolName]
+         school_name = VALUES(school_name),
+         signup_source = VALUES(signup_source)`,
+      [id("student"), user.id, user.name, user.email, user.phone, user.classLevel, user.schoolName, user.signupSource]
     );
   }
 
@@ -382,19 +464,21 @@ export async function recordLoginEvent(data: {
   ipAddress?: string | null;
   userAgent?: string | null;
   status?: string;
+  source?: "web" | "mobile" | "app";
 }) {
   const pool = await connectDb();
   if (!pool) return null;
 
   await pool.query(
-    `INSERT INTO login_events (id, user_id, email, name, role, ip_address, user_agent, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO login_events (id, user_id, email, name, role, source, ip_address, user_agent, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id("login"),
       data.user.id,
       data.user.email,
       data.user.name,
       data.user.role,
+      data.source === "app" ? "mobile" : data.source ?? "web",
       data.ipAddress ?? null,
       data.userAgent ?? null,
       data.status ?? "success"
@@ -514,6 +598,61 @@ export async function createCertificate(data: CertificateRecord) {
   );
 }
 
+export async function getCertificateById(credentialId: string) {
+  const pool = await connectDb();
+  if (!pool) return null;
+
+  const [rows] = await pool.query<RowDataPacket[]>(
+    `SELECT credential_id, student_name, user_email, course, qr_code, issued_at, status, created_at
+     FROM certificates
+     WHERE credential_id = ?
+     LIMIT 1`,
+    [credentialId]
+  );
+
+  const row = rows[0];
+  if (!row) return null;
+
+  return {
+    credentialId: row.credential_id,
+    studentName: row.student_name,
+    userEmail: row.user_email,
+    course: row.course,
+    qrCode: row.qr_code,
+    issuedAt: dateValue(row.issued_at),
+    status: row.status,
+    createdAt: dateValue(row.created_at)
+  };
+}
+
+export async function getStudentDashboardData(email?: string) {
+  const pool = await connectDb();
+
+  if (!pool) {
+    return {
+      dashboard: dashboardData,
+      mode: "dev"
+    };
+  }
+
+  const [rows] = await pool.query<RowDataPacket[]>(
+    `SELECT snapshot
+     FROM dashboard_snapshots
+     WHERE user_email IN (?, '__default__')
+     ORDER BY user_email = ? DESC
+     LIMIT 1`,
+    [email ?? "__default__", email ?? "__default__"]
+  );
+
+  const user = email ? await findUserByEmail(email) : null;
+  const snapshot = parseDashboardSnapshot(rows[0]?.snapshot);
+
+  return {
+    dashboard: personalizeDashboard(snapshot, user),
+    mode: "mysql"
+  };
+}
+
 export async function getAdminOverview() {
   const pool = await connectDb();
   if (!pool) return null;
@@ -528,6 +667,9 @@ export async function getAdminOverview() {
   );
   const [loginRows] = await pool.query<RowDataPacket[]>(
     "SELECT * FROM login_events ORDER BY created_at DESC LIMIT 100"
+  );
+  const [dashboardRows] = await pool.query<RowDataPacket[]>(
+    "SELECT id, user_email, source, created_at, updated_at FROM dashboard_snapshots ORDER BY updated_at DESC LIMIT 50"
   );
 
   const students = studentRows.map(mapUser);
@@ -571,10 +713,18 @@ export async function getAdminOverview() {
     email: row.email,
     name: row.name,
     role: row.role,
+    source: row.source ?? "web",
     ipAddress: row.ip_address,
     userAgent: row.user_agent,
     status: row.status,
     createdAt: dateValue(row.created_at)
+  }));
+  const dashboardSnapshots = dashboardRows.map((row) => ({
+    id: row.id,
+    userEmail: row.user_email,
+    source: row.source,
+    createdAt: dateValue(row.created_at),
+    updatedAt: dateValue(row.updated_at)
   }));
 
   return {
@@ -583,12 +733,14 @@ export async function getAdminOverview() {
     payments,
     certificates,
     loginEvents,
+    dashboardSnapshots,
     tables: [
       { name: "students", label: "Students", rows: students },
       { name: "leads", label: "Leads", rows: leads },
       { name: "payments", label: "Payments", rows: payments },
       { name: "certificates", label: "Certificates", rows: certificates },
-      { name: "login_events", label: "Login Events", rows: loginEvents }
+      { name: "login_events", label: "Login Events", rows: loginEvents },
+      { name: "dashboard_snapshots", label: "Dashboard Snapshots", rows: dashboardSnapshots }
     ]
   };
 }

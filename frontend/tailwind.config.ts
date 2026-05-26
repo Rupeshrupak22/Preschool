@@ -25,7 +25,7 @@ const config: Config = {
         glass: "0 20px 70px rgba(37, 99, 235, 0.16)"
       },
       fontFamily: {
-        sans: ["Poppins", "ui-sans-serif", "system-ui", "sans-serif"]
+        sans: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Arial", "sans-serif"]
       },
       backgroundImage: {
         "radial-grid": "none"
