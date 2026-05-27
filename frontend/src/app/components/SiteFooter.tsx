@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { ArrowUp, Clock, Instagram, Linkedin, Mail, MapPin, Phone, Youtube } from "lucide-react";
+import { ArrowUp, Clock, Instagram, Linkedin, Mail, MapPin, Phone, ShieldCheck, Youtube } from "lucide-react";
 
 const learningPrograms = [
   "Future Skills Foundation (Class 5 to 8)",
@@ -89,6 +89,13 @@ export default function SiteFooter() {
               </a>
             ))}
           </div>
+          <a
+            href="/principal/login"
+            className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-950 px-4 py-3 text-sm font-black text-white shadow-[0_18px_34px_rgba(15,23,42,0.18)] transition hover:-translate-y-1 hover:bg-cyan-700"
+          >
+            <ShieldCheck className="h-5 w-5" />
+            Principal Management System
+          </a>
         </div>
 
         <div>

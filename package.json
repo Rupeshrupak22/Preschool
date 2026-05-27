@@ -7,6 +7,8 @@
     "dev:frontend": "next dev frontend -p 3000",
     "dev:backend": "node backend/server.js",
     "db:init": "node scripts/init-mysql.js",
+    "principal:seed": "node scripts/seed-principal.js",
+    "principal:check": "node scripts/check-principal.js",
     "build": "next build frontend",
     "start": "next start frontend -p 3000",
     "lint": "next lint frontend"

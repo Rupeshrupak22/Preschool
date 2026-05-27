@@ -54,6 +54,7 @@ async function main() {
     await ensureColumn(connection, database, "students", "class_name", "VARCHAR(80)");
     await ensureColumn(connection, database, "students", "school", "VARCHAR(190)");
     await ensureColumn(connection, database, "leads", "class_name", "VARCHAR(80)");
+    await ensureColumn(connection, database, "principals", "last_login_at", "DATETIME");
     const [tables] = await connection.query(`SHOW TABLES FROM \`${database}\``);
 
     console.log(`MySQL schema initialized for database '${database}'.`);

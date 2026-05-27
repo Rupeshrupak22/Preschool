@@ -6,8 +6,10 @@ const fallbackSecret = "local-dev-secret-change-in-production";
 export type AuthPayload = {
   id: string;
   email: string;
-  role: "student" | "admin";
+  role: "student" | "admin" | "principal";
   name: string;
+  schoolId?: string;
+  schoolName?: string;
 };
 
 export function signToken(payload: AuthPayload) {
@@ -37,12 +39,25 @@ function bearerToken(request?: Request) {
 export async function currentUser(request?: Request) {
   const authUser = verifyToken(bearerToken(request));
 
-  if (authUser) {
+  if (authUser && authUser.role !== "principal") {
     return authUser;
   }
 
   const cookieStore = await cookies();
-  return verifyToken(cookieStore.get("adyapan_token")?.value);
+  const user = verifyToken(cookieStore.get("adyapan_token")?.value);
+  return user?.role === "principal" ? null : user;
+}
+
+export async function currentPrincipal(request?: Request) {
+  const authUser = verifyToken(bearerToken(request));
+
+  if (authUser?.role === "principal") {
+    return authUser;
+  }
+
+  const cookieStore = await cookies();
+  const principal = verifyToken(cookieStore.get("adyapan_principal_token")?.value);
+  return principal?.role === "principal" ? principal : null;
 }
 
 export function strongPassword(password: string) {

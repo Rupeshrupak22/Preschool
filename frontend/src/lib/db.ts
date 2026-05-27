@@ -19,6 +19,21 @@ type UserRecord = {
   updatedAt?: string;
 };
 
+type PrincipalRecord = {
+  id: string;
+  schoolId: string;
+  schoolName: string;
+  principalName: string;
+  email: string;
+  passwordHash: string;
+  accessKeyHash: string;
+  phone?: string | null;
+  status: "active" | "paused";
+  lastLoginAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 type LeadRecord = Record<string, unknown>;
 type PaymentRecord = Record<string, unknown>;
 type CertificateRecord = Record<string, unknown>;
@@ -264,6 +279,40 @@ async function ensureSchema(pool: Pool) {
   `);
 
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS principals (
+      id VARCHAR(64) PRIMARY KEY,
+      school_id VARCHAR(64) NOT NULL,
+      school_name VARCHAR(190) NOT NULL,
+      principal_name VARCHAR(160) NOT NULL,
+      email VARCHAR(190) NOT NULL UNIQUE,
+      password_hash VARCHAR(255) NOT NULL,
+      access_key_hash VARCHAR(255) NOT NULL,
+      phone VARCHAR(30),
+      status VARCHAR(40) NOT NULL DEFAULT 'active',
+      last_login_at DATETIME,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      KEY idx_principals_school_id (school_id),
+      KEY idx_principals_school_name (school_name)
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS principal_login_events (
+      id VARCHAR(64) PRIMARY KEY,
+      principal_id VARCHAR(64),
+      email VARCHAR(190) NOT NULL,
+      school_id VARCHAR(64),
+      ip_address VARCHAR(80),
+      user_agent TEXT,
+      status VARCHAR(40) NOT NULL DEFAULT 'success',
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      KEY idx_principal_login_events_email (email),
+      KEY idx_principal_login_events_school_id (school_id)
+    )
+  `);
+
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS dashboard_snapshots (
       id VARCHAR(64) PRIMARY KEY,
       user_email VARCHAR(190) NOT NULL UNIQUE,
@@ -282,6 +331,7 @@ async function ensureSchema(pool: Pool) {
   await ensureColumn(pool, "students", "school", "VARCHAR(190)");
   await ensureColumn(pool, "leads", "class_name", "VARCHAR(80)");
   await ensureColumn(pool, "login_events", "source", "VARCHAR(40) NOT NULL DEFAULT 'web'");
+  await ensureColumn(pool, "principals", "last_login_at", "DATETIME");
 }
 
 async function ensureColumn(pool: Pool, tableName: string, columnName: string, definition: string) {
@@ -341,6 +391,23 @@ function mapUser(row: RowDataPacket): UserRecord {
     signupSource: row.signup_source ?? "web",
     otpVerified: Boolean(row.otp_verified),
     unlockedCourses: parseCourses(row.unlocked_courses),
+    createdAt: dateValue(row.created_at) as string,
+    updatedAt: dateValue(row.updated_at) as string
+  };
+}
+
+function mapPrincipal(row: RowDataPacket): PrincipalRecord {
+  return {
+    id: String(row.id),
+    schoolId: String(row.school_id),
+    schoolName: String(row.school_name),
+    principalName: String(row.principal_name),
+    email: String(row.email),
+    passwordHash: String(row.password_hash),
+    accessKeyHash: String(row.access_key_hash),
+    phone: row.phone,
+    status: row.status === "paused" ? "paused" : "active",
+    lastLoginAt: dateValue(row.last_login_at) as string | null,
     createdAt: dateValue(row.created_at) as string,
     updatedAt: dateValue(row.updated_at) as string
   };
@@ -487,6 +554,180 @@ export async function recordLoginEvent(data: {
       data.status ?? "success"
     ]
   );
+}
+
+export async function findPrincipalByEmail(email: string) {
+  const pool = await connectDb();
+  if (!pool) return null;
+
+  const [rows] = await pool.query<RowDataPacket[]>("SELECT * FROM principals WHERE email = ? LIMIT 1", [email]);
+  return rows[0] ? mapPrincipal(rows[0]) : null;
+}
+
+export async function upsertPrincipal(data: {
+  id?: string;
+  schoolId: string;
+  schoolName: string;
+  principalName: string;
+  email: string;
+  passwordHash: string;
+  accessKeyHash: string;
+  phone?: string | null;
+  status?: "active" | "paused";
+}) {
+  const pool = await connectDb();
+  if (!pool) return null;
+
+  const principalId = data.id ?? id("principal");
+  await pool.query(
+    `INSERT INTO principals (id, school_id, school_name, principal_name, email, password_hash, access_key_hash, phone, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE
+       school_id = VALUES(school_id),
+       school_name = VALUES(school_name),
+       principal_name = VALUES(principal_name),
+       password_hash = VALUES(password_hash),
+       access_key_hash = VALUES(access_key_hash),
+       phone = VALUES(phone),
+       status = VALUES(status)`,
+    [
+      principalId,
+      data.schoolId,
+      data.schoolName,
+      data.principalName,
+      data.email,
+      data.passwordHash,
+      data.accessKeyHash,
+      data.phone ?? null,
+      data.status ?? "active"
+    ]
+  );
+
+  return findPrincipalByEmail(data.email);
+}
+
+export async function recordPrincipalLoginEvent(data: {
+  principal?: Pick<PrincipalRecord, "id" | "email" | "schoolId"> | null;
+  email: string;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  status?: string;
+}) {
+  const pool = await connectDb();
+  if (!pool) return null;
+
+  await pool.query(
+    `INSERT INTO principal_login_events (id, principal_id, email, school_id, ip_address, user_agent, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [
+      id("principal_login"),
+      data.principal?.id ?? null,
+      data.email,
+      data.principal?.schoolId ?? null,
+      data.ipAddress ?? null,
+      data.userAgent ?? null,
+      data.status ?? "success"
+    ]
+  );
+
+  if (data.principal?.id && data.status !== "failed") {
+    await pool.query("UPDATE principals SET last_login_at = NOW() WHERE id = ?", [data.principal.id]);
+  }
+}
+
+export async function getPrincipalDashboard(principalId: string) {
+  const pool = await connectDb();
+  if (!pool) return null;
+
+  const [principalRows] = await pool.query<RowDataPacket[]>("SELECT * FROM principals WHERE id = ? LIMIT 1", [
+    principalId
+  ]);
+  const principal = principalRows[0] ? mapPrincipal(principalRows[0]) : null;
+  if (!principal) return null;
+
+  const schoolLike = `%${principal.schoolName}%`;
+  const [studentRows, leadRows, loginRows, paymentRows] = await Promise.all([
+    pool.query<RowDataPacket[]>(
+      `SELECT id, name, email, phone, class_level, school_name, signup_source, created_at
+       FROM students
+       WHERE school_name = ? OR school = ?
+       ORDER BY created_at DESC
+       LIMIT 200`,
+      [principal.schoolName, principal.schoolName]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT id, type, name, email, phone, school, city, message, interest, created_at
+       FROM leads
+       WHERE school = ? OR school LIKE ?
+       ORDER BY created_at DESC
+       LIMIT 100`,
+      [principal.schoolName, schoolLike]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT id, email, status, created_at
+       FROM login_events
+       WHERE email IN (SELECT email FROM students WHERE school_name = ? OR school = ?)
+       ORDER BY created_at DESC
+       LIMIT 100`,
+      [principal.schoolName, principal.schoolName]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT COUNT(*) AS count
+       FROM payments
+       WHERE user_email IN (SELECT email FROM students WHERE school_name = ? OR school = ?)`,
+      [principal.schoolName, principal.schoolName]
+    )
+  ]);
+
+  const students = studentRows[0].map((row) => ({
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    classLevel: row.class_level,
+    schoolName: row.school_name,
+    signupSource: row.signup_source,
+    createdAt: dateValue(row.created_at)
+  }));
+  const leads = leadRows[0].map((row) => ({
+    id: row.id,
+    type: row.type,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    school: row.school,
+    city: row.city,
+    message: row.message,
+    interest: row.interest,
+    createdAt: dateValue(row.created_at)
+  }));
+  const logins = loginRows[0].map((row) => ({
+    id: row.id,
+    email: row.email,
+    status: row.status,
+    createdAt: dateValue(row.created_at)
+  }));
+
+  return {
+    principal: {
+      id: principal.id,
+      name: principal.principalName,
+      email: principal.email,
+      schoolId: principal.schoolId,
+      schoolName: principal.schoolName,
+      phone: principal.phone,
+      lastLoginAt: principal.lastLoginAt
+    },
+    stats: {
+      students: students.length,
+      leads: leads.length,
+      activeLogins: logins.filter((login) => login.status === "success" || login.status === "signup").length,
+      payments: Number(paymentRows[0][0]?.count ?? 0)
+    },
+    students,
+    leads,
+    logins
+  };
 }
 
 export async function createOtp(data: { email: string; code: string; expiresAt: Date }) {
