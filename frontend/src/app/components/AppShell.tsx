@@ -7,12 +7,14 @@ import SiteNavbar from "./SiteNavbar";
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isLmsRoute = pathname === "/student-dashboard" || pathname.startsWith("/student-dashboard/");
+  const isPrincipalDashboard = pathname === "/principal/dashboard" || pathname.startsWith("/principal/dashboard/");
+  const isAppRoute = isLmsRoute || isPrincipalDashboard;
 
   return (
     <>
-      {!isLmsRoute && <SiteNavbar />}
-      <div className={isLmsRoute ? undefined : "site-page-with-nav"}>{children}</div>
-      {!isLmsRoute && <SiteFooter />}
+      {!isAppRoute && <SiteNavbar />}
+      <div className={isAppRoute ? undefined : "site-page-with-nav"}>{children}</div>
+      {!isAppRoute && <SiteFooter />}
     </>
   );
 }

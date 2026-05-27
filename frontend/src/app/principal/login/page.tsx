@@ -13,6 +13,7 @@ export default function PrincipalLoginPage() {
     event.preventDefault();
     setLoading(true);
     setStatus("Verifying principal access...");
+    const dashboardWindow = window.open("about:blank", "_blank");
 
     try {
       const body = Object.fromEntries(new FormData(event.currentTarget).entries());
@@ -24,13 +25,27 @@ export default function PrincipalLoginPage() {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
+        dashboardWindow?.close();
         setStatus(data.error ?? "Principal login failed.");
+        return;
+      }
+
+      window.dispatchEvent(new Event("adyapan-auth-change"));
+      if (dashboardWindow) {
+        dashboardWindow.location.href = "/principal/dashboard";
+        dashboardWindow.opener = null;
+        dashboardWindow.focus();
+        setStatus("Dashboard opened in a new tab.");
+        window.setTimeout(() => {
+          window.location.replace("/");
+        }, 300);
         return;
       }
 
       setStatus("Access granted. Opening dashboard...");
       window.location.href = "/principal/dashboard";
     } catch {
+      dashboardWindow?.close();
       setStatus("Network issue. Please try again.");
     } finally {
       setLoading(false);

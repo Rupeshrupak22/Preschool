@@ -27,7 +27,8 @@ const navItems = [
 type NavUser = {
   name: string;
   email?: string;
-  role: "student" | "admin";
+  role: "student" | "admin" | "principal";
+  schoolName?: string;
 };
 
 export default function SiteNavbar() {
@@ -44,7 +45,25 @@ export default function SiteNavbar() {
       try {
         const response = await fetch("/api/auth/me", { cache: "no-store" });
         const data = await response.json();
-        if (active) setUser(response.ok ? data.user : null);
+        if (response.ok) {
+          if (active) setUser(data.user);
+          return;
+        }
+
+        const principalResponse = await fetch("/api/principal/me", { cache: "no-store" });
+        const principalData = await principalResponse.json();
+        if (active) {
+          setUser(
+            principalResponse.ok
+              ? {
+                  name: principalData.principal.name,
+                  email: principalData.principal.email,
+                  role: "principal",
+                  schoolName: principalData.principal.schoolName
+                }
+              : null
+          );
+        }
       } catch {
         if (active) setUser(null);
       }
@@ -84,12 +103,12 @@ export default function SiteNavbar() {
   }
 
   async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch(user?.role === "principal" ? "/api/principal/logout" : "/api/auth/logout", { method: "POST" });
     setUser(null);
     setMenuOpen(false);
     setProfileOpen(false);
     window.dispatchEvent(new Event("adyapan-auth-change"));
-    window.location.href = "/login";
+    window.location.href = user?.role === "principal" ? "/principal/login" : "/login";
   }
 
   function openDashboardWindow(href: string) {
@@ -100,12 +119,20 @@ export default function SiteNavbar() {
     setProfileOpen(false);
   }
 
-  const dashboardHref = user?.role === "admin" ? "/admin" : "/student-dashboard";
+  const dashboardHref =
+    user?.role === "admin" ? "/admin" : user?.role === "principal" ? "/principal/dashboard" : "/student-dashboard";
   const shortName = user?.name?.split(" ")[0] || "Student";
   const initial = (user?.name?.trim()?.[0] || "A").toUpperCase();
   const menuItems =
     user?.role === "admin"
       ? [{ label: "Admin Dashboard", href: dashboardHref, icon: LayoutDashboard }]
+      : user?.role === "principal"
+        ? [
+            { label: "Principal Dashboard", href: dashboardHref, icon: LayoutDashboard },
+            { label: "School Students", href: "/principal/dashboard#students", icon: BookOpen },
+            { label: "Activity", href: "/principal/dashboard#activity", icon: BarChart3 },
+            { label: "Security", href: "/principal/dashboard#security", icon: Settings }
+          ]
       : [
           { label: "Dashboard", href: dashboardHref, icon: LayoutDashboard },
           { label: "My Courses", href: "/student-dashboard#courses", icon: BookOpen },
@@ -171,7 +198,7 @@ export default function SiteNavbar() {
                 <span className="min-w-0">
                   <span className="block truncate text-[15px] leading-4">{shortName}</span>
                   <span className="block truncate text-[11px] font-bold uppercase tracking-[0.12em] text-slate-600">
-                    {user.role === "admin" ? "Admin" : "Student"}
+                    {user.role === "admin" ? "Admin" : user.role === "principal" ? "Principal" : "Student"}
                   </span>
                 </span>
                 <ChevronDown className={`h-4 w-4 shrink-0 transition ${profileOpen ? "rotate-180" : ""}`} />
@@ -268,7 +295,7 @@ export default function SiteNavbar() {
                   <span className="min-w-0">
                     <span className="block truncate text-base font-black text-slate-950">{user.name}</span>
                     <span className="block truncate text-xs font-bold uppercase tracking-[0.12em] text-slate-700">
-                      {user.role === "admin" ? "Admin" : "Student"}
+                      {user.role === "admin" ? "Admin" : user.role === "principal" ? "Principal" : "Student"}
                     </span>
                   </span>
                 </div>

@@ -166,7 +166,7 @@ export default function PrincipalDashboardPage() {
         </section>
 
         <section className="mt-6 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-          <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div id="students" className="rounded-lg border border-slate-200 bg-white shadow-sm">
             <div className="flex flex-col gap-3 border-b border-slate-200 p-5 md:flex-row md:items-center md:justify-between">
               <div>
                 <h2 className="text-xl font-black text-slate-950">Students</h2>
@@ -231,7 +231,7 @@ export default function PrincipalDashboardPage() {
               </div>
             </section>
 
-            <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <section id="activity" className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
               <h2 className="text-xl font-black text-slate-950">Recent Login Activity</h2>
               <div className="mt-4 grid gap-3">
                 {dashboard.logins.slice(0, 6).map((login) => (
