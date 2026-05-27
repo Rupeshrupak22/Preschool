@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Activity,
   Building2,
+  ExternalLink,
   KeyRound,
   LogOut,
   Mail,
@@ -11,6 +12,7 @@ import {
   RefreshCw,
   School,
   Search,
+  Settings,
   ShieldCheck,
   Users
 } from "lucide-react";
@@ -144,13 +146,31 @@ export default function PrincipalDashboardPage() {
               </div>
             </div>
           </div>
-          <button
-            onClick={logout}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-black text-slate-950 transition hover:bg-slate-950 hover:text-white"
-          >
-            <LogOut className="h-4 w-4" />
-            Logout
-          </button>
+          <div className="grid gap-2 sm:min-w-56">
+            <a
+              href="#settings"
+              className="inline-flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:text-slate-950"
+            >
+              <Settings className="h-4 w-4 text-slate-500" />
+              Settings
+            </a>
+            <a
+              href="/student-dashboard"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold text-slate-400 transition hover:bg-slate-50 hover:text-slate-700"
+            >
+              <ExternalLink className="h-4 w-4" />
+              View Student Site
+            </a>
+            <button
+              onClick={logout}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-black text-slate-950 transition hover:bg-slate-950 hover:text-white"
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </button>
+          </div>
         </header>
 
         <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -246,6 +266,24 @@ export default function PrincipalDashboardPage() {
                   </div>
                 ))}
                 {!dashboard.logins.length && <p className="py-6 text-center text-sm font-black text-slate-500">No login activity yet.</p>}
+              </div>
+            </section>
+
+            <section id="settings" className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="text-xl font-black text-slate-950">Settings</h2>
+              <div className="mt-4 grid gap-3 text-sm font-semibold text-slate-600">
+                <div className="flex items-center justify-between gap-4 rounded-lg bg-slate-50 px-4 py-3">
+                  <span>School ID</span>
+                  <span className="font-black text-slate-950">{dashboard.principal.schoolId}</span>
+                </div>
+                <div className="flex items-center justify-between gap-4 rounded-lg bg-slate-50 px-4 py-3">
+                  <span>Principal Email</span>
+                  <span className="text-right font-black text-slate-950">{dashboard.principal.email}</span>
+                </div>
+                <div className="flex items-center justify-between gap-4 rounded-lg bg-slate-50 px-4 py-3">
+                  <span>Last Login</span>
+                  <span className="text-right font-black text-slate-950">{formatDate(dashboard.principal.lastLoginAt)}</span>
+                </div>
               </div>
             </section>
           </div>
