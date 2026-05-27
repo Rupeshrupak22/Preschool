@@ -7,7 +7,12 @@
   <link rel="icon" href="/adyapan-logo.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/adyapan-logo.svg">
   <title>Adyapan Smart Learning Ecosystem – Study Smarter, Play Better</title>
-  
+  <script>
+    if (new URLSearchParams(window.location.search).get("embedded") === "1") {
+      document.documentElement.classList.add("adyapan-embedded");
+    }
+  </script>
+
   <style>
     /* ==========================================
        1. DESIGN SYSTEM & ROOT TOKENS (WHITE & BLUE)
@@ -61,6 +66,15 @@
       overflow-x: hidden;
       line-height: 1.6;
       padding-top: 80px;
+    }
+
+    html.adyapan-embedded body {
+      padding-top: 0;
+    }
+
+    html.adyapan-embedded .adyapan-fixed-navbar,
+    html.adyapan-embedded .adyapan-static-footer {
+      display: none !important;
     }
 
     .adyapan-fixed-navbar {
@@ -2780,7 +2794,7 @@
         <a href="/#top">Home</a>
         <a href="/#curriculum">Overview</a>
         <a href="/#events">Mentor</a>
-        <a href="/our.html">My App</a>
+        <a href="/our">My App</a>
         <a href="/student-dashboard">LMS</a>
         <a href="/about">About Us</a>
       </div>

@@ -15,7 +15,7 @@ const quickLinks = [
   ["School Partnership", "/#schools"],
   ["LMS Dashboard", "/student-dashboard"],
   ["Login", "/login"],
-  ["Contact Us", "/#demo"]
+  ["Contact Us", "/contact"]
 ];
 
 const socials = [

@@ -18,10 +18,10 @@ const navItems = [
   { label: "Home", href: "/#top" },
   { label: "Overview", href: "/overview" },
   { label: "Mentor", href: "/mentors" },
-  { label: "My App", href: "/our.html" },
+  { label: "My App", href: "/our" },
   { label: "LMS", href: "/dashboard" },
   { label: "About Us", href: "/about" },
-  { label: "Contact Us", href: "/#demo" }
+  { label: "Contact Us", href: "/contact" }
 ];
 
 type NavUser = {
