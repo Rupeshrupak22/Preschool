@@ -33,22 +33,28 @@ export default function SignupPage() {
       return;
     }
 
-    setStatus("Creating account...");
-    const body = Object.fromEntries(form.entries());
-    const response = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    const data = await response.json();
+    try {
+      setStatus("Creating account...");
+      const body = Object.fromEntries(form.entries());
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : {};
 
-    if (!response.ok) {
-      setStatus(data.error);
+      if (!response.ok) {
+        setStatus(data.error || "Account could not be created. Please try again.");
+        return;
+      }
+
+      window.dispatchEvent(new Event("adyapan-auth-change"));
+      window.location.href = data.user.role === "admin" ? "/admin" : "/student-dashboard";
+    } catch {
+      setStatus("Account could not be created. Please try again.");
       return;
     }
-
-    window.dispatchEvent(new Event("adyapan-auth-change"));
-    window.location.href = data.user.role === "admin" ? "/admin" : "/student-dashboard";
   }
 
   return (

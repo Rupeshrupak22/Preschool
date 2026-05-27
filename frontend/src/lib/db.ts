@@ -285,6 +285,12 @@ async function ensureSchema(pool: Pool) {
 }
 
 async function ensureColumn(pool: Pool, tableName: string, columnName: string, definition: string) {
+  if (await hasColumn(pool, tableName, columnName)) return;
+
+  await pool.query(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
+}
+
+async function hasColumn(pool: Pool, tableName: string, columnName: string) {
   const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT COUNT(*) AS count
      FROM INFORMATION_SCHEMA.COLUMNS
@@ -294,9 +300,7 @@ async function ensureColumn(pool: Pool, tableName: string, columnName: string, d
     [tableName, columnName]
   );
 
-  if (Number(rows[0]?.count ?? 0) === 0) {
-    await pool.query(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
-  }
+  return Number(rows[0]?.count ?? 0) > 0;
 }
 
 function parseCourses(value: unknown): string[] {
@@ -400,23 +404,42 @@ export async function createUser(data: {
     unlockedCourses: ["Future Skills Starter"]
   };
 
+  const hasLegacyPasswordColumn = await hasColumn(pool, "users", "password");
+  const userColumns = [
+    "id",
+    "name",
+    "email",
+    "password_hash",
+    ...(hasLegacyPasswordColumn ? ["password"] : []),
+    "phone",
+    "class_level",
+    "class_name",
+    "school_name",
+    "school",
+    "role",
+    "signup_source",
+    "unlocked_courses"
+  ];
+  const userValues = [
+    user.id,
+    user.name,
+    user.email,
+    user.passwordHash,
+    ...(hasLegacyPasswordColumn ? [user.passwordHash] : []),
+    user.phone,
+    user.classLevel,
+    user.classLevel,
+    user.schoolName,
+    user.schoolName,
+    user.role,
+    user.signupSource,
+    JSON.stringify(user.unlockedCourses)
+  ];
+
   await pool.query(
-    `INSERT INTO users (id, name, email, password_hash, phone, class_level, class_name, school_name, school, role, signup_source, unlocked_courses)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      user.id,
-      user.name,
-      user.email,
-      user.passwordHash,
-      user.phone,
-      user.classLevel,
-      user.classLevel,
-      user.schoolName,
-      user.schoolName,
-      user.role,
-      user.signupSource,
-      JSON.stringify(user.unlockedCourses)
-    ]
+    `INSERT INTO users (${userColumns.join(", ")})
+     VALUES (${userColumns.map(() => "?").join(", ")})`,
+    userValues
   );
 
   if (user.role === "student") {
