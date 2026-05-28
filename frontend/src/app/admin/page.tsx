@@ -16,6 +16,7 @@ import {
   Search,
   ShieldCheck,
   UserCog,
+  UserPlus,
   Users,
   X
 } from "lucide-react";
@@ -46,7 +47,8 @@ const tabs = [
   { id: "principals", label: "Principals", icon: ShieldCheck },
   { id: "students", label: "Students", icon: Users },
   { id: "payments", label: "Payments", icon: IndianRupee },
-  { id: "activity", label: "Activity", icon: Activity }
+  { id: "activity", label: "Activity", icon: Activity },
+  { id: "add-user", label: "Add User", icon: UserPlus }
 ] as const;
 
 function text(value: unknown, fallback = "-") {
@@ -356,6 +358,7 @@ export default function AdminPage() {
             {activeTab === "students" && <StudentsTable rows={activeRows} onView={setSelectedStudent} />}
             {activeTab === "payments" && <PaymentsTable rows={activeRows} />}
             {activeTab === "activity" && <ActivityTable rows={activeRows} />}
+            {activeTab === "add-user" && <AddUserPanel onSuccess={loadOverview} />}
           </div>
         </section>
 
@@ -651,4 +654,179 @@ function StatusBadge({ value }: { value: unknown }) {
         : "bg-slate-100 text-slate-700";
 
   return <span className={`rounded px-2 py-1 text-xs font-black uppercase ${color}`}>{status}</span>;
+}
+
+function AddUserPanel({ onSuccess }: { onSuccess: () => void }) {
+  const [role, setRole] = useState<"student" | "admin" | "principal" | "teacher">("student");
+  const [formStatus, setFormStatus] = useState("");
+  const [formSuccess, setFormSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitting(true);
+    setFormStatus("");
+    setFormSuccess(false);
+
+    const form = new FormData(event.currentTarget);
+    const body: Record<string, string> = { role };
+    form.forEach((value, key) => {
+      if (value) body[key] = String(value);
+    });
+
+    try {
+      const response = await fetch("/api/admin/add-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setFormStatus(data.error || "Failed to add user.");
+        setFormSuccess(false);
+      } else {
+        setFormStatus(data.message || "User added successfully!");
+        setFormSuccess(true);
+        (event.target as HTMLFormElement).reset();
+        onSuccess();
+      }
+    } catch {
+      setFormStatus("Network error. Please try again.");
+      setFormSuccess(false);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="p-6">
+      <div className="mx-auto max-w-2xl">
+        <div className="mb-6">
+          <h3 className="text-xl font-black text-slate-950">Add New User</h3>
+          <p className="mt-1 text-sm font-semibold text-slate-500">
+            Add students, teachers, principals, or admins directly to the database.
+          </p>
+        </div>
+
+        {/* Role Selector */}
+        <div className="mb-6 flex gap-2">
+          {(["student", "teacher", "principal", "admin"] as const).map((r) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => { setRole(r); setFormStatus(""); setFormSuccess(false); }}
+              className={`rounded-lg px-4 py-2.5 text-sm font-black capitalize transition ${
+                role === r
+                  ? "bg-slate-950 text-white"
+                  : "bg-slate-100 text-slate-600 hover:bg-cyan-50 hover:text-cyan-700"
+              }`}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
+
+        <form onSubmit={handleSubmit} className="grid gap-4">
+          {/* Common Fields */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="grid gap-1.5">
+              <span className="text-xs font-black uppercase tracking-wide text-slate-500">Full Name *</span>
+              <input name="name" required placeholder="Enter full name" className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100" />
+            </label>
+            <label className="grid gap-1.5">
+              <span className="text-xs font-black uppercase tracking-wide text-slate-500">Email *</span>
+              <input name="email" type="email" required placeholder="email@example.com" className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100" />
+            </label>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="grid gap-1.5">
+              <span className="text-xs font-black uppercase tracking-wide text-slate-500">Password *</span>
+              <input name="password" type="text" required placeholder="Min 8 chars, 1 uppercase, 1 number" className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100" />
+            </label>
+            <label className="grid gap-1.5">
+              <span className="text-xs font-black uppercase tracking-wide text-slate-500">Phone</span>
+              <input name="phone" placeholder="9876543210" className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100" />
+            </label>
+          </div>
+
+          {/* Student/Teacher/Principal Fields */}
+          {role !== "admin" && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="grid gap-1.5">
+                <span className="text-xs font-black uppercase tracking-wide text-slate-500">School Name {role !== "student" ? "*" : ""}</span>
+                <input name="school" required placeholder="School name" className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100" />
+              </label>
+              {role === "student" && (
+                <label className="grid gap-1.5">
+                  <span className="text-xs font-black uppercase tracking-wide text-slate-500">Class</span>
+                  <select name="classLevel" className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100">
+                    <option value="">Select class</option>
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <option key={i + 1} value={`Class ${i + 1}`}>Class {i + 1}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+            </div>
+          )}
+
+          {/* Principal-specific */}
+          {role === "principal" && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="grid gap-1.5">
+                <span className="text-xs font-black uppercase tracking-wide text-slate-500">School Key * (login secret)</span>
+                <input name="schoolKey" required placeholder="e.g. DPS-KEY-2024" className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100" />
+              </label>
+              <label className="grid gap-1.5">
+                <span className="text-xs font-black uppercase tracking-wide text-slate-500">School ID (optional)</span>
+                <input name="schoolId" placeholder="Auto-generated if empty" className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100" />
+              </label>
+            </div>
+          )}
+
+          {/* Teacher-specific */}
+          {role === "teacher" && (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="grid gap-1.5">
+                  <span className="text-xs font-black uppercase tracking-wide text-slate-500">Staff Key * (login secret)</span>
+                  <input name="staffKey" required placeholder="e.g. STAFF-KEY-001" className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100" />
+                </label>
+                <label className="grid gap-1.5">
+                  <span className="text-xs font-black uppercase tracking-wide text-slate-500">Subject</span>
+                  <input name="subject" placeholder="e.g. Maths, Science" className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100" />
+                </label>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="grid gap-1.5">
+                  <span className="text-xs font-black uppercase tracking-wide text-slate-500">Assigned Classes (comma-separated)</span>
+                  <input name="classes" placeholder="Class 8, Class 9, Class 10" className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100" />
+                </label>
+                <label className="grid gap-1.5">
+                  <span className="text-xs font-black uppercase tracking-wide text-slate-500">School ID (optional)</span>
+                  <input name="schoolId" placeholder="Auto-generated if empty" className="h-11 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100" />
+                </label>
+              </div>
+            </>
+          )}
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="mt-2 h-12 rounded-lg bg-slate-950 text-sm font-black text-white transition hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {submitting ? "Adding..." : `Add ${role.charAt(0).toUpperCase() + role.slice(1)}`}
+          </button>
+
+          {formStatus && (
+            <p className={`rounded-lg px-4 py-3 text-center text-sm font-black ${formSuccess ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
+              {formStatus}
+            </p>
+          )}
+        </form>
+      </div>
+    </div>
+  );
 }
