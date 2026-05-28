@@ -10,7 +10,6 @@ export default function LoginPage() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("Checking credentials...");
-    const lmsWindow = window.open("about:blank", "_blank");
     const body = Object.fromEntries(new FormData(event.currentTarget).entries());
     const response = await fetch("/api/auth/login", {
       method: "POST",
@@ -20,7 +19,6 @@ export default function LoginPage() {
     const data = await response.json();
 
     if (!response.ok) {
-      lmsWindow?.close();
       setStatus(data.error);
       return;
     }
@@ -29,9 +27,10 @@ export default function LoginPage() {
     const searchParams = new URLSearchParams(window.location.search);
     const next = searchParams.get("next");
     const target = next && next.startsWith("/") ? next : data.user.role === "admin" ? "/admin" : "/student-dashboard";
+    const windowName = data.user.role === "admin" ? "adyapan_admin_dashboard" : "adyapan_student_dashboard";
+    const lmsWindow = window.open(target, windowName);
 
     if (lmsWindow) {
-      lmsWindow.location.href = target;
       lmsWindow.opener = null;
       lmsWindow.focus();
       setStatus("Dashboard opened in a new tab.");
