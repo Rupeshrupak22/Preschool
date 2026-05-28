@@ -13,6 +13,7 @@ import {
   X
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
 
 const navItems = [
   { label: "Home", href: "/#top" },
@@ -96,6 +97,19 @@ export default function SiteNavbar() {
     setMenuOpen(false);
   }, [pathname]);
 
+  // Listen for logout from other tabs (e.g., dashboard tab)
+  useEffect(() => {
+    const cleanup = onAuthChange((message) => {
+      if (message.type === "logout") {
+        setUser(null);
+        window.dispatchEvent(new Event("adyapan-auth-change"));
+      } else if (message.type === "login") {
+        window.dispatchEvent(new Event("adyapan-auth-change"));
+      }
+    });
+    return cleanup;
+  }, []);
+
   useEffect(() => {
     function closeOnOutsideClick(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -120,6 +134,7 @@ export default function SiteNavbar() {
     const logoutUrl =
       user?.role === "principal" ? "/api/principal/logout" : user?.role === "teacher" ? "/api/teacher/logout" : "/api/auth/logout";
     await fetch(logoutUrl, { method: "POST" });
+    broadcastLogout();
     setUser(null);
     setMenuOpen(false);
     setProfileOpen(false);
@@ -288,20 +303,12 @@ export default function SiteNavbar() {
               )}
             </div>
           ) : (
-            <>
-              <a
-                href="/login"
-                className="inline-flex h-12 min-w-[92px] items-center justify-center rounded-full border-2 border-white bg-white/72 px-5 text-[15px] font-black text-slate-950 shadow-[0_10px_22px_rgba(255,255,255,0.24)] transition hover:-translate-y-0.5 hover:bg-white 2xl:min-w-[100px] 2xl:px-6"
-              >
-                Login
-              </a>
-              <a
-                href="/signup"
-                className="inline-flex h-12 min-w-[102px] items-center justify-center rounded-full border-2 border-emerald-300/70 bg-gradient-to-r from-[#37e286] to-[#19c87d] px-5 text-[15px] font-black text-slate-950 shadow-[0_12px_30px_rgba(16,185,129,0.36)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(16,185,129,0.46)] 2xl:min-w-[110px] 2xl:px-6"
-              >
-                Sign Up
-              </a>
-            </>
+            <a
+              href="/login"
+              className="inline-flex h-12 min-w-[92px] items-center justify-center rounded-full border-2 border-white bg-white/72 px-5 text-[15px] font-black text-slate-950 shadow-[0_10px_22px_rgba(255,255,255,0.24)] transition hover:-translate-y-0.5 hover:bg-white 2xl:min-w-[100px] 2xl:px-6"
+            >
+              Login
+            </a>
           )}
         </div>
 
@@ -371,20 +378,13 @@ export default function SiteNavbar() {
                 </div>
               </div>
             ) : (
-              <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="mt-4">
                 <a
                   href="/login"
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-full border-2 border-white bg-white/78 px-4 py-3 text-center text-base font-black text-slate-950 transition hover:bg-white"
+                  className="block rounded-full border-2 border-white bg-white/78 px-4 py-3 text-center text-base font-black text-slate-950 transition hover:bg-white"
                 >
                   Login
-                </a>
-                <a
-                  href="/signup"
-                  onClick={() => setMenuOpen(false)}
-                  className="rounded-full border-2 border-emerald-300/70 bg-gradient-to-r from-[#37e286] to-[#19c87d] px-4 py-3 text-center text-base font-black text-slate-950"
-                >
-                  Sign Up
                 </a>
               </div>
             )}

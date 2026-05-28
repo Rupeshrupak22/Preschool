@@ -5,7 +5,7 @@ export const signupSchema = z.object({
   email: z.string().email(),
   phone: z.string().min(8).max(15),
   classLevel: z.string().min(1),
-  schoolName: z.string().optional(),
+  schoolName: z.string().min(2, "School name is required"),
   password: z.string().min(8),
   captcha: z.literal("ADYAPAN"),
   source: z.enum(["web", "mobile", "app"]).optional().default("web")

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import DashboardSidebar from "./DashboardSidebar";
 import FloatingAIBuddy from "./FloatingAIBuddy";
+import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
 
 interface Props {
   children: React.ReactNode;
@@ -17,8 +18,19 @@ export default function DashboardLayout({ children, activeSection }: Props) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isPublicLms = pathname === "/dashboard";
 
+  // Listen for logout from other tabs — redirect to login
+  useEffect(() => {
+    const cleanup = onAuthChange((message) => {
+      if (message.type === "logout") {
+        window.location.href = "/login";
+      }
+    });
+    return cleanup;
+  }, []);
+
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
+    broadcastLogout();
     window.dispatchEvent(new Event("adyapan-auth-change"));
     window.location.href = "/";
   }

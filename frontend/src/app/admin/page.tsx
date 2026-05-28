@@ -20,6 +20,7 @@ import {
   X
 } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
 
 type Row = Record<string, unknown>;
 
@@ -123,6 +124,7 @@ export default function AdminPage() {
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
+    broadcastLogout();
     window.dispatchEvent(new Event("adyapan-auth-change"));
     window.location.href = "/login?next=/admin";
   }
@@ -130,6 +132,16 @@ export default function AdminPage() {
   useEffect(() => {
     setMounted(true);
     loadOverview();
+  }, []);
+
+  // Listen for logout from other tabs
+  useEffect(() => {
+    const cleanup = onAuthChange((message) => {
+      if (message.type === "logout") {
+        window.location.href = "/login?next=/admin";
+      }
+    });
+    return cleanup;
   }, []);
 
   const totals = overview?.totals ?? {};

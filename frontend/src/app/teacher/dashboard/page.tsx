@@ -17,6 +17,7 @@ import {
   UserRound,
   Users
 } from "lucide-react";
+import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
 
 type TeacherDashboard = {
   teacher: {
@@ -88,11 +89,22 @@ export default function TeacherDashboardPage() {
 
   async function logout() {
     await fetch("/api/teacher/logout", { method: "POST" });
+    broadcastLogout();
     window.location.href = "/teacher/login";
   }
 
   useEffect(() => {
     loadDashboard();
+  }, []);
+
+  // Listen for logout from other tabs — redirect to login
+  useEffect(() => {
+    const cleanup = onAuthChange((message) => {
+      if (message.type === "logout") {
+        window.location.href = "/teacher/login";
+      }
+    });
+    return cleanup;
   }, []);
 
   const filteredStudents = useMemo(() => {

@@ -1,24 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  X,
-  ChevronDown,
-  ChevronUp,
-  Calculator,
-  Sparkles,
-  Video,
-  Target,
-  BookOpen,
-  Brain,
-  Palette,
-  Award
-} from "lucide-react";
+import { X, ChevronDown, ChevronUp } from "lucide-react";
 
-type ProgramData = {
+type Icon = React.ComponentType<{ className?: string }>;
+
+interface Program {
   title: string;
   range: string;
-  icon: any;
+  icon: Icon;
   glow: string;
   avatar: string;
   image: string;
@@ -26,176 +16,243 @@ type ProgramData = {
   skills: string[];
   activities?: string[];
   competitive?: string[];
-  classes?: { [key: string]: { subjects: string[]; skills: string[]; examPrep?: string[] } };
-};
+  classes?: {
+    [key: string]: {
+      subjects: string[];
+      skills: string[];
+      examPrep?: string[];
+    };
+  };
+}
 
-type Props = {
-  program: ProgramData | null;
+interface ProgramPopupProps {
+  program: Program | null;
   onClose: () => void;
   expandedSections: string[];
   toggleSection: (section: string) => void;
-};
+}
 
-export default function ProgramPopup({ program, onClose, expandedSections, toggleSection }: Props) {
+export default function ProgramPopup({
+  program,
+  onClose,
+  expandedSections,
+  toggleSection,
+}: ProgramPopupProps) {
   if (!program) return null;
 
+  const IconComponent = program.icon;
+
   return (
-    <>
-      {/* Backdrop */}
+    <motion.div
+      key="program-popup"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 z-[80] bg-black/40 backdrop-blur-sm"
-      />
-
-      {/* Popup Panel */}
-      <motion.div
-        initial={{ x: -500, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: -500, opacity: 0 }}
-        transition={{
-          type: "spring",
-          damping: 25,
-          stiffness: 200
-        }}
-        className="fixed left-0 top-0 z-[90] h-full w-full max-w-2xl overflow-hidden"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        transition={{ type: "spring", duration: 0.5 }}
+        className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Glass Panel */}
-        <div className="relative h-full border-r-2 border-white/30 bg-white/20 backdrop-blur-3xl shadow-2xl">
-          {/* Gradient Overlay */}
-          <div className={`absolute inset-0 bg-gradient-to-br ${program.glow} opacity-20`} />
-          
-          {/* Content */}
-          <div className="relative z-10 flex h-full flex-col">
-            {/* Header */}
-            <div className="sticky top-0 z-20 border-b border-white/20 bg-white/30 backdrop-blur-xl p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${program.glow.replace(/\/\d+/g, '')} shadow-lg`}>
-                    <program.icon className="h-7 w-7 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-slate-900">{program.title}</h3>
-                    <p className="text-sm font-semibold text-slate-600">{program.range}</p>
-                  </div>
-                </div>
-                <motion.button
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={onClose}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/50 backdrop-blur-xl shadow-lg transition hover:bg-white/70"
-                >
-                  <X className="h-5 w-5 text-slate-700" />
-                </motion.button>
-              </div>
-            </div>
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+        >
+          <X className="h-5 w-5" />
+        </button>
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="space-y-6">
-                {/* Class-wise Details */}
-                {program.classes && Object.entries(program.classes).map(([className, classData], index) => (
-                  <motion.div
-                    key={className}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="rounded-2xl border border-white/30 bg-white/20 backdrop-blur-xl p-5 shadow-lg"
-                  >
-                    <div className="mb-4">
-                      <h3 className="text-2xl font-black text-slate-900">{className}</h3>
-                    </div>
-
-                    {/* Subjects for this class */}
-                    <div className="mb-4">
-                      <h4 className="mb-3 flex items-center gap-2 text-base font-bold text-slate-700">
-                        <BookOpen className="h-5 w-5 text-blue-600" />
-                        Subjects
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {classData.subjects.map((subject, idx) => (
-                          <motion.span
-                            key={idx}
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: (index * 0.1) + (idx * 0.02) }}
-                            whileHover={{ scale: 1.05, y: -2 }}
-                            className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 px-4 py-2 text-sm font-bold text-blue-700 shadow-sm"
-                          >
-                            <Calculator className="h-4 w-4" />
-                            {subject}
-                          </motion.span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Skills for this class */}
-                    <div className="mb-4">
-                      <h4 className="mb-3 flex items-center gap-2 text-base font-bold text-slate-700">
-                        <Brain className="h-5 w-5 text-purple-600" />
-                        Skills
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {classData.skills.map((skill, idx) => (
-                          <motion.span
-                            key={idx}
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: (index * 0.1) + (idx * 0.02) }}
-                            whileHover={{ scale: 1.05, y: -2 }}
-                            className="inline-flex items-center gap-2 rounded-full border border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50 px-4 py-2 text-sm font-bold text-purple-700 shadow-sm"
-                          >
-                            <Sparkles className="h-4 w-4" />
-                            {skill}
-                          </motion.span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Exam Prep for this class (if available) */}
-                    {classData.examPrep && (
-                      <div>
-                        <h4 className="mb-3 flex items-center gap-2 text-base font-bold text-slate-700">
-                          <Award className="h-5 w-5 text-orange-600" />
-                          Exam Preparation
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {classData.examPrep.map((exam, idx) => (
-                            <motion.span
-                              key={idx}
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ delay: (index * 0.1) + (idx * 0.02) }}
-                              whileHover={{ scale: 1.05, y: -2 }}
-                              className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-gradient-to-r from-orange-50 to-red-50 px-4 py-2 text-sm font-bold text-orange-700 shadow-sm"
-                            >
-                              <Target className="h-4 w-4" />
-                              {exam}
-                            </motion.span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            {/* Footer CTA */}
-            <div className="sticky bottom-0 z-20 border-t border-white/20 bg-white/30 backdrop-blur-xl p-6">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`w-full rounded-xl bg-gradient-to-r ${program.glow.replace(/\/\d+/g, '')} px-6 py-4 font-bold text-white shadow-xl transition-shadow hover:shadow-2xl`}
-              >
-                Enroll in {program.title} Program
-              </motion.button>
-            </div>
+        {/* Header */}
+        <div className="mb-6 flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-100 to-blue-100">
+            <IconComponent className="h-7 w-7 text-purple-600" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-black text-slate-900">{program.title}</h2>
+            <p className="text-sm font-semibold text-slate-500">{program.range}</p>
           </div>
         </div>
+
+        {/* Subjects Section */}
+        <CollapsibleSection
+          title="Subjects"
+          sectionKey="subjects"
+          expanded={expandedSections.includes("subjects")}
+          onToggle={() => toggleSection("subjects")}
+        >
+          <div className="flex flex-wrap gap-2">
+            {program.subjects.map((subject) => (
+              <span
+                key={subject}
+                className="rounded-full bg-purple-50 px-3 py-1.5 text-xs font-semibold text-purple-700"
+              >
+                {subject}
+              </span>
+            ))}
+          </div>
+        </CollapsibleSection>
+
+        {/* Skills Section */}
+        <CollapsibleSection
+          title="Skills"
+          sectionKey="skills"
+          expanded={expandedSections.includes("skills")}
+          onToggle={() => toggleSection("skills")}
+        >
+          <div className="flex flex-wrap gap-2">
+            {program.skills.map((skill) => (
+              <span
+                key={skill}
+                className="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </CollapsibleSection>
+
+        {/* Activities Section */}
+        {program.activities && program.activities.length > 0 && (
+          <CollapsibleSection
+            title="Activities"
+            sectionKey="activities"
+            expanded={expandedSections.includes("activities")}
+            onToggle={() => toggleSection("activities")}
+          >
+            <div className="flex flex-wrap gap-2">
+              {program.activities.map((activity) => (
+                <span
+                  key={activity}
+                  className="rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700"
+                >
+                  {activity}
+                </span>
+              ))}
+            </div>
+          </CollapsibleSection>
+        )}
+
+        {/* Competitive Exams Section */}
+        {program.competitive && program.competitive.length > 0 && (
+          <CollapsibleSection
+            title="Competitive Exams"
+            sectionKey="competitive"
+            expanded={expandedSections.includes("competitive")}
+            onToggle={() => toggleSection("competitive")}
+          >
+            <div className="flex flex-wrap gap-2">
+              {program.competitive.map((exam) => (
+                <span
+                  key={exam}
+                  className="rounded-full bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700"
+                >
+                  {exam}
+                </span>
+              ))}
+            </div>
+          </CollapsibleSection>
+        )}
+
+        {/* Class-wise Breakdown */}
+        {program.classes && (
+          <CollapsibleSection
+            title="Class-wise Breakdown"
+            sectionKey="classes"
+            expanded={expandedSections.includes("classes")}
+            onToggle={() => toggleSection("classes")}
+          >
+            <div className="space-y-4">
+              {Object.entries(program.classes).map(([className, data]) => (
+                <div
+                  key={className}
+                  className="rounded-xl border border-slate-100 bg-slate-50/50 p-4"
+                >
+                  <h4 className="mb-2 text-sm font-bold text-slate-800">
+                    {className}
+                  </h4>
+                  <div className="mb-2">
+                    <p className="mb-1 text-xs font-semibold text-slate-500">Subjects</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {data.subjects.map((s) => (
+                        <span
+                          key={s}
+                          className="rounded-full bg-purple-50 px-2.5 py-1 text-[11px] font-semibold text-purple-700"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="mb-2">
+                    <p className="mb-1 text-xs font-semibold text-slate-500">Skills</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {data.skills.map((s) => (
+                        <span
+                          key={s}
+                          className="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  {data.examPrep && data.examPrep.length > 0 && (
+                    <div>
+                      <p className="mb-1 text-xs font-semibold text-slate-500">Exam Prep</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {data.examPrep.map((e) => (
+                          <span
+                            key={e}
+                            className="rounded-full bg-rose-50 px-2.5 py-1 text-[11px] font-semibold text-rose-700"
+                          >
+                            {e}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CollapsibleSection>
+        )}
       </motion.div>
-    </>
+    </motion.div>
+  );
+}
+
+function CollapsibleSection({
+  title,
+  sectionKey,
+  expanded,
+  onToggle,
+  children,
+}: {
+  title: string;
+  sectionKey: string;
+  expanded: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="mb-4 rounded-2xl border border-slate-100 bg-slate-50/40">
+      <button
+        onClick={onToggle}
+        className="flex w-full items-center justify-between px-5 py-4 text-left"
+      >
+        <span className="text-sm font-bold text-slate-800">{title}</span>
+        {expanded ? (
+          <ChevronUp className="h-4 w-4 text-slate-400" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-slate-400" />
+        )}
+      </button>
+      {expanded && <div className="px-5 pb-4">{children}</div>}
+    </div>
   );
 }

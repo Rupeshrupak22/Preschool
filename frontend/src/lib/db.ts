@@ -399,9 +399,11 @@ async function ensureSchema(pool: Pool) {
   await ensureColumn(pool, "users", "signup_source", "VARCHAR(40) NOT NULL DEFAULT 'web'");
   await ensureColumn(pool, "users", "class_name", "VARCHAR(80)");
   await ensureColumn(pool, "users", "school", "VARCHAR(190)");
+  await ensureColumn(pool, "users", "school_id", "VARCHAR(64)");
   await ensureColumn(pool, "students", "signup_source", "VARCHAR(40) NOT NULL DEFAULT 'web'");
   await ensureColumn(pool, "students", "class_name", "VARCHAR(80)");
   await ensureColumn(pool, "students", "school", "VARCHAR(190)");
+  await ensureColumn(pool, "students", "school_id", "VARCHAR(64)");
   await ensureColumn(pool, "leads", "class_name", "VARCHAR(80)");
   await ensureColumn(pool, "login_events", "source", "VARCHAR(40) NOT NULL DEFAULT 'web'");
   await ensureColumn(pool, "principals", "last_login_at", "DATETIME");
@@ -409,12 +411,36 @@ async function ensureSchema(pool: Pool) {
   await ensureColumn(pool, "teachers", "phone", "VARCHAR(30)");
   await ensureColumn(pool, "teachers", "assigned_classes", "JSON");
   await ensureColumn(pool, "teachers", "last_login_at", "DATETIME");
+
+  // Add indexes for school-based filtering performance
+  await ensureIndex(pool, "students", "idx_students_school_name", "school_name");
+  await ensureIndex(pool, "students", "idx_students_school_id", "school_id");
+  await ensureIndex(pool, "users", "idx_users_school_name", "school_name");
 }
 
 async function ensureColumn(pool: Pool, tableName: string, columnName: string, definition: string) {
   if (await hasColumn(pool, tableName, columnName)) return;
 
   await pool.query(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
+}
+
+async function ensureIndex(pool: Pool, tableName: string, indexName: string, columnName: string) {
+  const [rows] = await pool.query<RowDataPacket[]>(
+    `SELECT COUNT(*) AS count
+     FROM INFORMATION_SCHEMA.STATISTICS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = ?
+       AND INDEX_NAME = ?`,
+    [tableName, indexName]
+  );
+
+  if (Number(rows[0]?.count ?? 0) > 0) return;
+
+  try {
+    await pool.query(`ALTER TABLE ${tableName} ADD INDEX ${indexName} (${columnName})`);
+  } catch {
+    // Index may already exist under a different name
+  }
 }
 
 async function hasColumn(pool: Pool, tableName: string, columnName: string) {
@@ -530,18 +556,35 @@ export async function updateUserProfile(
   const pool = await connectDb();
   if (!pool) return null;
 
+  // Resolve school_id from school name
+  let schoolId: string | null = null;
+  if (data.schoolName) {
+    const trimmedSchool = data.schoolName.trim();
+    const [schoolRows] = await pool.query<RowDataPacket[]>(
+      "SELECT id FROM schools WHERE TRIM(name) = ? LIMIT 1",
+      [trimmedSchool]
+    );
+    if (schoolRows[0]) {
+      schoolId = schoolRows[0].id;
+    }
+  }
+
+  const hasSchoolIdCol = await hasColumn(pool, "users", "school_id");
+
   await pool.query(
     `UPDATE users
-     SET name = ?, phone = ?, class_level = ?, class_name = ?, school_name = ?, school = ?
+     SET name = ?, phone = ?, class_level = ?, class_name = ?, school_name = ?, school = ?${hasSchoolIdCol ? ", school_id = ?" : ""}
      WHERE email = ?`,
-    [data.name, data.phone ?? null, data.classLevel ?? null, data.classLevel ?? null, data.schoolName ?? null, data.schoolName ?? null, email]
+    [data.name, data.phone ?? null, data.classLevel ?? null, data.classLevel ?? null, data.schoolName ?? null, data.schoolName ?? null, ...(hasSchoolIdCol ? [schoolId] : []), email]
   );
+
+  const hasStudentSchoolIdCol = await hasColumn(pool, "students", "school_id");
 
   await pool.query(
     `UPDATE students
-     SET name = ?, phone = ?, class_level = ?, class_name = ?, school_name = ?, school = ?
+     SET name = ?, phone = ?, class_level = ?, class_name = ?, school_name = ?, school = ?${hasStudentSchoolIdCol ? ", school_id = ?" : ""}
      WHERE email = ?`,
-    [data.name, data.phone ?? null, data.classLevel ?? null, data.classLevel ?? null, data.schoolName ?? null, data.schoolName ?? null, email]
+    [data.name, data.phone ?? null, data.classLevel ?? null, data.classLevel ?? null, data.schoolName ?? null, data.schoolName ?? null, ...(hasStudentSchoolIdCol ? [schoolId] : []), email]
   );
 
   return findUserByEmail(email);
@@ -560,6 +603,19 @@ export async function createUser(data: {
   const pool = await connectDb();
   if (!pool) return null;
 
+  // Resolve school_id from school name for proper linking
+  let schoolId: string | null = null;
+  if (data.schoolName) {
+    const trimmedSchool = data.schoolName.trim();
+    const [schoolRows] = await pool.query<RowDataPacket[]>(
+      "SELECT id FROM schools WHERE TRIM(name) = ? LIMIT 1",
+      [trimmedSchool]
+    );
+    if (schoolRows[0]) {
+      schoolId = schoolRows[0].id;
+    }
+  }
+
   const user: UserRecord = {
     id: id("user"),
     name: data.name,
@@ -574,6 +630,7 @@ export async function createUser(data: {
   };
 
   const hasLegacyPasswordColumn = await hasColumn(pool, "users", "password");
+  const hasSchoolIdColumn = await hasColumn(pool, "users", "school_id");
   const userColumns = [
     "id",
     "name",
@@ -585,6 +642,7 @@ export async function createUser(data: {
     "class_name",
     "school_name",
     "school",
+    ...(hasSchoolIdColumn ? ["school_id"] : []),
     "role",
     "signup_source",
     "unlocked_courses"
@@ -600,6 +658,7 @@ export async function createUser(data: {
     user.classLevel,
     user.schoolName,
     user.schoolName,
+    ...(hasSchoolIdColumn ? [schoolId] : []),
     user.role,
     user.signupSource,
     JSON.stringify(user.unlockedCourses)
@@ -612,9 +671,13 @@ export async function createUser(data: {
   );
 
   if (user.role === "student") {
+    const hasStudentSchoolId = await hasColumn(pool, "students", "school_id");
+    const studentColumns = ["id", "user_id", "name", "email", "phone", "class_level", "class_name", "school_name", "school", ...(hasStudentSchoolId ? ["school_id"] : []), "signup_source"];
+    const studentValues = [id("student"), user.id, user.name, user.email, user.phone, user.classLevel, user.classLevel, user.schoolName, user.schoolName, ...(hasStudentSchoolId ? [schoolId] : []), user.signupSource];
+
     await pool.query(
-      `INSERT INTO students (id, user_id, name, email, phone, class_level, class_name, school_name, school, signup_source)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO students (${studentColumns.join(", ")})
+       VALUES (${studentColumns.map(() => "?").join(", ")})
        ON DUPLICATE KEY UPDATE
          user_id = VALUES(user_id),
          name = VALUES(name),
@@ -623,8 +686,9 @@ export async function createUser(data: {
          class_name = VALUES(class_name),
          school_name = VALUES(school_name),
          school = VALUES(school),
+         ${hasStudentSchoolId ? "school_id = VALUES(school_id)," : ""}
          signup_source = VALUES(signup_source)`,
-      [id("student"), user.id, user.name, user.email, user.phone, user.classLevel, user.classLevel, user.schoolName, user.schoolName, user.signupSource]
+      studentValues
     );
   }
 
@@ -748,14 +812,25 @@ export async function getPrincipalDashboard(principalId: string) {
   if (!principal) return null;
 
   const schoolScope = principal.schoolName.trim();
+  const schoolId = principal.schoolId;
+
+  // Use school_id for precise matching when available, fallback to school_name text match
+  const hasStudentSchoolId = await hasColumn(pool, "students", "school_id");
+  const studentWhereClause = hasStudentSchoolId && schoolId
+    ? `(school_id = ? OR TRIM(COALESCE(school_name, '')) = ? OR TRIM(COALESCE(school, '')) = ?)`
+    : `(TRIM(COALESCE(school_name, '')) = ? OR TRIM(COALESCE(school, '')) = ?)`;
+  const studentParams = hasStudentSchoolId && schoolId
+    ? [schoolId, schoolScope, schoolScope]
+    : [schoolScope, schoolScope];
+
   const [studentRows, leadRows, loginRows, paymentRows] = await Promise.all([
     pool.query<RowDataPacket[]>(
       `SELECT id, name, email, phone, class_level, class_name, school_name, school, signup_source, created_at
        FROM students
-       WHERE TRIM(COALESCE(school_name, '')) = ? OR TRIM(COALESCE(school, '')) = ?
+       WHERE ${studentWhereClause}
        ORDER BY created_at DESC
        LIMIT 200`,
-      [schoolScope, schoolScope]
+      studentParams
     ),
     pool.query<RowDataPacket[]>(
       `SELECT id, type, name, email, phone, school, city, message, interest, created_at
@@ -770,20 +845,20 @@ export async function getPrincipalDashboard(principalId: string) {
        FROM login_events
        WHERE email IN (
          SELECT email FROM students
-         WHERE TRIM(COALESCE(school_name, '')) = ? OR TRIM(COALESCE(school, '')) = ?
+         WHERE ${studentWhereClause}
        )
        ORDER BY created_at DESC
        LIMIT 100`,
-      [schoolScope, schoolScope]
+      studentParams
     ),
     pool.query<RowDataPacket[]>(
       `SELECT COUNT(*) AS count
        FROM payments
        WHERE user_email IN (
          SELECT email FROM students
-         WHERE TRIM(COALESCE(school_name, '')) = ? OR TRIM(COALESCE(school, '')) = ?
+         WHERE ${studentWhereClause}
        )`,
-      [schoolScope, schoolScope]
+      studentParams
     )
   ]);
 
@@ -932,33 +1007,43 @@ export async function getTeacherDashboard(teacherId: string) {
   if (!teacher) return null;
 
   const schoolScope = teacher.schoolName.trim();
+  const schoolId = teacher.schoolId;
   const classFilters = teacher.assignedClasses;
   const classClause = classFilters.length
     ? ` AND (class_level IN (${classFilters.map(() => "?").join(", ")}) OR class_name IN (${classFilters.map(() => "?").join(", ")}))`
     : "";
   const classParams = classFilters.length ? [...classFilters, ...classFilters] : [];
 
+  // Use school_id for precise matching when available, fallback to school_name text match
+  const hasStudentSchoolId = await hasColumn(pool, "students", "school_id");
+  const schoolWhereClause = hasStudentSchoolId && schoolId
+    ? `(school_id = ? OR TRIM(COALESCE(school_name, '')) = ? OR TRIM(COALESCE(school, '')) = ?)`
+    : `(TRIM(COALESCE(school_name, '')) = ? OR TRIM(COALESCE(school, '')) = ?)`;
+  const schoolParams = hasStudentSchoolId && schoolId
+    ? [schoolId, schoolScope, schoolScope]
+    : [schoolScope, schoolScope];
+
   const [studentRows, loginRows, sessionRows, certificateRows] = await Promise.all([
     pool.query<RowDataPacket[]>(
       `SELECT id, name, email, phone, class_level, class_name, school_name, school, signup_source, status, created_at
        FROM students
-       WHERE (TRIM(COALESCE(school_name, '')) = ? OR TRIM(COALESCE(school, '')) = ?)
+       WHERE ${schoolWhereClause}
        ${classClause}
        ORDER BY class_level ASC, name ASC
        LIMIT 300`,
-      [schoolScope, schoolScope, ...classParams]
+      [...schoolParams, ...classParams]
     ),
     pool.query<RowDataPacket[]>(
       `SELECT id, email, status, created_at
        FROM login_events
        WHERE email IN (
          SELECT email FROM students
-         WHERE (TRIM(COALESCE(school_name, '')) = ? OR TRIM(COALESCE(school, '')) = ?)
+         WHERE ${schoolWhereClause}
          ${classClause}
        )
        ORDER BY created_at DESC
        LIMIT 100`,
-      [schoolScope, schoolScope, ...classParams]
+      [...schoolParams, ...classParams]
     ),
     pool.query<RowDataPacket[]>(
       `SELECT id, title, class_level, subject, start_time, end_time, room, mode, status
@@ -973,12 +1058,12 @@ export async function getTeacherDashboard(teacherId: string) {
        FROM certificates
        WHERE user_email IN (
          SELECT email FROM students
-         WHERE (TRIM(COALESCE(school_name, '')) = ? OR TRIM(COALESCE(school, '')) = ?)
+         WHERE ${schoolWhereClause}
          ${classClause}
        )
        ORDER BY created_at DESC
        LIMIT 100`,
-      [schoolScope, schoolScope, ...classParams]
+      [...schoolParams, ...classParams]
     )
   ]);
 
