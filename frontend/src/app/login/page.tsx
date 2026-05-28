@@ -11,15 +11,53 @@ export default function LoginPage() {
     event.preventDefault();
     setStatus("Checking credentials...");
     const body = Object.fromEntries(new FormData(event.currentTarget).entries());
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    const data = await response.json();
+    
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
 
-    if (!response.ok) {
-      setStatus(data.error);
+      // Check if response has content before parsing JSON
+      const text = await response.text();
+      let data;
+      
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (jsonError) {
+        console.error("JSON parse error:", jsonError);
+        setStatus("Server response error. Please try again.");
+        return;
+      }
+
+      if (!response.ok) {
+        setStatus(data.error || "Login failed. Please try again.");
+        return;
+      }
+
+      // Success case
+      window.dispatchEvent(new Event("adyapan-auth-change"));
+      const searchParams = new URLSearchParams(window.location.search);
+      const next = searchParams.get("next");
+      const target = next && next.startsWith("/") ? next : data.user?.role === "admin" ? "/admin" : "/student-dashboard";
+      const windowName = data.user?.role === "admin" ? "adyapan_admin_dashboard" : "adyapan_student_dashboard";
+      const lmsWindow = window.open(target, windowName);
+
+      if (lmsWindow) {
+        lmsWindow.opener = null;
+        lmsWindow.focus();
+        setStatus("Dashboard opened in a new tab.");
+        window.setTimeout(() => {
+          window.location.replace("/");
+        }, 300);
+        return;
+      }
+
+      window.location.href = target;
+    } catch (error) {
+      console.error("Network error:", error);
+      setStatus("Network error. Please check your connection and try again.");
       return;
     }
 

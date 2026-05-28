@@ -477,10 +477,6 @@ export default function Home() {
       <section id="top" className="relative !z-10 min-h-[92vh] overflow-hidden px-4 pt-10 md:px-6">
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 pb-8 lg:grid-cols-[0.9fr_1.1fr]">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <div className="mb-7 inline-flex items-center gap-3 rounded-full border border-white/75 bg-white/76 backdrop-blur-md px-4 py-2 text-sm font-bold text-slate-900 shadow-[0_14px_36px_rgba(15,23,42,0.12)]">
-              <img src="/adyapan-logo.svg" alt="ADYAPAN" className="h-10 w-10 rounded-full object-contain shadow-lg" />
-              Nurturing Minds. Building Futures.
-            </div>
             <h1 className="max-w-3xl text-5xl font-black leading-[0.96] tracking-tight text-slate-950 drop-shadow-[0_2px_0_rgba(255,255,255,0.9)] sm:text-6xl md:text-8xl">
               Big Dreams <span className="block text-blue-700">Start Small</span>
             </h1>
