@@ -129,7 +129,15 @@ export default function SiteNavbar() {
 
   function openDashboardWindow(href: string) {
     const target = href.includes("#") ? href.replace("#", "/") : href;
-    const dashboardWindow = window.open(target, "_blank");
+    const windowName =
+      user?.role === "admin"
+        ? "adyapan_admin_dashboard"
+        : user?.role === "principal"
+          ? "adyapan_principal_dashboard"
+          : user?.role === "teacher"
+            ? "adyapan_teacher_dashboard"
+            : "adyapan_student_dashboard";
+    const dashboardWindow = window.open(target, windowName);
     dashboardWindow?.focus();
     setMenuOpen(false);
     setProfileOpen(false);

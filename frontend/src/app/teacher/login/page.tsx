@@ -29,6 +29,18 @@ export default function TeacherLoginPage() {
       }
 
       window.dispatchEvent(new Event("adyapan-auth-change"));
+      const dashboardWindow = window.open("/teacher/dashboard", "adyapan_teacher_dashboard");
+
+      if (dashboardWindow) {
+        dashboardWindow.opener = null;
+        dashboardWindow.focus();
+        setStatus("Dashboard opened in a new tab.");
+        window.setTimeout(() => {
+          window.location.replace("/");
+        }, 300);
+        return;
+      }
+
       setStatus("Access granted. Opening teacher dashboard...");
       window.location.href = "/teacher/dashboard";
     } catch {
