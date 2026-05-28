@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { findPrincipalByEmail, recordPrincipalLoginEvent } from "@/lib/db";
-import { signToken } from "@/lib/security";
+import { clearAuthCookies, signToken } from "@/lib/security";
 import { principalLoginSchema } from "@/lib/validators";
 
 function clientIp(request: Request) {
@@ -58,6 +58,7 @@ export async function POST(request: Request) {
     }
   });
 
+  clearAuthCookies(response, "adyapan_principal_token");
   response.cookies.set("adyapan_principal_token", token, {
     httpOnly: true,
     sameSite: "lax",

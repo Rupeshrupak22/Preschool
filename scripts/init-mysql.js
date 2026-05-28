@@ -55,6 +55,10 @@ async function main() {
     await ensureColumn(connection, database, "students", "school", "VARCHAR(190)");
     await ensureColumn(connection, database, "leads", "class_name", "VARCHAR(80)");
     await ensureColumn(connection, database, "principals", "last_login_at", "DATETIME");
+    await ensureColumn(connection, database, "teachers", "subject", "VARCHAR(120)");
+    await ensureColumn(connection, database, "teachers", "phone", "VARCHAR(30)");
+    await ensureColumn(connection, database, "teachers", "assigned_classes", "JSON");
+    await ensureColumn(connection, database, "teachers", "last_login_at", "DATETIME");
     const [tables] = await connection.query(`SHOW TABLES FROM \`${database}\``);
 
     console.log(`MySQL schema initialized for database '${database}'.`);

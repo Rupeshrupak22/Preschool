@@ -2,9 +2,18 @@ import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { createUser, findUserByEmail, isMysqlConfigured, recordLoginEvent } from "@/lib/db";
 import { sendEmail } from "@/lib/mail";
-import { signToken, strongPassword } from "@/lib/security";
+import { activeCookieSessions, clearAuthCookies, signToken, strongPassword } from "@/lib/security";
 import { id, publicUser, store } from "@/lib/store";
 import { signupSchema } from "@/lib/validators";
+
+function isAllowedAdminEmail(email: string) {
+  const allowedEmails = String(process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+
+  return allowedEmails.includes(email.trim().toLowerCase());
+}
 
 export async function POST(request: Request) {
   const payload = signupSchema.safeParse(await request.json());
@@ -18,7 +27,11 @@ export async function POST(request: Request) {
   }
 
   const passwordHash = await bcrypt.hash(payload.data.password, 12);
-  const role = payload.data.email.endsWith("@adyapan.com") ? "admin" : "student";
+  const role = isAllowedAdminEmail(payload.data.email) ? "admin" : "student";
+
+  if ((await activeCookieSessions()).length > 0) {
+    return NextResponse.json({ error: "Please logout before creating or signing into another account." }, { status: 409 });
+  }
 
   if (isMysqlConfigured()) {
     const exists = await findUserByEmail(payload.data.email);
@@ -48,11 +61,13 @@ export async function POST(request: Request) {
     });
 
     const response = NextResponse.json({ user: publicUser(user), token, mode: "mysql" });
+    clearAuthCookies(response, "adyapan_token");
     response.cookies.set("adyapan_token", token, {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      path: "/"
+      path: "/",
+      maxAge: 60 * 60 * 8
     });
     return response;
   }
@@ -82,6 +97,13 @@ export async function POST(request: Request) {
 
   const token = signToken({ id: String(user.id), email: payload.data.email, role, name: payload.data.name });
   const response = NextResponse.json({ user: publicUser(user), token, mode: "dev" });
-  response.cookies.set("adyapan_token", token, { httpOnly: true, sameSite: "lax", secure: false, path: "/" });
+  clearAuthCookies(response, "adyapan_token");
+  response.cookies.set("adyapan_token", token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false,
+    path: "/",
+    maxAge: 60 * 60 * 8
+  });
   return response;
 }

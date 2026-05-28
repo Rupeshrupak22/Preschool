@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { findUserByEmail, isMysqlConfigured, recordLoginEvent } from "@/lib/db";
-import { signToken } from "@/lib/security";
+import { clearAuthCookies, signToken } from "@/lib/security";
 import { publicUser, store } from "@/lib/store";
 import { loginSchema } from "@/lib/validators";
 
@@ -21,6 +21,7 @@ export async function POST(request: Request) {
     }
 
     const token = signToken({ id: user.id, email: user.email, role: user.role, name: user.name });
+
     await recordLoginEvent({
       user,
       ipAddress: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? request.headers.get("x-real-ip"),
@@ -28,11 +29,13 @@ export async function POST(request: Request) {
       source: payload.data.source
     });
     const response = NextResponse.json({ user: publicUser(user), token, mode: "mysql" });
+    clearAuthCookies(response, "adyapan_token");
     response.cookies.set("adyapan_token", token, {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      path: "/"
+      path: "/",
+      maxAge: 60 * 60 * 8
     });
     return response;
   }
@@ -47,6 +50,13 @@ export async function POST(request: Request) {
   const role = user.role === "admin" ? "admin" : "student";
   const token = signToken({ id: String(user.id), email: String(user.email), role, name: String(user.name) });
   const response = NextResponse.json({ user: publicUser(user), token, mode: "dev" });
-  response.cookies.set("adyapan_token", token, { httpOnly: true, sameSite: "lax", secure: false, path: "/" });
+  clearAuthCookies(response, "adyapan_token");
+  response.cookies.set("adyapan_token", token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false,
+    path: "/",
+    maxAge: 60 * 60 * 8
+  });
   return response;
 }

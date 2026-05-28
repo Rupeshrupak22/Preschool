@@ -32,6 +32,13 @@ export const principalLoginSchema = z.object({
   captcha: z.literal("ADYAPAN")
 });
 
+export const teacherLoginSchema = z.object({
+  email: z.string().trim().toLowerCase().email(),
+  password: z.string().min(8),
+  staffKey: z.string().trim().min(8).transform((value) => value.toUpperCase()),
+  captcha: z.literal("ADYAPAN")
+});
+
 export const leadSchema = z.object({
   type: z.enum(["demo", "school", "newsletter"]),
   name: z.string().optional(),
