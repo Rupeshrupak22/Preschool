@@ -144,9 +144,9 @@ async function main() {
 
           const userId = id("user");
           await conn.query(
-            `INSERT INTO users (id, name, email, password_hash, phone, class_level, class_name, school_name, school, role, signup_source)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'admin')`,
-            [userId, user.name, user.email, passwordHash, user.phone || null, user.classLevel || null, user.classLevel || null, user.school || null, user.school || null, user.role]
+            `INSERT INTO users (id, name, email, password_hash, password, phone, class_level, class_name, school_name, school, role, signup_source)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'admin')`,
+            [userId, user.name, user.email, passwordHash, passwordHash, user.phone || null, user.classLevel || null, user.classLevel || null, user.school || null, user.school || null, user.role]
           );
 
           if (user.role === "student") {

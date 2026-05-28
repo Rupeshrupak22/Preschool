@@ -89,9 +89,9 @@ async function addStudent(conn, args) {
   }
 
   await conn.query(
-    `INSERT INTO users (id, name, email, password_hash, phone, class_level, class_name, school_name, school, role, signup_source)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'student', 'admin')`,
-    [userId, name, email, passwordHash, phone || null, classLevel || null, classLevel || null, school || null, school || null]
+    `INSERT INTO users (id, name, email, password_hash, password, phone, class_level, class_name, school_name, school, role, signup_source)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'student', 'admin')`,
+    [userId, name, email, passwordHash, passwordHash, phone || null, classLevel || null, classLevel || null, school || null, school || null]
   );
 
   await conn.query(
@@ -124,9 +124,9 @@ async function addAdmin(conn, args) {
   }
 
   await conn.query(
-    `INSERT INTO users (id, name, email, password_hash, role, signup_source)
-     VALUES (?, ?, ?, ?, 'admin', 'admin')`,
-    [userId, name, email, passwordHash]
+    `INSERT INTO users (id, name, email, password_hash, password, role, signup_source)
+     VALUES (?, ?, ?, ?, ?, 'admin', 'admin')`,
+    [userId, name, email, passwordHash, passwordHash]
   );
 
   console.log(`✓ Admin added: ${name} (${email})`);
