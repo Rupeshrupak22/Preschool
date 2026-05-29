@@ -1,11 +1,22 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState("");
+
+  // If someone comes to /login?next=/admin, redirect to /admin (it has its own login)
+  useEffect(() => {
+    const next = searchParams.get("next");
+    if (next === "/admin") {
+      router.replace("/admin");
+    }
+  }, [searchParams, router]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
