@@ -1,14 +1,29 @@
-﻿@tailwind base;
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
-  --bg: #ffffff;
-  --panel: rgba(255, 255, 255, 0.9);
-  --line: rgba(37, 99, 235, 0.18);
-  --muted: rgba(15, 23, 42, 0.72);
-  --saffron: #0d9488;
+  --bg-dark:#050816;
+  --bg-darker:#0f172a;
+  --bg-light-dark:#111827;
+
+  --text-main:#ffffff;
+  --text-sub:#d1d5db;
+  --text-muted:#9ca3af;
+
+  --purple:#7c3aed;
+  --cyan:#2563eb;
+  --orange:#f97316;
+  --green:#22c55e;
+
+  --glass-bg:rgba(15,23,42,0.72);
+  --glass-border:rgba(255,255,255,0.08);
+  --glass-hover:rgba(255,255,255,0.05);
+
+  --font-rounded:'Inter',sans-serif;
+  --font-sans:'Inter',sans-serif;
 }
 
 * {
@@ -220,6 +235,285 @@ a {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* =========================================================
+   PREMIUM UI OVERRIDE PATCH
+   ========================================================= */
+
+body{
+  background:#050816 !important;
+  color:white !important;
+  font-family:'Inter',sans-serif !important;
+}
+
+/* Remove excessive glow */
+*
+{
+  text-shadow:none !important;
+}
+
+/* Reduce blur everywhere */
+.glass-panel,
+.arcade-console,
+.feature-card,
+.hero-subtitle,
+.hero-badge,
+.section-tag,
+.btn-secondary,
+.todo-item,
+.quiz-option{
+  backdrop-filter:blur(8px) !important;
+  -webkit-backdrop-filter:blur(8px) !important;
+}
+
+/* Reduce heavy glow orbs */
+.glow-orb{
+  filter:blur(60px) !important;
+  opacity:0.5;
+}
+
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
+.adyapan-fixed-navbar{
+  background:rgba(10,15,30,0.82) !important;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(10px) !important;
+  box-shadow:0 10px 30px rgba(0,0,0,0.35) !important;
+}
+
+.adyapan-fixed-links{
+  background:rgba(255,255,255,0.04) !important;
+  border:1px solid rgba(255,255,255,0.08) !important;
+}
+
+.adyapan-fixed-links a{
+  color:white !important;
+}
+
+.adyapan-fixed-links a:first-child{
+  background:linear-gradient(135deg,#7c3aed,#2563eb) !important;
+}
+
+/* =========================================================
+   HERO SECTION
+   ========================================================= */
+
+.hero-title{
+  font-size:clamp(3rem,5vw,5.5rem) !important;
+  font-weight:800 !important;
+  line-height:1.05 !important;
+  letter-spacing:-0.04em !important;
+  color:white !important;
+}
+
+.hero-title span{
+  background:linear-gradient(135deg,#7c3aed,#2563eb) !important;
+  -webkit-background-clip:text !important;
+  -webkit-text-fill-color:transparent !important;
+}
+
+.hero-subtitle{
+  background:rgba(15,23,42,0.65) !important;
+  border:1px solid rgba(255,255,255,0.08) !important;
+  color:rgba(255,255,255,0.88) !important;
+  border-radius:24px !important;
+}
+
+.hero-badge{
+  background:rgba(15,23,42,0.7) !important;
+  border:1px solid rgba(255,255,255,0.08) !important;
+  color:white !important;
+}
+
+.hero-badge span{
+  color:#fbbf24 !important;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.btn-primary{
+  background:linear-gradient(135deg,#7c3aed,#2563eb) !important;
+  color:white !important;
+  box-shadow:0 10px 30px rgba(37,99,235,0.35) !important;
+}
+
+.btn-primary:hover{
+  transform:translateY(-3px) scale(1.03);
+}
+
+.btn-secondary{
+  background:rgba(255,255,255,0.05) !important;
+  border:1px solid rgba(255,255,255,0.08) !important;
+  color:white !important;
+}
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
+
+.section-title{
+  font-size:3rem !important;
+  font-weight:800 !important;
+  color:white !important;
+  letter-spacing:-0.03em;
+}
+
+.section-subtitle{
+  color:rgba(255,255,255,0.78) !important;
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.glass-panel,
+.feature-card,
+.arcade-console,
+.todo-item,
+.quiz-option,
+.phone-card,
+.badge-card,
+.analytics-chart-container,
+.dashboard-stat-box,
+.testi-card{
+  background:rgba(15,23,42,0.78) !important;
+  border:1px solid rgba(255,255,255,0.08) !important;
+  box-shadow:0 10px 30px rgba(0,0,0,0.35) !important;
+  color:white !important;
+}
+
+.feature-card h3,
+.arcade-title,
+.chart-title,
+.phone-card-content,
+.todo-text,
+.quiz-question-box{
+  color:white !important;
+}
+
+.feature-card p,
+.phone-card-title,
+.todo-item p,
+.quiz-option{
+  color:rgba(255,255,255,0.8) !important;
+}
+
+/* =========================================================
+   ROADMAP
+   ========================================================= */
+
+.node-circle{
+  background:rgba(15,23,42,0.9) !important;
+  border:3px solid rgba(255,255,255,0.08) !important;
+  color:white !important;
+  transition:all 0.3s ease;
+}
+
+.node-circle.active{
+  border-color:#7c3aed !important;
+  box-shadow:0 0 25px rgba(124,58,237,0.5) !important;
+  transform:scale(1.08);
+}
+
+.node-circle.locked{
+  opacity:0.45;
+  filter:grayscale(1);
+}
+
+.node-label{
+  color:white !important;
+}
+
+.roadmap-line{
+  background:linear-gradient(to right,#7c3aed,#2563eb) !important;
+}
+
+/* =========================================================
+   PHONE MOCKUP
+   ========================================================= */
+
+.phone-mockup-3d,
+.section-phone-mockup{
+  background:#0f172a !important;
+  border:10px solid rgba(255,255,255,0.08) !important;
+  box-shadow:0 25px 60px rgba(0,0,0,0.45) !important;
+}
+
+.phone-screen{
+  background:#0f172a !important;
+  color:white !important;
+}
+
+.phone-card{
+  background:rgba(255,255,255,0.04) !important;
+}
+
+/* =========================================================
+   TABS
+   ========================================================= */
+
+.arcade-tab-btn.active,
+.planner-tab-btn.active{
+  background:linear-gradient(135deg,#7c3aed,#2563eb) !important;
+  color:white !important;
+}
+
+/* =========================================================
+   REMOVE VISUAL OVERLOAD
+   ========================================================= */
+
+.h-book,
+.h-star,
+.h-trophy{
+  display:none !important;
+}
+
+.hero-svg-float{
+  width:42px !important;
+  height:42px !important;
+  opacity:0.5;
+}
+
+/* =========================================================
+   TEXT FIXES
+   ========================================================= */
+
+p,
+span,
+div,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6{
+  color:inherit;
+}
+
+p{
+  color:rgba(255,255,255,0.82) !important;
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#7c3aed;
+  border-radius:20px;
+}
+
+::-webkit-scrollbar-track{
+  background:#0f172a;
 }
 
 
