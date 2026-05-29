@@ -1,11 +1,12 @@
 const express = require('express');
 const crypto = require('crypto');
 const prisma = require('../lib/prisma');
-const { generateAccessToken, generateRefreshToken } = require('../utils/token');
+const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/token');
 const { hashPassword, verifyPassword, needsRehash, generateAccessKey, hashAccessKey } = require('../utils/password');
 const { sendResponse } = require('../utils/response');
 const { validateBody, validateEmail, validatePassword } = require('../middleware/validate');
 const { recordFailedAttempt, clearFailedAttempts } = require('../utils/progressive-delay');
+const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -19,51 +20,48 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
     });
 
     if (!user) {
-      // Still apply delay to prevent email enumeration
+      // Apply delay even for non-existent emails (prevent enumeration)
       await recordFailedAttempt(email);
       return sendResponse(res, 401, false, 'Invalid email or password');
     }
 
-    // Verify password (supports Argon2id, bcrypt, and plain text legacy)
+    // Verify password (Argon2id > bcrypt > plain text fallback)
     const storedHash = user.password_hash || user.password;
     const isValid = await verifyPassword(password, storedHash);
 
     if (!isValid) {
-      // Progressive delay on failed attempt
-      const { attempts, delayMs } = await recordFailedAttempt(email);
+      const { attempts } = await recordFailedAttempt(email);
       return sendResponse(res, 401, false, 'Invalid email or password', {
-        hint: attempts >= 3 ? 'Multiple failed attempts detected. Please wait before retrying.' : undefined,
+        ...(attempts >= 3 && { hint: 'Multiple failed attempts. Please wait before retrying.' }),
       });
     }
 
-    // Clear failed attempts on success
+    // Success — clear progressive delay counter
     clearFailedAttempts(email);
 
-    // Auto-upgrade password hash to Argon2id if needed
+    // Auto-upgrade to Argon2id if using legacy hash
     if (needsRehash(storedHash)) {
       const newHash = await hashPassword(password);
       await prisma.users.update({
         where: { id: user.id },
         data: { password_hash: newHash, password: newHash },
-      });
+      }).catch(() => {}); // non-critical, don't fail login
     }
 
-    // Log login event
-    try {
-      await prisma.login_events.create({
-        data: {
-          id: crypto.randomUUID(),
-          user_id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          source: req.body.platform || detectPlatform(req),
-          status: 'success',
-          ip_address: req.ip || null,
-          user_agent: req.get('user-agent') || null,
-        },
-      });
-    } catch (_) { /* non-critical */ }
+    // Log login event (fire-and-forget)
+    prisma.login_events.create({
+      data: {
+        id: crypto.randomUUID(),
+        user_id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        source: req.body.platform || detectPlatform(req),
+        status: 'success',
+        ip_address: req.ip || null,
+        user_agent: (req.get('user-agent') || '').slice(0, 500),
+      },
+    }).catch(() => {});
 
     const token = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
@@ -71,17 +69,7 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
     sendResponse(res, 200, true, 'Login successful', {
       token,
       refreshToken,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        phone: user.phone,
-        class_level: user.class_level,
-        class_name: user.class_name,
-        school_name: user.school_name,
-        school_id: user.school_id,
-      },
+      user: sanitizeUser(user),
     });
   } catch (err) {
     console.error('Login error:', err.message);
@@ -94,6 +82,10 @@ router.post('/register', validateBody('name', 'email', 'password'), validateEmai
   try {
     const { name, email, password, phone, role, class_level, class_name, school_name, school_id, school } = req.body;
 
+    // Restrict role assignment — only admin can create non-student accounts
+    const allowedSelfRoles = ['student'];
+    const assignedRole = allowedSelfRoles.includes(role) ? role : 'student';
+
     const existing = await prisma.users.findUnique({
       where: { email: email.toLowerCase().trim() },
     });
@@ -105,19 +97,15 @@ router.post('/register', validateBody('name', 'email', 'password'), validateEmai
     // Hash password with Argon2id
     const password_hash = await hashPassword(password);
 
-    // Generate 256-bit access key
-    const accessKey = generateAccessKey();
-    const accessKeyHash = hashAccessKey(accessKey);
-
     const user = await prisma.users.create({
       data: {
         id: crypto.randomUUID().replace(/-/g, '').slice(0, 25),
         name: name.trim(),
         email: email.toLowerCase().trim(),
         password_hash,
-        password: password_hash, // store same hash in both fields
+        password: password_hash,
         phone: phone || null,
-        role: role || 'student',
+        role: assignedRole,
         class_level: class_level || null,
         class_name: class_name || null,
         school_name: school_name || school || null,
@@ -132,18 +120,7 @@ router.post('/register', validateBody('name', 'email', 'password'), validateEmai
     sendResponse(res, 201, true, 'Registration successful', {
       token,
       refreshToken,
-      accessKey, // Return ONCE to user — they must save it, we only store hash
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        phone: user.phone,
-        class_level: user.class_level,
-        class_name: user.class_name,
-        school_name: user.school_name,
-        school_id: user.school_id,
-      },
+      user: sanitizeUser(user),
     });
   } catch (err) {
     console.error('Register error:', err.message);
@@ -152,7 +129,7 @@ router.post('/register', validateBody('name', 'email', 'password'), validateEmai
 });
 
 // ─── GET /api/v1/auth/me ────────────────────────────────────────────
-router.get('/me', require('../middleware/auth').authenticate, async (req, res) => {
+router.get('/me', authenticate, async (req, res) => {
   try {
     const user = await prisma.users.findUnique({
       where: { id: req.user.id },
@@ -172,37 +149,80 @@ router.get('/me', require('../middleware/auth').authenticate, async (req, res) =
 });
 
 // ─── POST /api/v1/auth/refresh ──────────────────────────────────────
-router.post('/refresh', async (req, res) => {
+router.post('/refresh', validateBody('refreshToken'), async (req, res) => {
   try {
     const { refreshToken } = req.body;
-    if (!refreshToken) return sendResponse(res, 400, false, 'Refresh token required');
 
-    const { verifyToken } = require('../utils/token');
-    const decoded = verifyToken(refreshToken);
-
-    if (decoded.type !== 'refresh') {
-      return sendResponse(res, 401, false, 'Invalid refresh token');
-    }
+    const decoded = verifyRefreshToken(refreshToken);
 
     const user = await prisma.users.findUnique({ where: { id: decoded.id } });
     if (!user) return sendResponse(res, 404, false, 'User not found');
 
+    // Issue new access token (short-lived)
     const newToken = generateAccessToken(user);
     sendResponse(res, 200, true, 'Token refreshed', { token: newToken });
   } catch (err) {
     if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
-      return sendResponse(res, 401, false, 'Invalid or expired refresh token');
+      return sendResponse(res, 401, false, 'Invalid or expired refresh token. Please login again.');
     }
+    console.error('Refresh error:', err.message);
     sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
-// ─── Helper ─────────────────────────────────────────────────────────
+// ─── POST /api/v1/auth/change-password ──────────────────────────────
+router.post('/change-password', authenticate, validateBody('currentPassword', 'newPassword'), async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (newPassword.length < 6) {
+      return sendResponse(res, 400, false, 'New password must be at least 6 characters.');
+    }
+
+    const user = await prisma.users.findUnique({ where: { id: req.user.id } });
+    if (!user) return sendResponse(res, 404, false, 'User not found');
+
+    const storedHash = user.password_hash || user.password;
+    const isValid = await verifyPassword(currentPassword, storedHash);
+
+    if (!isValid) {
+      return sendResponse(res, 401, false, 'Current password is incorrect');
+    }
+
+    const newHash = await hashPassword(newPassword);
+    await prisma.users.update({
+      where: { id: user.id },
+      data: { password_hash: newHash, password: newHash, updated_at: new Date() },
+    });
+
+    sendResponse(res, 200, true, 'Password changed successfully');
+  } catch (err) {
+    console.error('Change password error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
+  }
+});
+
+// ─── Helpers ────────────────────────────────────────────────────────
+
 function detectPlatform(req) {
   const ua = (req.get('user-agent') || '').toLowerCase();
-  if (/android|iphone|ipad|mobile/.test(ua)) return 'mobile';
+  if (/android|iphone|ipad|mobile|flutter/.test(ua)) return 'mobile';
   if (ua) return 'web';
   return 'unknown';
+}
+
+function sanitizeUser(user) {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    phone: user.phone || null,
+    class_level: user.class_level || null,
+    class_name: user.class_name || null,
+    school_name: user.school_name || null,
+    school_id: user.school_id || null,
+  };
 }
 
 module.exports = router;

@@ -1,6 +1,10 @@
-const { verifyToken } = require('../utils/token');
+const { verifyAccessToken } = require('../utils/token');
 const { sendResponse } = require('../utils/response');
 
+/**
+ * Authenticate JWT access token from Authorization header.
+ * Rejects refresh tokens used as access tokens (type check in verifyAccessToken).
+ */
 function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
 
@@ -11,7 +15,7 @@ function authenticate(req, res, next) {
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = verifyToken(token);
+    const decoded = verifyAccessToken(token);
     req.user = decoded;
     next();
   } catch (error) {
@@ -22,13 +26,20 @@ function authenticate(req, res, next) {
   }
 }
 
+/**
+ * Role-based authorization middleware.
+ * Usage: authorize('admin', 'principal')
+ */
 function authorize(...allowedRoles) {
   return (req, res, next) => {
     if (!req.user) {
       return sendResponse(res, 401, false, 'Authentication required.');
     }
     if (!allowedRoles.includes(req.user.role)) {
-      return sendResponse(res, 403, false, `Access denied. Required: ${allowedRoles.join(' or ')}. Your role: ${req.user.role}`);
+      return sendResponse(
+        res, 403, false,
+        `Access denied. Required: ${allowedRoles.join(' or ')}. Your role: ${req.user.role}`
+      );
     }
     next();
   };

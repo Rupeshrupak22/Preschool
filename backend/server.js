@@ -107,21 +107,27 @@ app.get('/', async (req, res) => {
     dbStatus = 'disconnected';
   }
 
-  res.json({
+  const response = {
     status: dbStatus === 'connected' ? 'ok' : 'degraded',
     message: 'Adyapan Unified Backend',
-    version: '2.1.0',
+    version: '3.0.0',
     database: dbStatus,
     uptime: Math.floor(process.uptime()) + 's',
-    environment: isProduction ? 'production' : 'development',
-    endpoints: [
+  };
+
+  // Only expose details in development
+  if (!isProduction) {
+    response.environment = 'development';
+    response.endpoints = [
       '/api/v1/auth', '/api/v1/profile', '/api/v1/students',
       '/api/v1/teachers', '/api/v1/schools', '/api/v1/live-classes',
       '/api/v1/events', '/api/v1/leaves', '/api/v1/meetings',
       '/api/v1/leads', '/api/v1/attendance', '/api/v1/classes',
       '/api/v1/payments', '/api/v1/notices', '/api/v1/dashboard',
-    ],
-  });
+    ];
+  }
+
+  res.json(response);
 });
 
 // ─── API Routes ─────────────────────────────────────────────────────
@@ -181,3 +187,15 @@ async function gracefulShutdown(signal) {
 
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// ─── Unhandled Errors (prevent silent crashes) ──────────────────────
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('⚠️ Unhandled Rejection:', reason);
+  // Don't exit — log and continue
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('💥 Uncaught Exception:', error);
+  // Exit on uncaught — state may be corrupted
+  gracefulShutdown('uncaughtException');
+});

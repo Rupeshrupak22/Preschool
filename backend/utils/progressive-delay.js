@@ -1,53 +1,47 @@
 /**
  * Progressive Delay for failed login attempts
  * 
- * 1st fail: 1 second delay
- * 2nd fail: 3-4 seconds delay
- * 3rd fail: 10 seconds delay
- * 4th+ fail: 15 seconds delay
+ * 1st fail: 1 second
+ * 2nd fail: 3.5 seconds
+ * 3rd fail: 10 seconds
+ * 4th+ fail: 15 seconds
  * 
- * Tracks by email (valid email + wrong password scenario)
+ * Auto-resets after 15 minutes of inactivity.
+ * In-memory store — for multi-instance deployments, replace with Redis.
  */
 
-// In-memory store (use Redis in production for multi-instance)
 const failedAttempts = new Map();
 
-// Cleanup old entries every 30 minutes
-setInterval(() => {
+// Cleanup old entries every 30 minutes — unref() so it doesn't block shutdown
+const cleanupTimer = setInterval(() => {
   const now = Date.now();
   for (const [key, data] of failedAttempts.entries()) {
-    // Remove entries older than 30 minutes
     if (now - data.lastAttempt > 30 * 60 * 1000) {
       failedAttempts.delete(key);
     }
   }
 }, 30 * 60 * 1000);
+cleanupTimer.unref();
 
-/**
- * Get delay in milliseconds based on failed attempt count
- */
 function getDelay(attemptCount) {
-  switch (attemptCount) {
-    case 1: return 1000;       // 1 second
-    case 2: return 3500;       // 3.5 seconds
-    case 3: return 10000;      // 10 seconds
-    default: return 15000;     // 15 seconds (4th+)
-  }
+  if (attemptCount <= 1) return 1000;
+  if (attemptCount === 2) return 3500;
+  if (attemptCount === 3) return 10000;
+  return 15000;
 }
 
 /**
- * Record a failed login attempt and apply progressive delay
- * Returns a promise that resolves after the delay
+ * Record a failed login attempt and apply progressive delay.
+ * The delay happens server-side — attacker must wait regardless.
  */
 async function recordFailedAttempt(email) {
   const key = email.toLowerCase().trim();
   const now = Date.now();
 
-  const existing = failedAttempts.get(key) || { count: 0, lastAttempt: now };
+  let existing = failedAttempts.get(key);
 
-  // Reset if last attempt was more than 15 minutes ago
-  if (now - existing.lastAttempt > 15 * 60 * 1000) {
-    existing.count = 0;
+  if (!existing || (now - existing.lastAttempt > 15 * 60 * 1000)) {
+    existing = { count: 0, lastAttempt: now };
   }
 
   existing.count += 1;
@@ -55,14 +49,9 @@ async function recordFailedAttempt(email) {
   failedAttempts.set(key, existing);
 
   const delay = getDelay(existing.count);
-
-  // Wait for the delay before responding
   await new Promise((resolve) => setTimeout(resolve, delay));
 
-  return {
-    attempts: existing.count,
-    delayMs: delay,
-  };
+  return { attempts: existing.count, delayMs: delay };
 }
 
 /**
@@ -73,18 +62,15 @@ function clearFailedAttempts(email) {
 }
 
 /**
- * Get current attempt count for an email
+ * Get current attempt count (for logging/monitoring)
  */
 function getAttemptCount(email) {
   const data = failedAttempts.get(email.toLowerCase().trim());
   if (!data) return 0;
-
-  // Reset if older than 15 minutes
   if (Date.now() - data.lastAttempt > 15 * 60 * 1000) {
     failedAttempts.delete(email.toLowerCase().trim());
     return 0;
   }
-
   return data.count;
 }
 
