@@ -1,7 +1,21 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+
+// ─── Validate required env vars ─────────────────────────────────────
+const REQUIRED_ENV = ['DATABASE_URL', 'JWT_SECRET'];
+const missing = REQUIRED_ENV.filter((key) => !process.env[key]);
+if (missing.length > 0) {
+  console.error(`❌ Missing required env vars: ${missing.join(', ')}`);
+  console.error('   Check your .env file or Render environment settings.');
+  process.exit(1);
+}
+
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const compression = require('compression');
+const prisma = require('./lib/prisma');
 
 // Route imports
 const authRoutes = require('./routes/auth');
@@ -22,40 +36,95 @@ const dashboardRoutes = require('./routes/dashboard');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+const isProduction = process.env.NODE_ENV === 'production';
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(morgan('dev'));
+// ─── Security Middleware ─────────────────────────────────────────────
+app.use(helmet());
 
-// Health Check
-app.get('/', (req, res) => {
+// ─── CORS Configuration ─────────────────────────────────────────────
+const allowedOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman)
+      if (!origin) return callback(null, true);
+      // In dev, allow all; in production, check whitelist
+      if (!isProduction || allowedOrigins.length === 0) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
+
+// ─── Rate Limiting ──────────────────────────────────────────────────
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // 200 requests per window
+  message: { success: false, message: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20, // Stricter for auth routes (prevent brute force)
+  message: { success: false, message: 'Too many login attempts. Try again in 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use('/api/', generalLimiter);
+app.use('/api/v1/auth/', authLimiter);
+
+// ─── Compression ────────────────────────────────────────────────────
+app.use(compression());
+
+// ─── Body Parsing ───────────────────────────────────────────────────
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+
+// ─── Logging ────────────────────────────────────────────────────────
+if (isProduction) {
+  app.use(morgan('combined'));
+} else {
+  app.use(morgan('dev'));
+}
+
+// ─── Health Check (with DB ping) ────────────────────────────────────
+app.get('/', async (req, res) => {
+  let dbStatus = 'unknown';
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    dbStatus = 'connected';
+  } catch {
+    dbStatus = 'disconnected';
+  }
+
   res.json({
-    status: 'ok',
-    message: 'Adyapan Unified Backend is running',
-    version: '2.0.0',
-    database: 'TiDB Cloud (Prisma + MySQL)',
+    status: dbStatus === 'connected' ? 'ok' : 'degraded',
+    message: 'Adyapan Unified Backend',
+    version: '2.1.0',
+    database: dbStatus,
+    uptime: Math.floor(process.uptime()) + 's',
+    environment: isProduction ? 'production' : 'development',
     endpoints: [
-      '/api/v1/auth',
-      '/api/v1/profile',
-      '/api/v1/students',
-      '/api/v1/teachers',
-      '/api/v1/schools',
-      '/api/v1/live-classes',
-      '/api/v1/events',
-      '/api/v1/leaves',
-      '/api/v1/meetings',
-      '/api/v1/leads',
-      '/api/v1/attendance',
-      '/api/v1/classes',
-      '/api/v1/payments',
-      '/api/v1/notices',
-      '/api/v1/dashboard',
+      '/api/v1/auth', '/api/v1/profile', '/api/v1/students',
+      '/api/v1/teachers', '/api/v1/schools', '/api/v1/live-classes',
+      '/api/v1/events', '/api/v1/leaves', '/api/v1/meetings',
+      '/api/v1/leads', '/api/v1/attendance', '/api/v1/classes',
+      '/api/v1/payments', '/api/v1/notices', '/api/v1/dashboard',
     ],
   });
 });
 
-// API Routes
+// ─── API Routes ─────────────────────────────────────────────────────
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/profile', profileRoutes);
 app.use('/api/v1/students', studentRoutes);
@@ -72,18 +141,43 @@ app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/notices', noticeRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 
-// 404 Handler
+// ─── 404 Handler ────────────────────────────────────────────────────
 app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found', path: req.path });
+  res.status(404).json({ success: false, message: `Route ${req.method} ${req.path} not found` });
 });
 
-// Global Error Handler
+// ─── Global Error Handler ───────────────────────────────────────────
 app.use((err, req, res, next) => {
-  console.error('Server Error:', err.message);
-  res.status(500).json({ error: 'Internal server error', details: err.message });
+  console.error('Server Error:', err.stack || err.message);
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
+    success: false,
+    message: isProduction ? 'Internal server error' : err.message,
+  });
 });
 
-app.listen(PORT, () => {
+// ─── Graceful Shutdown ──────────────────────────────────────────────
+const server = app.listen(PORT, () => {
   console.log(`🚀 Adyapan Unified Backend running on http://localhost:${PORT}`);
   console.log(`📦 Database: TiDB Cloud via Prisma`);
+  console.log(`🔐 Security: Helmet + Rate Limit + CORS`);
+  console.log(`🌐 Environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
 });
+
+async function gracefulShutdown(signal) {
+  console.log(`\n${signal} received. Shutting down gracefully...`);
+  server.close(async () => {
+    await prisma.$disconnect();
+    console.log('✅ Database disconnected. Server closed.');
+    process.exit(0);
+  });
+
+  // Force shutdown after 10s
+  setTimeout(() => {
+    console.error('⚠️ Forced shutdown after timeout.');
+    process.exit(1);
+  }, 10000);
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
