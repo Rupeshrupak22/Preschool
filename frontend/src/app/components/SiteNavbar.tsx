@@ -303,12 +303,20 @@ export default function SiteNavbar() {
               )}
             </div>
           ) : (
-            <a
-              href="/login"
-              className="inline-flex h-12 min-w-[92px] items-center justify-center rounded-full border-2 border-white bg-white/72 px-5 text-[15px] font-black text-slate-950 shadow-[0_10px_22px_rgba(255,255,255,0.24)] transition hover:-translate-y-0.5 hover:bg-white 2xl:min-w-[100px] 2xl:px-6"
-            >
-              Login
-            </a>
+            <>
+              <a
+                href="/login"
+                className="inline-flex h-12 min-w-[92px] items-center justify-center rounded-full border-2 border-white bg-white/72 px-5 text-[15px] font-black text-slate-950 shadow-[0_10px_22px_rgba(255,255,255,0.24)] transition hover:-translate-y-0.5 hover:bg-white 2xl:min-w-[100px] 2xl:px-6"
+              >
+                Login
+              </a>
+              <a
+                href="/signup"
+                className="inline-flex h-12 min-w-[92px] items-center justify-center rounded-full border-2 border-emerald-300/70 bg-gradient-to-r from-[#37e286] to-[#19c87d] px-5 text-[15px] font-black text-slate-950 shadow-[0_12px_30px_rgba(16,185,129,0.36)] transition hover:-translate-y-0.5 hover:brightness-110 2xl:min-w-[100px] 2xl:px-6"
+              >
+                Sign Up
+              </a>
+            </>
           )}
         </div>
 
@@ -378,13 +386,20 @@ export default function SiteNavbar() {
                 </div>
               </div>
             ) : (
-              <div className="mt-4">
+              <div className="mt-4 grid gap-3">
                 <a
                   href="/login"
                   onClick={() => setMenuOpen(false)}
                   className="block rounded-full border-2 border-white bg-white/78 px-4 py-3 text-center text-base font-black text-slate-950 transition hover:bg-white"
                 >
                   Login
+                </a>
+                <a
+                  href="/signup"
+                  onClick={() => setMenuOpen(false)}
+                  className="block rounded-full border-2 border-emerald-300/70 bg-gradient-to-r from-[#37e286] to-[#19c87d] px-4 py-3 text-center text-base font-black text-slate-950 transition hover:brightness-110"
+                >
+                  Sign Up
                 </a>
               </div>
             )}
