@@ -14,6 +14,7 @@ import {
   RefreshCw,
   School,
   Search,
+  Settings,
   ShieldCheck,
   UserCog,
   UserPlus,
@@ -48,7 +49,8 @@ const tabs = [
   { id: "students", label: "Students", icon: Users },
   { id: "payments", label: "Payments", icon: IndianRupee },
   { id: "activity", label: "Activity", icon: Activity },
-  { id: "add-user", label: "Add User", icon: UserPlus }
+  { id: "add-user", label: "Add User", icon: UserPlus },
+  { id: "manage-users", label: "Manage", icon: Settings }
 ] as const;
 
 function text(value: unknown, fallback = "-") {
@@ -359,6 +361,7 @@ export default function AdminPage() {
             {activeTab === "payments" && <PaymentsTable rows={activeRows} />}
             {activeTab === "activity" && <ActivityTable rows={activeRows} />}
             {activeTab === "add-user" && <AddUserPanel onSuccess={loadOverview} />}
+            {activeTab === "manage-users" && <ManageUsersPanel onSuccess={loadOverview} />}
           </div>
         </section>
 
@@ -826,6 +829,207 @@ function AddUserPanel({ onSuccess }: { onSuccess: () => void }) {
             </p>
           )}
         </form>
+      </div>
+    </div>
+  );
+}
+
+function ManageUsersPanel({ onSuccess }: { onSuccess: () => void }) {
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetRole, setResetRole] = useState<"student" | "admin" | "principal" | "teacher">("student");
+  const [resetPassword, setResetPassword] = useState("");
+  const [resetStatus, setResetStatus] = useState("");
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [resetting, setResetting] = useState(false);
+
+  const [deleteEmail, setDeleteEmail] = useState("");
+  const [deleteRole, setDeleteRole] = useState<"student" | "admin" | "principal" | "teacher">("student");
+  const [deleteStatus, setDeleteStatus] = useState("");
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  async function handleReset(event: React.FormEvent) {
+    event.preventDefault();
+    setResetting(true);
+    setResetStatus("");
+    setResetSuccess(false);
+
+    try {
+      const response = await fetch("/api/admin/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: resetEmail, newPassword: resetPassword, role: resetRole })
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setResetStatus(data.error || "Failed to reset password.");
+        setResetSuccess(false);
+      } else {
+        setResetStatus(data.message || "Password reset successfully!");
+        setResetSuccess(true);
+        setResetPassword("");
+      }
+    } catch {
+      setResetStatus("Network error.");
+      setResetSuccess(false);
+    } finally {
+      setResetting(false);
+    }
+  }
+
+  async function handleDelete(event: React.FormEvent) {
+    event.preventDefault();
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      setDeleteStatus("⚠️ Click Delete again to confirm. This action cannot be undone!");
+      setDeleteSuccess(false);
+      return;
+    }
+
+    setDeleting(true);
+    setDeleteStatus("");
+    setDeleteSuccess(false);
+
+    try {
+      const response = await fetch("/api/admin/delete-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: deleteEmail, role: deleteRole })
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setDeleteStatus(data.error || "Failed to delete user.");
+        setDeleteSuccess(false);
+      } else {
+        setDeleteStatus(data.message || "User deleted successfully!");
+        setDeleteSuccess(true);
+        setDeleteEmail("");
+        setConfirmDelete(false);
+        onSuccess();
+      }
+    } catch {
+      setDeleteStatus("Network error.");
+      setDeleteSuccess(false);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  return (
+    <div className="p-6">
+      <div className="mx-auto max-w-3xl grid gap-8 lg:grid-cols-2">
+        {/* Reset Password */}
+        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-black text-slate-950">🔑 Reset Password</h3>
+          <p className="mt-1 text-sm font-semibold text-slate-500">Change password for any user</p>
+
+          <form onSubmit={handleReset} className="mt-5 grid gap-4">
+            <label className="grid gap-1.5">
+              <span className="text-xs font-black uppercase tracking-wide text-slate-500">Role</span>
+              <select
+                value={resetRole}
+                onChange={(e) => setResetRole(e.target.value as typeof resetRole)}
+                className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100"
+              >
+                <option value="student">Student</option>
+                <option value="admin">Admin</option>
+                <option value="principal">Principal</option>
+                <option value="teacher">Teacher</option>
+              </select>
+            </label>
+
+            <label className="grid gap-1.5">
+              <span className="text-xs font-black uppercase tracking-wide text-slate-500">Email</span>
+              <input
+                type="email"
+                required
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                placeholder="user@example.com"
+                className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100"
+              />
+            </label>
+
+            <label className="grid gap-1.5">
+              <span className="text-xs font-black uppercase tracking-wide text-slate-500">New Password</span>
+              <input
+                type="text"
+                required
+                value={resetPassword}
+                onChange={(e) => setResetPassword(e.target.value)}
+                placeholder="Min 8 chars, 1 uppercase, 1 number"
+                className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-950 outline-none focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100"
+              />
+            </label>
+
+            <button
+              type="submit"
+              disabled={resetting}
+              className="h-10 rounded-lg bg-cyan-700 text-sm font-black text-white transition hover:bg-slate-950 disabled:opacity-60"
+            >
+              {resetting ? "Resetting..." : "Reset Password"}
+            </button>
+
+            {resetStatus && (
+              <p className={`rounded-lg px-3 py-2 text-center text-xs font-black ${resetSuccess ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
+                {resetStatus}
+              </p>
+            )}
+          </form>
+        </div>
+
+        {/* Delete User */}
+        <div className="rounded-xl border border-rose-200 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-black text-rose-700">🗑️ Delete User</h3>
+          <p className="mt-1 text-sm font-semibold text-slate-500">Permanently remove a user and all their data</p>
+
+          <form onSubmit={handleDelete} className="mt-5 grid gap-4">
+            <label className="grid gap-1.5">
+              <span className="text-xs font-black uppercase tracking-wide text-slate-500">Role</span>
+              <select
+                value={deleteRole}
+                onChange={(e) => { setDeleteRole(e.target.value as typeof deleteRole); setConfirmDelete(false); setDeleteStatus(""); }}
+                className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-950 outline-none focus:border-rose-400 focus:ring-4 focus:ring-rose-100"
+              >
+                <option value="student">Student</option>
+                <option value="admin">Admin</option>
+                <option value="principal">Principal</option>
+                <option value="teacher">Teacher</option>
+              </select>
+            </label>
+
+            <label className="grid gap-1.5">
+              <span className="text-xs font-black uppercase tracking-wide text-slate-500">Email</span>
+              <input
+                type="email"
+                required
+                value={deleteEmail}
+                onChange={(e) => { setDeleteEmail(e.target.value); setConfirmDelete(false); setDeleteStatus(""); }}
+                placeholder="user@example.com"
+                className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-950 outline-none focus:border-rose-400 focus:ring-4 focus:ring-rose-100"
+              />
+            </label>
+
+            <button
+              type="submit"
+              disabled={deleting}
+              className={`h-10 rounded-lg text-sm font-black text-white transition disabled:opacity-60 ${
+                confirmDelete ? "bg-rose-700 hover:bg-rose-900" : "bg-slate-950 hover:bg-rose-700"
+              }`}
+            >
+              {deleting ? "Deleting..." : confirmDelete ? "⚠️ Confirm Delete" : "Delete User"}
+            </button>
+
+            {deleteStatus && (
+              <p className={`rounded-lg px-3 py-2 text-center text-xs font-black ${deleteSuccess ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"}`}>
+                {deleteStatus}
+              </p>
+            )}
+          </form>
+        </div>
       </div>
     </div>
   );
