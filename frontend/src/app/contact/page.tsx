@@ -54,35 +54,35 @@ export default function ContactPage() {
 
       {/* Two Column Layout - Company Information & Personal Information */}
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-6 lg:py-24">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
           
-          {/* Left Column - Company Information */}
-          <div>
+          {/* Left Column - Company Information Box */}
+          <div className="rounded-3xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-white to-purple-50 p-8 shadow-xl backdrop-blur-sm md:p-10">
             <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">Company information</h2>
-            <p className="mt-4 text-lg text-gray-600">
+            <p className="mt-4 text-base text-gray-600 leading-relaxed">
               Connect with ADYAPAN - where education meets innovation. We're here to support your learning journey.
             </p>
 
             <div className="mt-10 space-y-6">
               {/* Phone */}
               <a href="tel:+918179124566" className="flex items-start gap-4 group">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white shadow-sm">
                   <PhoneCall className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Phone</h3>
-                  <p className="mt-1 text-lg font-semibold text-gray-900">+91 81791 24566</p>
+                  <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Phone</h3>
+                  <p className="mt-1 text-lg font-bold text-gray-900">+91 81791 24566</p>
                 </div>
               </a>
 
               {/* Email */}
               <a href="mailto:support@adyapan.com" className="flex items-start gap-4 group">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white shadow-sm">
                   <Mail className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Email</h3>
-                  <p className="mt-1 text-lg font-semibold text-gray-900">support@adyapan.com</p>
+                  <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Email</h3>
+                  <p className="mt-1 text-lg font-bold text-gray-900">support@adyapan.com</p>
                 </div>
               </a>
 
@@ -93,35 +93,35 @@ export default function ContactPage() {
                 rel="noreferrer"
                 className="flex items-start gap-4 group"
               >
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white shadow-sm">
                   <MapPin className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Address</h3>
-                  <p className="mt-1 text-lg font-semibold text-gray-900">ADYAPAN EDUTECH PRIVATE LIMITED</p>
-                  <p className="text-base text-gray-600">Sattva Magnus, behind Reliance Bazaar Shaikpet,</p>
-                  <p className="text-base text-gray-600">Sabza Colony, Ambedkar Nagar, Toli Chowki,</p>
-                  <p className="text-base text-gray-600">Hyderabad, Telangana 500008</p>
+                  <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Address</h3>
+                  <p className="mt-1 text-base font-bold text-gray-900">ADYAPAN EDUTECH PRIVATE LIMITED</p>
+                  <p className="text-sm text-gray-600">Sattva Magnus, behind Reliance Bazaar Shaikpet,</p>
+                  <p className="text-sm text-gray-600">Sabza Colony, Ambedkar Nagar, Toli Chowki,</p>
+                  <p className="text-sm text-gray-600">Hyderabad, Telangana 500008</p>
                 </div>
               </a>
 
               {/* Hours */}
               <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 shadow-sm">
                   <Clock3 className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Visit Us</h3>
-                  <p className="mt-1 text-lg font-semibold text-gray-900">Mon-Sat, 11 AM - 8 PM</p>
+                  <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Visit Us</h3>
+                  <p className="mt-1 text-lg font-bold text-gray-900">Mon-Sat, 11 AM - 8 PM</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column - Personal Information Form */}
-          <div>
+          {/* Right Column - Personal Information Form Box */}
+          <div className="rounded-3xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 via-white to-pink-50 p-8 shadow-xl backdrop-blur-sm md:p-10">
             <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">Personal information</h2>
-            <p className="mt-4 text-lg text-gray-600">
+            <p className="mt-4 text-base text-gray-600 leading-relaxed">
               Fill out the form below and we'll get back to you as soon as possible.
             </p>
 
@@ -288,7 +288,7 @@ export default function ContactPage() {
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <a
-              href="/signup"
+              href="/login"
               className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-4 text-base font-semibold text-blue-600 shadow-xl transition hover:bg-gray-50"
             >
               Get Started

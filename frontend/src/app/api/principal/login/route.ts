@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { findPrincipalByEmail, recordPrincipalLoginEvent } from "@/lib/db";
-import { signToken } from "@/lib/security";
+import { activeCookieSessions, clearAuthCookies, signToken } from "@/lib/security";
 import { principalLoginSchema } from "@/lib/validators";
 
 function clientIp(request: Request) {
@@ -13,6 +13,16 @@ export async function POST(request: Request) {
 
   if (!payload.success) {
     return NextResponse.json({ error: "Enter email, password, school key, and CAPTCHA." }, { status: 400 });
+  }
+
+  // Enforce single-session: block login if another role is already active
+  const sessions = await activeCookieSessions();
+  if (sessions.length > 0) {
+    const active = sessions[0].session;
+    return NextResponse.json(
+      { error: `You are already logged in as ${active.role} (${active.email}). Please logout first before signing into another account.` },
+      { status: 409 }
+    );
   }
 
   const principal = await findPrincipalByEmail(payload.data.email);
@@ -58,6 +68,7 @@ export async function POST(request: Request) {
     }
   });
 
+  clearAuthCookies(response, "adyapan_principal_token");
   response.cookies.set("adyapan_principal_token", token, {
     httpOnly: true,
     sameSite: "lax",

@@ -243,7 +243,7 @@ export default function OverviewPage() {
             different from a normal online class.
           </p>
           <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-            <a href="/signup" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 font-black text-white shadow-lg transition hover:-translate-y-1 hover:bg-emerald-600">
+            <a href="/login" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 font-black text-white shadow-lg transition hover:-translate-y-1 hover:bg-emerald-600">
               Join Now <Zap className="h-5 w-5" />
             </a>
             <a href="/#demo" className="inline-flex h-12 items-center justify-center gap-2 rounded-full border-2 border-slate-200 bg-white px-6 font-black text-slate-950 transition hover:-translate-y-1 hover:border-purple-200">

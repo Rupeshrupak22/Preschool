@@ -10,38 +10,51 @@ export default function LoginPage() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("Checking credentials...");
-    const lmsWindow = window.open("about:blank", "_blank");
     const body = Object.fromEntries(new FormData(event.currentTarget).entries());
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    const data = await response.json();
 
-    if (!response.ok) {
-      lmsWindow?.close();
-      setStatus(data.error);
-      return;
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      const text = await response.text();
+      let data;
+
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        setStatus("Server response error. Please try again.");
+        return;
+      }
+
+      if (!response.ok) {
+        setStatus(data.error || "Login failed. Please try again.");
+        return;
+      }
+
+      window.dispatchEvent(new Event("adyapan-auth-change"));
+      const searchParams = new URLSearchParams(window.location.search);
+      const next = searchParams.get("next");
+      const target = next && next.startsWith("/") ? next : data.user?.role === "admin" ? "/admin" : "/student-dashboard";
+      const windowName = data.user?.role === "admin" ? "adyapan_admin_dashboard" : "adyapan_student_dashboard";
+      const lmsWindow = window.open(target, windowName);
+
+      if (lmsWindow) {
+        lmsWindow.opener = null;
+        lmsWindow.focus();
+        setStatus("Dashboard opened in a new tab.");
+        window.setTimeout(() => {
+          window.location.replace("/");
+        }, 300);
+        return;
+      }
+
+      window.location.href = target;
+    } catch {
+      setStatus("Network error. Please check your connection and try again.");
     }
-
-    window.dispatchEvent(new Event("adyapan-auth-change"));
-    const searchParams = new URLSearchParams(window.location.search);
-    const next = searchParams.get("next");
-    const target = next && next.startsWith("/") ? next : data.user.role === "admin" ? "/admin" : "/student-dashboard";
-
-    if (lmsWindow) {
-      lmsWindow.location.href = target;
-      lmsWindow.opener = null;
-      lmsWindow.focus();
-      setStatus("Dashboard opened in a new tab.");
-      window.setTimeout(() => {
-        window.location.replace("/");
-      }, 300);
-      return;
-    }
-
-    window.location.href = target;
   }
 
   return (
@@ -108,7 +121,7 @@ export default function LoginPage() {
                 <Lock className="h-10 w-10" />
               </div>
               <h1 className="mt-7 text-4xl font-black text-[#08133f]">Welcome back</h1>
-              <p className="mt-3 text-base font-medium text-slate-600">Continue learning with your future skills dashboard.</p>
+              <p className="mt-3 text-base font-medium text-slate-600">Login with your registered account credentials.</p>
             </div>
 
             <div className="mt-8 grid gap-6">
@@ -120,7 +133,7 @@ export default function LoginPage() {
                     name="email"
                     type="email"
                     required
-                    placeholder="student@example.com"
+                    placeholder="your-email@example.com"
                     className="h-16 w-full rounded-xl border border-slate-200 bg-white pl-14 pr-4 text-lg font-medium text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-200/50"
                   />
                 </div>
@@ -151,19 +164,10 @@ export default function LoginPage() {
               <button className="h-16 rounded-xl bg-gradient-to-r from-[#1e63ff] via-[#9b3bdc] to-[#ff2d72] text-xl font-black text-white shadow-[0_18px_32px_rgba(236,72,153,0.25)] transition hover:-translate-y-0.5">
                 Login
               </button>
-
-              <button
-                type="button"
-                onClick={() => setStatus("Google OAuth provider ready for production keys.")}
-                className="flex h-16 items-center justify-center gap-4 rounded-xl border border-slate-200 bg-white text-xl font-black text-[#08133f] transition hover:bg-slate-50"
-              >
-                <span className="text-3xl font-black text-[#4285f4]">G</span>
-                Google
-              </button>
             </div>
 
-            <p className="mt-8 text-center text-base font-medium text-slate-700">
-              New to ADYAPAN? <a href="/signup" className="font-black text-blue-700">Create account</a>
+            <p className="mt-8 text-center text-sm font-medium text-slate-500">
+              Only pre-registered accounts can login. Contact your school admin for access.
             </p>
             {status && <p className="mt-5 rounded-xl bg-blue-50 px-4 py-3 text-center text-sm font-bold text-blue-900">{status}</p>}
           </form>

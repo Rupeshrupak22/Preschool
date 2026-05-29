@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Users
 } from "lucide-react";
+import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
 
 type PrincipalDashboard = {
   principal: {
@@ -74,11 +75,22 @@ export default function PrincipalDashboardPage() {
 
   async function logout() {
     await fetch("/api/principal/logout", { method: "POST" });
+    broadcastLogout();
     window.location.href = "/principal/login";
   }
 
   useEffect(() => {
     loadDashboard();
+  }, []);
+
+  // Listen for logout from other tabs — redirect to login
+  useEffect(() => {
+    const cleanup = onAuthChange((message) => {
+      if (message.type === "logout") {
+        window.location.href = "/principal/login";
+      }
+    });
+    return cleanup;
   }, []);
 
   const filteredStudents = useMemo(() => {
