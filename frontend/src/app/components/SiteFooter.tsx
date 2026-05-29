@@ -15,10 +15,13 @@ const quickLinks = [
   ["School Partnership", "/#schools"],
   ["LMS Dashboard", "/student-dashboard"],
   ["Login", "/login"],
-  ["Contact Us", "/contact"]
+  ["Contact Us", "/contact"],
+  ["Principal Access", "/principal/dashboard"],
+  ["Teacher Access", "/teacher/login"],
+  ["Admin Access", "/login?next=/admin"]
 ];
 
-const socials = [
+const socials: [string, string, React.ComponentType<{ className?: string }>][] = [
   ["Instagram", "https://www.instagram.com/adyapanschool/", Instagram],
   ["LinkedIn", "https://www.linkedin.com/company/adyapan-edutech-pvt-ltd/posts/?feedView=all", Linkedin],
   ["YouTube", "https://www.youtube.com/@adyapan21", Youtube]
@@ -26,121 +29,155 @@ const socials = [
 
 export default function SiteFooter() {
   return (
-    <footer id="footer" className="relative overflow-hidden border-t border-blue-100 bg-white px-4 py-10 text-slate-950 md:px-6 md:py-12">
-      <div className="mx-auto grid max-w-7xl gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-10">
-        <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <img
-              src="/adyapan-logo.svg"
-              alt="ADYAPAN"
-              className="h-16 w-16 shrink-0 rounded-full object-contain drop-shadow-[0_12px_18px_rgba(234,88,12,0.2)]"
-            />
-            <span className="text-4xl font-black leading-none tracking-tight text-slate-950 sm:text-5xl">Adyapan</span>
-            <span className="inline-flex items-center rounded-full bg-cyan-600 px-3 py-2 text-xs font-black uppercase tracking-[0.22em] text-white">
-              Future Skills
-            </span>
-          </div>
-          <p className="mt-6 max-w-sm text-base font-medium leading-8 text-slate-700">
-            We help students from Class 5 to 12 become confident creators through coding, AI, robotics,
-            communication, design, and career-ready future skills.
-          </p>
-          <div className="mt-8 flex gap-3">
-            {socials.map(([label, href, Icon]) => {
-              const SocialIcon = Icon as React.ComponentType<{ className?: string }>;
-              return (
+    <footer id="footer" className="relative overflow-hidden bg-gradient-to-b from-slate-900 to-slate-950 text-white">
+      {/* Decorative top border */}
+      <div className="h-1 w-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500" />
+
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+
+      <div className="relative mx-auto max-w-7xl px-6 pb-8 pt-16 md:px-8">
+        {/* Main Grid */}
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
+
+          {/* Brand Column */}
+          <div className="lg:col-span-4">
+            <div className="flex items-center gap-3">
+              <img
+                src="/adyapan-logo.svg"
+                alt="ADYAPAN"
+                className="h-14 w-14 shrink-0 rounded-full object-contain ring-2 ring-white/10"
+              />
+              <div>
+                <span className="text-3xl font-black tracking-tight text-white">Adyapan</span>
+                <span className="ml-2 inline-flex items-center rounded-md bg-gradient-to-r from-cyan-500 to-blue-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg shadow-cyan-500/20">
+                  Future Skills
+                </span>
+              </div>
+            </div>
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-slate-400">
+              We help students from Class 5 to 12 become confident creators through coding, AI, robotics,
+              communication, design, and career-ready future skills.
+            </p>
+            <div className="mt-6 flex gap-3">
+              {socials.map(([label, href, Icon]) => (
                 <a
-                  key={String(label)}
-                  href={String(href)}
+                  key={label}
+                  href={href}
                   target="_blank"
                   rel="noreferrer"
-                  aria-label={`ADYAPAN ${String(label)}`}
-                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-blue-200 bg-white text-blue-700 shadow-[0_12px_28px_rgba(37,99,235,0.10)] transition hover:-translate-y-1 hover:bg-cyan-600 hover:text-white hover:shadow-[0_16px_34px_rgba(13,148,136,0.22)]"
+                  aria-label={`ADYAPAN ${label}`}
+                  className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-slate-400 ring-1 ring-white/10 transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-500/20 hover:text-cyan-400 hover:ring-cyan-500/30"
                 >
-                  <SocialIcon className="h-5 w-5" />
+                  <Icon className="h-4.5 w-4.5" />
                 </a>
-              );
-            })}
+              ))}
+            </div>
+          </div>
+
+          {/* Learning Programs */}
+          <div className="lg:col-span-3">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+              Learning Programs
+            </h3>
+            <div className="mt-1 h-0.5 w-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" />
+            <ul className="mt-5 space-y-3">
+              {learningPrograms.map((item) => (
+                <li key={item}>
+                  <a
+                    href="/#curriculum"
+                    className="text-sm text-slate-400 transition-colors duration-200 hover:text-cyan-400"
+                  >
+                    {item}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Quick Links */}
+          <div className="lg:col-span-2">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+              Quick Links
+            </h3>
+            <div className="mt-1 h-0.5 w-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" />
+            <ul className="mt-5 space-y-3">
+              {quickLinks.map(([label, href]) => (
+                <li key={label}>
+                  <a
+                    href={href}
+                    className="text-sm text-slate-400 transition-colors duration-200 hover:text-cyan-400"
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Get In Touch */}
+          <div className="lg:col-span-3">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
+              Get In Touch
+            </h3>
+            <div className="mt-1 h-0.5 w-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" />
+            <ul className="mt-5 space-y-4">
+              <li>
+                <a href="mailto:support@adyapan.com" className="flex items-center gap-3 text-sm text-slate-400 transition-colors duration-200 hover:text-cyan-400">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
+                    <Mail className="h-4 w-4" />
+                  </div>
+                  support@adyapan.com
+                </a>
+              </li>
+              <li>
+                <a href="tel:+918292244709" className="flex items-center gap-3 text-sm text-slate-400 transition-colors duration-200 hover:text-cyan-400">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
+                    <Phone className="h-4 w-4" />
+                  </div>
+                  +91 82922 44709
+                </a>
+              </li>
+              <li className="flex items-center gap-3 text-sm text-slate-400">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
+                  <MapPin className="h-4 w-4" />
+                </div>
+                India
+              </li>
+            </ul>
+
+            {/* Hours Card */}
+            <div className="mt-6 rounded-xl border border-white/5 bg-white/[0.03] p-4 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
+                <Clock className="h-3.5 w-3.5 text-cyan-400" />
+                Business Hours
+              </div>
+              <p className="mt-2 text-sm text-slate-400">Mon – Sat: 09:00 AM – 5:00 PM</p>
+              <p className="mt-1 text-sm text-red-400/80">Sunday: Closed</p>
+            </div>
           </div>
         </div>
 
-        <div>
-          <h3 className="inline-block border-b-2 border-cyan-600 pb-2 text-2xl font-black text-slate-950">
-            Learning Programs
-          </h3>
-          <div className="mt-6 grid gap-4 text-base font-semibold leading-7 text-slate-950 md:mt-7 md:grid-cols-2 md:gap-4">
-            {learningPrograms.map((item) => (
-              <a key={item} href="/#curriculum" className="transition hover:translate-x-1 hover:text-cyan-700">
-                {item}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h3 className="inline-block border-b-2 border-cyan-600 pb-2 text-2xl font-black text-slate-950">
-            Quick Links
-          </h3>
-          <div className="mt-6 grid gap-4 text-base font-semibold text-slate-950 md:mt-7 md:grid-cols-2 md:gap-5">
-            {quickLinks.map(([label, href]) => (
-              <a key={label} href={href} className="transition hover:translate-x-1 hover:text-cyan-700">
-                {label}
-              </a>
-            ))}
-            <a
-              href="/principal/dashboard"
-              target="_blank"
-              rel="noreferrer"
-              className="transition hover:translate-x-1 hover:text-cyan-700"
-            >
-              Principal Access
-            </a>
-            <a href="/teacher/login" className="transition hover:translate-x-1 hover:text-cyan-700">
-              Teacher Access
-            </a>
-            <a href="/login?next=/admin" className="transition hover:translate-x-1 hover:text-cyan-700">
-              Admin Access
-            </a>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="inline-block border-b-2 border-cyan-600 pb-2 text-2xl font-black text-slate-950">
-            Get In Touch
-          </h3>
-          <div className="mt-6 grid gap-4 text-base font-semibold text-slate-950 md:mt-7 md:gap-5">
-            <a href="mailto:support@adyapan.com" className="flex items-center gap-3 transition hover:text-cyan-700">
-              <Mail className="h-5 w-5 text-cyan-700" />
-              support@adyapan.com
-            </a>
-            <a href="tel:+918292244709" className="flex items-center gap-3 transition hover:text-cyan-700">
-              <Phone className="h-5 w-5 text-cyan-700" />
-              +91 82922 44709
-            </a>
-            <span className="flex items-center gap-3">
-              <MapPin className="h-5 w-5 text-cyan-700" />
-              India
-            </span>
-          </div>
-          <div className="mt-8 rounded-lg border border-blue-200 bg-blue-50 p-5 text-base text-slate-950 shadow-[0_20px_50px_rgba(37,99,235,0.12)]">
-            <Clock className="mb-4 h-6 w-6 text-blue-700" />
-            <p>Mon - Sat: 09:00 AM - 5:00 PM</p>
-            <p className="mt-2 text-cyan-700">Sunday: Closed</p>
+        {/* Bottom Bar */}
+        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 sm:flex-row">
+          <p className="text-xs text-slate-500">
+            © 2026 ADYAPAN Future Skills Platform. All rights reserved.
+          </p>
+          <div className="flex gap-6 text-xs text-slate-500">
+            <a href="#" className="transition hover:text-slate-300">Privacy Policy</a>
+            <a href="#" className="transition hover:text-slate-300">Terms of Service</a>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto mt-12 flex max-w-7xl justify-center border-t border-blue-100 pt-8 text-sm text-slate-500">
-        <span>Copyright 2026 ADYAPAN Future Skills Platform. All rights reserved.</span>
-      </div>
-
+      {/* Back to top */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="fixed bottom-4 right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-blue-700 text-white shadow-[0_18px_38px_rgba(37,99,235,0.30)] transition hover:-translate-y-1 hover:bg-cyan-600 sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"
+        className="fixed bottom-5 right-5 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:shadow-cyan-500/30 sm:bottom-8 sm:right-8 sm:h-12 sm:w-12"
         aria-label="Back to top"
       >
-        <ArrowUp className="h-6 w-6" />
+        <ArrowUp className="h-5 w-5" />
       </button>
     </footer>
   );
 }
-
