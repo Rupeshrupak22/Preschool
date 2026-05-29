@@ -539,6 +539,80 @@
       height: 350px;
     }
 
+    /* Orb colors per class */
+    body[data-class="explorers"] .orb-cyan { background: rgba(251,191,36,0.15); }
+    body[data-class="explorers"] .orb-blue { background: rgba(249,115,22,0.12); }
+    body[data-class="explorers"] .orb-pink { background: rgba(34,197,94,0.1); }
+    body[data-class="stars"] .orb-cyan { background: rgba(139,92,246,0.12); }
+    body[data-class="stars"] .orb-blue { background: rgba(236,72,153,0.1); }
+    body[data-class="stars"] .orb-pink { background: rgba(99,102,241,0.08); }
+    body[data-class="builders"] .orb-cyan { background: rgba(8,145,178,0.1); }
+    body[data-class="builders"] .orb-blue { background: rgba(37,99,235,0.1); }
+    body[data-class="builders"] .orb-pink { background: rgba(6,182,212,0.06); }
+
+    /* Background images per class */
+    body[data-class="explorers"] {
+      background-color: #fffbeb;
+    }
+    body[data-class="stars"] {
+      background-color: #f5f0ff;
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-muted: #64748b;
+      color: #0f172a;
+    }
+    body[data-class="builders"] {
+      background-color: #f0f7ff;
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-muted: #64748b;
+      color: #0f172a;
+    }
+
+    /* Video background container — subtle light overlay */
+    .bg-video-wrap {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      overflow: hidden;
+      display: none;
+      opacity: 0.15;
+    }
+    .bg-video-wrap video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    body[data-class="stars"] .bg-video-wrap.bg-video-stars,
+    body[data-class="builders"] .bg-video-wrap.bg-video-builders,
+    body[data-class="explorers"] .bg-video-wrap.bg-video-explorers {
+      display: block;
+    }
+
+    /* Dark overlay for text visibility on video/image */
+    .bg-dark-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+      display: none;
+    }
+    body[data-class="stars"] .bg-dark-overlay {
+      display: none;
+    }
+    body[data-class="builders"] .bg-dark-overlay {
+      display: none;
+    }
+    body[data-class="explorers"] .bg-dark-overlay {
+      display: none;
+    }
+
     /* ==========================================
        3. NAVIGATION BAR
        ========================================== */
@@ -668,7 +742,7 @@
        4. HERO SECTION
        ========================================== */
     .hero-section {
-      padding: 82px 24px 76px;
+      padding: 50px 24px 76px;
       position: relative;
       min-height: calc(100vh - 80px);
       display: flex;
@@ -686,9 +760,7 @@
       height: 100%;
       min-height: 620px;
       transform: translateX(-50%);
-      background:
-        linear-gradient(90deg, rgba(248, 250, 252, 0.9) 0%, rgba(248, 250, 252, 0.72) 42%, rgba(248, 250, 252, 0.86) 100%),
-        url("/our-abstract-bg.svg") center top / cover no-repeat;
+      background: transparent;
       z-index: 0;
       pointer-events: none;
     }
@@ -700,7 +772,7 @@
       width: 100vw;
       height: 160px;
       transform: translateX(-50%);
-      background: linear-gradient(180deg, rgba(248, 250, 252, 0), var(--bg-dark) 76%);
+      background: transparent;
       z-index: 1;
       pointer-events: none;
     }
@@ -1582,7 +1654,7 @@
        SECTION 3: SUBJECT ROADMAPS
        ========================================== */
     .roadmaps-section {
-      background: linear-gradient(180deg, var(--bg-dark), var(--bg-light-dark));
+      background: transparent;
       overflow: hidden;
     }
     .roadmap-selector-wrap {
@@ -1592,13 +1664,13 @@
     }
     .roadmap-track-container {
       width: 100%;
-      overflow-x: auto;
+      overflow: hidden;
       padding: 40px 10px;
       position: relative;
       z-index: 10;
     }
     .roadmap-track-container::-webkit-scrollbar {
-      height: 6px;
+      display: none;
     }
     .roadmap-track-container::-webkit-scrollbar-thumb {
       background: rgba(37, 99, 235, 0.15);
@@ -1607,10 +1679,11 @@
     
     .roadmap-track {
       display: flex;
-      gap: 80px;
+      gap: 60px;
       align-items: center;
-      min-width: max-content;
-      padding: 0 60px;
+      min-width: auto;
+      padding: 0 20px;
+      justify-content: center;
     }
     
     .roadmap-node {
@@ -1738,8 +1811,7 @@
     }
     
     .roadmap-svg-connector {
-      position: absolute;
-      top: 40px;
+      display: none;
       left: 0;
       width: 100%;
       height: 12px;
@@ -1887,7 +1959,7 @@
        SECTION 5: FOCUS MODE & BRAINWAVE SYNC (UNIQUE)
        ========================================== */
     .focus-section {
-      background: radial-gradient(circle at center, #ffffff 0%, var(--bg-dark) 100%);
+      background: transparent;
       position: relative;
     }
     .focus-space-hud {
@@ -2073,7 +2145,7 @@
        SECTION 6: PARENT CONTROL
        ========================================== */
     .parents-section {
-      background: var(--bg-light-dark);
+      background: transparent;
     }
     .parents-dashboard-frame {
       width: 100%;
@@ -2447,7 +2519,7 @@
       padding: 140px 24px;
       position: relative;
       overflow: hidden;
-      background: radial-gradient(circle at center, #eff6ff 0%, var(--bg-dark) 100%);
+      background: transparent;
     }
     .final-cta-content {
       position: relative;
@@ -2776,9 +2848,1109 @@
         justify-content: center;
       }
     }
+
+    /* ==========================================
+       CLASS SELECTOR BAR
+       ========================================== */
+    .class-selector-bar {
+      position: sticky;
+      top: 80px;
+      z-index: 900;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 2px solid var(--cls-accent, rgba(37,99,235,0.18));
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+      transition: border-color 0.4s, background 0.4s;
+    }
+    html.adyapan-embedded .class-selector-bar {
+      top: 0;
+    }
+    .class-selector-inner {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 72px;
+      overflow-x: auto;
+    }
+    .class-selector-label {
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .class-selector-tabs {
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .cls-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: 999px;
+      border: 2px solid transparent;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.28s cubic-bezier(0.34,1.56,0.64,1);
+      white-space: nowrap;
+      background: #f1f5f9;
+      color: var(--text-sub);
+      position: relative;
+      overflow: hidden;
+    }
+    .cls-tab::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+      border-radius: inherit;
+    }
+    .cls-tab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+    /* Explorers tab */
+    .cls-tab[data-cls="explorers"] { border-color: rgba(234,88,12,0.25); }
+    .cls-tab[data-cls="explorers"]:hover { background: rgba(254,215,170,0.5); color: #c2410c; }
+    .cls-tab[data-cls="explorers"].active {
+      background: linear-gradient(135deg, #f97316, #fbbf24);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 8px 24px rgba(249,115,22,0.38);
+      transform: translateY(-3px) scale(1.04);
+    }
+    /* Stars tab */
+    .cls-tab[data-cls="stars"] { border-color: rgba(168,85,247,0.25); }
+    .cls-tab[data-cls="stars"]:hover { background: rgba(233,213,255,0.5); color: #7c3aed; }
+    .cls-tab[data-cls="stars"].active {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 8px 24px rgba(139,92,246,0.38);
+      transform: translateY(-3px) scale(1.04);
+    }
+    /* Builders tab */
+    .cls-tab[data-cls="builders"] { border-color: rgba(37,99,235,0.25); }
+    .cls-tab[data-cls="builders"]:hover { background: rgba(191,219,254,0.5); color: #1d4ed8; }
+    .cls-tab[data-cls="builders"].active {
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 8px 24px rgba(37,99,235,0.38);
+      transform: translateY(-3px) scale(1.04);
+    }
+
+    .cls-tab-emoji { font-size: 1.2rem; }
+    .cls-tab-info { display: flex; flex-direction: column; line-height: 1.1; }
+    .cls-tab-name { font-size: 0.92rem; font-weight: 800; }
+    .cls-tab-range { font-size: 0.68rem; font-weight: 600; opacity: 0.8; letter-spacing: 0.04em; }
+
+    /* Active class indicator strip */
+    .cls-active-strip {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--cls-accent-bg, #e2e8f0);
+      overflow: hidden;
+      min-width: 60px;
+    }
+    .cls-active-strip-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--cls-gradient, linear-gradient(90deg,#2563eb,#06b6d4));
+      width: 100%;
+      transition: background 0.4s;
+    }
+
+    /* ==========================================
+       PER-CLASS THEME OVERRIDES
+       ========================================== */
+
+    /* EXPLORERS (Class 1–5): Warm orange/yellow/green — playful, bright */
+    body[data-class="explorers"] {
+      --blue-accent: #ea580c;
+      --blue-accent-glow: rgba(234,88,12,0.25);
+      --cyan: #d97706;
+      --cyan-glow: rgba(217,119,6,0.2);
+      --glass-border: rgba(234,88,12,0.14);
+      --glass-hover: rgba(234,88,12,0.06);
+      --glass-card-glow: 0 10px 30px -5px rgba(234,88,12,0.1), 0 4px 12px -2px rgba(0,0,0,0.03);
+      --cls-accent: rgba(234,88,12,0.35);
+      --cls-gradient: linear-gradient(90deg,#f97316,#fbbf24);
+      --cls-accent-bg: rgba(254,215,170,0.5);
+      background-color: #fffbf5;
+    }
+    body[data-class="explorers"] .section-tag {
+      color: #c2410c;
+      background: rgba(234,88,12,0.07);
+      border-color: rgba(234,88,12,0.2);
+    }
+    body[data-class="explorers"] .btn-primary {
+      background: linear-gradient(135deg, #f97316, #fbbf24);
+      box-shadow: 0 4px 20px rgba(249,115,22,0.3);
+    }
+    body[data-class="explorers"] .btn-primary:hover {
+      box-shadow: 0 8px 25px rgba(249,115,22,0.45);
+    }
+    body[data-class="explorers"] .btn-secondary {
+      color: #ea580c;
+      border-color: rgba(234,88,12,0.25);
+    }
+    body[data-class="explorers"] .arcade-tab-btn.active,
+    body[data-class="explorers"] .arcade-tab-btn:hover,
+    body[data-class="explorers"] .planner-tab-btn.active,
+    body[data-class="explorers"] .planner-tab-btn:hover {
+      background: linear-gradient(135deg, #f97316, #fbbf24);
+      border-color: #f97316;
+      box-shadow: 0 4px 12px rgba(249,115,22,0.3);
+    }
+    body[data-class="explorers"] .phone-radial-bar { stroke: #f97316; }
+    body[data-class="explorers"] .progress-bar-fill { background: linear-gradient(90deg,#f97316,#fbbf24,#16a34a); }
+    body[data-class="explorers"] .engine-status { background: rgba(234,88,12,0.08); border-color: rgba(234,88,12,0.3); color: #ea580c; }
+    body[data-class="explorers"] .engine-pulse { background: #ea580c; box-shadow: 0 0 8px #ea580c; }
+    body[data-class="explorers"] .roadmap-node.unlocked .node-circle { border-color: #f97316; color: #f97316; box-shadow: 0 0 20px rgba(249,115,22,0.3); }
+    body[data-class="explorers"] .chart-line-path { stroke: #f97316; }
+    body[data-class="explorers"] .chart-dot { fill: #fbbf24; }
+    body[data-class="explorers"] .chart-pill.active, body[data-class="explorers"] .chart-pill:hover { background: #f97316; }
+    body[data-class="explorers"] .freeze-btn-interactive { background: linear-gradient(135deg,#f97316,#fbbf24); }
+    body[data-class="explorers"] .pomo-btn-main { background: linear-gradient(135deg,#f97316,#fbbf24); }
+    body[data-class="explorers"] .hero-badge { border-color: rgba(234,88,12,0.2); color: #ea580c; }
+    body[data-class="explorers"] .hero-badge span { color: #d97706; }
+    body[data-class="explorers"] .class-selector-bar { background: rgba(255,251,245,0.94); }
+    body[data-class="explorers"] .section-container { background: transparent; }
+    body[data-class="explorers"] .roadmaps-section { background: transparent; }
+    body[data-class="explorers"] .parents-section { background: transparent; }
+    body[data-class="explorers"] .focus-section { background: transparent; }
+    body[data-class="explorers"] .feature-card.f-purple { border-color: rgba(234,88,12,0.2); }
+    body[data-class="explorers"] .feature-card.f-purple .feature-icon-box { background: rgba(234,88,12,0.08); color: #ea580c; }
+    body[data-class="explorers"] .feature-card.f-cyan .feature-icon-box { background: rgba(217,119,6,0.08); color: #d97706; }
+    body[data-class="explorers"] .arcade-title { color: #ea580c; }
+    body[data-class="explorers"] .quiz-option:hover { border-color: #f97316; color: #ea580c; }
+    body[data-class="explorers"] .todo-tag { background: rgba(234,88,12,0.08); color: #ea580c; border-color: rgba(234,88,12,0.2); }
+    body[data-class="explorers"] .parent-slider::-webkit-slider-thumb { background: #f97316; box-shadow: 0 0 8px rgba(249,115,22,0.4); }
+    body[data-class="explorers"] .pin-dot.filled { background: #f97316; border-color: #f97316; box-shadow: 0 0 8px rgba(249,115,22,0.4); }
+    body[data-class="explorers"] .numpad-btn:hover { border-color: #f97316; }
+    body[data-class="explorers"] .toggle-switch input:checked + .toggle-slider { background-color: #f97316; }
+    body[data-class="explorers"] .final-cta-section { background: transparent; }
+    body[data-class="explorers"] .final-cta-title { background: linear-gradient(135deg,#ea580c,#d97706); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    body[data-class="explorers"] .badge-btn { border-color: rgba(234,88,12,0.25); }
+    body[data-class="explorers"] .badge-btn:hover { background: rgba(234,88,12,0.06); border-color: #f97316; }
+    body[data-class="explorers"] ::-webkit-scrollbar-thumb { background: rgba(234,88,12,0.2); }
+    body[data-class="explorers"] ::-webkit-scrollbar-thumb:hover { background: #f97316; box-shadow: 0 0 10px rgba(249,115,22,0.3); }
+
+    /* RISING STARS (Class 6–8): Purple/pink/violet — energetic, creative */
+    body[data-class="stars"] {
+      --blue-accent: #7c3aed;
+      --blue-accent-glow: rgba(124,58,237,0.25);
+      --cyan: #db2777;
+      --cyan-glow: rgba(219,39,119,0.2);
+      --glass-bg: rgba(255,255,255,0.75);
+      --glass-border: rgba(124,58,237,0.14);
+      --glass-hover: rgba(124,58,237,0.06);
+      --glass-card-glow: 0 10px 30px -5px rgba(124,58,237,0.1), 0 4px 12px -2px rgba(0,0,0,0.03);
+      --cls-accent: rgba(124,58,237,0.35);
+      --cls-gradient: linear-gradient(90deg,#8b5cf6,#ec4899);
+      --cls-accent-bg: rgba(233,213,255,0.5);
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-muted: #64748b;
+      background-color: #f5f0ff;
+    }
+    body[data-class="stars"] .section-tag {
+      color: #7c3aed;
+      background: rgba(124,58,237,0.07);
+      border-color: rgba(124,58,237,0.2);
+    }
+    body[data-class="stars"] .btn-primary {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      box-shadow: 0 4px 20px rgba(139,92,246,0.3);
+    }
+    body[data-class="stars"] .btn-primary:hover {
+      box-shadow: 0 8px 25px rgba(139,92,246,0.45);
+    }
+    body[data-class="stars"] .btn-secondary {
+      color: #7c3aed;
+      border-color: rgba(124,58,237,0.25);
+    }
+    body[data-class="stars"] .arcade-tab-btn.active,
+    body[data-class="stars"] .arcade-tab-btn:hover,
+    body[data-class="stars"] .planner-tab-btn.active,
+    body[data-class="stars"] .planner-tab-btn:hover {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      border-color: #8b5cf6;
+      box-shadow: 0 4px 12px rgba(139,92,246,0.3);
+    }
+    body[data-class="stars"] .phone-radial-bar { stroke: #8b5cf6; }
+    body[data-class="stars"] .progress-bar-fill { background: linear-gradient(90deg,#8b5cf6,#ec4899,#db2777); }
+    body[data-class="stars"] .engine-status { background: rgba(124,58,237,0.08); border-color: rgba(124,58,237,0.3); color: #7c3aed; }
+    body[data-class="stars"] .engine-pulse { background: #7c3aed; box-shadow: 0 0 8px #7c3aed; }
+    body[data-class="stars"] .roadmap-node.unlocked .node-circle { border-color: #8b5cf6; color: #8b5cf6; box-shadow: 0 0 20px rgba(139,92,246,0.3); }
+    body[data-class="stars"] .chart-line-path { stroke: #8b5cf6; }
+    body[data-class="stars"] .chart-dot { fill: #ec4899; }
+    body[data-class="stars"] .chart-pill.active, body[data-class="stars"] .chart-pill:hover { background: #8b5cf6; }
+    body[data-class="stars"] .freeze-btn-interactive { background: linear-gradient(135deg,#8b5cf6,#ec4899); }
+    body[data-class="stars"] .pomo-btn-main { background: linear-gradient(135deg,#8b5cf6,#ec4899); }
+    body[data-class="stars"] .hero-badge { border-color: rgba(124,58,237,0.2); color: #7c3aed; }
+    body[data-class="stars"] .hero-badge span { color: #db2777; }
+    body[data-class="stars"] .class-selector-bar { background: rgba(253,248,255,0.94); }
+    body[data-class="stars"] .roadmaps-section { background: transparent; }
+    body[data-class="stars"] .parents-section { background: transparent; }
+    body[data-class="stars"] .focus-section { background: transparent; }
+    body[data-class="stars"] .feature-card.f-purple .feature-icon-box { background: rgba(124,58,237,0.08); color: #7c3aed; }
+    body[data-class="stars"] .feature-card.f-cyan .feature-icon-box { background: rgba(219,39,119,0.08); color: #db2777; }
+    body[data-class="stars"] .arcade-title { color: #7c3aed; }
+    body[data-class="stars"] .quiz-option:hover { border-color: #8b5cf6; color: #7c3aed; }
+    body[data-class="stars"] .todo-tag { background: rgba(124,58,237,0.08); color: #7c3aed; border-color: rgba(124,58,237,0.2); }
+    body[data-class="stars"] .parent-slider::-webkit-slider-thumb { background: #8b5cf6; box-shadow: 0 0 8px rgba(139,92,246,0.4); }
+    body[data-class="stars"] .pin-dot.filled { background: #8b5cf6; border-color: #8b5cf6; box-shadow: 0 0 8px rgba(139,92,246,0.4); }
+    body[data-class="stars"] .numpad-btn:hover { border-color: #8b5cf6; }
+    body[data-class="stars"] .toggle-switch input:checked + .toggle-slider { background-color: #8b5cf6; }
+    body[data-class="stars"] .final-cta-section { background: transparent; }
+    body[data-class="stars"] .final-cta-title { background: linear-gradient(135deg,#7c3aed,#db2777); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    body[data-class="stars"] .badge-btn { border-color: rgba(124,58,237,0.25); }
+    body[data-class="stars"] .badge-btn:hover { background: rgba(124,58,237,0.06); border-color: #8b5cf6; }
+    body[data-class="stars"] ::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.2); }
+    body[data-class="stars"] ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; box-shadow: 0 0 10px rgba(139,92,246,0.3); }
+
+    /* FUTURE BUILDERS (Class 9–12): Deep blue/cyan/teal — professional, tech */
+    body[data-class="builders"] {
+      --blue-accent: #2563eb;
+      --blue-accent-glow: rgba(37,99,235,0.25);
+      --cyan: #0891b2;
+      --cyan-glow: rgba(8,145,178,0.2);
+      --glass-bg: rgba(255,255,255,0.75);
+      --glass-border: rgba(37,99,235,0.14);
+      --glass-hover: rgba(37,99,235,0.06);
+      --glass-card-glow: 0 10px 30px -5px rgba(37,99,235,0.1), 0 4px 12px -2px rgba(0,0,0,0.03);
+      --cls-accent: rgba(37,99,235,0.35);
+      --cls-gradient: linear-gradient(90deg,#2563eb,#06b6d4);
+      --cls-accent-bg: rgba(191,219,254,0.5);
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-muted: #64748b;
+      background-color: #f0f7ff;
+    }
+    body[data-class="builders"] .section-tag {
+      color: #1d4ed8;
+      background: rgba(37,99,235,0.07);
+      border-color: rgba(37,99,235,0.2);
+    }
+    body[data-class="builders"] .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+      box-shadow: 0 4px 20px rgba(37,99,235,0.3);
+    }
+    body[data-class="builders"] .btn-primary:hover {
+      box-shadow: 0 8px 25px rgba(37,99,235,0.45);
+    }
+    body[data-class="builders"] .progress-bar-fill { background: linear-gradient(90deg,#2563eb,#0891b2,#0f766e); }
+    body[data-class="builders"] .final-cta-section { background: transparent; }
+    body[data-class="builders"] .final-cta-title { background: linear-gradient(135deg,#1d4ed8,#0891b2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    body[data-class="builders"] .roadmaps-section { background: transparent; }
+    body[data-class="builders"] .parents-section { background: transparent; }
+
+    /* ==========================================
+       PER-CLASS PHONE MOCKUP THEME OVERRIDES
+       ========================================== */
+
+    /* Additional keyframes for class themes */
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+    @keyframes rainbow-border {
+      0% { border-color: #f97316; }
+      25% { border-color: #fbbf24; }
+      50% { border-color: #22c55e; }
+      75% { border-color: #06b6d4; }
+      100% { border-color: #f97316; }
+    }
+    @keyframes neon-pulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(139,92,246,0.3), 0 0 40px rgba(236,72,153,0.2), 0 30px 70px -10px rgba(139,92,246,0.3); }
+      50% { box-shadow: 0 0 40px rgba(139,92,246,0.5), 0 0 80px rgba(236,72,153,0.3), 0 30px 70px -10px rgba(139,92,246,0.3); }
+    }
+    @keyframes sparkle-float {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; }
+      50% { transform: translateY(-10px) scale(1.2); opacity: 1; }
+    }
+    /* ─── EXPLORERS (Class 1–5): Cartoon, bubbly, rainbow, fun ─── */
+    body[data-class="explorers"] .phone-mockup-3d {
+      border-color: #fdba74;
+      border-width: 16px;
+      border-radius: 52px;
+      background: #fffbeb;
+      box-shadow: 0 30px 70px -10px rgba(249,115,22,0.25),
+                  0 0 0 6px rgba(251,191,36,0.4),
+                  0 0 0 12px rgba(34,197,94,0.15),
+                  0 0 50px rgba(249,115,22,0.2);
+      transform: perspective(1000px) rotateY(-4deg) rotateX(4deg) rotateZ(0deg);
+      animation: rainbow-border 4s linear infinite, float-slow 6s ease-in-out infinite;
+    }
+    body[data-class="explorers"] .phone-mockup-3d:hover {
+      transform: perspective(1000px) rotateY(0deg) rotateX(0deg) rotateZ(0deg) scale(1.05);
+      box-shadow: 0 40px 90px -10px rgba(249,115,22,0.35),
+                  0 0 0 6px rgba(251,191,36,0.6),
+                  0 0 0 12px rgba(34,197,94,0.25);
+    }
+    body[data-class="explorers"] .phone-notch {
+      background: linear-gradient(90deg, #fdba74, #fbbf24, #4ade80);
+      border-bottom-left-radius: 26px;
+      border-bottom-right-radius: 26px;
+      height: 28px;
+    }
+    body[data-class="explorers"] .phone-camera {
+      background: #fff;
+      width: 10px;
+      height: 10px;
+      box-shadow: 0 0 6px rgba(251,191,36,0.5);
+    }
+    body[data-class="explorers"] .phone-screen {
+      background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 50%, #fff7ed 100%);
+      font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, var(--font-sans);
+    }
+    body[data-class="explorers"] .phone-card {
+      background: linear-gradient(135deg, #fff7ed, #fef9c3);
+      border: 2.5px dashed rgba(249,115,22,0.3);
+      border-radius: 22px;
+      box-shadow: 0 4px 12px rgba(251,191,36,0.1);
+    }
+    body[data-class="explorers"] .phone-username {
+      font-family: 'Comic Sans MS', cursive;
+      color: #ea580c;
+    }
+    body[data-class="explorers"] .phone-xp {
+      background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(251,191,36,0.15));
+      border: 2px solid rgba(34,197,94,0.4);
+      color: #16a34a;
+      border-radius: 14px;
+      font-weight: 900;
+      padding: 4px 10px;
+    }
+    body[data-class="explorers"] .phone-card-title {
+      font-family: 'Comic Sans MS', cursive;
+      color: #ea580c;
+    }
+    body[data-class="explorers"] .phone-card-content {
+      font-family: 'Comic Sans MS', cursive !important;
+    }
+    body[data-class="explorers"] .phone-button {
+      background: linear-gradient(135deg, #f97316, #fbbf24, #22c55e);
+      border-radius: 18px;
+      font-family: 'Comic Sans MS', cursive;
+      font-weight: 900;
+      padding: 12px;
+      box-shadow: 0 6px 20px rgba(249,115,22,0.3);
+    }
+    body[data-class="explorers"] .phone-avatar {
+      background: linear-gradient(135deg, #fbbf24, #f97316);
+      box-shadow: 0 4px 12px rgba(251,191,36,0.4);
+    }
+    body[data-class="explorers"] .section-phone-mockup {
+      border-color: #fdba74 !important;
+      border-width: 14px;
+      border-radius: 48px;
+      background: #fffbeb;
+      box-shadow: 0 25px 55px rgba(249,115,22,0.15),
+                  0 0 0 5px rgba(251,191,36,0.3);
+      animation: rainbow-border 4s linear infinite;
+    }
+    body[data-class="explorers"] .section-phone-mockup .phone-screen {
+      background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 50%, #fff7ed 100%);
+      font-family: 'Comic Sans MS', cursive, var(--font-sans);
+    }
+    body[data-class="explorers"] .section-phone-mockup .phone-notch {
+      background: linear-gradient(90deg, #fdba74, #fbbf24, #4ade80);
+    }
+    body[data-class="explorers"] .section-phone-mockup .phone-card {
+      background: linear-gradient(135deg, #fff7ed, #fef9c3);
+      border: 2.5px dashed rgba(249,115,22,0.3);
+      border-radius: 22px;
+    }
+
+    /* ─── STARS (Class 6–8): Neon glow, gradient, energetic ─── */
+    body[data-class="stars"] .phone-mockup-3d {
+      border: 4px solid transparent;
+      border-radius: 44px;
+      background: #fdf4ff;
+      outline: 8px solid rgba(139,92,246,0.25);
+      box-shadow: 0 30px 70px -10px rgba(139,92,246,0.3),
+                  0 0 60px rgba(236,72,153,0.2),
+                  inset 0 0 30px rgba(139,92,246,0.05);
+      transform: perspective(1000px) rotateY(-8deg) rotateX(6deg) rotateZ(1deg);
+      animation: neon-pulse 3s ease-in-out infinite, float-slow 7s ease-in-out infinite;
+    }
+    body[data-class="stars"] .phone-mockup-3d:hover {
+      transform: perspective(1000px) rotateY(0deg) rotateX(0deg) rotateZ(0deg) scale(1.04);
+      box-shadow: 0 40px 90px -10px rgba(139,92,246,0.4),
+                  0 0 80px rgba(236,72,153,0.3);
+      outline-color: rgba(139,92,246,0.4);
+    }
+    body[data-class="stars"] .phone-notch {
+      background: linear-gradient(90deg, #a78bfa, #f472b6, #818cf8);
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+      height: 26px;
+    }
+    body[data-class="stars"] .phone-camera {
+      background: rgba(255,255,255,0.7);
+      box-shadow: 0 0 8px rgba(236,72,153,0.5);
+    }
+    body[data-class="stars"] .phone-screen {
+      background: linear-gradient(180deg, #faf5ff 0%, #fdf2f8 50%, #eef2ff 100%);
+    }
+    body[data-class="stars"] .phone-card {
+      background: rgba(250,245,255,0.9);
+      border: 1.5px solid rgba(139,92,246,0.2);
+      border-radius: 18px;
+      box-shadow: 0 4px 16px rgba(139,92,246,0.08);
+    }
+    body[data-class="stars"] .phone-username { color: #7c3aed; font-weight: 800; }
+    body[data-class="stars"] .phone-xp {
+      background: linear-gradient(135deg, rgba(236,72,153,0.12), rgba(139,92,246,0.12));
+      border: 1.5px solid rgba(236,72,153,0.35);
+      color: #db2777;
+    }
+    body[data-class="stars"] .phone-card-title { color: #7c3aed; }
+    body[data-class="stars"] .phone-button {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899, #6366f1);
+      border-radius: 14px;
+      box-shadow: 0 6px 24px rgba(139,92,246,0.35);
+    }
+    body[data-class="stars"] .phone-avatar {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      box-shadow: 0 4px 12px rgba(139,92,246,0.4);
+    }
+    body[data-class="stars"] .section-phone-mockup {
+      border: none !important;
+      outline: 6px solid rgba(139,92,246,0.25);
+      border-radius: 42px;
+      background: #fdf4ff;
+      box-shadow: 0 25px 55px rgba(139,92,246,0.2), 0 0 50px rgba(236,72,153,0.15);
+      animation: neon-pulse 3s ease-in-out infinite;
+    }
+    body[data-class="stars"] .section-phone-mockup .phone-screen {
+      background: linear-gradient(180deg, #faf5ff 0%, #fdf2f8 50%, #eef2ff 100%);
+    }
+    body[data-class="stars"] .section-phone-mockup .phone-notch {
+      background: linear-gradient(90deg, #a78bfa, #f472b6, #818cf8);
+    }
+    body[data-class="stars"] .section-phone-mockup .phone-card {
+      background: rgba(250,245,255,0.9);
+      border: 1.5px solid rgba(139,92,246,0.15);
+      border-radius: 18px;
+    }
+
+    /* ─── BUILDERS (Class 9–12): Dark mode, sleek, professional ─── */
+    body[data-class="builders"] .phone-mockup-3d {
+      border: 3px solid #1e3a5f;
+      border-radius: 36px;
+      background: #0f172a;
+      box-shadow: 0 30px 70px -10px rgba(15,23,42,0.4),
+                  0 0 0 1px rgba(37,99,235,0.2),
+                  0 0 40px rgba(37,99,235,0.1);
+      transform: perspective(1000px) rotateY(-10deg) rotateX(10deg) rotateZ(2deg);
+    }
+    body[data-class="builders"] .phone-mockup-3d:hover {
+      transform: perspective(1000px) rotateY(0deg) rotateX(0deg) rotateZ(0deg) scale(1.04);
+      box-shadow: 0 40px 90px -10px rgba(15,23,42,0.5),
+                  0 0 0 1px rgba(37,99,235,0.4),
+                  0 0 60px rgba(37,99,235,0.2);
+    }
+    body[data-class="builders"] .phone-notch { background: #1e293b; height: 24px; }
+    body[data-class="builders"] .phone-camera { background: #334155; box-shadow: 0 0 4px rgba(37,99,235,0.3); }
+    body[data-class="builders"] .phone-screen {
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+      color: #e2e8f0;
+    }
+    body[data-class="builders"] .phone-card {
+      background: rgba(30,41,59,0.8);
+      border: 1px solid rgba(37,99,235,0.2);
+      border-radius: 14px;
+    }
+    body[data-class="builders"] .phone-card-title { color: #94a3b8 !important; }
+    body[data-class="builders"] .phone-card-content { color: #60a5fa !important; }
+    body[data-class="builders"] .phone-username { color: #e2e8f0; }
+    body[data-class="builders"] .phone-xp {
+      background: rgba(37,99,235,0.15);
+      border: 1px solid rgba(37,99,235,0.4);
+      color: #60a5fa;
+    }
+    body[data-class="builders"] .phone-button {
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+    }
+    body[data-class="builders"] .phone-avatar { background: linear-gradient(135deg, #2563eb, #0891b2); }
+    body[data-class="builders"] .phone-radial-bg { stroke: #1e293b !important; }
+    body[data-class="builders"] .phone-radial-bar { stroke: #2563eb !important; }
+    body[data-class="builders"] .phone-radial-text { color: #e2e8f0 !important; }
+    body[data-class="builders"] .section-phone-mockup {
+      border: 3px solid #1e3a5f !important;
+      border-radius: 34px;
+      background: #0f172a;
+      box-shadow: 0 25px 55px rgba(15,23,42,0.35), 0 0 30px rgba(37,99,235,0.1);
+    }
+    body[data-class="builders"] .section-phone-mockup .phone-screen {
+      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+      color: #e2e8f0;
+    }
+    body[data-class="builders"] .section-phone-mockup .phone-notch { background: #1e293b; }
+    body[data-class="builders"] .section-phone-mockup .phone-card {
+      background: rgba(30,41,59,0.8) !important;
+      border: 1px solid rgba(37,99,235,0.15) !important;
+      border-radius: 14px;
+    }
+
+    /* ─── EXPLORERS: Fun floating decorations around phone ─── */
+    body[data-class="explorers"] .hero-graphics::before {
+      content: '🌈';
+      position: absolute;
+      top: -35px;
+      right: 15px;
+      font-size: 3rem;
+      animation: float-medium 4s ease-in-out infinite;
+      z-index: 20;
+    }
+    body[data-class="explorers"] .hero-graphics::after {
+      content: '🦋';
+      position: absolute;
+      bottom: 15px;
+      right: -15px;
+      font-size: 2.5rem;
+      animation: wiggle 2s ease-in-out infinite;
+      z-index: 20;
+    }
+    body[data-class="explorers"] .h-rocket { font-size: 0; }
+    body[data-class="explorers"] .h-rocket::before { content: '🎨'; font-size: 2.8rem; }
+    body[data-class="explorers"] .h-book { font-size: 0; }
+    body[data-class="explorers"] .h-book::before { content: '🧸'; font-size: 2.8rem; }
+    body[data-class="explorers"] .h-star { font-size: 0; }
+    body[data-class="explorers"] .h-star::before { content: '🌻'; font-size: 2.8rem; }
+    body[data-class="explorers"] .h-trophy { font-size: 0; }
+    body[data-class="explorers"] .h-trophy::before { content: '🎪'; font-size: 2.8rem; }
+
+    /* ─── STARS: Sparkle decorations ─── */
+    body[data-class="stars"] .hero-graphics::before {
+      content: '✨';
+      position: absolute;
+      top: -25px;
+      right: 25px;
+      font-size: 2.5rem;
+      animation: sparkle-float 2s ease-in-out infinite;
+      z-index: 20;
+    }
+    body[data-class="stars"] .hero-graphics::after {
+      content: '💫';
+      position: absolute;
+      bottom: 25px;
+      left: -15px;
+      font-size: 2.2rem;
+      animation: float-medium 5s ease-in-out infinite;
+      z-index: 20;
+    }
+
+    /* ─── Hero backgrounds — transparent to show body bg image ─── */
+
+    /* ─── "Ecosystem" word gradient per class ─── */
+    body[data-class="explorers"] .hero-title span {
+      background: linear-gradient(135deg, #f97316 0%, #eab308 40%, #22c55e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 3px 12px rgba(249,115,22,0.3));
+    }
+    body[data-class="stars"] .hero-title span {
+      background: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #6366f1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 3px 12px rgba(168,85,247,0.3));
+    }
+    body[data-class="builders"] .hero-title span {
+      background: linear-gradient(135deg, #2563eb 0%, #0891b2 50%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 3px 12px rgba(37,99,235,0.3));
+    }
+
+    /* ─── Fix content blending — stronger text contrast ─── */
+    body[data-class="explorers"] .hero-subtitle { color: #78350f; background: rgba(255,251,235,0.88); border-color: rgba(249,115,22,0.2); }
+    body[data-class="explorers"] .hero-subtitle strong { color: #ea580c; }
+    body[data-class="explorers"] .section-subtitle { color: #78350f; }
+    body[data-class="explorers"] .section-title { color: #431407; }
+    body[data-class="stars"] .hero-subtitle { color: #4c1d95; background: rgba(253,244,255,0.88); border-color: rgba(139,92,246,0.2); }
+    body[data-class="stars"] .section-subtitle { color: #4c1d95; }
+    body[data-class="stars"] .section-title { color: #2e1065; }
+    body[data-class="builders"] .hero-subtitle { color: #1e3a8a; background: rgba(240,249,255,0.88); border-color: rgba(37,99,235,0.15); }
+    body[data-class="builders"] .section-subtitle { color: #1e3a8a; }
+    body[data-class="builders"] .section-title { color: #0f172a; }
+
+    /* ─── Animated background shapes per class ─── */
+    .cls-bg-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .cls-bg-shapes .shape {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity 0.6s;
+    }
+    /* Explorers animated shapes */
+    body[data-class="explorers"] .cls-bg-shapes .shape { opacity: 1; }
+    body[data-class="explorers"] .cls-bg-shapes .shape-1 {
+      width: 300px; height: 300px;
+      top: 10%; left: -5%;
+      background: radial-gradient(circle, rgba(251,191,36,0.2) 0%, transparent 70%);
+      animation: float-slow 8s ease-in-out infinite;
+    }
+    body[data-class="explorers"] .cls-bg-shapes .shape-2 {
+      width: 250px; height: 250px;
+      top: 50%; right: -3%;
+      background: radial-gradient(circle, rgba(34,197,94,0.18) 0%, transparent 70%);
+      animation: float-medium 10s ease-in-out infinite;
+    }
+    body[data-class="explorers"] .cls-bg-shapes .shape-3 {
+      width: 200px; height: 200px;
+      bottom: 15%; left: 20%;
+      background: radial-gradient(circle, rgba(249,115,22,0.15) 0%, transparent 70%);
+      animation: float-slow 12s ease-in-out infinite;
+    }
+    body[data-class="explorers"] .cls-bg-shapes .shape-4 {
+      width: 150px; height: 150px;
+      top: 30%; left: 40%;
+      background: radial-gradient(circle, rgba(236,72,153,0.12) 0%, transparent 70%);
+      animation: float-medium 9s ease-in-out infinite;
+    }
+    /* Stars animated shapes */
+    body[data-class="stars"] .cls-bg-shapes .shape { opacity: 1; }
+    body[data-class="stars"] .cls-bg-shapes .shape-1 {
+      width: 350px; height: 350px;
+      top: 5%; right: -5%;
+      background: radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%);
+      animation: float-medium 7s ease-in-out infinite;
+    }
+    body[data-class="stars"] .cls-bg-shapes .shape-2 {
+      width: 280px; height: 280px;
+      bottom: 10%; left: -3%;
+      background: radial-gradient(circle, rgba(236,72,153,0.18) 0%, transparent 70%);
+      animation: float-slow 9s ease-in-out infinite;
+    }
+    body[data-class="stars"] .cls-bg-shapes .shape-3 {
+      width: 220px; height: 220px;
+      top: 40%; left: 30%;
+      background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+      animation: float-medium 11s ease-in-out infinite;
+    }
+    body[data-class="stars"] .cls-bg-shapes .shape-4 {
+      width: 180px; height: 180px;
+      top: 60%; right: 20%;
+      background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, transparent 70%);
+      animation: float-slow 8s ease-in-out infinite;
+    }
+    /* Builders animated shapes */
+    body[data-class="builders"] .cls-bg-shapes .shape { opacity: 1; }
+    body[data-class="builders"] .cls-bg-shapes .shape-1 {
+      width: 400px; height: 400px;
+      top: 8%; left: -8%;
+      background: radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%);
+      animation: float-slow 10s ease-in-out infinite;
+    }
+    body[data-class="builders"] .cls-bg-shapes .shape-2 {
+      width: 300px; height: 300px;
+      bottom: 5%; right: -5%;
+      background: radial-gradient(circle, rgba(8,145,178,0.12) 0%, transparent 70%);
+      animation: float-medium 12s ease-in-out infinite;
+    }
+    body[data-class="builders"] .cls-bg-shapes .shape-3 {
+      width: 250px; height: 250px;
+      top: 45%; right: 25%;
+      background: radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%);
+      animation: float-slow 9s ease-in-out infinite;
+    }
+    body[data-class="builders"] .cls-bg-shapes .shape-4 {
+      width: 180px; height: 180px;
+      top: 20%; left: 35%;
+      background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%);
+      animation: float-medium 7s ease-in-out infinite;
+    }
+
+    /* ─── Animated floating icons per class (background decoration) ─── */
+    .cls-floating-icons {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .cls-floating-icons .ficon {
+      position: absolute;
+      font-size: 2.5rem;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    body[data-class="explorers"] .cls-floating-icons .ficon { opacity: 0.15; }
+    body[data-class="explorers"] .cls-floating-icons .ficon-1 { top: 12%; left: 8%; animation: float-slow 7s ease-in-out infinite; }
+    body[data-class="explorers"] .cls-floating-icons .ficon-2 { top: 25%; right: 12%; animation: float-medium 9s ease-in-out infinite; }
+    body[data-class="explorers"] .cls-floating-icons .ficon-3 { top: 55%; left: 5%; animation: float-slow 11s ease-in-out infinite; }
+    body[data-class="explorers"] .cls-floating-icons .ficon-4 { top: 70%; right: 8%; animation: float-medium 8s ease-in-out infinite; }
+    body[data-class="explorers"] .cls-floating-icons .ficon-5 { top: 85%; left: 25%; animation: float-slow 10s ease-in-out infinite; }
+    body[data-class="explorers"] .cls-floating-icons .ficon-6 { top: 40%; left: 50%; animation: float-medium 6s ease-in-out infinite; }
+
+    body[data-class="stars"] .cls-floating-icons .ficon { opacity: 0.12; }
+    body[data-class="stars"] .cls-floating-icons .ficon-1 { top: 15%; right: 10%; animation: sparkle-float 5s ease-in-out infinite; }
+    body[data-class="stars"] .cls-floating-icons .ficon-2 { top: 35%; left: 7%; animation: sparkle-float 7s ease-in-out infinite 1s; }
+    body[data-class="stars"] .cls-floating-icons .ficon-3 { top: 60%; right: 15%; animation: sparkle-float 6s ease-in-out infinite 0.5s; }
+    body[data-class="stars"] .cls-floating-icons .ficon-4 { top: 80%; left: 20%; animation: sparkle-float 8s ease-in-out infinite 1.5s; }
+    body[data-class="stars"] .cls-floating-icons .ficon-5 { top: 45%; left: 45%; animation: sparkle-float 9s ease-in-out infinite 2s; }
+    body[data-class="stars"] .cls-floating-icons .ficon-6 { top: 20%; left: 30%; animation: sparkle-float 7s ease-in-out infinite 0.8s; }
+
+    body[data-class="builders"] .cls-floating-icons .ficon { opacity: 0.08; }
+    body[data-class="builders"] .cls-floating-icons .ficon-1 { top: 10%; left: 12%; animation: float-slow 12s ease-in-out infinite; }
+    body[data-class="builders"] .cls-floating-icons .ficon-2 { top: 30%; right: 8%; animation: float-slow 14s ease-in-out infinite; }
+    body[data-class="builders"] .cls-floating-icons .ficon-3 { top: 55%; left: 6%; animation: float-slow 10s ease-in-out infinite; }
+    body[data-class="builders"] .cls-floating-icons .ficon-4 { top: 75%; right: 12%; animation: float-slow 11s ease-in-out infinite; }
+    body[data-class="builders"] .cls-floating-icons .ficon-5 { top: 42%; left: 40%; animation: float-slow 13s ease-in-out infinite; }
+    body[data-class="builders"] .cls-floating-icons .ficon-6 { top: 65%; left: 55%; animation: float-slow 9s ease-in-out infinite; }
+
+    /* ─── EXPLORERS: Playful rounded cards & fonts ─── */
+    body[data-class="explorers"] .feature-card { border-radius: 28px; border: 2.5px dashed rgba(249,115,22,0.25); }
+    body[data-class="explorers"] .feature-card:hover { border-style: solid; border-color: #f97316; box-shadow: 0 15px 40px rgba(249,115,22,0.18); transform: translateY(-10px) rotate(-1deg); }
+    body[data-class="explorers"] .feature-icon-box { border-radius: 22px; background: linear-gradient(135deg, #fff7ed, #fef9c3) !important; border: 2px dashed rgba(249,115,22,0.25) !important; }
+    body[data-class="explorers"] .glass-panel { border-radius: 28px; border: 2.5px dashed rgba(249,115,22,0.2); background: rgba(255,251,235,0.85); }
+    body[data-class="explorers"] .arcade-console { border-radius: 28px; border: 2.5px dashed rgba(249,115,22,0.3); }
+    body[data-class="explorers"] .hero-title { font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, var(--font-rounded); font-size: clamp(2.6rem, 4vw, 4rem); }
+    body[data-class="explorers"] .hero-subtitle { border-radius: 28px; border: 2.5px dashed rgba(249,115,22,0.2); background: rgba(255,251,235,0.75); font-family: 'Comic Sans MS', cursive, var(--font-sans); }
+    body[data-class="explorers"] .section-title { font-family: 'Comic Sans MS', cursive, var(--font-rounded); }
+    body[data-class="explorers"] .btn { border-radius: 22px; font-family: 'Comic Sans MS', cursive, var(--font-rounded); }
+
+    /* ─── STARS: Gradient glow cards ─── */
+    body[data-class="stars"] .feature-card { border-radius: 22px; border-color: rgba(139,92,246,0.18); }
+    body[data-class="stars"] .feature-card:hover { border-color: #8b5cf6; box-shadow: 0 15px 40px rgba(139,92,246,0.15), 0 0 30px rgba(236,72,153,0.1); transform: translateY(-8px); }
+    body[data-class="stars"] .glass-panel { border-radius: 22px; border-color: rgba(139,92,246,0.18); background: rgba(253,244,255,0.8); }
+    body[data-class="stars"] .arcade-console { border-radius: 22px; border-color: rgba(139,92,246,0.22); }
+    body[data-class="stars"] .hero-subtitle { border-radius: 22px; border-color: rgba(139,92,246,0.2); background: rgba(253,244,255,0.65); }
+
+    /* ─── BUILDERS: Sharp minimal cards ─── */
+    body[data-class="builders"] .feature-card { border-radius: 14px; border-color: rgba(37,99,235,0.12); }
+    body[data-class="builders"] .feature-card:hover { border-color: #2563eb; box-shadow: 0 15px 35px rgba(37,99,235,0.12); }
+    body[data-class="builders"] .glass-panel { border-radius: 18px; border-color: rgba(37,99,235,0.12); }
+    body[data-class="builders"] .arcade-console { border-radius: 18px; border-color: rgba(37,99,235,0.15); }
+    body[data-class="builders"] .hero-subtitle { border-radius: 16px; border-color: rgba(37,99,235,0.15); background: rgba(240,249,255,0.6); }
+
+    /* Class banner shown below selector */
+    .cls-banner {
+      display: none;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 24px;
+      border-radius: 16px;
+      margin: 0 auto 0;
+      max-width: 1300px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      animation: pop-in 0.35s ease;
+    }
+    .cls-banner.visible { display: flex; }
+    .cls-banner-emoji { font-size: 2rem; }
+    .cls-banner-text strong { display: block; font-size: 1.1rem; }
+    .cls-banner-text span { font-size: 0.82rem; opacity: 0.8; }
+    .cls-banner-badge {
+      margin-left: auto;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.5);
+      border: 1.5px solid rgba(255,255,255,0.7);
+    }
+
+    /* Explorers banner */
+    body[data-class="explorers"] .cls-banner {
+      background: linear-gradient(135deg, rgba(254,215,170,0.7), rgba(254,240,138,0.5));
+      border: 1.5px solid rgba(234,88,12,0.2);
+      color: #7c2d12;
+    }
+    /* Stars banner */
+    body[data-class="stars"] .cls-banner {
+      background: linear-gradient(135deg, rgba(233,213,255,0.7), rgba(251,207,232,0.5));
+      border: 1.5px solid rgba(124,58,237,0.2);
+      color: #4c1d95;
+    }
+    /* Builders banner */
+    body[data-class="builders"] .cls-banner {
+      background: linear-gradient(135deg, rgba(191,219,254,0.7), rgba(165,243,252,0.5));
+      border: 1.5px solid rgba(37,99,235,0.2);
+      color: #1e3a8a;
+    }
+    /* ═══════════════════════════════════════════
+       FINAL OVERRIDE: Text colors for light theme
+       All classes use light backgrounds — dark text
+       This MUST be last in the stylesheet to win.
+       ═══════════════════════════════════════════ */
+
+    /* Explorers — warm dark brown text */
+    body[data-class="explorers"] { color: #431407 !important; }
+    body[data-class="explorers"] * { color: #431407 !important; }
+    body[data-class="explorers"] .hero-title { color: #1c1917 !important; }
+    body[data-class="explorers"] .hero-title span { -webkit-text-fill-color: transparent !important; }
+    body[data-class="explorers"] .section-title { color: #1c1917 !important; }
+    body[data-class="explorers"] .section-subtitle { color: #78350f !important; }
+    body[data-class="explorers"] .hero-subtitle { color: #44403c !important; }
+    body[data-class="explorers"] .arcade-title { color: #ea580c !important; }
+    /* Explorers — ALL phone screens light bg, dark text */
+    body[data-class="explorers"] .phone-screen,
+    body[data-class="explorers"] .phone-screen * { color: #1c1917 !important; }
+    body[data-class="explorers"] .phone-card-title { color: #ea580c !important; }
+    body[data-class="explorers"] .phone-card-content { color: #92400e !important; }
+    body[data-class="explorers"] .phone-username { color: #ea580c !important; }
+    body[data-class="explorers"] .phone-xp { color: #16a34a !important; }
+    body[data-class="explorers"] .phone-button,
+    body[data-class="explorers"] .phone-button * { color: #ffffff !important; }
+    body[data-class="explorers"] .section-phone-mockup .phone-screen,
+    body[data-class="explorers"] .section-phone-mockup .phone-screen * { color: #1c1917 !important; }
+    /* Explorers download badges have dark bg — text white */
+    body[data-class="explorers"] .badge-btn,
+    body[data-class="explorers"] .badge-btn * { color: #ffffff !important; }
+    body[data-class="explorers"] .badge-btn-txt span { color: #94a3b8 !important; }
+
+    /* Stars — deep purple text */
+    body[data-class="stars"] { color: #2e1065 !important; }
+    body[data-class="stars"] * { color: #2e1065 !important; }
+    body[data-class="stars"] .hero-title { color: #1e1b4b !important; }
+    body[data-class="stars"] .hero-title span { -webkit-text-fill-color: transparent !important; }
+    body[data-class="stars"] .section-title { color: #1e1b4b !important; }
+    body[data-class="stars"] .section-subtitle { color: #4c1d95 !important; }
+    body[data-class="stars"] .hero-subtitle { color: #3b0764 !important; }
+    body[data-class="stars"] .arcade-title { color: #7c3aed !important; }
+    /* Stars download badges have dark bg — text white */
+    body[data-class="stars"] .badge-btn,
+    body[data-class="stars"] .badge-btn * { color: #ffffff !important; }
+    body[data-class="stars"] .badge-btn-txt span { color: #94a3b8 !important; }
+
+    /* Builders — deep blue text */
+    body[data-class="builders"] { color: #1e3a8a !important; }
+    body[data-class="builders"] * { color: #1e3a8a !important; }
+    body[data-class="builders"] .hero-title { color: #0f172a !important; }
+    body[data-class="builders"] .hero-title span { -webkit-text-fill-color: transparent !important; }
+    body[data-class="builders"] .section-title { color: #0f172a !important; }
+    body[data-class="builders"] .section-subtitle { color: #1e40af !important; }
+    body[data-class="builders"] .hero-subtitle { color: #1e3a8a !important; }
+    body[data-class="builders"] .arcade-title { color: #2563eb !important; }
+    /* Builders — ALL phone screens dark bg, white text (one consistent style) */
+    body[data-class="builders"] .phone-screen,
+    body[data-class="builders"] .phone-screen * { color: #ffffff !important; }
+    body[data-class="builders"] .phone-card-title { color: #94a3b8 !important; }
+    body[data-class="builders"] .phone-card-content { color: #60a5fa !important; }
+    body[data-class="builders"] .phone-username { color: #f1f5f9 !important; }
+    body[data-class="builders"] .phone-radial-text { color: #ffffff !important; }
+    body[data-class="builders"] .phone-xp { color: #60a5fa !important; }
+    body[data-class="builders"] .section-phone-mockup .phone-screen,
+    body[data-class="builders"] .section-phone-mockup .phone-screen * { color: #ffffff !important; }
+    /* Light-bg elements inside dark phones — force dark text */
+    body[data-class="builders"] .phone-screen .phone-info-note,
+    body[data-class="builders"] .phone-screen .phone-light-item,
+    body[data-class="builders"] .phone-screen .phone-light-item *,
+    body[data-class="builders"] .phone-screen .phone-info-note *,
+    body[data-class="builders"] .section-phone-mockup .phone-screen .phone-info-note,
+    body[data-class="builders"] .section-phone-mockup .phone-screen .phone-light-item,
+    body[data-class="builders"] .section-phone-mockup .phone-screen .phone-light-item *,
+    body[data-class="builders"] .section-phone-mockup .phone-screen .phone-info-note * {
+      color: #334155 !important;
+    }
+    body[data-class="stars"] .phone-screen .phone-info-note,
+    body[data-class="stars"] .phone-screen .phone-info-note *,
+    body[data-class="stars"] .phone-screen .phone-light-item,
+    body[data-class="stars"] .phone-screen .phone-light-item * {
+      color: #334155 !important;
+    }
+    /* Builders download badges — white text */
+    body[data-class="builders"] .badge-btn,
+    body[data-class="builders"] .badge-btn * { color: #ffffff !important; }
+    body[data-class="builders"] .badge-btn-txt span { color: #94a3b8 !important; }
+
+    /* Footer — always dark text on white bg for all classes */
+    body[data-class="explorers"] .adyapan-static-footer,
+    body[data-class="explorers"] .adyapan-static-footer *,
+    body[data-class="stars"] .adyapan-static-footer,
+    body[data-class="stars"] .adyapan-static-footer *,
+    body[data-class="builders"] .adyapan-static-footer,
+    body[data-class="builders"] .adyapan-static-footer * {
+      color: #0f172a !important;
+    }
+    body[data-class="explorers"] .adyapan-static-hours p,
+    body[data-class="stars"] .adyapan-static-hours p,
+    body[data-class="builders"] .adyapan-static-hours p {
+      color: #0f172a !important;
+    }
+    body[data-class="explorers"] .adyapan-static-hours .closed,
+    body[data-class="stars"] .adyapan-static-hours .closed,
+    body[data-class="builders"] .adyapan-static-hours .closed {
+      color: #0f766e !important;
+    }
+    body[data-class="explorers"] .adyapan-static-hours strong,
+    body[data-class="stars"] .adyapan-static-hours strong,
+    body[data-class="builders"] .adyapan-static-hours strong {
+      color: #1d4ed8 !important;
+    }
+    body[data-class="explorers"] .adyapan-static-footer-bottom,
+    body[data-class="stars"] .adyapan-static-footer-bottom,
+    body[data-class="builders"] .adyapan-static-footer-bottom {
+      color: #64748b !important;
+    }
+
+    /* Muted text — lighter shade per class */
+    body[data-class="explorers"] .hero-stat-item p,
+    body[data-class="explorers"] .node-subtitle { color: #a8a29e !important; }
+    body[data-class="stars"] .hero-stat-item p,
+    body[data-class="stars"] .node-subtitle { color: #a78bfa !important; }
+    body[data-class="builders"] .hero-stat-item p,
+    body[data-class="builders"] .node-subtitle { color: #93c5fd !important; }
+
+    /* Stat numbers — bold accent color */
+    body[data-class="explorers"] .hero-stat-item h3 { color: #ea580c !important; }
+    body[data-class="stars"] .hero-stat-item h3 { color: #7c3aed !important; }
+    body[data-class="builders"] .hero-stat-item h3 { color: #2563eb !important; }
+
+    /* All classes — buttons, active tabs, phone button = white text */
+    body[data-class="stars"] .btn-primary,
+    body[data-class="stars"] .btn-primary *,
+    body[data-class="builders"] .btn-primary,
+    body[data-class="builders"] .btn-primary *,
+    body[data-class="explorers"] .btn-primary,
+    body[data-class="explorers"] .btn-primary *,
+    body[data-class="stars"] .phone-button,
+    body[data-class="stars"] .phone-button *,
+    body[data-class="builders"] .phone-button,
+    body[data-class="builders"] .phone-button *,
+    body[data-class="explorers"] .phone-button,
+    body[data-class="explorers"] .phone-button *,
+    body[data-class="stars"] .cls-tab.active,
+    body[data-class="stars"] .cls-tab.active *,
+    body[data-class="builders"] .cls-tab.active,
+    body[data-class="builders"] .cls-tab.active *,
+    body[data-class="explorers"] .cls-tab.active,
+    body[data-class="explorers"] .cls-tab.active *,
+    body[data-class="explorers"] .phone-avatar,
+    body[data-class="stars"] .phone-avatar,
+    body[data-class="builders"] .phone-avatar {
+      color: #ffffff !important;
+    }
+
+    /* Phone XP badge color */
+    body[data-class="explorers"] .phone-xp { color: #16a34a !important; }
+    body[data-class="stars"] .phone-xp { color: #db2777 !important; }
+    body[data-class="builders"] .phone-xp { color: #0891b2 !important; }
+
+    /* Section tags — accent colored */
+    body[data-class="explorers"] .section-tag { color: #ea580c !important; }
+    body[data-class="stars"] .section-tag { color: #7c3aed !important; }
+    body[data-class="builders"] .section-tag { color: #2563eb !important; }
+
+    /* Hero badge text */
+    body[data-class="explorers"] .hero-badge { color: #ea580c !important; }
+    body[data-class="explorers"] .hero-badge span { color: #d97706 !important; }
+    body[data-class="stars"] .hero-badge { color: #7c3aed !important; }
+    body[data-class="stars"] .hero-badge span { color: #db2777 !important; }
+    body[data-class="builders"] .hero-badge { color: #2563eb !important; }
+    body[data-class="builders"] .hero-badge span { color: #0891b2 !important; }
+
+    /* ABSOLUTE LAST: Footer must always have dark text */
+    body[data-class="explorers"] .adyapan-static-footer,
+    body[data-class="explorers"] .adyapan-static-footer *,
+    body[data-class="stars"] .adyapan-static-footer,
+    body[data-class="stars"] .adyapan-static-footer *,
+    body[data-class="builders"] .adyapan-static-footer,
+    body[data-class="builders"] .adyapan-static-footer * {
+      color: #0f172a !important;
+    }
+    body[data-class="explorers"] .adyapan-static-hours p,
+    body[data-class="explorers"] .adyapan-static-hours strong,
+    body[data-class="explorers"] .adyapan-static-hours *,
+    body[data-class="stars"] .adyapan-static-hours p,
+    body[data-class="stars"] .adyapan-static-hours strong,
+    body[data-class="stars"] .adyapan-static-hours *,
+    body[data-class="builders"] .adyapan-static-hours p,
+    body[data-class="builders"] .adyapan-static-hours strong,
+    body[data-class="builders"] .adyapan-static-hours * {
+      color: #0f172a !important;
+    }
+    body[data-class="explorers"] .adyapan-static-hours .closed,
+    body[data-class="stars"] .adyapan-static-hours .closed,
+    body[data-class="builders"] .adyapan-static-hours .closed {
+      color: #0f766e !important;
+    }
+    body[data-class="explorers"] .adyapan-static-hours strong,
+    body[data-class="stars"] .adyapan-static-hours strong,
+    body[data-class="builders"] .adyapan-static-hours strong {
+      color: #1d4ed8 !important;
+    }
+    body[data-class="explorers"] .adyapan-static-footer-bottom,
+    body[data-class="explorers"] .adyapan-static-footer-bottom *,
+    body[data-class="stars"] .adyapan-static-footer-bottom,
+    body[data-class="stars"] .adyapan-static-footer-bottom *,
+    body[data-class="builders"] .adyapan-static-footer-bottom,
+    body[data-class="builders"] .adyapan-static-footer-bottom * {
+      color: #64748b !important;
+    }
+
   </style>
 </head>
 <body>
+
+  <!-- Dark overlay for text visibility -->
+  <div class="bg-dark-overlay"></div>
+
+  <!-- Video backgrounds for all classes -->
+  <div class="bg-video-wrap bg-video-explorers">
+    <video autoplay muted loop playsinline>
+      <source src="/bg-explorers.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="bg-video-wrap bg-video-stars">
+    <video autoplay muted loop playsinline>
+      <source src="/bg-stars.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="bg-video-wrap bg-video-builders">
+    <video autoplay muted loop playsinline>
+      <source src="/bg-builders.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <!-- Animated background shapes (change per class) -->
+  <div class="cls-bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+  </div>
+
+  <!-- Floating background icons (change per class) -->
+  <div class="cls-floating-icons">
+    <span class="ficon ficon-1" data-explorers="🎈" data-stars="⚡" data-builders="💻">🎈</span>
+    <span class="ficon ficon-2" data-explorers="🌟" data-stars="🎯" data-builders="⚙️">🌟</span>
+    <span class="ficon ficon-3" data-explorers="🎨" data-stars="🔮" data-builders="📊">🎨</span>
+    <span class="ficon ficon-4" data-explorers="🦄" data-stars="💜" data-builders="🧪">🦄</span>
+    <span class="ficon ficon-5" data-explorers="🌈" data-stars="✨" data-builders="🔬">🌈</span>
+    <span class="ficon ficon-6" data-explorers="🎪" data-stars="🌙" data-builders="📐">🎪</span>
+  </div>
 
   <nav class="adyapan-fixed-navbar" aria-label="ADYAPAN main navigation">
     <div class="adyapan-fixed-navbar-inner">
@@ -2888,10 +4060,56 @@
     })();
   </script>
 
-  <!-- Background Glowing Orbs -->
+  <!-- Background Glowing Orbs (change per class) -->
   <div class="glow-orb orb-blue" style="top: 10%; left: -10%;"></div>
   <div class="glow-orb orb-cyan" style="top: 40%; right: -10%;"></div>
   <div class="glow-orb orb-pink" style="bottom: 10%; left: 20%;"></div>
+
+  <!-- ==========================================
+     CLASS SELECTOR BAR (moved to top for immediate visibility)
+     ========================================== -->
+  <div class="class-selector-bar" id="class-selector-bar">
+    <div class="class-selector-inner">
+      <span class="class-selector-label">Choose Your Class</span>
+      <div class="class-selector-tabs">
+        <button class="cls-tab" data-cls="explorers" onclick="switchClass('explorers')" aria-pressed="false">
+          <span class="cls-tab-emoji">🌱</span>
+          <span class="cls-tab-info">
+            <span class="cls-tab-name">Little Explorers</span>
+            <span class="cls-tab-range">Class 1 – 5</span>
+          </span>
+        </button>
+        <button class="cls-tab" data-cls="stars" onclick="switchClass('stars')" aria-pressed="false">
+          <span class="cls-tab-emoji">⭐</span>
+          <span class="cls-tab-info">
+            <span class="cls-tab-name">Rising Stars</span>
+            <span class="cls-tab-range">Class 6 – 8</span>
+          </span>
+        </button>
+        <button class="cls-tab" data-cls="builders" onclick="switchClass('builders')" aria-pressed="false">
+          <span class="cls-tab-emoji">🚀</span>
+          <span class="cls-tab-info">
+            <span class="cls-tab-name">Future Builders</span>
+            <span class="cls-tab-range">Class 9 – 12</span>
+          </span>
+        </button>
+      </div>
+      <div class="cls-active-strip">
+        <div class="cls-active-strip-fill" id="cls-strip-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Class Banner -->
+  <div class="cls-banner" id="cls-banner">
+    <span class="cls-banner-emoji" id="cls-banner-emoji">🌱</span>
+    <div class="cls-banner-text">
+      <strong id="cls-banner-name">Little Explorers</strong>
+      <span id="cls-banner-desc">Class 1–5 · Playful, story-driven learning with games and badges</span>
+    </div>
+    <span class="cls-banner-badge" id="cls-banner-badge">Beginner</span>
+  </div>
+
 <!-- ==========================================
      2. HERO SECTION
      ========================================== -->
@@ -3169,15 +4387,15 @@
             <div class="phone-card">
               <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">ACTIVE BADGES UNLOCKED</div>
               <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center;">
-                <div style="background: white; border: 1px dashed rgba(37, 99, 235, 0.2); border-radius: 8px; padding: 4px;">
+                <div class="phone-light-item" style="background: white; border: 1px dashed rgba(37, 99, 235, 0.2); border-radius: 8px; padding: 4px;">
                   <span style="font-size: 1.2rem;">🔥</span>
                   <div style="font-size: 0.55rem; font-weight: bold; margin-top: 2px;">7-Day</div>
                 </div>
-                <div style="background: white; border: 1px dashed rgba(37, 99, 235, 0.2); border-radius: 8px; padding: 4px;">
+                <div class="phone-light-item" style="background: white; border: 1px dashed rgba(37, 99, 235, 0.2); border-radius: 8px; padding: 4px;">
                   <span style="font-size: 1.2rem;">⚡</span>
                   <div style="font-size: 0.55rem; font-weight: bold; margin-top: 2px;">Speed</div>
                 </div>
-                <div style="background: white; border: 1px dashed rgba(37, 99, 235, 0.2); border-radius: 8px; padding: 4px;">
+                <div class="phone-light-item" style="background: white; border: 1px dashed rgba(37, 99, 235, 0.2); border-radius: 8px; padding: 4px;">
                   <span style="font-size: 1.2rem;">🧠</span>
                   <div style="font-size: 0.55rem; font-weight: bold; margin-top: 2px;">Master</div>
                 </div>
@@ -3191,7 +4409,7 @@
               </div>
             </div>
 
-            <div style="background: #f8fafc; border: 1px solid var(--glass-border); border-radius: 12px; padding: 10px; font-size: 0.65rem; color: var(--text-sub); text-align: center; margin-top: auto; font-weight: bold;">
+            <div class="phone-info-note" style="background: #f8fafc; border: 1px solid var(--glass-border); border-radius: 12px; padding: 10px; font-size: 0.65rem; color: #334155; text-align: center; margin-top: auto; font-weight: bold;">
               Leaderboards synchronize remotely to mock arena servers.
             </div>
           </div>
@@ -3228,11 +4446,11 @@
                 <span style="display: block; font-size: 0.6rem; color: var(--blue-accent); text-transform: uppercase; font-weight: 700;">Mon</span>
                 <span style="font-family: var(--font-rounded); font-size: 0.95rem; font-weight: 700; color: var(--text-main);">23</span>
               </div>
-              <div style="min-width: 45px; background: #f8fafc; border: 1px solid var(--glass-border); border-radius: 12px; padding: 8px 4px; text-align: center;">
+              <div class="phone-light-item" style="min-width: 45px; background: #f8fafc; border: 1px solid var(--glass-border); border-radius: 12px; padding: 8px 4px; text-align: center;">
                 <span style="display: block; font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500;">Tue</span>
                 <span style="font-family: var(--font-rounded); font-size: 0.95rem; font-weight: 700; color: var(--text-sub);">24</span>
               </div>
-              <div style="min-width: 45px; background: #f8fafc; border: 1px solid var(--glass-border); border-radius: 12px; padding: 8px 4px; text-align: center;">
+              <div class="phone-light-item" style="min-width: 45px; background: #f8fafc; border: 1px solid var(--glass-border); border-radius: 12px; padding: 8px 4px; text-align: center;">
                 <span style="display: block; font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; font-weight: 500;">Wed</span>
                 <span style="font-family: var(--font-rounded); font-size: 0.95rem; font-weight: 700; color: var(--text-sub);">25</span>
               </div>
@@ -3657,7 +4875,7 @@
               </div>
             </div>
 
-            <div style="background: rgba(234, 88, 12, 0.06); border: 1px solid rgba(234, 88, 12, 0.2); border-radius: 12px; padding: 10px; font-size: 0.65rem; color: var(--orange); text-align: center; margin-top: auto; font-weight: 600;">
+            <div class="phone-info-note" style="background: rgba(234, 88, 12, 0.06); border: 1px solid rgba(234, 88, 12, 0.2); border-radius: 12px; padding: 10px; font-size: 0.65rem; color: #ea580c; text-align: center; margin-top: auto; font-weight: 600;">
               Parent notifications actively logging via cloud sync.
             </div>
           </div>
@@ -3850,14 +5068,14 @@
       
       <div class="download-badges">
         <a href="#" class="badge-btn">
-          <span class="badge-btn-icon">🍏</span>
+          <span class="badge-btn-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg></span>
           <div class="badge-btn-txt">
             <span>Download on the</span>
             <strong>App Store</strong>
           </div>
         </a>
         <a href="#" class="badge-btn">
-          <span class="badge-btn-icon">🤖</span>
+          <span class="badge-btn-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M3.18 23.04c-.55-.3-.96-.82-1.12-1.43L2 21.28V2.72l.06-.33c.16-.61.57-1.13 1.12-1.43l9.6 11.04-9.6 11.04zm.82.48l10.3-10.3 2.84 3.27-12.14 7.03c-.32.18-.67.27-1 .27v-.27zm12.14-14.49l-2.84 3.27L3.18.48c.33 0 .68.09 1 .27l12.14 7.03-.18.25zm1.14.66l3.12 1.8c.87.5.87 1.75 0 2.25l-3.12 1.8-3.12-3.6 3.12-2.25z"/></svg></span>
           <div class="badge-btn-txt">
             <span>Get it on</span>
             <strong>Google Play</strong>
@@ -3925,9 +5143,9 @@
           <span>India</span>
         </div>
         <div class="adyapan-static-hours">
-          <strong>Clock</strong>
-          <p>Mon - Sat: 09:00 AM - 5:00 PM</p>
-          <p class="closed">Sunday: Closed</p>
+          <strong style="color: #000000 !important;">Clock</strong>
+          <p style="color: #000000 !important;">Mon - Sat: 09:00 AM - 5:00 PM</p>
+          <p class="closed" style="color: #000000  !important;">Sunday: Closed</p>
         </div>
       </div>
     </div>
@@ -3988,6 +5206,9 @@
     };
 
     document.addEventListener("DOMContentLoaded", () => {
+      // 0. Initialize class selector (default: no class selected)
+      initClassSelector();
+
       // 1. Initialize custom Quiz arena puzzle
       loadNextQuizQuestion();
       
@@ -4015,6 +5236,134 @@
       // 9. Monitor window scroll offsets
       window.addEventListener("scroll", handleWindowScrolling);
     });
+
+    /* ==========================================
+       CLASS SELECTOR LOGIC
+       ========================================== */
+    const CLASS_DATA = {
+      explorers: {
+        emoji: '🌱',
+        name: 'Little Explorers',
+        range: 'Class 1–5',
+        desc: 'Class 1–5 · Playful, story-driven learning with games and badges',
+        badge: 'Beginner',
+        gradient: 'linear-gradient(90deg,#f97316,#fbbf24)',
+      },
+      stars: {
+        emoji: '⭐',
+        name: 'Rising Stars',
+        range: 'Class 6–8',
+        desc: 'Class 6–8 · Creative, competitive learning with quizzes and roadmaps',
+        badge: 'Intermediate',
+        gradient: 'linear-gradient(90deg,#8b5cf6,#ec4899)',
+      },
+      builders: {
+        emoji: '🚀',
+        name: 'Future Builders',
+        range: 'Class 9–12',
+        desc: 'Class 9–12 · Advanced, tech-focused learning with coding and analytics',
+        badge: 'Advanced',
+        gradient: 'linear-gradient(90deg,#2563eb,#06b6d4)',
+      }
+    };
+
+    function initClassSelector() {
+      // Default to explorers (Class 1-5) to showcase the playful theme
+      var saved = null;
+      try { saved = localStorage.getItem('adyapan-class'); } catch(e) {}
+      switchClass(saved && CLASS_DATA[saved] ? saved : 'explorers');
+    }
+
+    function switchClass(cls) {
+      // Scroll to top of page
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Update body data attribute for CSS theme
+      document.body.setAttribute('data-class', cls);
+
+      // Update tab active states
+      document.querySelectorAll('.cls-tab').forEach(function(btn) {
+        var isActive = btn.getAttribute('data-cls') === cls;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+
+      // Update strip fill gradient
+      var strip = document.getElementById('cls-strip-fill');
+      if (strip && CLASS_DATA[cls]) {
+        strip.style.background = CLASS_DATA[cls].gradient;
+      }
+
+      // Update banner
+      var banner = document.getElementById('cls-banner');
+      var bannerEmoji = document.getElementById('cls-banner-emoji');
+      var bannerName = document.getElementById('cls-banner-name');
+      var bannerDesc = document.getElementById('cls-banner-desc');
+      var bannerBadge = document.getElementById('cls-banner-badge');
+      if (banner && CLASS_DATA[cls]) {
+        var d = CLASS_DATA[cls];
+        bannerEmoji.textContent = d.emoji;
+        bannerName.textContent = d.name + ' · ' + d.range;
+        bannerDesc.textContent = d.desc;
+        bannerBadge.textContent = d.badge;
+        banner.classList.add('visible');
+      }
+
+      // Update phone mockup content per class
+      var phoneUsername = document.querySelector('.phone-username');
+      var phoneCardContent = document.querySelector('.phone-card-content');
+      var phoneCardModule = document.querySelector('.phone-card-title');
+      var heroBadgeEl = document.querySelector('.hero-badge');
+      if (phoneUsername && phoneCardContent) {
+        if (cls === 'explorers') {
+          phoneUsername.textContent = 'LittleStar_A';
+          phoneCardContent.textContent = 'Story Time: The Magic Garden';
+          if (phoneCardModule) phoneCardModule.textContent = '🌈 CURRENT ADVENTURE';
+          if (heroBadgeEl) heroBadgeEl.innerHTML = '🌈 <span>Class 1–5</span> Fun Learning Mode';
+        } else if (cls === 'stars') {
+          phoneUsername.textContent = 'RisingStar_X';
+          phoneCardContent.textContent = 'Science Quest: Solar System';
+          if (phoneCardModule) phoneCardModule.textContent = '⭐ CURRENT QUEST';
+          if (heroBadgeEl) heroBadgeEl.innerHTML = '⭐ <span>Class 6–8</span> Creative Mode';
+        } else {
+          phoneUsername.textContent = 'ProLearner_Z';
+          phoneCardContent.textContent = 'Quadratic Quest II';
+          if (phoneCardModule) phoneCardModule.textContent = '🚀 CURRENT MODULE';
+          if (heroBadgeEl) heroBadgeEl.innerHTML = '🚀 <span>Class 9–12</span> Pro Mode';
+        }
+      }
+
+      // Update hero XP badge style per class
+      var heroXpBadge = document.getElementById('hero-xp-badge');
+      if (heroXpBadge) {
+        if (cls === 'explorers') {
+          heroXpBadge.innerHTML = '⭐ ' + STATE.xpBalance + ' Stars';
+        } else if (cls === 'stars') {
+          heroXpBadge.innerHTML = '💎 ' + STATE.xpBalance + ' XP';
+        } else {
+          heroXpBadge.innerHTML = '🔥 ' + STATE.xpBalance + ' XP';
+        }
+      }
+
+      // Update misc text colors for dark phone (builders)
+      var phoneTexts = document.querySelectorAll('.phone-screen [style*="color: var(--text"]');
+      phoneTexts.forEach(function(el) {
+        if (cls === 'builders') {
+          if (el.style.color === 'var(--text-main)') el.style.color = '#e2e8f0';
+          if (el.style.color === 'var(--text-muted)') el.style.color = '#94a3b8';
+          if (el.style.color === 'var(--text-sub)') el.style.color = '#cbd5e1';
+        }
+      });
+
+      // Update floating background icons per class
+      document.querySelectorAll('.cls-floating-icons .ficon').forEach(function(icon) {
+        var val = icon.getAttribute('data-' + cls);
+        if (val) icon.textContent = val;
+      });
+
+      // Save preference
+      try { localStorage.setItem('adyapan-class', cls); } catch(e) {}
+    }
 
     /* ==========================================
        SCROLL UTILS & MENU Toggles

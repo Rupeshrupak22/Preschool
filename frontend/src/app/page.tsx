@@ -374,6 +374,39 @@ export default function Home() {
         </motion.div>
       </section>
 
+      <section id="skills" className="px-4 py-20 md:px-6 relative">
+        <div className="mx-auto max-w-7xl">
+          <SectionTitle
+            eyebrow="Future-Ready Skills"
+            title="10 Essential Skills for Tomorrow's Leaders"
+            copy="From coding to communication, we equip students with the complete skill set needed to thrive in the digital age."
+          />
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            {skills.map((skill, index) => (
+              <motion.div
+                key={skill.title}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: "-90px" }}
+                transition={{ delay: index * 0.05, duration: 0.45 }}
+                className="group rounded-2xl border-2 border-white/60 bg-white/70 backdrop-blur p-5 shadow-[0_16px_40px_rgba(168,85,247,0.15)] transition hover:-translate-y-2 hover:border-purple-300 hover:bg-gradient-to-br hover:from-purple-50 hover:to-pink-50 hover:shadow-[0_22px_48px_rgba(168,85,247,0.25)]"
+              >
+                <div className="flex h-14 w-14 items-center justify-center rounded-xl border-2 border-purple-200 bg-gradient-to-br from-purple-100 to-pink-100 text-purple-600 transition group-hover:scale-110 group-hover:border-purple-300 group-hover:from-purple-200 group-hover:to-pink-200">
+                  <skill.icon className="h-7 w-7" />
+                </div>
+                <h3 className="mt-5 text-lg font-black text-slate-900">
+                  {skill.title}
+                </h3>
+                <p className="mt-3 text-sm font-bold leading-6 text-slate-700">
+                  {skill.copy}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="curriculum" className="px-4 py-20 md:px-6 relative">
         <div className="mx-auto max-w-7xl">
           <div className="grid items-start gap-8 lg:grid-cols-[0.72fr_1fr]">
@@ -579,7 +612,7 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {certificates.map((certificate) => (
                 <div key={certificate} className="rounded-xl border-2 border-white/60 bg-white/70 backdrop-blur p-5 transition hover:-translate-y-1 hover:border-purple-300">
                   <ShieldCheck className="h-8 w-8 text-purple-600" />

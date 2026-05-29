@@ -1,18 +1,16 @@
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "My App | ADYAPAN",
-  description: "ADYAPAN Smart Learning Ecosystem app experience."
-};
-
 export default function OurAppPage() {
   return (
-    <main className="min-h-[calc(100vh-80px)] bg-white">
+    <div style={{ width: '100%', height: '100vh', margin: 0, padding: 0, overflow: 'hidden' }}>
       <iframe
-        title="ADYAPAN Smart Learning Ecosystem"
         src="/our.html?embedded=1"
-        className="block h-[calc(100vh-80px)] min-h-[720px] w-full border-0 bg-white"
+        style={{
+          width: '100%',
+          height: '100%',
+          border: 'none',
+          display: 'block',
+        }}
+        title="Adyapan Smart Learning Ecosystem"
       />
-    </main>
+    </div>
   );
 }
