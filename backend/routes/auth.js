@@ -1,14 +1,15 @@
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const prisma = require('../lib/prisma');
 const { generateAccessToken, generateRefreshToken } = require('../utils/token');
+const { hashPassword, verifyPassword, needsRehash, generateAccessKey, hashAccessKey } = require('../utils/password');
 const { sendResponse } = require('../utils/response');
 const { validateBody, validateEmail, validatePassword } = require('../middleware/validate');
+const { recordFailedAttempt, clearFailedAttempts } = require('../utils/progressive-delay');
 
 const router = express.Router();
 
-// POST /api/v1/auth/login
+// ─── POST /api/v1/auth/login ────────────────────────────────────────
 router.post('/login', validateBody('email', 'password'), validateEmail, async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -18,37 +19,32 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
     });
 
     if (!user) {
+      // Still apply delay to prevent email enumeration
+      await recordFailedAttempt(email);
       return sendResponse(res, 401, false, 'Invalid email or password');
     }
 
-    // Check password (bcrypt hash first, then plain fallback for legacy data)
-    let isValid = false;
-    let shouldUpgrade = false;
-
-    if (user.password_hash && /^\$2[aby]\$/.test(user.password_hash)) {
-      isValid = await bcrypt.compare(password, user.password_hash);
-    }
-
-    if (!isValid && user.password) {
-      if (/^\$2[aby]\$/.test(user.password)) {
-        isValid = await bcrypt.compare(password, user.password);
-      } else {
-        // Plain text password (legacy) — upgrade it
-        isValid = (password === user.password);
-        if (isValid) shouldUpgrade = true;
-      }
-    }
+    // Verify password (supports Argon2id, bcrypt, and plain text legacy)
+    const storedHash = user.password_hash || user.password;
+    const isValid = await verifyPassword(password, storedHash);
 
     if (!isValid) {
-      return sendResponse(res, 401, false, 'Invalid email or password');
+      // Progressive delay on failed attempt
+      const { attempts, delayMs } = await recordFailedAttempt(email);
+      return sendResponse(res, 401, false, 'Invalid email or password', {
+        hint: attempts >= 3 ? 'Multiple failed attempts detected. Please wait before retrying.' : undefined,
+      });
     }
 
-    // Upgrade plain password to bcrypt hash
-    if (shouldUpgrade) {
-      const hash = await bcrypt.hash(password, 12);
+    // Clear failed attempts on success
+    clearFailedAttempts(email);
+
+    // Auto-upgrade password hash to Argon2id if needed
+    if (needsRehash(storedHash)) {
+      const newHash = await hashPassword(password);
       await prisma.users.update({
         where: { id: user.id },
-        data: { password_hash: hash, password: hash },
+        data: { password_hash: newHash, password: newHash },
       });
     }
 
@@ -61,7 +57,7 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
           email: user.email,
           name: user.name,
           role: user.role,
-          source: req.body.platform || 'unknown',
+          source: req.body.platform || detectPlatform(req),
           status: 'success',
           ip_address: req.ip || null,
           user_agent: req.get('user-agent') || null,
@@ -93,7 +89,7 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
   }
 });
 
-// POST /api/v1/auth/register
+// ─── POST /api/v1/auth/register ─────────────────────────────────────
 router.post('/register', validateBody('name', 'email', 'password'), validateEmail, validatePassword, async (req, res) => {
   try {
     const { name, email, password, phone, role, class_level, class_name, school_name, school_id, school } = req.body;
@@ -106,7 +102,12 @@ router.post('/register', validateBody('name', 'email', 'password'), validateEmai
       return sendResponse(res, 409, false, 'User with this email already exists');
     }
 
-    const password_hash = await bcrypt.hash(password, 12);
+    // Hash password with Argon2id
+    const password_hash = await hashPassword(password);
+
+    // Generate 256-bit access key
+    const accessKey = generateAccessKey();
+    const accessKeyHash = hashAccessKey(accessKey);
 
     const user = await prisma.users.create({
       data: {
@@ -114,14 +115,14 @@ router.post('/register', validateBody('name', 'email', 'password'), validateEmai
         name: name.trim(),
         email: email.toLowerCase().trim(),
         password_hash,
-        password: password_hash,
+        password: password_hash, // store same hash in both fields
         phone: phone || null,
         role: role || 'student',
         class_level: class_level || null,
         class_name: class_name || null,
         school_name: school_name || school || null,
         school_id: school_id || null,
-        signup_source: req.body.platform || 'app',
+        signup_source: req.body.platform || detectPlatform(req),
       },
     });
 
@@ -131,6 +132,7 @@ router.post('/register', validateBody('name', 'email', 'password'), validateEmai
     sendResponse(res, 201, true, 'Registration successful', {
       token,
       refreshToken,
+      accessKey, // Return ONCE to user — they must save it, we only store hash
       user: {
         id: user.id,
         name: user.name,
@@ -149,7 +151,7 @@ router.post('/register', validateBody('name', 'email', 'password'), validateEmai
   }
 });
 
-// GET /api/v1/auth/me
+// ─── GET /api/v1/auth/me ────────────────────────────────────────────
 router.get('/me', require('../middleware/auth').authenticate, async (req, res) => {
   try {
     const user = await prisma.users.findUnique({
@@ -169,7 +171,7 @@ router.get('/me', require('../middleware/auth').authenticate, async (req, res) =
   }
 });
 
-// POST /api/v1/auth/refresh
+// ─── POST /api/v1/auth/refresh ──────────────────────────────────────
 router.post('/refresh', async (req, res) => {
   try {
     const { refreshToken } = req.body;
@@ -194,5 +196,13 @@ router.post('/refresh', async (req, res) => {
     sendResponse(res, 500, false, 'Internal server error');
   }
 });
+
+// ─── Helper ─────────────────────────────────────────────────────────
+function detectPlatform(req) {
+  const ua = (req.get('user-agent') || '').toLowerCase();
+  if (/android|iphone|ipad|mobile/.test(ua)) return 'mobile';
+  if (ua) return 'web';
+  return 'unknown';
+}
 
 module.exports = router;
