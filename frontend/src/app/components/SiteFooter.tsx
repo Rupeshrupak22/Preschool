@@ -27,7 +27,38 @@ const socials = [
 export default function SiteFooter() {
   return (
     <footer id="footer" className="relative overflow-hidden border-t border-blue-100 bg-white px-4 py-10 text-slate-950 md:px-6 md:py-12">
-      <div className="mx-auto grid max-w-7xl gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-10">
+      {/* Background branding typography - decorative only */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 flex items-end justify-center overflow-hidden"
+      >
+        <div className="relative w-full flex items-end justify-center">
+          {/* blurred glow layer */}
+          <span
+            className="select-none absolute -bottom-6 w-full text-center font-extrabold uppercase tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-amber-400 to-orange-600 opacity-8 blur-2xl filter drop-shadow-[0_40px_80px_rgba(249,115,22,0.08)]"
+            style={{
+              fontSize: "clamp(6rem, 22vw, 22rem)",
+              lineHeight: 0.8,
+              transform: "translateY(6%)",
+              WebkitTransform: "translateY(6%)",
+              animation: "footerFloat 14s ease-in-out infinite"
+            }}
+          >
+            ADYAPAN
+          </span>
+
+          {/* main faint text */}
+          <span
+            className="select-none absolute -bottom-4 w-full text-center font-extrabold uppercase tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-amber-400 to-orange-600 opacity-10 filter drop-shadow-[0_26px_56px_rgba(249,115,22,0.12)]"
+            style={{ fontSize: "clamp(5rem, 20vw, 20rem)", lineHeight: 0.8, transform: "translateY(0%)", WebkitTransform: "translateY(0%)", mixBlendMode: "screen" }}
+          >
+            ADYAPAN
+          </span>
+        </div>
+      </div>
+
+      {/* Ensure all actual footer content sits above the decorative background */}
+      <div className="relative z-10 mx-auto grid max-w-7xl gap-8 sm:grid-cols-2 lg:grid-cols-[1.15fr_1.1fr_.9fr_1.1fr] lg:gap-10">
         <div>
           <div className="flex flex-wrap items-center gap-3">
             <img
@@ -129,7 +160,7 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      <div className="mx-auto mt-12 flex max-w-7xl justify-center border-t border-blue-100 pt-8 text-sm text-slate-500">
+      <div className="mx-auto mt-12 flex max-w-7xl justify-center border-t border-blue-100 pt-8 text-sm text-slate-500 relative z-10">
         <span>Copyright 2026 ADYAPAN Future Skills Platform. All rights reserved.</span>
       </div>
 
@@ -143,4 +174,13 @@ export default function SiteFooter() {
     </footer>
   );
 }
+
+/* Decorative animation keyframes scoped to this component (pure CSS) */
+<style jsx>{`
+  @keyframes footerFloat {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0px); }
+  }
+`}</style>
 
