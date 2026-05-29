@@ -1,19 +1,18 @@
 "use client";
 
-import { FormEvent, useState } from "react";
 import {
   ArrowRight,
   BarChart3,
   BookOpen,
   Brain,
+  CheckCircle2,
   Code2,
   Cpu,
   GraduationCap,
   Laptop,
-  MessageCircle,
   Rocket,
   ShieldCheck,
-  Target,
+  Sparkles,
   Users,
   Wifi,
   Zap
@@ -21,20 +20,20 @@ import {
 
 type Icon = React.ComponentType<{ className?: string }>;
 
-const skillTiles: { label: string; icon: Icon }[] = [
-  { label: "Robotics", icon: Cpu },
-  { label: "Coding", icon: Laptop },
-  { label: "IoT", icon: Wifi },
-  { label: "Electronics", icon: Zap },
-  { label: "AI/ML", icon: Brain },
-  { label: "Programming", icon: Code2 }
+const skillTiles: { label: string; icon: Icon; color: string }[] = [
+  { label: "Robotics", icon: Cpu, color: "from-orange-500 to-red-500" },
+  { label: "Coding", icon: Laptop, color: "from-blue-500 to-indigo-600" },
+  { label: "IoT", icon: Wifi, color: "from-green-500 to-emerald-600" },
+  { label: "Electronics", icon: Zap, color: "from-yellow-500 to-orange-500" },
+  { label: "AI/ML", icon: Brain, color: "from-purple-500 to-pink-500" },
+  { label: "Programming", icon: Code2, color: "from-cyan-500 to-blue-600" }
 ];
 
-const overviewCards: { title: string; copy: string; icon: Icon }[] = [
-  { title: "Progress Tracking", copy: "Real-time monitoring of student performance", icon: BarChart3 },
-  { title: "AI-Powered Tools", copy: "Smart recommendations and automated tasks", icon: Brain },
-  { title: "Curriculum Management", copy: "Organized and structured learning paths", icon: BookOpen },
-  { title: "Collaborative Learning", copy: "Interactive tools for group activities", icon: GraduationCap }
+const overviewCards: { title: string; copy: string; icon: Icon; gradient: string }[] = [
+  { title: "Progress Tracking", copy: "Real-time monitoring of student performance with detailed analytics", icon: BarChart3, gradient: "from-blue-500 to-cyan-500" },
+  { title: "AI-Powered Tools", copy: "Smart recommendations and automated tasks for better learning", icon: Brain, gradient: "from-purple-500 to-pink-500" },
+  { title: "Curriculum Management", copy: "Organized and structured learning paths for every class", icon: BookOpen, gradient: "from-orange-500 to-red-500" },
+  { title: "Collaborative Learning", copy: "Interactive tools for group activities and peer learning", icon: GraduationCap, gradient: "from-green-500 to-emerald-500" }
 ];
 
 const studentFeatures = [
@@ -73,362 +72,265 @@ const teacherFeatures = [
   "AI Notes Generator"
 ];
 
-const examCards: { title: string; copy: string; icon: Icon; tags: string[] }[] = [
+const examCards: { title: string; copy: string; icon: Icon; tags: string[]; gradient: string }[] = [
   {
     title: "Multiple Formats",
     copy: "Support for MCQs, essays, coding challenges, and descriptive questions.",
     icon: BookOpen,
-    tags: ["MCQs", "Essays", "Coding", "True/False"]
+    tags: ["MCQs", "Essays", "Coding", "True/False"],
+    gradient: "from-blue-600 to-indigo-600"
   },
   {
     title: "Auto Evaluation",
     copy: "Instant grading and detailed feedback with AI-powered analysis.",
     icon: BarChart3,
-    tags: ["Instant Grading", "AI Analysis", "Reports"]
+    tags: ["Instant Grading", "AI Analysis", "Reports"],
+    gradient: "from-purple-600 to-pink-600"
   },
   {
     title: "Secure Platform",
     copy: "Protected exam environment with anti-cheating and monitoring measures.",
     icon: ShieldCheck,
-    tags: ["Anti-Cheating", "Secure Browser", "Time Limits"]
+    tags: ["Anti-Cheating", "Secure Browser", "Time Limits"],
+    gradient: "from-emerald-600 to-cyan-600"
   }
 ];
 
-function SectionShell({
-  id,
-  title,
-  subtitle,
-  children,
-  accent = "right"
-}: {
-  id: string;
-  title: string;
-  subtitle: string;
-  children: React.ReactNode;
-  accent?: "left" | "right";
-}) {
-  return (
-    <section id={id} className="px-4 py-16 md:px-6">
-      <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[28px] border border-blue-100 bg-white p-8 shadow-[0_22px_70px_rgba(15,23,42,0.10)] md:p-12">
-        <div
-          className={`absolute top-0 h-32 w-32 bg-blue-100 ${
-            accent === "left" ? "left-0 rounded-br-full" : "right-0 rounded-bl-full"
-          }`}
-        />
-        <div className="relative">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl font-black text-slate-950 md:text-4xl">{title}</h2>
-            <p className="mt-4 text-base leading-7 text-slate-600">{subtitle}</p>
-          </div>
-          {children}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FeaturePill({ label, active }: { label: string; active?: boolean }) {
-  return (
-    <div
-      className={`flex min-h-14 items-center gap-3 rounded-xl border px-4 font-semibold text-slate-950 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-500 hover:bg-blue-600 hover:text-white ${
-        active ? "border-cyan-500 bg-cyan-50 ring-1 ring-cyan-500/25" : "border-slate-200 bg-white"
-      }`}
-    >
-      <span className={`h-3 w-3 rounded-full ${active ? "bg-cyan-600" : "bg-blue-700"}`} />
-      {label}
-    </div>
-  );
-}
-
 export default function LMSPage() {
-  const [status, setStatus] = useState("");
-
   function goTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  async function submitDemo(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setStatus("Submitting demo request...");
-    const form = new FormData(event.currentTarget);
-    const body = Object.fromEntries(form.entries());
-    const response = await fetch("/api/leads", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "school",
-        name: body.name,
-        email: body.email,
-        phone: body.phone,
-        school: body.school,
-        city: body.city,
-        message: `${body.schedule || ""} ${body.message || ""}`.trim()
-      })
-    });
-    const data = await response.json();
-    setStatus(response.ok ? "Demo request submitted. ADYAPAN team will contact you." : data.error);
-    if (response.ok) event.currentTarget.reset();
-  }
-
   return (
-    <main className="relative min-h-screen overflow-hidden bg-white text-slate-950">
-      <div className="pointer-events-none fixed inset-0 z-0 bg-[url('/classroom-bg.svg')] bg-cover bg-center bg-no-repeat opacity-70" />
-      <div className="pointer-events-none fixed inset-0 z-0 bg-white/72" />
-      <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(circle_at_18%_22%,rgba(14,165,233,0.12),transparent_24%),radial-gradient(circle_at_78%_18%,rgba(37,99,235,0.10),transparent_24%)]" />
+    <main className="lms-dashboard-page relative min-h-screen text-gray-900" style={{ color: '#000000' }}>
+      {/* Video Background */}
+      <div className="fixed inset-0 z-0 overflow-hidden">
+        <video autoPlay muted loop playsInline className="h-full w-full object-cover">
+          <source src="/lms-bg.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-white/55" />
+      </div>
 
-      <section className="relative z-10 overflow-hidden px-4 pb-14 pt-32 md:px-6">
-        <div className="absolute -left-28 -top-36 h-80 w-80 rounded-full bg-gradient-to-br from-blue-700 to-cyan-700 opacity-80" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.95fr_1fr]">
-          <div>
-            <a href="/" className="mb-10 inline-flex items-center gap-3 rounded-full bg-white/92 px-4 py-2 text-sm font-bold text-blue-950 shadow-[0_12px_30px_rgba(15,23,42,0.10)] backdrop-blur">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-700 text-white">A</span>
-              ADYAPAN LMS
-            </a>
-            <h1 className="text-5xl font-black tracking-tight text-[#050b24] md:text-7xl">
-              <span className="text-cyan-700">Adyapan</span> LMS
-            </h1>
-            <p className="mt-7 max-w-3xl text-2xl font-bold leading-[1.6] text-slate-600">
-              <span className="font-black text-blue-950">AI-powered Learning Management System</span> enriched with
-              dynamic features to enhance teaching efficiency and{" "}
-              <span className="font-black text-cyan-700">student engagement</span>
-            </p>
-            <div className="mt-9 flex flex-col gap-4 sm:flex-row">
-              <a
-                href="#demo"
-                className="inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-cyan-600 px-8 font-black text-white shadow-[0_14px_30px_rgba(13,148,136,0.24)] transition hover:-translate-y-1 hover:bg-blue-700"
-              >
-                <Target className="h-5 w-5" /> Book Demo <ArrowRight className="h-5 w-5" />
-              </a>
-              <a
-                href="tel:+918292244709"
-                className="inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-blue-700 px-8 font-black text-white shadow-[0_14px_30px_rgba(37,99,235,0.22)] transition hover:-translate-y-1 hover:bg-slate-950"
-              >
-                <MessageCircle className="h-5 w-5" /> Chat on WhatsApp
-              </a>
+      {/* Content */}
+      <div className="relative z-10">
+
+        {/* Hero */}
+        <section className="px-4 pb-20 pt-10 md:px-6">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid items-center gap-14 lg:grid-cols-2">
+              <div className="rounded-3xl bg-white/50 backdrop-blur-xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/60" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.35) 100%)' }}>
+                <div className="lms-tilt mb-8 inline-flex items-center gap-3 rounded-full border border-white/50 bg-white/45 backdrop-blur-xl px-5 py-2.5 text-sm font-black text-blue-900 shadow-[0_8px_30px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.9)]">
+                  <Sparkles className="h-5 w-5 text-cyan-600" />
+                  AI-Powered Education Platform
+                </div>
+                <h1 className="text-5xl font-black leading-tight tracking-tight text-gray-900 md:text-7xl">
+                  <span className="bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent">Adyapan</span> LMS
+                </h1>
+                <p className="mt-6 max-w-xl text-lg font-medium leading-relaxed text-gray-800">
+                  AI-powered Learning Management System enriched with dynamic features to enhance teaching efficiency and student engagement for Classes 5–12.
+                </p>
+                <div className="mt-10 flex flex-wrap gap-4">
+                  <button
+                    onClick={() => goTo("overview")}
+                    className="lms-tilt-btn inline-flex h-14 items-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-700 px-8 font-black text-white shadow-[0_14px_30px_rgba(6,182,212,0.35)]"
+                  >
+                    Explore Features <ArrowRight className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => goTo("exam-software")}
+                    className="lms-tilt-btn inline-flex h-14 items-center gap-3 rounded-2xl border-2 border-white/50 bg-white/40 backdrop-blur-xl px-8 font-black text-gray-900 shadow-[0_8px_24px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.9)]"
+                  >
+                    Exam Software
+                  </button>
+                </div>
+
+                {/* Skill Tiles */}
+                <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3" style={{ perspective: '1000px' }}>
+                  {skillTiles.map((tile) => (
+                    <div
+                      key={tile.label}
+                      className="lms-tilt group flex h-14 items-center gap-3 rounded-xl border border-white/50 bg-white/40 backdrop-blur-xl px-4 font-bold text-gray-900 shadow-[0_8px_24px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.8)]"
+                    >
+                      <div className={`flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br ${tile.color} shadow-lg`}>
+                        <tile.icon className="h-4 w-4 text-white" />
+                      </div>
+                      <span className="text-sm">{tile.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Hero Image */}
+              <div className="relative" style={{ perspective: '1200px' }}>
+                <div className="lms-tilt absolute -left-6 -top-6 z-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-[0_12px_30px_rgba(6,182,212,0.4)]">
+                  <Users className="h-8 w-8" />
+                </div>
+                <div className="lms-tilt overflow-hidden rounded-3xl border-4 border-white/80 bg-white shadow-[0_30px_80px_rgba(0,0,0,0.15)]" style={{ transform: 'rotateY(-5deg) rotateX(3deg)' }}>
+                  <img
+                    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1000&q=80"
+                    alt="Students collaborating"
+                    className="h-[400px] w-full object-cover"
+                  />
+                </div>
+                <div className="lms-tilt absolute -bottom-5 -right-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-[0_12px_30px_rgba(168,85,247,0.4)]">
+                  <GraduationCap className="h-8 w-8" />
+                </div>
+              </div>
             </div>
-            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:max-w-3xl lg:grid-cols-3">
-              {skillTiles.map((tile) => (
-                <div
-                  key={tile.label}
-                  className="group flex h-16 items-center gap-4 rounded-xl border border-slate-200 bg-white/92 px-5 font-bold text-slate-700 shadow-sm backdrop-blur transition hover:-translate-y-1 hover:border-blue-500 hover:bg-blue-700 hover:text-white"
-                >
-                  <tile.icon className="h-6 w-6 text-cyan-700 transition group-hover:text-white" />
-                  {tile.label}
+          </div>
+        </section>
+
+        {/* Sticky Nav */}
+        <div className="sticky top-24 z-40 mx-4 md:mx-auto md:max-w-3xl">
+          <div className="flex gap-2 rounded-2xl border border-white/50 bg-white/40 backdrop-blur-xl p-2 shadow-[0_12px_40px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.9)]" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
+            {[
+              ["Overview", "overview"],
+              ["Student Features", "student-features"],
+              ["Teacher Features", "teacher-features"],
+              ["Exam Software", "exam-software"]
+            ].map(([label, id], index) => (
+              <button
+                key={id}
+                onClick={() => goTo(id)}
+                className={`lms-tilt-btn h-12 flex-1 rounded-xl text-xs font-black sm:text-sm ${
+                  index === 0 ? "bg-gradient-to-r from-cyan-600 to-blue-700 text-white shadow-md" : "text-gray-900 hover:bg-gradient-to-r hover:from-cyan-600 hover:to-blue-700 hover:text-white"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Overview */}
+        <section id="overview" className="px-4 py-20 md:px-6">
+          <div className="mx-auto max-w-6xl">
+            <div className="text-center rounded-2xl bg-white/45 backdrop-blur-xl p-8 mb-14 border border-white/50 shadow-[0_8px_32px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.9)]" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
+              <h2 className="text-3xl font-black text-gray-900 md:text-5xl drop-shadow-sm">Comprehensive Digital Platform</h2>
+              <p className="mx-auto mt-4 max-w-2xl text-lg font-semibold text-gray-900">
+                Class management, curriculum delivery, assessments, progress tracking, and teacher support — all in one.
+              </p>
+            </div>
+            <div className="mt-0 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" style={{ perspective: '1200px' }}>
+              {overviewCards.map((card) => (
+                <div key={card.title} className="lms-tilt group rounded-2xl border border-white/50 bg-white/40 backdrop-blur-xl p-6 shadow-[0_12px_35px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.9)]" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
+                  <div className={`flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${card.gradient} shadow-lg`}>
+                    <card.icon className="h-7 w-7 text-white" />
+                  </div>
+                  <h3 className="mt-5 text-lg font-black text-gray-900">{card.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-gray-900">{card.copy}</p>
                 </div>
               ))}
             </div>
-            <p className="mt-8 max-w-3xl text-lg font-bold leading-8 text-slate-600">
-              Learn from expert faculties of Robotics, Arduino, IoT, Coding, Electronics, AI and modern classroom tools.
-            </p>
-          </div>
-
-          <div className="relative">
-            <div className="absolute -left-8 -top-7 z-10 flex h-14 w-14 items-center justify-center rounded-xl bg-white text-cyan-700 shadow-xl">
-              <Users className="h-7 w-7" />
-            </div>
-            <div className="overflow-hidden rounded-[28px] border-[8px] border-blue-200 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.18)]">
-              <img
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1000&q=80"
-                alt="Students collaborating on ADYAPAN LMS"
-                className="h-[380px] w-full object-cover"
-              />
-            </div>
-            <div className="absolute -bottom-6 -right-5 flex h-14 w-14 items-center justify-center rounded-xl bg-white text-blue-950 shadow-xl">
-              <GraduationCap className="h-7 w-7" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="sticky top-24 z-40 mx-auto flex max-w-3xl gap-3 rounded-2xl border border-slate-200 bg-white/92 p-2 shadow-[0_14px_34px_rgba(15,23,42,0.10)] backdrop-blur">
-        {[
-          ["Overview", "overview"],
-          ["Student Features", "student-features"],
-          ["Teacher Features", "teacher-features"],
-          ["Exam Software", "exam-software"]
-        ].map(([label, id], index) => (
-          <button
-            key={id}
-            onClick={() => goTo(id)}
-            className={`h-12 flex-1 rounded-xl text-sm font-black transition hover:bg-blue-700 hover:text-white ${
-              index === 0 ? "bg-cyan-600 text-white" : "text-slate-600"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      <SectionShell
-        id="overview"
-        title="Comprehensive Digital Platform"
-        subtitle="ADYAPAN LMS provides schools with class management, curriculum delivery, online/offline assessments, student progress tracking, and teacher support in one integrated platform."
-        accent="left"
-      >
-        <div className="mt-12 grid items-center gap-10 lg:grid-cols-[1fr_0.95fr]">
-          <div className="grid gap-5 sm:grid-cols-2">
-            {overviewCards.map((card) => (
-              <div key={card.title} className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:bg-blue-700 hover:text-white">
-                <card.icon className="h-8 w-8 text-cyan-700 transition group-hover:text-white" />
-                <h3 className="mt-5 font-black">{card.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-600 transition group-hover:text-white/90">{card.copy}</p>
-              </div>
-            ))}
-          </div>
-          <div className="rounded-[24px] bg-gradient-to-br from-blue-100 to-white p-8">
-            <div className="rounded-2xl bg-white p-10 text-center shadow">
-              <Rocket className="mx-auto h-16 w-16 text-blue-950" />
-              <h3 className="mt-7 text-2xl font-black">Transform Education</h3>
-              <p className="mt-4 leading-7 text-slate-600">
-                Empowering educators and engaging students through innovative technology.
+            <div className="lms-tilt mt-14 rounded-3xl bg-gradient-to-r from-cyan-600 to-blue-700 p-10 text-center text-white shadow-[0_20px_60px_rgba(6,182,212,0.3)]">
+              <Rocket className="mx-auto h-14 w-14" />
+              <h3 className="mt-5 text-3xl font-black">Transform Education</h3>
+              <p className="mx-auto mt-4 max-w-lg text-lg text-white/90">
+                Empowering educators and engaging students through innovative AI-powered technology.
               </p>
             </div>
           </div>
-        </div>
-      </SectionShell>
+        </section>
 
-      <SectionShell
-        id="student-features"
-        title="Student Features"
-        subtitle="Empowering students with personalized learning experiences and cutting-edge educational tools."
-      >
-        <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {studentFeatures.map((feature, index) => (
-            <FeaturePill key={feature} label={feature} active={index === 8} />
-          ))}
-        </div>
-      </SectionShell>
-
-      <SectionShell
-        id="teacher-features"
-        title="Teacher Features"
-        subtitle="Streamlining teaching workflows with AI-powered tools and comprehensive classroom management."
-        accent="left"
-      >
-        <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {teacherFeatures.map((feature, index) => (
-            <FeaturePill key={feature} label={feature} active={index === 10} />
-          ))}
-        </div>
-      </SectionShell>
-
-      <SectionShell
-        id="exam-software"
-        title="Create & Conduct Any type of Exam with"
-        subtitle="ONLINE EXAM SOFTWARE"
-      >
-        <div className="mt-10 rounded-2xl bg-gradient-to-r from-blue-50 to-blue-100 p-8 text-center">
-          <p className="text-lg font-black">Question Preview</p>
-          <div className="mx-auto mt-5 max-w-md rounded-xl border border-slate-200 bg-white p-6 font-mono text-sm shadow">
-            <p className="font-bold text-slate-700">1x - 2x - 1 at x = 3</p>
-            <hr className="my-4" />
-            <p className="text-cyan-700">Evaluate at x = 3: f(3) = 1(3) - 2(3) - 1 = -4</p>
+        {/* Student Features */}
+        <section id="student-features" className="px-4 py-20 md:px-6">
+          <div className="lms-tilt mx-auto max-w-6xl rounded-3xl border border-white/50 bg-white/40 backdrop-blur-xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.9)] md:p-12" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
+            <div className="text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600">
+                <BookOpen className="h-7 w-7 text-white" />
+              </div>
+              <h2 className="text-3xl font-black text-gray-900 md:text-4xl">Student Features</h2>
+              <p className="mt-3 text-gray-800">Personalized learning experiences and cutting-edge tools</p>
+            </div>
+            <div className="mt-10 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {studentFeatures.map((feature) => (
+                <div
+                  key={feature}
+                  className="lms-tilt-feature flex items-center gap-3 rounded-xl border border-white/50 bg-white/45 backdrop-blur-lg px-4 py-3.5 font-bold text-gray-900 shadow-[0_4px_16px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.8)] hover:border-blue-300 hover:bg-white/60"
+                >
+                  <CheckCircle2 className="h-5 w-5 shrink-0 text-cyan-600" />
+                  <span className="text-sm">{feature}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="mt-8 grid gap-5 lg:grid-cols-3">
-          {examCards.map((card, index) => (
-            <div
-              key={card.title}
-              className={`group rounded-2xl border bg-white p-7 text-center shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:bg-blue-700 hover:text-white ${
-                index === 1 ? "border-blue-300 ring-1 ring-blue-200" : "border-slate-200"
-              }`}
-            >
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200 bg-white text-cyan-700 transition group-hover:border-white/25 group-hover:bg-white/15 group-hover:text-white">
-                <card.icon className="h-8 w-8" />
+        </section>
+
+        {/* Teacher Features */}
+        <section id="teacher-features" className="px-4 py-20 md:px-6">
+          <div className="lms-tilt mx-auto max-w-6xl rounded-3xl border border-white/50 bg-white/40 backdrop-blur-xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.9)] md:p-12" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
+            <div className="text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500">
+                <Brain className="h-7 w-7 text-white" />
               </div>
-              <h3 className="mt-6 text-xl font-black">{card.title}</h3>
-              <p className="mt-4 min-h-14 text-sm leading-6 text-slate-600 transition group-hover:text-white/90">{card.copy}</p>
-              <div className="mt-5 flex flex-wrap justify-center gap-2">
-                {card.tags.map((tag) => (
-                  <span key={tag} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600 transition group-hover:bg-white/15 group-hover:text-white">
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              <h2 className="text-3xl font-black text-gray-900 md:text-4xl">Teacher Features</h2>
+              <p className="mt-3 text-gray-800">AI-powered tools and comprehensive classroom management</p>
             </div>
-          ))}
-        </div>
-        <div className="mt-8 grid gap-6 text-center sm:grid-cols-4">
-          {[
-            ["100%", "Real-time Monitoring"],
-            ["Instant", "Auto Grading"],
-            ["20+", "Question Types"],
-            ["15+", "Security Features"]
-          ].map(([value, label]) => (
-            <div key={label}>
-              <p className="text-2xl font-black text-cyan-700">{value}</p>
-              <p className="text-sm text-slate-600">{label}</p>
+            <div className="mt-10 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {teacherFeatures.map((feature) => (
+                <div
+                  key={feature}
+                  className="lms-tilt-feature flex items-center gap-3 rounded-xl border border-white/50 bg-white/45 backdrop-blur-lg px-4 py-3.5 font-bold text-gray-900 shadow-[0_4px_16px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.8)] hover:border-purple-300 hover:bg-white/60"
+                >
+                  <CheckCircle2 className="h-5 w-5 shrink-0 text-purple-600" />
+                  <span className="text-sm">{feature}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </SectionShell>
+          </div>
+        </section>
 
-      <section id="demo" className="relative mt-10 bg-gradient-to-br from-blue-800 via-slate-950 to-cyan-700 px-4 py-16 text-white md:px-6">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:40px_40px]" />
-        <div className="relative mx-auto max-w-4xl text-center">
-          <h2 className="text-4xl font-black text-blue-100">Book Your Free Demo</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-white/85">
-            Experience the future of education. Schedule a personalized demo tailored to your school needs.
-          </p>
-          <form onSubmit={submitDemo} className="mt-8 rounded-3xl border border-white/18 bg-white/10 p-6 text-left shadow-2xl backdrop-blur md:p-8">
-            <div className="grid gap-4 md:grid-cols-2">
-              <label className="grid gap-2 text-sm font-bold">
-                Full Name *
-                <input name="name" required placeholder="John Doe" className="h-12 rounded-lg border border-white/10 bg-blue-950/60 px-4 text-white outline-none placeholder:text-white/40" />
-              </label>
-              <label className="grid gap-2 text-sm font-bold">
-                Email Address *
-                <input name="email" type="email" required placeholder="john@example.com" className="h-12 rounded-lg border border-white/10 bg-blue-950/60 px-4 text-white outline-none placeholder:text-white/40" />
-              </label>
-              <label className="grid gap-2 text-sm font-bold md:col-span-2">
-                Phone Number *
-                <input name="phone" required placeholder="Enter 10 digit phone number" className="h-12 rounded-lg border border-white/10 bg-blue-950/60 px-4 text-white outline-none placeholder:text-white/40" />
-              </label>
-              <label className="grid gap-2 text-sm font-bold">
-                School Name *
-                <input name="school" required placeholder="Springfield High School" className="h-12 rounded-lg border border-white/10 bg-blue-950/60 px-4 text-white outline-none placeholder:text-white/40" />
-              </label>
-              <label className="grid gap-2 text-sm font-bold">
-                City *
-                <input name="city" required placeholder="Jaipur" className="h-12 rounded-lg border border-white/10 bg-blue-950/60 px-4 text-white outline-none placeholder:text-white/40" />
-              </label>
-              <label className="grid gap-2 text-sm font-bold md:col-span-2">
-                Schedule Call For *
-                <select name="schedule" required className="h-12 rounded-lg border border-white/10 bg-blue-950/60 px-4 text-white outline-none">
-                  <option value="">Select Option</option>
-                  <option>School LMS Demo</option>
-                  <option>Robotics & AI Lab</option>
-                  <option>Exam Software</option>
-                  <option>Teacher Training</option>
-                </select>
-              </label>
-              <label className="grid gap-2 text-sm font-bold md:col-span-2">
-                Additional Message
-                <textarea name="message" rows={4} placeholder="Tell us about your requirements..." className="rounded-lg border border-white/10 bg-blue-950/60 px-4 py-3 text-white outline-none placeholder:text-white/40" />
-              </label>
+        {/* Exam Software */}
+        <section id="exam-software" className="px-4 py-20 md:px-6">
+          <div className="mx-auto max-w-6xl">
+            <div className="text-center rounded-2xl bg-white/45 backdrop-blur-xl p-8 mb-14 border border-white/50 shadow-[0_8px_32px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.9)]" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
+              <h2 className="text-3xl font-black text-gray-900 md:text-5xl drop-shadow-sm">Online Exam Software</h2>
+              <p className="mx-auto mt-4 max-w-2xl text-lg font-semibold text-gray-900">
+                Create & conduct any type of exam with our powerful AI-driven platform
+              </p>
             </div>
-            <button className="mt-6 h-14 w-full rounded-xl bg-cyan-600 font-black text-white transition hover:bg-white hover:text-blue-950">
-              Submit Demo Request <ArrowRight className="ml-2 inline h-4 w-4" />
-            </button>
-          </form>
-        </div>
-      </section>
+            <div className="mt-0 grid gap-6 lg:grid-cols-3" style={{ perspective: '1200px' }}>
+              {examCards.map((card) => (
+                <div
+                  key={card.title}
+                  className="lms-tilt group overflow-hidden rounded-2xl border border-white/50 bg-white/40 backdrop-blur-xl shadow-[0_12px_35px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.9)]" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}
+                >
+                  <div className={`bg-gradient-to-r ${card.gradient} p-6`}>
+                    <card.icon className="h-10 w-10 text-white drop-shadow-md" />
+                    <h3 className="mt-4 text-xl font-black text-white drop-shadow-md">{card.title}</h3>
+                  </div>
+                  <div className="p-6">
+                    <p className="text-sm leading-6 font-semibold text-gray-900">{card.copy}</p>
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {card.tags.map((tag) => (
+                        <span key={tag} className="lms-tilt-feature rounded-full border border-gray-200 bg-white/70 backdrop-blur-lg px-3 py-1 text-xs font-bold text-gray-800 shadow-sm">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="lms-tilt mt-14 grid gap-6 rounded-2xl border border-white/50 bg-white/40 backdrop-blur-xl p-8 text-center shadow-[0_12px_35px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.9)] sm:grid-cols-4" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
+              {[
+                ["100%", "Real-time Monitoring"],
+                ["Instant", "Auto Grading"],
+                ["20+", "Question Types"],
+                ["15+", "Security Features"]
+              ].map(([value, label]) => (
+                <div key={label}>
+                  <p className="text-3xl font-black text-gray-900">{value}</p>
+                  <p className="mt-1 text-sm font-medium text-gray-900">{label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-
-      {status && (
-        <button
-          onClick={() => setStatus("")}
-          className="fixed bottom-6 left-1/2 z-50 max-w-[92vw] -translate-x-1/2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-950 shadow-2xl"
-        >
-          {status}
-        </button>
-      )}
+        {/* Bottom spacing */}
+        <div className="h-20" />
+      </div>
     </main>
   );
 }
-
-
-
-
-
-
