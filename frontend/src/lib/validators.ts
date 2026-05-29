@@ -20,8 +20,8 @@ export const profileSchema = z.object({
 
 export const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(1),
-  captcha: z.literal("ADYAPAN"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  captcha: z.string().min(1),
   source: z.enum(["web", "mobile", "app"]).optional().default("web")
 });
 

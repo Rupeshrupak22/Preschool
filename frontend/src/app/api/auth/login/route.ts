@@ -58,7 +58,7 @@ export async function POST(request: Request) {
   clearAuthCookies(response, "adyapan_token");
   response.cookies.set("adyapan_token", token, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 60 * 60 * 8

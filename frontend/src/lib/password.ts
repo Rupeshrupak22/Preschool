@@ -16,7 +16,7 @@ export async function hashPassword(password: string): Promise<string> {
     type: argon2.argon2id,
     memoryCost: 65536, // 64 MB
     timeCost: 3,
-    parallelism: 4,
+    parallelism: 1,    // Must match backend
   });
 }
 
