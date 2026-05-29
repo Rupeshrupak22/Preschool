@@ -33,6 +33,7 @@ const classRoutes = require('./routes/classes');
 const paymentRoutes = require('./routes/payments');
 const noticeRoutes = require('./routes/notices');
 const dashboardRoutes = require('./routes/dashboard');
+const bulkImportRoutes = require('./routes/bulk-import');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -146,6 +147,7 @@ app.use('/api/v1/classes', classRoutes);
 app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/notices', noticeRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
+app.use('/api/v1/bulk-import', bulkImportRoutes);
 
 // ─── 404 Handler ────────────────────────────────────────────────────
 app.use((req, res) => {
