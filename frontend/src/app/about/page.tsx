@@ -147,7 +147,7 @@ export default function AboutPage() {
             </motion.p>
             <motion.div variants={fadeUp} className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a
-                href="/signup"
+                href="/login"
                 className="group inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-slate-950 px-7 font-black text-white shadow-[0_18px_38px_rgba(15,23,42,0.22)] transition hover:-translate-y-1 hover:bg-blue-700 hover:shadow-[0_22px_44px_rgba(37,99,235,0.28)]"
               >
                 Start Learning <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />

@@ -5,7 +5,7 @@ export const signupSchema = z.object({
   email: z.string().email(),
   phone: z.string().min(8).max(15),
   classLevel: z.string().min(1),
-  schoolName: z.string().optional(),
+  schoolName: z.string().min(2, "School name is required"),
   password: z.string().min(8),
   captcha: z.literal("ADYAPAN"),
   source: z.enum(["web", "mobile", "app"]).optional().default("web")
@@ -23,6 +23,20 @@ export const loginSchema = z.object({
   password: z.string().min(1),
   captcha: z.literal("ADYAPAN"),
   source: z.enum(["web", "mobile", "app"]).optional().default("web")
+});
+
+export const principalLoginSchema = z.object({
+  email: z.string().trim().toLowerCase().email(),
+  password: z.string().min(8),
+  schoolKey: z.string().trim().min(8).transform((value) => value.toUpperCase()),
+  captcha: z.literal("ADYAPAN")
+});
+
+export const teacherLoginSchema = z.object({
+  email: z.string().trim().toLowerCase().email(),
+  password: z.string().min(8),
+  staffKey: z.string().trim().min(8).transform((value) => value.toUpperCase()),
+  captcha: z.literal("ADYAPAN")
 });
 
 export const leadSchema = z.object({

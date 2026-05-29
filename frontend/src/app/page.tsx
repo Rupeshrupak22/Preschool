@@ -24,8 +24,17 @@ import {
   Smartphone,
   Star,
   Trophy,
-  Users
+  Users,
+  X,
+  ChevronDown,
+  ChevronUp,
+  Calculator,
+  Target,
+  Video,
+  Award
 } from "lucide-react";
+import ProgramPopup from "./components/ProgramPopup";
+import { AnimatePresence } from "framer-motion";
 
 type Icon = React.ComponentType<{ className?: string }>;
 
@@ -44,29 +53,71 @@ const skills: { title: string; icon: Icon; copy: string }[] = [
 
 const paths = [
   {
-    title: "Class 5-8",
-    level: "Explorer Track",
-    steps: ["Visual coding", "Creative web", "AI basics", "Robotics lab", "Portfolio demo day"],
-    courses: ["Scratch Lab", "Junior Python", "AI for Kids", "Robotics Starter"]
+    title: "Class 1–5",
+    level: "Foundation Track",
+    skills: [
+      "Spoken English",
+      "Puzzles", 
+      "Habit Tracker",
+      "Basic Digital Literacy",
+      "General Knowledge",
+      "Show & Tell / Storytelling",
+      "Olympiad Worksheets"
+    ]
   },
   {
-    title: "Class 9-12",
-    level: "Builder Track",
-    steps: ["Python mastery", "Full-stack web", "AI projects", "Career portfolio", "Startup capstone"],
-    courses: ["Python Pro", "React Studio", "AI Builder", "Innovation Lab"]
+    title: "Class 6–8", 
+    level: "Development Track",
+    skills: [
+      "Communication & Public Speaking (MUN)",
+      "Financial Literacy",
+      "Excel (Basics)",
+      "HTML",
+      "Foreign Language",
+      "Art Theory",
+      "Current Affairs",
+      "Olympiad Worksheets",
+      "Information Session on Puppets",
+      "Digital Marketing and How Digital Platforms Work"
+    ]
+  },
+  {
+    title: "Class 9–10",
+    level: "Growth Track", 
+    skills: [
+      "Art Tools & Productivity",
+      "Coding",
+      "Calligraphy & Course Learning",
+      "Handwriting",
+      "Current Affairs",
+      "JEE / NEET / KVPY / Olympiad / CUET / PMAT Preparation",
+      "Informational Session on Wildlife & Career Options",
+      "Extempore"
+    ]
+  },
+  {
+    title: "Class 11–12",
+    level: "Mastery Track",
+    skills: [
+      "Personal Finance",
+      "Coding (Python / SQL)",
+      "Microsoft Office",
+      "Exam Readiness",
+      "Resume / Career Coaching",
+      "Current Affairs",
+      "Foreign Language", 
+      "Career Awareness through Videos",
+      "Stock Market",
+      "Extempore",
+      "Video Editing",
+      "Nutrition"
+    ]
   }
 ];
 
-const certificates = ["AI Certification", "Python Certification", "Web Development Certification", "Robotics Certification"];
 
-const projects = [
-  { title: "AI Study Buddy", type: "AI Projects", stat: "92% task accuracy" },
-  { title: "School House Website", type: "Websites", stat: "Deployed live" },
-  { title: "Line Follower Bot", type: "Robotics Models", stat: "Arduino build" },
-  { title: "Attendance App", type: "Apps", stat: "QR enabled" },
-  { title: "Smart Farming Kit", type: "Smart Farming", stat: "IoT sensors" },
-  { title: "Water Quality Monitor", type: "IoT", stat: "Live dashboard" }
-];
+
+
 
 const curriculumPrograms: { title: string; icon: Icon; copy: string }[] = [
   {
@@ -127,27 +178,164 @@ const testimonials = [
   }
 ];
 
-const heroPrograms: { title: string; range: string; icon: Icon; glow: string; avatar: string }[] = [
+const heroPrograms: { title: string; range: string; icon: Icon; glow: string; avatar: string; image: string; subjects: string[]; skills: string[]; activities?: string[]; competitive?: string[]; classes?: { [key: string]: { subjects: string[]; skills: string[]; examPrep?: string[] } } }[] = [
   {
     title: "Primary",
     range: "Class 1-5",
     icon: BookOpen,
     glow: "from-fuchsia-400/25 via-purple-300/18 to-cyan-300/22",
-    avatar: "P"
+    avatar: "P",
+    image: "/assets/primary-student.png",
+    subjects: [
+      "Maths",
+      "Science", 
+      "English"
+    ],
+    skills: [
+      "Communication Skills",
+      "Spoken English",
+      "Basic Digital Literacy",
+      "General Knowledge",
+      "Creative Thinking",
+      "Public Speaking",
+      "Logical Thinking",
+      "Presentation Skills",
+      "Critical Thinking",
+      "Problem Solving",
+      "Productivity Skills",
+      "Digital Literacy",
+      "Habit Building",
+      "Digital Awareness",
+      "Basic Computer Skills",
+      "Olympiads"
+    ],
+    classes: {
+      "Class 1": {
+        subjects: ["Maths", "Science", "English"],
+        skills: ["Communication Skills", "Spoken English", "Basic Digital Literacy", "General Knowledge", "Olympiads"]
+      },
+      "Class 2": {
+        subjects: ["Maths", "Science", "English"],
+        skills: ["Communication Skills", "Spoken English", "Creative Thinking", "Habit Building", "Olympiads"]
+      },
+      "Class 3": {
+        subjects: ["Maths", "Science", "English"],
+        skills: ["Public Speaking", "Logical Thinking", "General Knowledge", "Digital Awareness", "Olympiads"]
+      },
+      "Class 4": {
+        subjects: ["Maths", "Science", "English"],
+        skills: ["Communication Skills", "Presentation Skills", "Critical Thinking", "Basic Computer Skills", "Olympiads"]
+      },
+      "Class 5": {
+        subjects: ["Maths", "Science", "English"],
+        skills: ["Public Speaking", "Problem Solving", "Productivity Skills", "Digital Literacy", "Olympiads"]
+      }
+    }
   },
   {
     title: "Middle",
     range: "Class 6 to 8",
     icon: School,
     glow: "from-purple-400/25 via-pink-300/18 to-emerald-300/22",
-    avatar: "M"
+    avatar: "M",
+    image: "/assets/middle-student.png",
+    subjects: [
+      "Maths",
+      "Science",
+      "English",
+      "Social Science"
+    ],
+    skills: [
+      "Communication Skills",
+      "Public Speaking",
+      "Financial Literacy",
+      "Excel Basics",
+      "Debate & MUN",
+      "HTML Basics",
+      "Foreign Language",
+      "Leadership Skills",
+      "Coding Basics",
+      "Digital Awareness",
+      "Critical Thinking",
+      "Olympiads"
+    ],
+    classes: {
+      "Class 6": {
+        subjects: ["Maths", "Science", "English", "Social Science"],
+        skills: ["Communication Skills", "Public Speaking", "Financial Literacy", "Excel Basics", "Olympiads"]
+      },
+      "Class 7": {
+        subjects: ["Maths", "Science", "English", "Social Science"],
+        skills: ["Communication Skills", "Debate & MUN", "HTML Basics", "Foreign Language", "Olympiads"]
+      },
+      "Class 8": {
+        subjects: ["Maths", "Science", "English", "Social Science"],
+        skills: ["Leadership Skills", "Coding Basics", "Digital Awareness", "Critical Thinking", "Olympiads"]
+      }
+    }
   },
   {
     title: "High School",
     range: "Class 9-12",
     icon: GraduationCap,
     glow: "from-cyan-400/25 via-blue-300/18 to-fuchsia-300/22",
-    avatar: "HS"
+    avatar: "HS",
+    image: "/assets/highschool-student.png",
+    subjects: [
+      "Maths",
+      "Physics",
+      "Chemistry", 
+      "Biology",
+      "English",
+      "Social Science",
+      "Economics",
+      "Accountancy",
+      "BST",
+      "Humanities"
+    ],
+    skills: [
+      "Coding Basics",
+      "Current Affairs",
+      "Productivity Skills",
+      "Public Speaking",
+      "Communication Skills",
+      "Career Awareness",
+      "Exam Preparation",
+      "Logical Thinking",
+      "Coding",
+      "Financial Literacy",
+      "Resume Building",
+      "Career Coaching",
+      "Interview Preparation",
+      "Olympiads"
+    ],
+    competitive: [
+      "JEE",
+      "NEET", 
+      "CUET",
+      "Board Exams",
+      "Olympiads"
+    ],
+    classes: {
+      "Class 9": {
+        subjects: ["Maths", "Science", "English", "Social Science"],
+        skills: ["Coding Basics", "Current Affairs", "Productivity Skills", "Public Speaking", "Olympiads"]
+      },
+      "Class 10": {
+        subjects: ["Maths", "Science", "English", "Social Science"],
+        skills: ["Communication Skills", "Career Awareness", "Exam Preparation", "Logical Thinking", "Olympiads"]
+      },
+      "Class 11": {
+        subjects: ["Maths", "Physics", "Chemistry", "Biology", "Economics", "Accountancy", "BST", "English", "Humanities"],
+        skills: ["Coding", "Financial Literacy", "Resume Building", "Public Speaking", "Olympiads"],
+        examPrep: ["JEE", "NEET", "CUET", "CLAT", "IPMAT", "KVPY", "Board Exams"]
+      },
+      "Class 12": {
+        subjects: ["Maths", "Physics", "Chemistry", "Biology", "Economics", "Accountancy", "BST", "English", "Humanities"],
+        skills: ["Coding", "Career Coaching", "Interview Preparation", "Communication Skills", "Olympiads"],
+        examPrep: ["JEE", "NEET", "CUET", "CLAT", "IPMAT", "KVPY", "Board Exams"]
+      }
+    }
   }
 ];
 
@@ -204,6 +392,8 @@ export default function Home() {
   const [leadSuccess, setLeadSuccess] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [alreadyLoggedInNotice, setAlreadyLoggedInNotice] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState<typeof heroPrograms[0] | null>(null);
+  const [expandedSections, setExpandedSections] = useState<string[]>(["subjects"]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -239,6 +429,14 @@ export default function Home() {
     setAlreadyLoggedInNotice(true);
   }
 
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev =>
+      prev.includes(section)
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    );
+  };
+
   async function submitLead(event: FormEvent<HTMLFormElement>, type: "demo" | "school" | "newsletter") {
     event.preventDefault();
 
@@ -268,25 +466,17 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen overflow-hidden text-slate-900">
-      <div className="pointer-events-none fixed inset-0 !z-0 bg-[url('/classroom-bg.svg')] bg-cover bg-center bg-no-repeat" />
-      <div className="pointer-events-none fixed inset-0 !z-0 bg-gradient-to-b from-white/50 via-white/72 to-white/92" />
-      <div className="pointer-events-none fixed inset-0 !z-0 bg-[radial-gradient(circle_at_17%_18%,rgba(245,158,11,0.20),transparent_22%),radial-gradient(circle_at_83%_24%,rgba(37,99,235,0.16),transparent_24%)]" />
-
-      {/* Soft classroom overlays */}
-      <div className="fixed inset-0 !z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-24 left-10 w-32 h-32 rounded-full border border-amber-300/40 bg-white/10 blur-[1px]" />
-        <div className="absolute right-8 top-28 hidden h-16 w-16 rounded-full border border-sky-300/35 bg-white/10 md:block" />
-        <div className="absolute -bottom-8 left-20 w-36 h-36 rounded-full bg-blue-200/20 blur-3xl" />
-      </div>
+    <main className="min-h-screen overflow-hidden text-slate-900 relative">
+      {/* Full Page Background Image */}
+      <div 
+        className="pointer-events-none fixed inset-0 !z-0 bg-cover bg-center bg-no-repeat" 
+        style={{ backgroundImage: "url('/homepagebackgroundimage.png')" }}
+      />
+      <div className="pointer-events-none fixed inset-0 !z-0 bg-white/10" />
 
       <section id="top" className="relative !z-10 min-h-[92vh] overflow-hidden px-4 pt-10 md:px-6">
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 pb-8 lg:grid-cols-[0.9fr_1.1fr]">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <div className="mb-7 inline-flex items-center gap-3 rounded-full border border-white/75 bg-white/76 backdrop-blur-md px-4 py-2 text-sm font-bold text-slate-900 shadow-[0_14px_36px_rgba(15,23,42,0.12)]">
-              <img src="/adyapan-logo.svg" alt="ADYAPAN" className="h-10 w-10 rounded-full object-contain shadow-lg" />
-              Nurturing Minds. Building Futures.
-            </div>
             <h1 className="max-w-3xl text-5xl font-black leading-[0.96] tracking-tight text-slate-950 drop-shadow-[0_2px_0_rgba(255,255,255,0.9)] sm:text-6xl md:text-8xl">
               Big Dreams <span className="block text-blue-700">Start Small</span>
             </h1>
@@ -323,7 +513,11 @@ export default function Home() {
             {heroPrograms.map((program, index) => (
               <a
                 key={program.title}
-                href="#curriculum"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSelectedProgram(program);
+                }}
                 className="group relative min-h-[390px] overflow-hidden rounded-[30px] border border-white/80 bg-white/70 p-5 text-center shadow-[0_24px_70px_rgba(15,23,42,0.13)] backdrop-blur-xl transition duration-300 hover:-translate-y-3 hover:border-blue-200 hover:bg-white/86 hover:shadow-[0_30px_90px_rgba(37,99,235,0.20)] sm:min-h-[455px] sm:rounded-[34px] sm:p-6"
               >
                 <div className={`absolute inset-x-4 bottom-4 top-24 rounded-[28px] bg-gradient-to-b ${program.glow} opacity-75 blur-sm transition duration-300 group-hover:scale-105 group-hover:opacity-100`} />
@@ -339,7 +533,7 @@ export default function Home() {
                 <div className="relative z-10 mx-auto mt-6 flex h-48 max-w-[168px] items-end justify-center sm:h-56">
                   <div className="absolute bottom-0 h-28 w-36 rounded-[32px] bg-white/72 shadow-[0_18px_40px_rgba(15,23,42,0.12)] transition duration-300 group-hover:scale-105 group-hover:shadow-[0_0_34px_rgba(34,211,238,0.30)]" />
                   <img
-                    src="/assets/school-boy.png"
+                    src={program.image}
                     alt={`${program.title} student`}
                     className="relative z-10 h-full w-auto object-contain drop-shadow-[0_22px_26px_rgba(88,28,135,0.20)] transition duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_24px_rgba(168,85,247,0.40)]"
                   />
@@ -505,7 +699,7 @@ export default function Home() {
             title="Class-wise journeys from beginner to advanced"
             copy="Two clear pathways help students progress from fundamentals to capstones without losing momentum."
           />
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {paths.map((path) => (
               <div key={path.title} className="rounded-2xl border-2 border-white/60 bg-white/70 backdrop-blur p-6 shadow-[0_16px_40px_rgba(168,85,247,0.15)] transition hover:-translate-y-1">
                 <div className="flex items-center justify-between gap-4">
@@ -515,24 +709,17 @@ export default function Home() {
                   </div>
                   <GraduationCap className="h-10 w-10 text-pink-600" />
                 </div>
-                <div className="mt-8 grid gap-4">
-                  {path.steps.map((step, index) => (
-                    <div key={step} className="grid grid-cols-[2.5rem_1fr] items-center gap-4">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-lg border-2 border-purple-200 bg-gradient-to-br from-purple-300 to-pink-300 text-sm font-bold text-white">
-                        {index + 1}
-                      </span>
-                      <div className="rounded-lg border-2 border-white/60 bg-white/70 backdrop-blur px-4 py-3">
-                        <p className="font-bold text-slate-900">{step}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {path.courses.map((course) => (
-                    <span key={course} className="rounded-full bg-gradient-to-r from-purple-200 to-pink-200 px-3 py-1 text-sm font-bold text-slate-900">
-                      {course}
-                    </span>
-                  ))}
+                
+                <div className="mt-6">
+                  <h4 className="mb-4 text-lg font-bold text-slate-800">Skills</h4>
+                  <ul className="space-y-2">
+                    {path.skills.map((skill) => (
+                      <li key={skill} className="flex items-start gap-2 text-sm font-semibold text-slate-700">
+                        <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-gradient-to-r from-purple-400 to-pink-400"></span>
+                        {skill}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             ))}
@@ -540,102 +727,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="certificates" className="px-4 py-20 md:px-6">
-        <div className="mx-auto max-w-7xl">
-          <SectionTitle
-            eyebrow="Certification"
-            title="Enroll -> Take Exam -> Get Certified"
-            copy="Premium credentials with QR verification, downloadable records, and exam enrollment workflows."
-          />
-          <div className="grid gap-6 lg:grid-cols-[.9fr_1.1fr]">
-            <div className="rounded-2xl border-2 border-white/60 bg-white/70 backdrop-blur p-6 shadow-[0_16px_40px_rgba(168,85,247,0.15)]">
-              <div className="relative overflow-hidden rounded-xl border-2 border-white/60 bg-gradient-to-br from-purple-300/30 via-white/8 to-pink-300/24 p-6">
-                <div className="absolute right-4 top-4 rounded-lg bg-white/80 p-2">
-                  <QrCode className="h-8 w-8 text-purple-600" />
-                </div>
-                <p className="text-sm font-bold uppercase tracking-[0.22em] text-purple-700">ADYAPAN Credential</p>
-                <h3 className="mt-12 text-3xl font-black text-slate-900">AI Builder Certificate</h3>
-                <p className="mt-3 text-slate-800 font-bold">Awarded for project mastery, exam performance, and mentor review.</p>
-                <div className="mt-10 flex items-center justify-between border-t-2 border-white/60 pt-4 text-sm font-bold text-slate-800">
-                  <span>ID ADY-CERT-2026</span>
-                  <span>QR Verified</span>
-                </div>
-              </div>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <button
-                  onClick={() => setStatus("Certificate preview downloaded as a production-ready flow placeholder.")}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white/70 backdrop-blur border-2 border-white/60 font-bold text-slate-900 hover:bg-white transition"
-                >
-                  <Download className="h-4 w-4" /> Download
-                </button>
-                <a
-                  href="/signup"
-                  onClick={(event) => {
-                    if (isLoggedIn) showAlreadyLoggedIn(event);
-                  }}
-                  className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 font-bold text-white shadow-[0_12px_26px_rgba(34,197,94,0.3)] hover:-translate-y-1 transition"
-                >
-                  Exam Enrollment <ArrowRight className="h-4 w-4" />
-                </a>
-              </div>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {certificates.map((certificate) => (
-                <div key={certificate} className="rounded-xl border-2 border-white/60 bg-white/70 backdrop-blur p-5 transition hover:-translate-y-1 hover:border-purple-300">
-                  <ShieldCheck className="h-8 w-8 text-purple-600" />
-                  <h3 className="mt-5 text-xl font-black text-slate-900">{certificate}</h3>
-                  <p className="mt-3 text-sm font-bold leading-6 text-slate-800">Exam, QR credential, mentor remark, and portfolio linkage.</p>
-                  <a
-                    href="/signup"
-                    onClick={(event) => {
-                      if (isLoggedIn) showAlreadyLoggedIn(event);
-                    }}
-                    className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-purple-700"
-                  >
-                    Enroll <ArrowRight className="h-4 w-4" />
-                  </a>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section id="projects" className="bg-gradient-to-r from-purple-200/50 via-pink-100/50 to-blue-200/50 px-4 py-20 md:px-6">
-        <div className="mx-auto max-w-7xl">
-          <SectionTitle
-            eyebrow="Student projects"
-            title="A portfolio-first showcase with real outcomes"
-            copy="Students ship practical work across AI, websites, robotics, apps, smart farming, and IoT."
-          />
-          <div className="no-scrollbar flex snap-x gap-4 overflow-x-auto pb-4">
-            {projects.map((project) => (
-              <div key={project.title} className="min-w-[280px] snap-start rounded-2xl border-2 border-white/60 bg-white/70 backdrop-blur p-5 shadow-[0_16px_40px_rgba(168,85,247,0.15)] md:min-w-[360px] transition hover:-translate-y-1">
-                <div className="flex aspect-video items-center justify-center rounded-xl border-2 border-purple-200 bg-gradient-to-br from-purple-100 to-pink-100">
-                  <Play className="h-12 w-12 text-purple-600" />
-                </div>
-                <p className="mt-5 text-sm font-bold text-purple-700">{project.type}</p>
-                <h3 className="mt-1 text-xl font-black text-slate-900">{project.title}</h3>
-                <p className="mt-3 font-bold text-slate-800">{project.stat}</p>
-                <div className="mt-5 flex gap-3">
-                  <button
-                    onClick={() => setStatus(`${project.title} GitHub workspace opened.`)}
-                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-full bg-purple-100 text-sm font-bold text-purple-700 hover:bg-purple-200 transition"
-                  >
-                    <Github className="h-4 w-4" /> GitHub
-                  </button>
-                  <button
-                    onClick={() => setStatus(`${project.title} demo launched.`)}
-                    className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 text-sm font-bold text-white hover:shadow-lg transition"
-                  >
-                    <ExternalLink className="h-4 w-4" /> Demo
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
+
 
       <section id="schools" className="px-4 py-20 md:px-6">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_.85fr]">
@@ -803,11 +897,21 @@ export default function Home() {
       {status && !leadSuccess && (
         <button
           onClick={() => setStatus("")}
-          className="fixed bottom-5 left-1/2 z-50 max-w-[92vw] -translate-x-1/2 rounded-lg border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-saffron-900 shadow-glass"
+          className="fixed bottom-5 left-1/2 z-50 max-w-[92vw] -translate-x-1/2 rounded-lg border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 shadow-[0_16px_38px_rgba(15,23,42,0.16)]"
         >
           {status}
         </button>
       )}
+
+      {/* Program Popup */}
+      <AnimatePresence>
+        <ProgramPopup
+          program={selectedProgram}
+          onClose={() => setSelectedProgram(null)}
+          expandedSections={expandedSections}
+          toggleSection={toggleSection}
+        />
+      </AnimatePresence>
     </main>
   );
 }

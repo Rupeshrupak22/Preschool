@@ -13,6 +13,7 @@ import {
   X
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
 
 const navItems = [
   { label: "Home", href: "/#top" },
@@ -27,7 +28,8 @@ const navItems = [
 type NavUser = {
   name: string;
   email?: string;
-  role: "student" | "admin";
+  role: "student" | "admin" | "principal" | "teacher";
+  schoolName?: string;
 };
 
 export default function SiteNavbar() {
@@ -44,7 +46,39 @@ export default function SiteNavbar() {
       try {
         const response = await fetch("/api/auth/me", { cache: "no-store" });
         const data = await response.json();
-        if (active) setUser(response.ok ? data.user : null);
+        if (response.ok) {
+          if (active) setUser(data.user);
+          return;
+        }
+
+        const principalResponse = await fetch("/api/principal/me", { cache: "no-store" });
+        const principalData = await principalResponse.json();
+        if (principalResponse.ok) {
+          if (active) {
+            setUser({
+              name: principalData.principal.name,
+              email: principalData.principal.email,
+              role: "principal",
+              schoolName: principalData.principal.schoolName
+            });
+          }
+          return;
+        }
+
+        const teacherResponse = await fetch("/api/teacher/me", { cache: "no-store" });
+        const teacherData = await teacherResponse.json();
+        if (active) {
+          setUser(
+            teacherResponse.ok
+              ? {
+                  name: teacherData.teacher.name,
+                  email: teacherData.teacher.email,
+                  role: "teacher",
+                  schoolName: teacherData.teacher.schoolName
+                }
+              : null
+          );
+        }
       } catch {
         if (active) setUser(null);
       }
@@ -62,6 +96,19 @@ export default function SiteNavbar() {
     setProfileOpen(false);
     setMenuOpen(false);
   }, [pathname]);
+
+  // Listen for logout from other tabs (e.g., dashboard tab)
+  useEffect(() => {
+    const cleanup = onAuthChange((message) => {
+      if (message.type === "logout") {
+        setUser(null);
+        window.dispatchEvent(new Event("adyapan-auth-change"));
+      } else if (message.type === "login") {
+        window.dispatchEvent(new Event("adyapan-auth-change"));
+      }
+    });
+    return cleanup;
+  }, []);
 
   useEffect(() => {
     function closeOnOutsideClick(event: MouseEvent) {
@@ -84,28 +131,60 @@ export default function SiteNavbar() {
   }
 
   async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
+    const logoutUrl =
+      user?.role === "principal" ? "/api/principal/logout" : user?.role === "teacher" ? "/api/teacher/logout" : "/api/auth/logout";
+    await fetch(logoutUrl, { method: "POST" });
+    broadcastLogout();
     setUser(null);
     setMenuOpen(false);
     setProfileOpen(false);
     window.dispatchEvent(new Event("adyapan-auth-change"));
-    window.location.href = "/login";
+    window.location.href = user?.role === "principal" ? "/principal/login" : user?.role === "teacher" ? "/teacher/login" : "/login";
   }
 
   function openDashboardWindow(href: string) {
     const target = href.includes("#") ? href.replace("#", "/") : href;
-    const dashboardWindow = window.open(target, "_blank");
+    const windowName =
+      user?.role === "admin"
+        ? "adyapan_admin_dashboard"
+        : user?.role === "principal"
+          ? "adyapan_principal_dashboard"
+          : user?.role === "teacher"
+            ? "adyapan_teacher_dashboard"
+            : "adyapan_student_dashboard";
+    const dashboardWindow = window.open(target, windowName);
     dashboardWindow?.focus();
     setMenuOpen(false);
     setProfileOpen(false);
   }
 
-  const dashboardHref = user?.role === "admin" ? "/admin" : "/student-dashboard";
+  const dashboardHref =
+    user?.role === "admin"
+      ? "/admin"
+      : user?.role === "principal"
+        ? "/principal/dashboard"
+        : user?.role === "teacher"
+          ? "/teacher/dashboard"
+          : "/student-dashboard";
   const shortName = user?.name?.split(" ")[0] || "Student";
   const initial = (user?.name?.trim()?.[0] || "A").toUpperCase();
   const menuItems =
     user?.role === "admin"
       ? [{ label: "Admin Dashboard", href: dashboardHref, icon: LayoutDashboard }]
+      : user?.role === "principal"
+        ? [
+            { label: "Principal Dashboard", href: dashboardHref, icon: LayoutDashboard },
+            { label: "School Students", href: "/principal/dashboard#students", icon: BookOpen },
+            { label: "Activity", href: "/principal/dashboard#activity", icon: BarChart3 },
+            { label: "Security", href: "/principal/dashboard#security", icon: Settings }
+          ]
+        : user?.role === "teacher"
+          ? [
+              { label: "Teacher Dashboard", href: dashboardHref, icon: LayoutDashboard },
+              { label: "Student List", href: "/teacher/dashboard#students", icon: BookOpen },
+              { label: "Class Schedule", href: "/teacher/dashboard#schedule", icon: BarChart3 },
+              { label: "Security", href: "/teacher/dashboard#security", icon: Settings }
+            ]
       : [
           { label: "Dashboard", href: dashboardHref, icon: LayoutDashboard },
           { label: "My Courses", href: "/student-dashboard#courses", icon: BookOpen },
@@ -171,7 +250,13 @@ export default function SiteNavbar() {
                 <span className="min-w-0">
                   <span className="block truncate text-[15px] leading-4">{shortName}</span>
                   <span className="block truncate text-[11px] font-bold uppercase tracking-[0.12em] text-slate-600">
-                    {user.role === "admin" ? "Admin" : "Student"}
+                    {user.role === "admin"
+                      ? "Admin"
+                      : user.role === "principal"
+                        ? "Principal"
+                        : user.role === "teacher"
+                          ? "Teacher"
+                          : "Student"}
                   </span>
                 </span>
                 <ChevronDown className={`h-4 w-4 shrink-0 transition ${profileOpen ? "rotate-180" : ""}`} />
@@ -218,20 +303,12 @@ export default function SiteNavbar() {
               )}
             </div>
           ) : (
-            <>
-              <a
-                href="/login"
-                className="inline-flex h-12 min-w-[92px] items-center justify-center rounded-full border-2 border-white bg-white/72 px-5 text-[15px] font-black text-slate-950 shadow-[0_10px_22px_rgba(255,255,255,0.24)] transition hover:-translate-y-0.5 hover:bg-white 2xl:min-w-[100px] 2xl:px-6"
-              >
-                Login
-              </a>
-              <a
-                href="/signup"
-                className="inline-flex h-12 min-w-[102px] items-center justify-center rounded-full border-2 border-emerald-300/70 bg-gradient-to-r from-[#37e286] to-[#19c87d] px-5 text-[15px] font-black text-slate-950 shadow-[0_12px_30px_rgba(16,185,129,0.36)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(16,185,129,0.46)] 2xl:min-w-[110px] 2xl:px-6"
-              >
-                Sign Up
-              </a>
-            </>
+            <a
+              href="/login"
+              className="inline-flex h-12 min-w-[92px] items-center justify-center rounded-full border-2 border-white bg-white/72 px-5 text-[15px] font-black text-slate-950 shadow-[0_10px_22px_rgba(255,255,255,0.24)] transition hover:-translate-y-0.5 hover:bg-white 2xl:min-w-[100px] 2xl:px-6"
+            >
+              Login
+            </a>
           )}
         </div>
 
@@ -268,7 +345,13 @@ export default function SiteNavbar() {
                   <span className="min-w-0">
                     <span className="block truncate text-base font-black text-slate-950">{user.name}</span>
                     <span className="block truncate text-xs font-bold uppercase tracking-[0.12em] text-slate-700">
-                      {user.role === "admin" ? "Admin" : "Student"}
+                      {user.role === "admin"
+                        ? "Admin"
+                        : user.role === "principal"
+                          ? "Principal"
+                          : user.role === "teacher"
+                            ? "Teacher"
+                            : "Student"}
                     </span>
                   </span>
                 </div>
@@ -295,20 +378,13 @@ export default function SiteNavbar() {
                 </div>
               </div>
             ) : (
-              <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="mt-4">
                 <a
                   href="/login"
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-full border-2 border-white bg-white/78 px-4 py-3 text-center text-base font-black text-slate-950 transition hover:bg-white"
+                  className="block rounded-full border-2 border-white bg-white/78 px-4 py-3 text-center text-base font-black text-slate-950 transition hover:bg-white"
                 >
                   Login
-                </a>
-                <a
-                  href="/signup"
-                  onClick={() => setMenuOpen(false)}
-                  className="rounded-full border-2 border-emerald-300/70 bg-gradient-to-r from-[#37e286] to-[#19c87d] px-4 py-3 text-center text-base font-black text-slate-950"
-                >
-                  Sign Up
                 </a>
               </div>
             )}

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isMysqlConfigured, updateUserProfile } from "@/lib/db";
-import { currentUser, signToken } from "@/lib/security";
+import { clearAuthCookies, currentUser, signToken } from "@/lib/security";
 import { publicUser, store } from "@/lib/store";
 import { profileSchema } from "@/lib/validators";
 
@@ -33,11 +33,13 @@ export async function PATCH(request: Request) {
 
     const token = signToken({ id: updated.id, email: updated.email, role: updated.role, name: updated.name });
     const response = NextResponse.json({ user: publicUser(updated), mode: "mysql" });
+    clearAuthCookies(response, "adyapan_token");
     response.cookies.set("adyapan_token", token, {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      path: "/"
+      path: "/",
+      maxAge: 60 * 60 * 8
     });
     return response;
   }
@@ -52,6 +54,13 @@ export async function PATCH(request: Request) {
   const role = existing.role === "admin" ? "admin" : "student";
   const token = signToken({ id: String(existing.id), email: String(existing.email), role, name: cleanProfile.name });
   const response = NextResponse.json({ user: publicUser(existing), mode: "dev" });
-  response.cookies.set("adyapan_token", token, { httpOnly: true, sameSite: "lax", secure: false, path: "/" });
+  clearAuthCookies(response, "adyapan_token");
+  response.cookies.set("adyapan_token", token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false,
+    path: "/",
+    maxAge: 60 * 60 * 8
+  });
   return response;
 }

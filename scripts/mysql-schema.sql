@@ -165,6 +165,86 @@ CREATE TABLE IF NOT EXISTS login_events (
   KEY idx_login_events_email (email)
 );
 
+CREATE TABLE IF NOT EXISTS principals (
+  id VARCHAR(64) PRIMARY KEY,
+  school_id VARCHAR(64) NOT NULL,
+  school_name VARCHAR(190) NOT NULL,
+  principal_name VARCHAR(160) NOT NULL,
+  email VARCHAR(190) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  access_key_hash VARCHAR(255) NOT NULL,
+  phone VARCHAR(30),
+  status VARCHAR(40) NOT NULL DEFAULT 'active',
+  last_login_at DATETIME,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_principals_school_id (school_id),
+  KEY idx_principals_school_name (school_name)
+);
+
+CREATE TABLE IF NOT EXISTS principal_login_events (
+  id VARCHAR(64) PRIMARY KEY,
+  principal_id VARCHAR(64),
+  email VARCHAR(190) NOT NULL,
+  school_id VARCHAR(64),
+  ip_address VARCHAR(80),
+  user_agent TEXT,
+  status VARCHAR(40) NOT NULL DEFAULT 'success',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_principal_login_events_email (email),
+  KEY idx_principal_login_events_school_id (school_id)
+);
+
+CREATE TABLE IF NOT EXISTS teachers (
+  id VARCHAR(64) PRIMARY KEY,
+  school_id VARCHAR(64) NOT NULL,
+  school_name VARCHAR(190) NOT NULL,
+  teacher_name VARCHAR(160) NOT NULL,
+  email VARCHAR(190) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  staff_key_hash VARCHAR(255) NOT NULL,
+  subject VARCHAR(120),
+  phone VARCHAR(30),
+  assigned_classes JSON,
+  status VARCHAR(40) NOT NULL DEFAULT 'active',
+  last_login_at DATETIME,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_teachers_school_id (school_id),
+  KEY idx_teachers_school_name (school_name)
+);
+
+CREATE TABLE IF NOT EXISTS teacher_login_events (
+  id VARCHAR(64) PRIMARY KEY,
+  teacher_id VARCHAR(64),
+  email VARCHAR(190) NOT NULL,
+  school_id VARCHAR(64),
+  ip_address VARCHAR(80),
+  user_agent TEXT,
+  status VARCHAR(40) NOT NULL DEFAULT 'success',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_teacher_login_events_email (email),
+  KEY idx_teacher_login_events_school_id (school_id)
+);
+
+CREATE TABLE IF NOT EXISTS teacher_class_sessions (
+  id VARCHAR(64) PRIMARY KEY,
+  teacher_id VARCHAR(64) NOT NULL,
+  title VARCHAR(190) NOT NULL,
+  class_level VARCHAR(80) NOT NULL,
+  subject VARCHAR(120),
+  start_time DATETIME NOT NULL,
+  end_time DATETIME,
+  room VARCHAR(80),
+  mode VARCHAR(40) NOT NULL DEFAULT 'online',
+  status VARCHAR(40) NOT NULL DEFAULT 'scheduled',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_teacher_class_sessions_teacher_id (teacher_id),
+  KEY idx_teacher_class_sessions_class_level (class_level),
+  KEY idx_teacher_class_sessions_start_time (start_time)
+);
+
 CREATE TABLE IF NOT EXISTS dashboard_snapshots (
   id VARCHAR(64) PRIMARY KEY,
   user_email VARCHAR(190) NOT NULL UNIQUE,
