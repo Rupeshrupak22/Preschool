@@ -1,6 +1,6 @@
-import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import { findTeacherByEmail, recordTeacherLoginEvent } from "@/lib/db";
+import { findTeacherByEmail, recordTeacherLoginEvent, updatePasswordHash, updateStaffKeyHash } from "@/lib/db";
+import { verifyPassword, hashPassword } from "@/lib/password";
 import { activeCookieSessions, clearAuthCookies, signToken } from "@/lib/security";
 import { teacherLoginSchema } from "@/lib/validators";
 
@@ -26,10 +26,10 @@ export async function POST(request: Request) {
   }
 
   const teacher = await findTeacherByEmail(payload.data.email);
-  const passwordValid = teacher ? await bcrypt.compare(payload.data.password, teacher.passwordHash) : false;
-  const staffKeyValid = teacher ? await bcrypt.compare(payload.data.staffKey, teacher.staffKeyHash) : false;
+  const passwordResult = teacher ? await verifyPassword(payload.data.password, teacher.passwordHash) : { valid: false, needsRehash: false };
+  const staffKeyResult = teacher ? await verifyPassword(payload.data.staffKey, teacher.staffKeyHash) : { valid: false, needsRehash: false };
 
-  if (!teacher || teacher.status !== "active" || !passwordValid || !staffKeyValid) {
+  if (!teacher || teacher.status !== "active" || !passwordResult.valid || !staffKeyResult.valid) {
     await recordTeacherLoginEvent({
       teacher,
       email: payload.data.email,
@@ -38,6 +38,16 @@ export async function POST(request: Request) {
       status: "failed"
     });
     return NextResponse.json({ error: "Invalid teacher credentials or staff key." }, { status: 401 });
+  }
+
+  // Transparently upgrade bcrypt hashes to Argon2id
+  if (passwordResult.needsRehash) {
+    const newHash = await hashPassword(payload.data.password);
+    await updatePasswordHash("teachers", teacher.email, newHash);
+  }
+  if (staffKeyResult.needsRehash) {
+    const newHash = await hashPassword(payload.data.staffKey);
+    await updateStaffKeyHash("teachers", teacher.email, newHash);
   }
 
   const token = signToken({

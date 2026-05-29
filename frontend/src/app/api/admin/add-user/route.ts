@@ -1,6 +1,6 @@
-import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { connectDb, findUserByEmail, findPrincipalByEmail, findTeacherByEmail, isMysqlConfigured } from "@/lib/db";
+import { hashPassword } from "@/lib/password";
 import { currentUser, strongPassword } from "@/lib/security";
 import { id } from "@/lib/store";
 import type { RowDataPacket } from "mysql2/promise";
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Database connection failed." }, { status: 500 });
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
+  const passwordHash = await hashPassword(password);
 
   try {
     if (role === "student" || role === "admin") {
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: `Principal with email ${email} already exists.` }, { status: 409 });
       }
 
-      const accessKeyHash = await bcrypt.hash(schoolKey.toUpperCase(), 12);
+      const accessKeyHash = await hashPassword(schoolKey.toUpperCase());
       const principalId = id("principal");
       const finalSchoolId = schoolId || id("school");
 
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: `Teacher with email ${email} already exists.` }, { status: 409 });
       }
 
-      const staffKeyHash = await bcrypt.hash(staffKey.toUpperCase(), 12);
+      const staffKeyHash = await hashPassword(staffKey.toUpperCase());
       const teacherId = id("teacher");
       const finalSchoolId = schoolId || id("school");
       const assignedClasses = classes ? (Array.isArray(classes) ? classes : classes.split(",").map((c: string) => c.trim())) : [];

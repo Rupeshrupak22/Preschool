@@ -1,6 +1,6 @@
-import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { connectDb, isMysqlConfigured } from "@/lib/db";
+import { hashPassword } from "@/lib/password";
 import { currentUser, strongPassword } from "@/lib/security";
 import type { RowDataPacket } from "mysql2/promise";
 
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Database connection failed." }, { status: 500 });
   }
 
-  const passwordHash = await bcrypt.hash(newPassword, 12);
+  const passwordHash = await hashPassword(newPassword);
 
   try {
     if (role === "principal") {
