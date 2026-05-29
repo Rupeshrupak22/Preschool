@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import {
   ArrowRight,
   BarChart3,
@@ -14,6 +15,8 @@ import {
   ShieldCheck,
   Sparkles,
   Users,
+  Volume2,
+  VolumeX,
   Wifi,
   Zap
 } from "lucide-react";
@@ -97,18 +100,28 @@ const examCards: { title: string; copy: string; icon: Icon; tags: string[]; grad
 ];
 
 export default function LMSPage() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
+
   function goTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  function toggleMute() {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  }
+
   return (
-    <main className="lms-dashboard-page relative min-h-screen text-gray-900" style={{ color: '#000000' }}>
+    <main className="lms-dashboard-page relative min-h-screen text-gray-900">
       {/* Video Background */}
       <div className="fixed inset-0 z-0 overflow-hidden">
         <video autoPlay muted loop playsInline className="h-full w-full object-cover">
           <source src="/lms-bg.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-white/55" />
+        <div className="absolute inset-0 bg-white/20" />
       </div>
 
       {/* Content */}
@@ -117,28 +130,28 @@ export default function LMSPage() {
         {/* Hero */}
         <section className="px-4 pb-20 pt-10 md:px-6">
           <div className="mx-auto max-w-7xl">
-            <div className="grid items-center gap-14 lg:grid-cols-2">
-              <div className="rounded-3xl bg-white/50 backdrop-blur-xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/60" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.35) 100%)' }}>
-                <div className="lms-tilt mb-8 inline-flex items-center gap-3 rounded-full border border-white/50 bg-white/45 backdrop-blur-xl px-5 py-2.5 text-sm font-black text-blue-900 shadow-[0_8px_30px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.9)]">
+            <div className="grid items-start gap-14 lg:grid-cols-2">
+              <div className="rounded-3xl border border-white/5 bg-transparent backdrop-blur-sm p-8">
+                <div className="lms-tilt mb-8 inline-flex items-center gap-3 rounded-full border border-white/50 bg-white/50 backdrop-blur-xl px-5 py-2.5 text-sm font-black text-blue-900 shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
                   <Sparkles className="h-5 w-5 text-cyan-600" />
                   AI-Powered Education Platform
                 </div>
-                <h1 className="text-5xl font-black leading-tight tracking-tight text-gray-900 md:text-7xl">
-                  <span className="bg-gradient-to-r from-cyan-600 to-blue-700 bg-clip-text text-transparent">Adyapan</span> LMS
+                <h1 className="lms-text-white text-5xl font-black leading-tight tracking-tight md:text-7xl">
+                  <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Adyapan</span> LMS
                 </h1>
-                <p className="mt-6 max-w-xl text-lg font-medium leading-relaxed text-gray-800">
+                <p className="lms-text-white mt-6 max-w-xl text-lg font-bold leading-relaxed">
                   AI-powered Learning Management System enriched with dynamic features to enhance teaching efficiency and student engagement for Classes 5–12.
                 </p>
                 <div className="mt-10 flex flex-wrap gap-4">
                   <button
                     onClick={() => goTo("overview")}
-                    className="lms-tilt-btn inline-flex h-14 items-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-700 px-8 font-black text-white shadow-[0_14px_30px_rgba(6,182,212,0.35)]"
+                    className="lms-tilt-btn inline-flex h-14 items-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 font-black text-white shadow-[0_14px_30px_rgba(6,182,212,0.4)]"
                   >
                     Explore Features <ArrowRight className="h-5 w-5" />
                   </button>
                   <button
                     onClick={() => goTo("exam-software")}
-                    className="lms-tilt-btn inline-flex h-14 items-center gap-3 rounded-2xl border-2 border-white/50 bg-white/40 backdrop-blur-xl px-8 font-black text-gray-900 shadow-[0_8px_24px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.9)]"
+                    className="lms-tilt-btn inline-flex h-14 items-center gap-3 rounded-2xl border border-white/50 bg-white/40 backdrop-blur-xl px-8 font-black text-gray-900 shadow-[0_4px_16px_rgba(0,0,0,0.08)]"
                   >
                     Exam Software
                   </button>
@@ -149,7 +162,7 @@ export default function LMSPage() {
                   {skillTiles.map((tile) => (
                     <div
                       key={tile.label}
-                      className="lms-tilt group flex h-14 items-center gap-3 rounded-xl border border-white/50 bg-white/40 backdrop-blur-xl px-4 font-bold text-gray-900 shadow-[0_8px_24px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.8)]"
+                      className="lms-tilt group flex h-14 items-center gap-3 rounded-xl border border-white/40 bg-white/40 backdrop-blur-xl px-4 font-bold text-gray-900 shadow-[0_4px_16px_rgba(0,0,0,0.06)]"
                     >
                       <div className={`flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br ${tile.color} shadow-lg`}>
                         <tile.icon className="h-4 w-4 text-white" />
@@ -160,17 +173,31 @@ export default function LMSPage() {
                 </div>
               </div>
 
-              {/* Hero Image */}
-              <div className="relative" style={{ perspective: '1200px' }}>
+              {/* Hero Video */}
+              <div className="relative flex justify-center">
                 <div className="lms-tilt absolute -left-6 -top-6 z-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-[0_12px_30px_rgba(6,182,212,0.4)]">
                   <Users className="h-8 w-8" />
                 </div>
-                <div className="lms-tilt overflow-hidden rounded-3xl border-4 border-white/80 bg-white shadow-[0_30px_80px_rgba(0,0,0,0.15)]" style={{ transform: 'rotateY(-5deg) rotateX(3deg)' }}>
-                  <img
-                    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1000&q=80"
-                    alt="Students collaborating"
-                    className="h-[400px] w-full object-cover"
-                  />
+                <div className="lms-tilt relative overflow-hidden rounded-3xl border-4 border-white/80 shadow-[0_30px_80px_rgba(0,0,0,0.15)] inline-block">
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    muted
+                    loop
+                    controls
+                    playsInline
+                    className="block max-h-[600px] w-auto max-w-full"
+                  >
+                    <source src="/lms-vid.mp4" type="video/mp4" />
+                  </video>
+                  {/* Mute/Unmute Button */}
+                  <button
+                    onClick={toggleMute}
+                    className="absolute bottom-12 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition hover:bg-black/70"
+                    aria-label={isMuted ? "Unmute video" : "Mute video"}
+                  >
+                    {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                  </button>
                 </div>
                 <div className="lms-tilt absolute -bottom-5 -right-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-[0_12px_30px_rgba(168,85,247,0.4)]">
                   <GraduationCap className="h-8 w-8" />

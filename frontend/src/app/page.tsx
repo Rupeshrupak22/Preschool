@@ -487,7 +487,7 @@ export default function Home() {
             <h1 className="max-w-3xl text-5xl font-black leading-[0.96] tracking-tight text-slate-950 drop-shadow-[0_2px_0_rgba(255,255,255,0.9)] sm:text-6xl md:text-8xl">
               Big Dreams <span className="block text-blue-700">Start Small</span>
             </h1>
-            <p className="mt-7 max-w-2xl rounded-3xl border border-white/70 bg-white/62 p-5 text-lg font-bold leading-8 text-slate-900 shadow-[0_16px_40px_rgba(15,23,42,0.10)] backdrop-blur-md sm:text-xl md:text-2xl md:leading-9">
+            <p className="mt-7 max-w-2xl rounded-3xl border border-white/40 p-5 text-lg font-bold leading-8 text-slate-900 shadow-[0_8px_32px_rgba(31,38,135,0.1)] backdrop-blur-xl sm:text-xl md:text-2xl md:leading-9" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.20) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 8px 32px rgba(31,38,135,0.1)' }}>
               Nurturing young minds from <span className="font-black text-blue-700">Class 1</span> and guiding them
               all the way to <span className="font-black text-blue-700">Class 12</span>.
             </p>
@@ -504,7 +504,8 @@ export default function Home() {
                 onClick={(event) => {
                   if (isLoggedIn) showAlreadyLoggedIn(event);
                 }}
-                className="inline-flex h-14 items-center justify-center gap-3 rounded-full border border-white/80 bg-white/76 backdrop-blur-md px-7 font-bold text-slate-900 shadow-[0_14px_30px_rgba(15,23,42,0.10)] transition hover:-translate-y-1 hover:bg-white"
+                className="inline-flex h-14 items-center justify-center gap-3 rounded-full border border-white/40 px-7 font-bold text-slate-900 shadow-[0_4px_16px_rgba(31,38,135,0.08)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(31,38,135,0.15)]"
+                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}
               >
                 <CalendarDays className="h-5 w-5" /> Book a Free Class
               </a>
@@ -525,7 +526,8 @@ export default function Home() {
                   e.preventDefault();
                   setSelectedProgram(program);
                 }}
-                className="group relative min-h-[390px] overflow-hidden rounded-[30px] border border-white/80 bg-white/70 p-5 text-center shadow-[0_24px_70px_rgba(15,23,42,0.13)] backdrop-blur-xl transition duration-300 hover:-translate-y-3 hover:border-blue-200 hover:bg-white/86 hover:shadow-[0_30px_90px_rgba(37,99,235,0.20)] sm:min-h-[455px] sm:rounded-[34px] sm:p-6"
+                className="group relative min-h-[390px] overflow-hidden rounded-[30px] border border-white/40 p-5 text-center shadow-[0_8px_32px_rgba(31,38,135,0.12)] backdrop-blur-xl transition duration-300 hover:-translate-y-3 hover:border-white/60 hover:shadow-[0_16px_48px_rgba(31,38,135,0.2)] sm:min-h-[455px] sm:rounded-[34px] sm:p-6"
+                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.22) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 8px 32px rgba(31,38,135,0.12)' }}
               >
                 <div className={`absolute inset-x-4 bottom-4 top-24 rounded-[28px] bg-gradient-to-b ${program.glow} opacity-75 blur-sm transition duration-300 group-hover:scale-105 group-hover:opacity-100`} />
                 <div className="absolute inset-0 rounded-[30px] ring-1 ring-inset ring-white/90 transition duration-300 group-hover:ring-fuchsia-300/70" />
@@ -580,14 +582,16 @@ export default function Home() {
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.22, duration: 0.7 }}
-          className="relative mx-auto mb-10 grid max-w-6xl gap-4 rounded-[32px] border border-white/75 bg-white/72 p-5 shadow-[0_26px_70px_rgba(15,23,42,0.12)] backdrop-blur-xl sm:grid-cols-2 lg:grid-cols-4"
+          className="relative mx-auto mb-10 grid max-w-6xl gap-4 rounded-[32px] border border-white/40 p-5 shadow-[0_8px_32px_rgba(31,38,135,0.15)] backdrop-blur-xl sm:grid-cols-2 lg:grid-cols-4"
+          style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.20) 100%)', boxShadow: '0 8px 32px rgba(31,38,135,0.12), inset 0 1px 0 rgba(255,255,255,0.6)' }}
         >
           {heroBenefits.map((benefit) => (
             <div
               key={benefit.title}
-              className="group flex min-h-24 items-center gap-4 rounded-2xl border border-white/80 bg-white/68 p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:bg-white hover:shadow-[0_18px_36px_rgba(37,99,235,0.14)]"
+              className="group flex min-h-24 items-center gap-4 rounded-2xl border border-white/50 p-4 shadow-[0_4px_16px_rgba(31,38,135,0.08)] backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:border-white/70 hover:shadow-[0_12px_28px_rgba(31,38,135,0.15)]"
+              style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.30) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.7), 0 4px 16px rgba(31,38,135,0.08)' }}
             >
-              <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${benefit.color} transition duration-300 group-hover:scale-110`}>
+              <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${benefit.color} shadow-lg transition duration-300 group-hover:scale-110`}>
                 <benefit.icon className="h-7 w-7" />
               </span>
               <p className="text-base font-bold leading-6 text-slate-900">{benefit.title}</p>
@@ -606,7 +610,7 @@ export default function Home() {
               viewport={{ once: true, margin: "-120px" }}
               transition={{ duration: 0.55 }}
             >
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border-2 border-purple-300 bg-white/70 backdrop-blur px-4 py-2 text-xs font-bold text-purple-700 shadow-[0_10px_28px_rgba(168,85,247,0.15)]">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-purple-200/60 px-4 py-2 text-xs font-bold text-purple-700 shadow-[0_4px_16px_rgba(168,85,247,0.1)] backdrop-blur-xl" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.25) 100%)' }}>
                 <span className="h-2 w-2 rounded-full bg-yellow-400" />
                 <span className="h-2 w-2 rounded-full bg-pink-400" />
                 <span className="h-2 w-2 rounded-full bg-blue-400" />
@@ -626,10 +630,11 @@ export default function Home() {
                 ].map(([value, label]) => (
                   <div
                     key={label}
-                    className="rounded-2xl border-2 border-white/60 bg-white/70 backdrop-blur p-5 text-center shadow-[0_16px_34px_rgba(168,85,247,0.15)] transition hover:-translate-y-1 hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 hover:text-white hover:border-white"
+                    className="rounded-2xl border border-white/40 p-5 text-center shadow-[0_4px_20px_rgba(31,38,135,0.1)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(168,85,247,0.2)] hover:border-purple-300/50"
+                    style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.25) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 20px rgba(31,38,135,0.1)' }}
                   >
-                    <p className="text-2xl font-black">{value}</p>
-                    <p className="mt-1 text-xs font-bold">{label}</p>
+                    <p className="text-2xl font-black text-slate-900">{value}</p>
+                    <p className="mt-1 text-xs font-bold text-slate-700">{label}</p>
                   </div>
                 ))}
               </div>
@@ -641,7 +646,8 @@ export default function Home() {
               whileInView="show"
               viewport={{ once: true, margin: "-120px" }}
               transition={{ delay: 0.08, duration: 0.55 }}
-              className="rounded-[24px] border-2 border-white/60 bg-white/70 backdrop-blur p-6 shadow-[0_22px_55px_rgba(168,85,247,0.15)] transition hover:-translate-y-1 hover:border-white"
+              className="rounded-[24px] border border-white/40 p-6 shadow-[0_8px_32px_rgba(31,38,135,0.12)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(31,38,135,0.18)]"
+              style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.22) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 8px 32px rgba(31,38,135,0.12)' }}
             >
               <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
                 <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-[0_14px_30px_rgba(168,85,247,0.3)] font-bold">
@@ -667,30 +673,31 @@ export default function Home() {
                 whileInView="show"
                 viewport={{ once: true, margin: "-90px" }}
                 transition={{ delay: index * 0.035, duration: 0.45 }}
-                className={`group rounded-2xl border-2 bg-white/70 backdrop-blur p-6 shadow-[0_16px_40px_rgba(168,85,247,0.15)] transition hover:-translate-y-1 hover:bg-gradient-to-br hover:from-purple-400 hover:to-pink-400 hover:text-white hover:shadow-[0_22px_48px_rgba(168,85,247,0.3)] hover:border-white ${
-                  index === 0 ? "border-purple-300 ring-2 ring-purple-200/50" : "border-white/60"
+                className={`group rounded-2xl border p-6 shadow-[0_4px_20px_rgba(31,38,135,0.08)] backdrop-blur-xl transition hover:-translate-y-2 hover:shadow-[0_16px_40px_rgba(31,38,135,0.18)] ${
+                  index === 0 ? "border-purple-200/60 ring-1 ring-purple-200/30" : "border-white/40"
                 }`}
+                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.22) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 20px rgba(31,38,135,0.08)' }}
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-purple-200 bg-purple-100 text-purple-600 transition group-hover:border-white/25 group-hover:bg-white/20 group-hover:text-white">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-purple-200/50 bg-purple-50/80 text-purple-600 shadow-sm backdrop-blur-sm transition group-hover:scale-110 group-hover:shadow-[0_8px_20px_rgba(168,85,247,0.2)]">
                   <program.icon className="h-6 w-6" />
                 </div>
-                <h3 className="mt-5 text-lg font-black text-slate-900 transition group-hover:text-white">
+                <h3 className="mt-5 text-lg font-black text-slate-900">
                   {program.title}
                 </h3>
-                <p className="mt-4 min-h-16 text-sm font-bold leading-6 text-slate-800 transition group-hover:text-white/90">
+                <p className="mt-4 min-h-16 text-sm font-bold leading-6 text-slate-700">
                   {program.copy}
                 </p>
-                <p className="mt-5 flex items-center gap-2 text-xs font-bold text-purple-700 transition group-hover:text-white">
-                  <span className="h-2 w-2 rounded-full bg-gradient-to-r from-yellow-400 to-pink-400 transition group-hover:bg-white" />
+                <p className="mt-5 flex items-center gap-2 text-xs font-bold text-purple-700">
+                  <span className="h-2 w-2 rounded-full bg-gradient-to-r from-yellow-400 to-pink-400" />
                   Available
                 </p>
               </motion.div>
             ))}
           </div>
 
-          <div className="mt-9 rounded-[22px] border-2 border-white/60 bg-white/70 backdrop-blur p-7 text-center shadow-[0_18px_48px_rgba(168,85,247,0.15)]">
+          <div className="mt-9 rounded-[22px] border border-white/40 p-7 text-center shadow-[0_8px_32px_rgba(31,38,135,0.1)] backdrop-blur-xl" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.22) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 8px 32px rgba(31,38,135,0.1)' }}>
             <h3 className="text-2xl font-black text-slate-900">Ready to transform education?</h3>
-            <p className="mx-auto mt-3 max-w-2xl text-sm font-bold leading-6 text-slate-800">
+            <p className="mx-auto mt-3 max-w-2xl text-sm font-bold leading-6 text-slate-700">
               Join schools and students using ADYAPAN's future skills curriculum to prepare learners for tomorrow.
             </p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
@@ -711,7 +718,8 @@ export default function Home() {
               </a>
               <button
                 onClick={() => setStatus("ADYAPAN brochure download will be connected with the final PDF.")}
-                className="inline-flex h-11 items-center justify-center rounded-full border-2 border-white/60 bg-white/70 backdrop-blur px-6 text-sm font-bold text-slate-900 transition hover:-translate-y-1 hover:bg-white hover:border-white"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-white/40 px-6 text-sm font-bold text-slate-900 shadow-[0_4px_16px_rgba(31,38,135,0.08)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(31,38,135,0.15)]"
+                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}
               >
                 Download Brochure
               </button>
@@ -720,7 +728,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="path" className="bg-gradient-to-r from-purple-200/50 via-pink-100/50 to-blue-200/50 px-4 py-20 md:px-6">
+      <section id="path" className="px-4 py-20 md:px-6">
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Learning path"
@@ -729,13 +737,19 @@ export default function Home() {
           />
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {paths.map((path) => (
-              <div key={path.title} className="rounded-2xl border-2 border-white/60 bg-white/70 backdrop-blur p-6 shadow-[0_16px_40px_rgba(168,85,247,0.15)] transition hover:-translate-y-1">
+              <div
+                key={path.title}
+                className="rounded-2xl border border-white/40 p-6 shadow-[0_4px_20px_rgba(31,38,135,0.08)] backdrop-blur-xl transition hover:-translate-y-2 hover:shadow-[0_16px_40px_rgba(31,38,135,0.15)]"
+                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.22) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 20px rgba(31,38,135,0.08)' }}
+              >
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-sm font-bold text-purple-700">{path.level}</p>
                     <h3 className="mt-1 text-2xl font-black text-slate-900">{path.title}</h3>
                   </div>
-                  <GraduationCap className="h-10 w-10 text-pink-600" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-pink-200/50 bg-pink-50/60 backdrop-blur-sm">
+                    <GraduationCap className="h-7 w-7 text-pink-600" />
+                  </div>
                 </div>
                 
                 <div className="mt-6">
@@ -769,14 +783,23 @@ export default function Home() {
             />
             <div className="grid gap-4 sm:grid-cols-2">
               {["AI Curriculum", "Coding Labs", "Robotics Workshops", "Teacher Training", "Future Skills Programs", "Analytics"].map((item) => (
-                <div key={item} className="rounded-xl border-2 border-white/60 bg-white/70 backdrop-blur p-5 transition hover:-translate-y-1 hover:border-purple-300">
+                <div
+                  key={item}
+                  className="rounded-xl border border-white/40 p-5 shadow-[0_4px_16px_rgba(31,38,135,0.06)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(31,38,135,0.14)] hover:border-purple-200/50"
+                  style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.22) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 16px rgba(31,38,135,0.06)' }}
+                >
                   <School className="h-7 w-7 text-purple-600" />
                   <p className="mt-4 font-bold text-slate-900">{item}</p>
                 </div>
               ))}
             </div>
           </div>
-          <form id="demo" onSubmit={(event) => submitLead(event, "school")} className="rounded-2xl border-2 border-white/60 bg-white/70 backdrop-blur p-6 shadow-[0_16px_40px_rgba(168,85,247,0.15)]">
+          <form
+            id="demo"
+            onSubmit={(event) => submitLead(event, "school")}
+            className="rounded-2xl border border-white/40 p-6 shadow-[0_8px_32px_rgba(31,38,135,0.12)] backdrop-blur-xl"
+            style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.22) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 8px 32px rgba(31,38,135,0.12)' }}
+          >
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-700">Partnership CTA</p>
             <h3 className="mt-3 text-2xl font-black text-slate-900">School onboarding form</h3>
             <div className="mt-6 grid gap-3">
@@ -793,7 +816,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="events" className="bg-white/70 px-4 py-20 md:px-6">
+      <section id="events" className="px-4 py-20 md:px-6">
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Community"
@@ -805,13 +828,14 @@ export default function Home() {
               <motion.div
                 key={event}
                 whileHover={{ y: -6 }}
-                className="rounded-xl border border-slate-200 bg-white p-5"
+                className="rounded-xl border border-white/40 p-5 shadow-[0_4px_16px_rgba(31,38,135,0.06)] backdrop-blur-xl"
+                style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.22) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 16px rgba(31,38,135,0.06)' }}
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-saffron-500/15 text-saffron-700">
+                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100/80 text-purple-700 font-bold backdrop-blur-sm">
                   {index + 1}
                 </span>
-                <h3 className="mt-5 text-lg font-semibold">{event}</h3>
-                <p className="mt-3 text-sm leading-6 text-saffron-900/56">Live cohorts, challenge boards, and community recognition.</p>
+                <h3 className="mt-5 text-lg font-bold text-slate-900">{event}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-600">Live cohorts, challenge boards, and community recognition.</p>
               </motion.div>
             ))}
           </div>
@@ -825,22 +849,25 @@ export default function Home() {
             title="Trusted by students, parents, and schools"
             copy="Auto-sliding feedback, rating proof, and video-style cards built into the premium platform surface."
           />
-          <div className="glass mx-auto max-w-3xl rounded-2xl p-8 text-center">
-            <div className="mx-auto flex justify-center gap-1 text-saffron-600">
+          <div
+            className="mx-auto max-w-3xl rounded-2xl border border-white/40 p-8 text-center shadow-[0_8px_32px_rgba(31,38,135,0.12)] backdrop-blur-xl"
+            style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.22) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 8px 32px rgba(31,38,135,0.12)' }}
+          >
+            <div className="mx-auto flex justify-center gap-1 text-amber-500">
               {Array.from({ length: 5 }).map((_, index) => (
                 <Star key={index} className="h-5 w-5 fill-current" />
               ))}
             </div>
-            <p className="mt-6 text-2xl font-medium leading-10">"{testimonials[activeTestimonial].quote}"</p>
-            <p className="mt-6 font-semibold">{testimonials[activeTestimonial].name}</p>
-            <p className="mt-1 text-sm text-saffron-900/52">{testimonials[activeTestimonial].role}</p>
+            <p className="mt-6 text-2xl font-medium leading-10 text-slate-900">"{testimonials[activeTestimonial].quote}"</p>
+            <p className="mt-6 font-bold text-slate-900">{testimonials[activeTestimonial].name}</p>
+            <p className="mt-1 text-sm text-slate-600">{testimonials[activeTestimonial].role}</p>
             <div className="mt-6 flex justify-center gap-2">
               {testimonials.map((testimonial, index) => (
                 <button
                   key={testimonial.name}
                   onClick={() => setActiveTestimonial(index)}
                   aria-label={`Show ${testimonial.name} review`}
-                  className={`h-2.5 rounded-full transition ${activeTestimonial === index ? "w-8 bg-saffron-400" : "w-2.5 bg-blue-200"}`}
+                  className={`h-2.5 rounded-full transition ${activeTestimonial === index ? "w-8 bg-purple-500" : "w-2.5 bg-purple-200"}`}
                 />
               ))}
             </div>
