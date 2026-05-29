@@ -33,11 +33,43 @@ const rotatingWords = [
   { text: "brave", className: "from-violet-700 to-fuchsia-500" }
 ];
 
-const metrics: { value: string; label: string; icon: Icon; accent: string }[] = [
-  { value: "5-12", label: "Classes", icon: GraduationCap, accent: "from-blue-600 to-cyan-500" },
-  { value: "10+", label: "Future skills", icon: Brain, accent: "from-violet-600 to-fuchsia-500" },
-  { value: "100%", label: "Project-first learning", icon: Target, accent: "from-emerald-600 to-teal-500" },
-  { value: "24/7", label: "Digital access", icon: Rocket, accent: "from-amber-500 to-rose-500" }
+const impactCards: { title: string; description: string; image: string; imageAlt: string; gradient: string; badge: string; icon: Icon }[] = [
+  {
+    title: "Class 1–12",
+    description: "Comprehensive curriculum and future skills learning programs for students from Class 1 to 12.",
+    image: "/coding-character.png",
+    imageAlt: "Student illustration",
+    gradient: "from-blue-600 via-indigo-600 to-violet-700",
+    badge: "Class 1–12",
+    icon: GraduationCap
+  },
+  {
+    title: "25+ Future Skills",
+    description: "Coding, AI, Robotics, Communication, Design Thinking, Financial Literacy, Entrepreneurship, Public Speaking and more.",
+    image: "/coding-hero.png",
+    imageAlt: "Student using laptop",
+    gradient: "from-violet-600 via-fuchsia-600 to-pink-500",
+    badge: "Future skills",
+    icon: Brain
+  },
+  {
+    title: "Real-World Learning",
+    description: "Hands-on projects, practical activities, challenges and industry-inspired learning experiences.",
+    image: "/highschool-student.png",
+    imageAlt: "Student building something",
+    gradient: "from-emerald-500 via-lime-400 to-cyan-500",
+    badge: "Real-World Learning",
+    icon: Target
+  },
+  {
+    title: "24/7 Learning Support",
+    description: "Access to learning resources, AI tools, mentors, assignments and learning content anytime.",
+    image: "/school-boy.png",
+    imageAlt: "Student with tablet/headphones",
+    gradient: "from-orange-400 via-rose-500 to-fuchsia-500",
+    badge: "24/7 Support",
+    icon: Rocket
+  }
 ];
 
 const values: { title: string; copy: string; icon: Icon; tone: string }[] = [
@@ -181,28 +213,44 @@ export default function AboutPage() {
               </div>
               <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">Live ready</span>
             </div>
-            <div className="grid h-full gap-4 sm:grid-cols-2">
-              {metrics.map((metric, index) => (
-                <motion.div
-                  key={metric.label}
-                  initial={{ opacity: 0, y: 18 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  whileHover={{ y: -8, scale: 1.02 }}
-                  transition={{ delay: 0.15 + index * 0.08 }}
-                  className="group relative flex min-h-40 flex-col justify-between overflow-hidden rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-[0_22px_48px_rgba(37,99,235,0.16)]"
-                >
-                  <div className={`absolute left-0 top-0 h-1.5 w-full bg-gradient-to-r ${metric.accent}`} />
-                  <span className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${metric.accent} text-white shadow-[0_14px_28px_rgba(37,99,235,0.18)] transition group-hover:scale-110`}>
-                    <metric.icon className="h-5 w-5" />
-                  </span>
-                  <div>
-                    <p className={`bg-gradient-to-r ${metric.accent} bg-clip-text text-4xl font-black text-transparent`}>
-                      {metric.value}
-                    </p>
-                    <p className="mt-2 text-sm font-black uppercase tracking-[0.12em] text-slate-500">{metric.label}</p>
-                  </div>
-                </motion.div>
-              ))}
+            <div className="grid gap-6 sm:grid-cols-2">
+              {impactCards.map((card, index) => {
+                const IconComponent = card.icon;
+                return (
+                  <motion.article
+                    key={card.title}
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ y: -10, scale: 1.02 }}
+                    transition={{ delay: 0.15 + index * 0.08, duration: 0.45, ease: "easeOut" }}
+                    className={`relative flex aspect-square w-full flex-col justify-between overflow-hidden rounded-[32px] border border-white/20 bg-gradient-to-br ${card.gradient} p-6 text-white shadow-[0_32px_84px_rgba(15,23,42,0.18)]`}
+                  >
+                    <div className="absolute inset-x-0 top-0 h-36 bg-white/10 blur-3xl" />
+                    <div className="absolute right-6 top-6 h-36 w-36 rounded-full bg-white/10 blur-2xl" />
+                    <div className="absolute right-6 top-6 flex h-36 w-36 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-white/10 shadow-[0_24px_60px_rgba(15,23,42,0.18)]">
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 via-transparent to-transparent blur-2xl" />
+                      <img
+                        src={card.image}
+                        alt={card.imageAlt}
+                        className="relative h-32 w-32 rounded-full object-cover"
+                      />
+                    </div>
+                    <div className="relative z-10 h-full pr-44">
+                      <span className="inline-flex rounded-full border border-white/30 bg-white/15 px-3 py-1 text-[11px] font-black uppercase tracking-[0.24em] text-white/90 backdrop-blur">
+                        {card.badge}
+                      </span>
+                      <h3 className="mt-5 text-2xl font-black leading-tight">{card.title}</h3>
+                      <p className="mt-4 text-sm font-semibold leading-7 text-white/90">{card.description}</p>
+                      <div className="mt-5 flex items-center gap-3 rounded-2xl bg-white/10 px-3 py-2 text-sm font-semibold text-white/90 backdrop-blur">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 text-white/90">
+                          <IconComponent className="h-5 w-5" />
+                        </span>
+                        <span className="uppercase tracking-[0.18em] text-white/80">{card.imageAlt}</span>
+                      </div>
+                    </div>
+                  </motion.article>
+                );
+              })}
             </div>
           </motion.div>
         </div>
