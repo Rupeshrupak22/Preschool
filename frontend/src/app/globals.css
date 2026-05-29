@@ -242,8 +242,8 @@ a {
    ========================================================= */
 
 body{
-  background:#050816 !important;
-  color:white !important;
+  background:transparent !important;
+  color:inherit !important;
   font-family:'Inter',sans-serif !important;
 }
 
@@ -495,8 +495,143 @@ h6{
   color:inherit;
 }
 
-p{
+/* Only apply white text to specific dark sections */
+.dark-section p{
   color:rgba(255,255,255,0.82) !important;
+}
+
+/* Home page specific text visibility fixes */
+main .text-slate-900,
+main .text-slate-800,
+main .text-slate-700,
+main .text-slate-600 {
+  color: inherit !important;
+}
+
+/* Ensure proper contrast for home page elements */
+.text-slate-950 {
+  color: #020617 !important;
+}
+
+.text-slate-900 {
+  color: #0f172a !important;
+}
+
+.text-slate-800 {
+  color: #1e293b !important;
+}
+
+.text-slate-700 {
+  color: #334155 !important;
+}
+
+.text-slate-600 {
+  color: #475569 !important;
+}
+
+/* Video background styling */
+video {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+/* Ensure video doesn't interfere with interactions */
+video[autoplay] {
+  pointer-events: none;
+}
+
+/* Clean video display without filters */
+.video-container {
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+}
+
+.video-container video {
+  position: relative;
+  z-index: 2;
+  /* No filters - display videos naturally */
+}
+
+/* =========================================================
+   LMS DASHBOARD PAGE - DARK TEXT OVERRIDE
+   ========================================================= */
+
+.lms-dashboard-page,
+.lms-dashboard-page p,
+.lms-dashboard-page span,
+.lms-dashboard-page h1,
+.lms-dashboard-page h2,
+.lms-dashboard-page h3,
+.lms-dashboard-page h4,
+.lms-dashboard-page h5,
+.lms-dashboard-page h6,
+.lms-dashboard-page div {
+  color: #000000 !important;
+}
+
+.lms-dashboard-page .text-white,
+.lms-dashboard-page .text-white\/90 {
+  color: white !important;
+}
+
+.lms-dashboard-page .text-transparent {
+  color: transparent !important;
+}
+
+.lms-dashboard-page .text-cyan-600 {
+  color: #0891b2 !important;
+}
+
+.lms-dashboard-page .text-purple-600 {
+  color: #9333ea !important;
+}
+
+.lms-dashboard-page .text-blue-900 {
+  color: #1e3a5f !important;
+}
+
+/* =========================================================
+   LMS 3D HOVER TILT ANIMATION
+   ========================================================= */
+
+.lms-tilt {
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.35s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.lms-tilt:hover {
+  transform: perspective(800px) rotateX(-4deg) rotateY(4deg) translateY(-8px) scale(1.02) !important;
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18), 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.lms-tilt-btn {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.lms-tilt-btn:hover {
+  transform: perspective(600px) rotateX(-3deg) rotateY(3deg) translateY(-5px) scale(1.05) !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2), 0 6px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+.lms-tilt-btn:active {
+  transform: perspective(600px) rotateX(0deg) rotateY(0deg) translateY(-2px) scale(0.98) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.lms-tilt-feature {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.lms-tilt-feature:hover {
+  transform: perspective(600px) rotateX(-2deg) rotateY(3deg) translateY(-4px) scale(1.03) !important;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
 }
 
 /* =========================================================

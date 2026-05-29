@@ -178,7 +178,7 @@ const testimonials = [
   }
 ];
 
-const heroPrograms: { title: string; range: string; icon: Icon; glow: string; avatar: string; image: string; subjects: string[]; skills: string[]; activities?: string[]; competitive?: string[]; classes?: { [key: string]: { subjects: string[]; skills: string[]; examPrep?: string[] } } }[] = [
+const heroPrograms: { title: string; range: string; icon: Icon; glow: string; avatar: string; image: string; video: string; subjects: string[]; skills: string[]; activities?: string[]; competitive?: string[]; classes?: { [key: string]: { subjects: string[]; skills: string[]; examPrep?: string[] } } }[] = [
   {
     title: "Primary",
     range: "Class 1-5",
@@ -186,6 +186,7 @@ const heroPrograms: { title: string; range: string; icon: Icon; glow: string; av
     glow: "from-fuchsia-400/25 via-purple-300/18 to-cyan-300/22",
     avatar: "P",
     image: "/assets/primary-student.png",
+    video: "/primary.webm",
     subjects: [
       "Maths",
       "Science", 
@@ -239,6 +240,7 @@ const heroPrograms: { title: string; range: string; icon: Icon; glow: string; av
     glow: "from-purple-400/25 via-pink-300/18 to-emerald-300/22",
     avatar: "M",
     image: "/assets/middle-student.png",
+    video: "/middle.webm",
     subjects: [
       "Maths",
       "Science",
@@ -281,6 +283,7 @@ const heroPrograms: { title: string; range: string; icon: Icon; glow: string; av
     glow: "from-cyan-400/25 via-blue-300/18 to-fuchsia-300/22",
     avatar: "HS",
     image: "/assets/highschool-student.png",
+    video: "/highschool_nobg.mov",
     subjects: [
       "Maths",
       "Physics",
@@ -467,12 +470,16 @@ export default function Home() {
 
   return (
     <main className="min-h-screen overflow-hidden text-slate-900 relative">
-      {/* Full Page Background Image */}
-      <div 
-        className="pointer-events-none fixed inset-0 !z-0 bg-cover bg-center bg-no-repeat" 
-        style={{ backgroundImage: "url('/homepagebackgroundimage.png')" }}
-      />
-      <div className="pointer-events-none fixed inset-0 !z-0 bg-white/10" />
+      {/* Full Page Background Video */}
+      <video
+        className="pointer-events-none fixed inset-0 !z-0 h-full w-full object-cover"
+        autoPlay
+        muted
+        loop
+        playsInline
+      >
+        <source src="/newbackgroundvideohomepage.mp4" type="video/mp4" />
+      </video>
 
       <section id="top" className="relative !z-10 min-h-[92vh] overflow-hidden px-4 pt-10 md:px-6">
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 pb-8 lg:grid-cols-[0.9fr_1.1fr]">
@@ -532,11 +539,32 @@ export default function Home() {
                 </div>
                 <div className="relative z-10 mx-auto mt-6 flex h-48 max-w-[168px] items-end justify-center sm:h-56">
                   <div className="absolute bottom-0 h-28 w-36 rounded-[32px] bg-white/72 shadow-[0_18px_40px_rgba(15,23,42,0.12)] transition duration-300 group-hover:scale-105 group-hover:shadow-[0_0_34px_rgba(34,211,238,0.30)]" />
+                  
+                  {/* Try video first, fallback to image */}
+                  <video
+                    className="relative z-10 h-full w-auto object-contain rounded-[20px] drop-shadow-[0_22px_26px_rgba(88,28,135,0.20)] transition duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_24px_rgba(168,85,247,0.40)]"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    style={{ display: 'block' }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const img = e.currentTarget.nextElementSibling as HTMLImageElement;
+                      if (img) img.style.display = 'block';
+                    }}
+                  >
+                    <source src={program.video} type="video/mp4" />
+                  </video>
+                  
+                  {/* Fallback image */}
                   <img
                     src={program.image}
                     alt={`${program.title} student`}
                     className="relative z-10 h-full w-auto object-contain drop-shadow-[0_22px_26px_rgba(88,28,135,0.20)] transition duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_24px_rgba(168,85,247,0.40)]"
+                    style={{ display: 'none' }}
                   />
+                  
                   <span
                     className={`absolute ${index % 2 === 0 ? "left-0" : "right-0"} bottom-8 z-20 rounded-2xl border border-white bg-white/92 px-3 py-2 text-sm font-black text-purple-700 shadow-[0_12px_28px_rgba(168,85,247,0.20)] transition duration-300 group-hover:-translate-y-1`}
                   >
