@@ -5,6 +5,7 @@ const morgan = require('morgan');
 
 // Route imports
 const authRoutes = require('./routes/auth');
+const profileRoutes = require('./routes/profile');
 const studentRoutes = require('./routes/students');
 const teacherRoutes = require('./routes/teachers');
 const schoolRoutes = require('./routes/schools');
@@ -13,6 +14,11 @@ const eventRoutes = require('./routes/events');
 const leaveRoutes = require('./routes/leaves');
 const meetingRoutes = require('./routes/meetings');
 const leadRoutes = require('./routes/leads');
+const attendanceRoutes = require('./routes/attendance');
+const classRoutes = require('./routes/classes');
+const paymentRoutes = require('./routes/payments');
+const noticeRoutes = require('./routes/notices');
+const dashboardRoutes = require('./routes/dashboard');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -31,6 +37,7 @@ app.get('/', (req, res) => {
     database: 'TiDB Cloud (Prisma + MySQL)',
     endpoints: [
       '/api/v1/auth',
+      '/api/v1/profile',
       '/api/v1/students',
       '/api/v1/teachers',
       '/api/v1/schools',
@@ -39,12 +46,18 @@ app.get('/', (req, res) => {
       '/api/v1/leaves',
       '/api/v1/meetings',
       '/api/v1/leads',
+      '/api/v1/attendance',
+      '/api/v1/classes',
+      '/api/v1/payments',
+      '/api/v1/notices',
+      '/api/v1/dashboard',
     ],
   });
 });
 
 // API Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/profile', profileRoutes);
 app.use('/api/v1/students', studentRoutes);
 app.use('/api/v1/teachers', teacherRoutes);
 app.use('/api/v1/schools', schoolRoutes);
@@ -53,6 +66,11 @@ app.use('/api/v1/events', eventRoutes);
 app.use('/api/v1/leaves', leaveRoutes);
 app.use('/api/v1/meetings', meetingRoutes);
 app.use('/api/v1/leads', leadRoutes);
+app.use('/api/v1/attendance', attendanceRoutes);
+app.use('/api/v1/classes', classRoutes);
+app.use('/api/v1/payments', paymentRoutes);
+app.use('/api/v1/notices', noticeRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
 
 // 404 Handler
 app.use((req, res) => {
