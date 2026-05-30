@@ -78,7 +78,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: `Principal with email ${email} already exists.` }, { status: 409 });
       }
 
-      const accessKeyHash = await hashPassword(schoolKey.toUpperCase());
+      const accessKeyHash = await hashPassword(schoolKey);
       const principalId = id("principal");
       const finalSchoolId = schoolId || id("school");
 
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: `Teacher with email ${email} already exists.` }, { status: 409 });
       }
 
-      const staffKeyHash = await hashPassword(staffKey.toUpperCase());
+      const staffKeyHash = await hashPassword(staffKey);
       const teacherId = id("teacher");
       const finalSchoolId = schoolId || id("school");
       const assignedClasses = classes ? (Array.isArray(classes) ? classes : classes.split(",").map((c: string) => c.trim())) : [];

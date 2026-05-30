@@ -35,8 +35,7 @@ export async function POST(request: Request) {
 
   const principal = await findPrincipalByEmail(payload.data.email);
   const passwordResult = principal ? await verifyPassword(payload.data.password, principal.passwordHash) : { valid: false, needsRehash: false };
-  // School key may be stored as uppercase hash (admin add-user uses .toUpperCase()) or as-is (backend/seed).
-  // Try exact match first, then uppercase fallback for compatibility.
+  // School key: try exact match first, then uppercase fallback for legacy records
   let keyResult = principal ? await verifyPassword(payload.data.schoolKey, principal.accessKeyHash) : { valid: false, needsRehash: false };
   if (!keyResult.valid && principal) {
     keyResult = await verifyPassword(payload.data.schoolKey.toUpperCase(), principal.accessKeyHash);
