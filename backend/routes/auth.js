@@ -16,6 +16,7 @@ const {
   setSessionRefreshJti,
   rotateRefreshToken,
   destroySession,
+  destroyAllSessions,
   INACTIVITY_LIMIT_MS,
 } = require('../utils/sessions');
 
@@ -24,7 +25,7 @@ const router = express.Router();
 // ─── POST /api/v1/auth/login ────────────────────────────────────────
 router.post('/login', validateBody('email', 'password'), validateEmail, async (req, res) => {
   try {
-    const { email, password, role, forceLogoutPrevious } = req.body;
+    const { email, password, role } = req.body;
     const fingerprint = generateFingerprint(req);
     const ip = req.ip || req.connection?.remoteAddress || 'unknown';
     const requestedRole = ['student', 'teacher', 'principal', 'admin'].includes(role) ? role : null;
@@ -88,18 +89,19 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
     clearFailures(email, user.role);
 
     // 6. Enforce one active session per account
-    const sessionResult = createSession({
+    const sessionResult = await createSession({
       user,
       refreshJti: null,
       fingerprint,
       userAgent: req.get('user-agent') || '',
       ip,
-      replace: forceLogoutPrevious === true || forceLogoutPrevious === 'true',
+      replace: false,
     });
 
     if (sessionResult.conflict) {
       return sendResponse(res, 409, false, 'This account is already active on another device. Confirm logout of previous sessions and login again.', {
         code: 'ACTIVE_SESSION_EXISTS',
+        action: 'CLEAR_PREVIOUS_SESSIONS_AND_RELOGIN',
       });
     }
 
@@ -119,7 +121,7 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
     const token = generateAccessToken(user, sessionResult.session.sid);
     const refreshToken = generateRefreshToken(user, sessionResult.session.sid);
     const refreshPayload = decodeToken(refreshToken);
-    setSessionRefreshJti({ userId: user.id, sid: sessionResult.session.sid, refreshJti: refreshPayload?.jti });
+    await setSessionRefreshJti({ userId: user.id, sid: sessionResult.session.sid, refreshJti: refreshPayload?.jti });
 
     setAuthCookies(res, token, refreshToken);
 
@@ -131,6 +133,58 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
   } catch (err) {
     console.error('Login error:', err.message);
     sendResponse(res, 500, false, 'Internal server error');
+  }
+});
+
+// ─── POST /api/v1/auth/clear-previous-sessions ─────────────────────
+// Verifies the same credentials, clears existing sessions, and does NOT log in.
+// Client should refresh/reload the login page and ask for credentials again.
+router.post('/clear-previous-sessions', validateBody('email', 'password'), validateEmail, async (req, res) => {
+  try {
+    const { email, password, role } = req.body;
+    const requestedRole = ['student', 'teacher', 'principal', 'admin'].includes(role) ? role : null;
+    const identity = await findLoginIdentity(email, requestedRole);
+
+    if (!identity) {
+      await recordFailedAttempt(email, requestedRole || 'student');
+      recordFailure(email, requestedRole || 'student');
+      return sendResponse(res, 401, false, 'Invalid email or password');
+    }
+
+    const { user, source } = identity;
+    const lockStatus = isLocked(email, user.role);
+    if (lockStatus.locked) {
+      const minutes = Math.ceil(lockStatus.remainingMs / 60000);
+      return sendResponse(res, 423, false, `Account locked due to too many failed attempts. Try again in ${minutes} minutes.`);
+    }
+
+    const storedHash = user.password_hash || user.password;
+    const passwordValid = await verifyPassword(password, storedHash);
+    const keyValid = await verifyRequiredAccessKey(req.body, user, source);
+
+    if (!passwordValid || !keyValid) {
+      await recordFailedAttempt(email, user.role);
+      const lockResult = recordFailure(email, user.role);
+      if (lockResult.locked) {
+        const minutes = Math.ceil(lockResult.lockDurationMs / 60000);
+        return sendResponse(res, 423, false, `Account locked after ${lockResult.attempts} failed attempts. Try again in ${minutes} minutes.`);
+      }
+      return sendResponse(res, 401, false, 'Invalid email or password');
+    }
+
+    clearFailedAttempts(email);
+    clearFailures(email, user.role);
+    await destroyAllSessions(user.id);
+    revokeAllUserTokens(user.id);
+    clearAuthCookies(res);
+
+    return sendResponse(res, 200, true, 'Previous sessions cleared. Refresh the page and login again.', {
+      code: 'PREVIOUS_SESSIONS_CLEARED',
+      reloadRequired: true,
+    });
+  } catch (err) {
+    console.error('Clear previous sessions error:', err.message);
+    return sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -171,7 +225,7 @@ router.post('/register', validateBody('name', 'email', 'password'), validateEmai
       },
     });
 
-    const sessionResult = createSession({
+    const sessionResult = await createSession({
       user,
       refreshJti: null,
       fingerprint: generateFingerprint(req),
@@ -182,7 +236,7 @@ router.post('/register', validateBody('name', 'email', 'password'), validateEmai
     const token = generateAccessToken(user, sessionResult.session.sid);
     const refreshToken = generateRefreshToken(user, sessionResult.session.sid);
     const refreshPayload = decodeToken(refreshToken);
-    setSessionRefreshJti({ userId: user.id, sid: sessionResult.session.sid, refreshJti: refreshPayload?.jti });
+    await setSessionRefreshJti({ userId: user.id, sid: sessionResult.session.sid, refreshJti: refreshPayload?.jti });
     setAuthCookies(res, token, refreshToken);
 
     sendResponse(res, 201, true, 'Registration successful', {
@@ -218,7 +272,7 @@ router.post('/refresh', async (req, res) => {
 
     const decoded = verifyRefreshToken(refreshToken);
 
-    const rotate = rotateRefreshToken({
+    const rotate = await rotateRefreshToken({
       userId: decoded.id,
       sid: decoded.sid,
       oldRefreshJti: decoded.jti,
@@ -233,7 +287,7 @@ router.post('/refresh', async (req, res) => {
     const newToken = generateAccessToken(user, decoded.sid);
     const newRefreshToken = generateRefreshToken(user, decoded.sid);
     const newRefreshPayload = decodeToken(newRefreshToken);
-    setSessionRefreshJti({ userId: decoded.id, sid: decoded.sid, refreshJti: newRefreshPayload?.jti });
+    await setSessionRefreshJti({ userId: decoded.id, sid: decoded.sid, refreshJti: newRefreshPayload?.jti });
     setAuthCookies(res, newToken, newRefreshToken);
     sendResponse(res, 200, true, 'Token refreshed', { token: newToken, refreshToken: newRefreshToken });
   } catch (err) {
@@ -280,23 +334,31 @@ router.post('/change-password', authenticate, validateBody('currentPassword', 'n
 });
 
 // ─── POST /api/v1/auth/logout ───────────────────────────────────────
-router.post('/logout', authenticate, (req, res) => {
-  // Blacklist the current token
-  if (req.user && req.user.jti) {
-    blacklistToken(req.user.jti, 28800); // 8 hours
+router.post('/logout', authenticate, async (req, res) => {
+  try {
+    if (req.user && req.user.jti) {
+      blacklistToken(req.user.jti, 28800);
+    }
+    await destroySession(req.user.id, req.user.sid);
+    clearAuthCookies(res);
+    sendResponse(res, 200, true, 'Logged out successfully');
+  } catch (err) {
+    console.error('Logout error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
-  destroySession(req.user.id, req.user.sid);
-  clearAuthCookies(res);
-  sendResponse(res, 200, true, 'Logged out successfully');
 });
 
 // ─── POST /api/v1/auth/logout-all ───────────────────────────────────
-router.post('/logout-all', authenticate, (req, res) => {
-  // Revoke ALL tokens for this user
-  revokeAllUserTokens(req.user.id);
-  destroySession(req.user.id, req.user.sid);
-  clearAuthCookies(res);
-  sendResponse(res, 200, true, 'All sessions revoked');
+router.post('/logout-all', authenticate, async (req, res) => {
+  try {
+    revokeAllUserTokens(req.user.id);
+    await destroyAllSessions(req.user.id);
+    clearAuthCookies(res);
+    sendResponse(res, 200, true, 'All sessions revoked');
+  } catch (err) {
+    console.error('Logout all error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
+  }
 });
 
 // ─── Helpers ────────────────────────────────────────────────────────

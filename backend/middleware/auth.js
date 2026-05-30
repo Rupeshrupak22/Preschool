@@ -27,7 +27,7 @@ function tokenFromRequest(req) {
  *   3. Token is not blacklisted (logout)
  *   4. User hasn't revoked all tokens (logout-all / password change)
  */
-function authenticate(req, res, next) {
+async function authenticate(req, res, next) {
   const token = tokenFromRequest(req);
   if (!token) {
     return sendResponse(res, 401, false, 'Access denied. No token provided.');
@@ -50,7 +50,7 @@ function authenticate(req, res, next) {
       return sendResponse(res, 401, false, 'Session missing. Please login again.');
     }
 
-    const session = validateSession({ userId: decoded.id, sid: decoded.sid });
+    const session = await validateSession({ userId: decoded.id, sid: decoded.sid });
     if (!session.valid) {
       return sendResponse(res, 401, false, session.reason);
     }
