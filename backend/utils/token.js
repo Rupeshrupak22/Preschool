@@ -18,7 +18,7 @@ function getSecrets() {
   };
 }
 
-function generateAccessToken(user) {
+function generateAccessToken(user, sessionId) {
   const secrets = getSecrets();
   return jwt.sign(
     {
@@ -26,6 +26,9 @@ function generateAccessToken(user) {
       email: user.email,
       role: user.role,
       name: user.name,
+      school_id: user.school_id || user.schoolId || null,
+      teacher_id: user.teacher_id || user.teacherId || null,
+      sid: sessionId,
       type: 'access',
       jti: crypto.randomUUID(), // Unique token ID for blacklisting
     },
@@ -38,12 +41,14 @@ function generateAccessToken(user) {
   );
 }
 
-function generateRefreshToken(user) {
+function generateRefreshToken(user, sessionId) {
   const secrets = getSecrets();
   return jwt.sign(
     {
       id: user.id,
       email: user.email,
+      role: user.role,
+      sid: sessionId,
       type: 'refresh',
       // Add jti (JWT ID) for future revocation support
       jti: crypto.randomUUID(),
@@ -86,9 +91,14 @@ function verifyRefreshToken(token) {
   return decoded;
 }
 
+function decodeToken(token) {
+  return jwt.decode(token);
+}
+
 module.exports = {
   generateAccessToken,
   generateRefreshToken,
   verifyAccessToken,
   verifyRefreshToken,
+  decodeToken,
 };

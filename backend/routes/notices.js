@@ -36,6 +36,9 @@ router.get('/:id', authenticate, async (req, res) => {
   try {
     const notice = await prisma.notifications.findUnique({ where: { id: req.params.id } });
     if (!notice) return sendResponse(res, 404, false, 'Notice not found.');
+    if ((req.user.role === 'student' || req.user.role === 'teacher') && notice.user_email && notice.user_email !== req.user.email) {
+      return sendResponse(res, 403, false, 'Access denied.');
+    }
     sendResponse(res, 200, true, 'Notice fetched.', notice);
   } catch (error) {
     sendResponse(res, 500, false, 'Failed to fetch notice.');
@@ -83,6 +86,11 @@ router.post('/broadcast', authenticate, authorize('admin', 'principal'), validat
 // PUT /api/v1/notices/:id/read
 router.put('/:id/read', authenticate, async (req, res) => {
   try {
+    const existing = await prisma.notifications.findUnique({ where: { id: req.params.id } });
+    if (!existing) return sendResponse(res, 404, false, 'Notice not found.');
+    if ((req.user.role === 'student' || req.user.role === 'teacher') && existing.user_email && existing.user_email !== req.user.email) {
+      return sendResponse(res, 403, false, 'Access denied.');
+    }
     const notice = await prisma.notifications.update({
       where: { id: req.params.id },
       data: { read_at: new Date(), status: 'read' },

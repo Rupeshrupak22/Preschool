@@ -78,6 +78,20 @@ function verifyAccessKey(accessKey, storedHash) {
   }
 }
 
+/**
+ * Verify an access/staff key.
+ * New keys are stored as sha256 hex; legacy seeded keys may still be bcrypt/Argon2.
+ */
+async function verifyAccessKeyCredential(accessKey, storedHash) {
+  if (!accessKey || !storedHash) return false;
+
+  if (/^[a-f0-9]{64}$/i.test(storedHash)) {
+    return verifyAccessKey(accessKey, storedHash);
+  }
+
+  return verifyPassword(accessKey, storedHash);
+}
+
 module.exports = {
   hashPassword,
   verifyPassword,
@@ -85,4 +99,5 @@ module.exports = {
   generateAccessKey,
   hashAccessKey,
   verifyAccessKey,
+  verifyAccessKeyCredential,
 };
