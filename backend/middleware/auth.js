@@ -1,9 +1,14 @@
 const { verifyAccessToken } = require('../utils/token');
 const { sendResponse } = require('../utils/response');
+const { isBlacklisted, isUserTokenRevoked } = require('../utils/token-blacklist');
 
 /**
  * Authenticate JWT access token from Authorization header.
- * Rejects refresh tokens used as access tokens (type check in verifyAccessToken).
+ * Checks:
+ *   1. Token exists and is valid
+ *   2. Token type is 'access' (not refresh)
+ *   3. Token is not blacklisted (logout)
+ *   4. User hasn't revoked all tokens (logout-all / password change)
  */
 function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -16,6 +21,17 @@ function authenticate(req, res, next) {
 
   try {
     const decoded = verifyAccessToken(token);
+
+    // Check if this specific token is blacklisted
+    if (decoded.jti && isBlacklisted(decoded.jti)) {
+      return sendResponse(res, 401, false, 'Token has been revoked. Please login again.');
+    }
+
+    // Check if all user tokens were revoked (password change / logout-all)
+    if (decoded.iat && isUserTokenRevoked(decoded.id, decoded.iat)) {
+      return sendResponse(res, 401, false, 'Session expired. Please login again.');
+    }
+
     req.user = decoded;
     next();
   } catch (error) {
@@ -28,7 +44,6 @@ function authenticate(req, res, next) {
 
 /**
  * Role-based authorization middleware.
- * Usage: authorize('admin', 'principal')
  */
 function authorize(...allowedRoles) {
   return (req, res, next) => {

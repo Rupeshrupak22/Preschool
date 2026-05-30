@@ -21,13 +21,13 @@ type Icon = React.ComponentType<{ className?: string }>;
 const platformCards: { title: string; copy: string; icon: Icon; tone: string }[] = [
   {
     title: "Future Skills Curriculum",
-    copy: "Coding, AI, robotics, communication, design thinking, and career skills mapped class-wise.",
+    copy: "Coding, ML, economics, communication, design thinking, and career skills mapped class-wise.",
     icon: Brain,
     tone: "from-purple-500 to-pink-500"
   },
   {
-    title: "AI Learning Dashboard",
-    copy: "Subject-wise score, attendance, homework, rank, live classes, and AI improvement insights.",
+    title: "Smart Learning Dashboard",
+    copy: "Subject-wise score, attendance, homework, rank, live classes, and smart improvement insights.",
     icon: BarChart3,
     tone: "from-blue-500 to-cyan-400"
   },
@@ -48,7 +48,7 @@ const platformCards: { title: string; copy: string; icon: Icon; tone: string }[]
 const journey = [
   { title: "Diagnose", copy: "Student level, class, strengths, weak areas, interests, and learning habits are mapped.", icon: Target },
   { title: "Learn", copy: "Live classes, activities, projects, worksheets, and recorded sessions keep learning active.", icon: PlayCircle },
-  { title: "Track", copy: "Attendance, homework, subject scores, class rank, and AI analysis stay visible in one place.", icon: Bot },
+  { title: "Track", copy: "Attendance, homework, subject scores, class rank, and smart analysis stay visible in one place.", icon: Bot },
   { title: "Showcase", copy: "Students build portfolios, earn certificates, and present real outcomes confidently.", icon: Trophy }
 ];
 

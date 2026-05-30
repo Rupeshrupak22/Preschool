@@ -5,12 +5,12 @@ import { Trophy, TrendingUp, Star, Medal } from "lucide-react";
 import DashboardLayout from "@/components/student-dashboard/DashboardLayout";
 
 const leaderboard = [
-  { rank: 1,  name: "Riya Patel",    score: 96, attendance: 98, consistency: 95, badge: "🥇", highlight: false },
-  { rank: 2,  name: "Aryan Mehta",   score: 94, attendance: 96, consistency: 92, badge: "🥈", highlight: false },
-  { rank: 3,  name: "Sneha Gupta",   score: 91, attendance: 97, consistency: 90, badge: "🥉", highlight: false },
-  { rank: 4,  name: "Aarav Sharma",  score: 88, attendance: 94, consistency: 84, badge: "⭐", highlight: true  },
-  { rank: 5,  name: "Priya Singh",   score: 86, attendance: 92, consistency: 88, badge: "",   highlight: false },
-  { rank: 6,  name: "Karan Joshi",   score: 84, attendance: 90, consistency: 82, badge: "",   highlight: false },
+  { rank: 1,  name: "Riya Patel",    score: 85, attendance: 90, consistency: 88, badge: "🥇", highlight: false },
+  { rank: 2,  name: "Aryan Mehta",   score: 82, attendance: 88, consistency: 85, badge: "🥈", highlight: false },
+  { rank: 3,  name: "Sneha Gupta",   score: 80, attendance: 87, consistency: 82, badge: "🥉", highlight: false },
+  { rank: 4,  name: "Aarav Sharma",  score: 78, attendance: 85, consistency: 80, badge: "⭐", highlight: true  },
+  { rank: 5,  name: "Priya Singh",   score: 75, attendance: 83, consistency: 78, badge: "",   highlight: false },
+  { rank: 6,  name: "Karan Joshi",   score: 72, attendance: 80, consistency: 75, badge: "",   highlight: false },
   { rank: 7,  name: "Ananya Rao",    score: 82, attendance: 95, consistency: 80, badge: "",   highlight: false },
   { rank: 8,  name: "Dev Sharma",    score: 80, attendance: 88, consistency: 78, badge: "",   highlight: false },
   { rank: 9,  name: "Meera Nair",    score: 78, attendance: 91, consistency: 76, badge: "",   highlight: false },

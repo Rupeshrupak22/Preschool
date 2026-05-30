@@ -11,7 +11,7 @@ import DashboardLayout from "@/components/student-dashboard/DashboardLayout";
 // ── Types ────────────────────────────────────────────────────────────────────
 interface Message {
   id: string;
-  role: "user" | "ai";
+  role: "user" | "smart";
   text: string;
 }
 
@@ -28,8 +28,8 @@ const quickActions = [
 const suggestedTopics = [
   { label: "Mathematics",    emoji: "📐", color: "bg-blue-50 text-blue-700 hover:bg-blue-100" },
   { label: "Science",        emoji: "🔬", color: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100" },
-  { label: "AI & Coding",    emoji: "🤖", color: "bg-purple-50 text-purple-700 hover:bg-purple-100" },
-  { label: "Robotics",       emoji: "⚙️", color: "bg-orange-50 text-orange-700 hover:bg-orange-100" },
+  { label: "ML & Coding",    emoji: "🤖", color: "bg-purple-50 text-purple-700 hover:bg-purple-100" },
+  { label: "Finance", emoji: "⚙️", color: "bg-orange-50 text-orange-700 hover:bg-orange-100" },
   { label: "Communication",  emoji: "🎤", color: "bg-rose-50 text-rose-700 hover:bg-rose-100" },
   { label: "History",        emoji: "📜", color: "bg-yellow-50 text-yellow-700 hover:bg-yellow-100" },
   { label: "English",        emoji: "📖", color: "bg-cyan-50 text-cyan-700 hover:bg-cyan-100" },
@@ -59,8 +59,8 @@ export default function AiLabPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      role: "ai",
-      text: "Hey there! 👋 I'm your Adyapan AI learning buddy! I can help you understand concepts, solve homework, write code, or just share cool facts. What would you like to learn today? 🚀",
+      role: "smart",
+      text: "Hey there! 👋 I'm your Adyapan Smart learning buddy! I can help you understand concepts, solve homework, write code, or just share cool facts. What would you like to learn today? 🚀",
     },
   ]);
   const [input, setInput] = useState("");
@@ -78,18 +78,18 @@ export default function AiLabPage() {
     setInput("");
     setLoading(true);
     setTimeout(() => {
-      const aiMsg: Message = {
+      const smartMsg: Message = {
         id: (Date.now() + 1).toString(),
-        role: "ai",
+        role: "smart",
         text: getAiResponse(text),
       };
-      setMessages((prev) => [...prev, aiMsg]);
+      setMessages((prev) => [...prev, smartMsg]);
       setLoading(false);
     }, 900);
   }
 
   return (
-    <DashboardLayout activeSection="/student-dashboard/ai-lab">
+    <DashboardLayout activeSection="/student-dashboard/smart-lab">
       <div className="flex h-[calc(100vh-160px)] flex-col gap-4 lg:flex-row">
 
         {/* ── LEFT: Quick Actions ─────────────────────────────────────── */}
@@ -120,15 +120,15 @@ export default function AiLabPage() {
                 <Sparkles className="h-4 w-4 text-yellow-300" />
               </div>
               <div>
-                <p className="text-sm font-black text-white">Adyapan AI</p>
+                <p className="text-sm font-black text-white">Adyapan Smart</p>
                 <p className="text-[10px] font-semibold text-white/60">Your learning buddy · Always here to help</p>
               </div>
             </div>
             <button
               onClick={() => setMessages([{
                 id: "welcome",
-                role: "ai",
-                text: "Hey there! 👋 I'm your Adyapan AI learning buddy! I can help you understand concepts, solve homework, write code, or just share cool facts. What would you like to learn today? 🚀",
+                role: "smart",
+                text: "Hey there! 👋 I'm your Adyapan Smart learning buddy! I can help you understand concepts, solve homework, write code, or just share cool facts. What would you like to learn today? 🚀",
               }])}
               className="flex items-center gap-1.5 rounded-lg bg-white/15 px-2.5 py-1.5 text-[10px] font-bold text-white transition hover:bg-white/25"
             >
@@ -149,16 +149,16 @@ export default function AiLabPage() {
                 >
                   {/* Avatar */}
                   <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm ${
-                    msg.role === "ai"
+                    msg.role === "smart"
                       ? "bg-gradient-to-br from-violet-500 to-blue-500 text-white"
                       : "bg-gradient-to-br from-slate-700 to-slate-900 text-white"
                   }`}>
-                    {msg.role === "ai" ? "✨" : "👤"}
+                    {msg.role === "smart" ? "✨" : "👤"}
                   </div>
 
                   {/* Bubble */}
                   <div className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm font-semibold leading-relaxed whitespace-pre-line ${
-                    msg.role === "ai"
+                    msg.role === "smart"
                       ? "rounded-tl-sm bg-slate-50 text-slate-800"
                       : "rounded-tr-sm bg-gradient-to-br from-violet-600 to-blue-600 text-white"
                   }`}>

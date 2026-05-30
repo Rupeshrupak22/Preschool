@@ -26,9 +26,9 @@ const courses = [
     topics: ["Python", "Data Structures", "Web Basics", "Algorithms"],
   },
   {
-    id: "c5", title: "AI Basics", progress: 45, totalLessons: 30, completedLessons: 14,
+    id: "c5", title: "ML Basics", progress: 45, totalLessons: 30, completedLessons: 14,
     teacher: "Mr. Arjun", color: "from-purple-500 to-fuchsia-600", status: "active",
-    topics: ["ML Concepts", "Neural Networks", "Data & AI", "Projects"],
+    topics: ["ML Concepts", "Neural Networks", "Data & ML", "Projects"],
   },
   {
     id: "c6", title: "Social Studies", progress: 65, totalLessons: 44, completedLessons: 29,

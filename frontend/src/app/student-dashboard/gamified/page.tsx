@@ -40,9 +40,9 @@ const games = [
   },
   {
     id: "g4",
-    title: "AI Challenge",
-    subject: "AI Basics",
-    description: "Test your AI knowledge with scenario-based challenges.",
+    title: "ML Challenge",
+    subject: "ML Basics",
+    description: "Test your ML knowledge with scenario-based challenges.",
     players: "Solo",
     xp: 200,
     gradient: "from-purple-500 to-violet-600",
@@ -74,11 +74,11 @@ const games = [
 ];
 
 const leaderboard = [
-  { rank: 1, name: "Priya S.",   xp: 1840, avatar: "PS", gradient: "from-yellow-400 to-orange-400" },
-  { rank: 2, name: "Rohan M.",   xp: 1720, avatar: "RM", gradient: "from-slate-400 to-slate-500" },
-  { rank: 3, name: "Aarav S.",   xp: 1650, avatar: "AS", gradient: "from-amber-600 to-orange-700" },
-  { rank: 4, name: "Kavya T.",   xp: 1580, avatar: "KT", gradient: "from-purple-500 to-pink-500" },
-  { rank: 5, name: "Arjun P.",   xp: 1490, avatar: "AP", gradient: "from-blue-500 to-indigo-500" },
+  { rank: 1, name: "Priya S.",   xp: 180, avatar: "PS", gradient: "from-yellow-400 to-orange-400" },
+  { rank: 2, name: "Rohan M.",   xp: 170, avatar: "RM", gradient: "from-slate-400 to-slate-500" },
+  { rank: 3, name: "Aarav S.",   xp: 150, avatar: "AS", gradient: "from-amber-600 to-orange-700" },
+  { rank: 4, name: "Kavya T.",   xp: 140, avatar: "KT", gradient: "from-purple-500 to-pink-500" },
+  { rank: 5, name: "Arjun P.",   xp: 130, avatar: "AP", gradient: "from-blue-500 to-indigo-500" },
 ];
 
 export default function GamifiedPage() {
@@ -106,7 +106,7 @@ export default function GamifiedPage() {
                 <Flame className="h-3 w-3 text-orange-300" /> 14-day streak
               </span>
               <span className="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-black backdrop-blur-sm">
-                <Star className="h-3 w-3 text-yellow-300 fill-yellow-300" /> 1,650 XP earned
+                <Star className="h-3 w-3 text-yellow-300 fill-yellow-300" /> 150 XP earned
               </span>
               <span className="flex items-center gap-white/20 rounded-full bg-white/20 px-3 py-1 text-xs font-black backdrop-blur-sm">
                 <Trophy className="h-3 w-3 text-yellow-300 mr-1.5" /> Rank #3
@@ -122,9 +122,9 @@ export default function GamifiedPage() {
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: "XP Earned",    value: "1,650", icon: Zap,    gradient: "from-purple-500 to-violet-500" },
-            { label: "Games Played", value: "24",    icon: Gamepad2, gradient: "from-blue-500 to-indigo-500" },
-            { label: "Badges Won",   value: "7",     icon: Trophy, gradient: "from-yellow-400 to-orange-500" },
+            { label: "XP Earned",    value: "150", icon: Zap,    gradient: "from-purple-500 to-violet-500" },
+            { label: "Games Played", value: "3",    icon: Gamepad2, gradient: "from-blue-500 to-indigo-500" },
+            { label: "Badges Won",   value: "1",     icon: Trophy, gradient: "from-yellow-400 to-orange-500" },
           ].map((stat) => (
             <motion.div
               key={stat.label}

@@ -46,8 +46,8 @@ const subjectColors: Record<string, string> = {
   Science: "bg-emerald-100 text-emerald-700",
   English: "bg-purple-100 text-purple-700",
   "Computer Science": "bg-cyan-100 text-cyan-700",
-  "AI Basics": "bg-fuchsia-100 text-fuchsia-700",
-  Robotics: "bg-orange-100 text-orange-700",
+  "ML Basics": "bg-fuchsia-100 text-fuchsia-700",
+  "Economics": "bg-orange-100 text-orange-700",
 };
 
 export default function HomeworkSection({ items }: Props) {

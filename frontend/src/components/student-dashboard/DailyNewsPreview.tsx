@@ -18,10 +18,10 @@ const allNews = [
   },
   {
     id: "n2",
-    category: "AI",
+    category: "ML",
     emoji: "🤖",
-    title: "AI Tutors Help Kids Learn Maths 3× Faster",
-    summary: "A new AI study buddy helps students solve problems step-by-step — like having a teacher 24/7!",
+    title: "ML Tutors Help Kids Learn Maths 3× Faster",
+    summary: "A new ML study buddy helps students solve problems step-by-step — like having a teacher 24/7!",
     cardBg: "from-[#4a1d96] to-[#7c3aed]",
     badgeBg: "bg-purple-500",
     readTime: "2 min",
@@ -73,7 +73,7 @@ const allNews = [
   },
 ];
 
-const categories = ["All", "Space", "AI", "Science", "Tech", "Nature", "Fun Fact"];
+const categories = ["All", "Space", "ML", "Science", "Tech", "Nature", "Fun Fact"];
 
 export default function DailyNewsPreview() {
   const [search, setSearch] = useState("");
@@ -120,7 +120,7 @@ export default function DailyNewsPreview() {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search space, AI, science, fun facts..."
+          placeholder="Search space, ML, science, fun facts..."
           className="h-12 w-full rounded-2xl border-2 border-white/80 bg-white/80 pl-11 pr-4 text-sm font-semibold text-slate-900 shadow-[0_4px_16px_rgba(168,85,247,0.08)] outline-none backdrop-blur-sm placeholder:text-slate-400 transition focus:border-purple-300 focus:ring-4 focus:ring-purple-200/40"
         />
         {search && (

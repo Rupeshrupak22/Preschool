@@ -24,17 +24,17 @@ import {
 type Icon = React.ComponentType<{ className?: string }>;
 
 const skillTiles: { label: string; icon: Icon; color: string }[] = [
-  { label: "Robotics", icon: Cpu, color: "from-orange-500 to-red-500" },
+  { label: "Economics", icon: Cpu, color: "from-orange-500 to-red-500" },
   { label: "Coding", icon: Laptop, color: "from-blue-500 to-indigo-600" },
-  { label: "IoT", icon: Wifi, color: "from-green-500 to-emerald-600" },
-  { label: "Electronics", icon: Zap, color: "from-yellow-500 to-orange-500" },
-  { label: "AI/ML", icon: Brain, color: "from-purple-500 to-pink-500" },
+  { label: "Entrepreneurship", icon: Wifi, color: "from-green-500 to-emerald-600" },
+  { label: "Finance", icon: Zap, color: "from-yellow-500 to-orange-500" },
+  { label: "Machine Learning", icon: Brain, color: "from-purple-500 to-pink-500" },
   { label: "Programming", icon: Code2, color: "from-cyan-500 to-blue-600" }
 ];
 
 const overviewCards: { title: string; copy: string; icon: Icon; gradient: string }[] = [
   { title: "Progress Tracking", copy: "Real-time monitoring of student performance with detailed analytics", icon: BarChart3, gradient: "from-blue-500 to-cyan-500" },
-  { title: "AI-Powered Tools", copy: "Smart recommendations and automated tasks for better learning", icon: Brain, gradient: "from-purple-500 to-pink-500" },
+  { title: "Smart Tools", copy: "Smart recommendations and automated tasks for better learning", icon: Brain, gradient: "from-purple-500 to-pink-500" },
   { title: "Curriculum Management", copy: "Organized and structured learning paths for every class", icon: BookOpen, gradient: "from-orange-500 to-red-500" },
   { title: "Collaborative Learning", copy: "Interactive tools for group activities and peer learning", icon: GraduationCap, gradient: "from-green-500 to-emerald-500" }
 ];
@@ -42,8 +42,8 @@ const overviewCards: { title: string; copy: string; icon: Icon; gradient: string
 const studentFeatures = [
   "Personalized Learning Path",
   "Interactive Quizzes & Games",
-  "Doubt Solver (AI Chatbot)",
-  "AI Notes & Summaries",
+  "Doubt Solver (Chatbot)",
+  "Notes & Summaries",
   "Practice Question Bank",
   "Exam Preparation Mode",
   "Study Planner & Reminders",
@@ -52,27 +52,27 @@ const studentFeatures = [
   "Language Translation & Simplification",
   "Gamification & Leaderboards",
   "Collaborative Tools",
-  "AI Voice Narration",
+  "Voice Narration",
   "Adaptive Revision Plans",
   "E-Library Access"
 ];
 
 const teacherFeatures = [
-  "AI Lesson Plan Generator",
+  "Lesson Plan Generator",
   "Unit Plan Creation",
   "Exam & Question Paper Generator",
-  "AI Quiz Maker",
+  "Quiz Maker",
   "Automatic PPT Maker",
   "Assignment & Worksheet Generator",
   "Auto-Grading System",
   "Homework Allocation",
   "Content Recommendation",
   "Progress Dashboard",
-  "AI Teaching Assistant (Chatbot)",
+  "Teaching Assistant (Chatbot)",
   "Curriculum Mapping",
   "Plagiarism Check & Report",
   "Parent Communication Tools",
-  "AI Notes Generator"
+  "Notes Generator"
 ];
 
 const examCards: { title: string; copy: string; icon: Icon; tags: string[]; gradient: string }[] = [
@@ -85,9 +85,9 @@ const examCards: { title: string; copy: string; icon: Icon; tags: string[]; grad
   },
   {
     title: "Auto Evaluation",
-    copy: "Instant grading and detailed feedback with AI-powered analysis.",
+    copy: "Instant grading and detailed feedback with smart analysis.",
     icon: BarChart3,
-    tags: ["Instant Grading", "AI Analysis", "Reports"],
+    tags: ["Instant Grading", "Smart Analysis", "Reports"],
     gradient: "from-purple-600 to-pink-600"
   },
   {
@@ -134,13 +134,13 @@ export default function LMSPage() {
               <div className="rounded-3xl border border-white/5 bg-transparent backdrop-blur-sm p-8">
                 <div className="lms-tilt mb-8 inline-flex items-center gap-3 rounded-full border border-white/50 bg-white/50 backdrop-blur-xl px-5 py-2.5 text-sm font-black text-blue-900 shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
                   <Sparkles className="h-5 w-5 text-cyan-600" />
-                  AI-Powered Education Platform
+                  Smart Education Platform
                 </div>
                 <h1 className="lms-text-white text-5xl font-black leading-tight tracking-tight md:text-7xl">
                   <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Adyapan</span> LMS
                 </h1>
                 <p className="lms-text-white mt-6 max-w-xl text-lg font-bold leading-relaxed">
-                  AI-powered Learning Management System enriched with dynamic features to enhance teaching efficiency and student engagement for Classes 5–12.
+                  Smart Learning Management System enriched with dynamic features to enhance teaching efficiency and student engagement for Classes 5–12.
                 </p>
                 <div className="mt-10 flex flex-wrap gap-4">
                   <button
@@ -253,7 +253,7 @@ export default function LMSPage() {
               <Rocket className="mx-auto h-14 w-14" />
               <h3 className="mt-5 text-3xl font-black">Transform Education</h3>
               <p className="mx-auto mt-4 max-w-lg text-lg text-white/90">
-                Empowering educators and engaging students through innovative AI-powered technology.
+                Empowering educators and engaging students through innovative smart technology.
               </p>
             </div>
           </div>
@@ -291,7 +291,7 @@ export default function LMSPage() {
                 <Brain className="h-7 w-7 text-white" />
               </div>
               <h2 className="text-3xl font-black text-gray-900 md:text-4xl">Teacher Features</h2>
-              <p className="mt-3 text-gray-800">AI-powered tools and comprehensive classroom management</p>
+              <p className="mt-3 text-gray-800">Smart tools and comprehensive classroom management</p>
             </div>
             <div className="mt-10 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {teacherFeatures.map((feature) => (
@@ -313,7 +313,7 @@ export default function LMSPage() {
             <div className="text-center rounded-2xl bg-white/45 backdrop-blur-xl p-8 mb-14 border border-white/50 shadow-[0_8px_32px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.9)]" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
               <h2 className="text-3xl font-black text-gray-900 md:text-5xl drop-shadow-sm">Online Exam Software</h2>
               <p className="mx-auto mt-4 max-w-2xl text-lg font-semibold text-gray-900">
-                Create & conduct any type of exam with our powerful AI-driven platform
+                Create & conduct any type of exam with our powerful smart platform
               </p>
             </div>
             <div className="mt-0 grid gap-6 lg:grid-cols-3" style={{ perspective: '1200px' }}>
@@ -341,10 +341,10 @@ export default function LMSPage() {
             </div>
             <div className="lms-tilt mt-14 grid gap-6 rounded-2xl border border-white/50 bg-white/40 backdrop-blur-xl p-8 text-center shadow-[0_12px_35px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.9)] sm:grid-cols-4" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
               {[
-                ["100%", "Real-time Monitoring"],
+                ["Secure", "Real-time Monitoring"],
                 ["Instant", "Auto Grading"],
-                ["20+", "Question Types"],
-                ["15+", "Security Features"]
+                ["Multiple", "Question Types"],
+                ["Advanced", "Security Features"]
               ].map(([value, label]) => (
                 <div key={label}>
                   <p className="text-3xl font-black text-gray-900">{value}</p>

@@ -15,9 +15,9 @@ const certificates = [
   },
   {
     id: "cert2",
-    course: "AI & Machine Learning Basics",
+    course: "Machine Learning Basics",
     issuedDate: "January 20, 2026",
-    credentialId: "ADY-2026-AI-0031",
+    credentialId: "ADY-2026-ML-0031",
     status: "active",
     color: "from-purple-500 to-fuchsia-600",
   },
@@ -31,9 +31,9 @@ const certificates = [
   },
   {
     id: "cert4",
-    course: "Robotics & Arduino Basics",
+    course: "Economics Basics",
     issuedDate: "December 5, 2025",
-    credentialId: "ADY-2025-RB-0009",
+    credentialId: "ADY-2025-EF-0009",
     status: "active",
     color: "from-orange-500 to-amber-600",
   },

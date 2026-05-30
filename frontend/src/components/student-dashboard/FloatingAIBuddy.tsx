@@ -113,7 +113,7 @@ export default function FloatingAIBuddy() {
                   <div>
                     <div className="flex items-center gap-2">
                       <p className="text-[10px] font-black uppercase tracking-widest text-white/60">
-                        ADYAPAN AI
+                        ADYAPAN SMART
                       </p>
                       <span className="rounded-full bg-emerald-400/30 px-2 py-0.5 text-[9px] font-black text-emerald-200">
                         ✨ NEW
@@ -142,7 +142,7 @@ export default function FloatingAIBuddy() {
                   {chips.map((chip) => (
                     <a
                       key={chip.label}
-                      href="/student-dashboard/ai-lab"
+                      href="/student-dashboard/smart-lab"
                       onClick={() => setOpen(false)}
                       className="flex items-center gap-2 rounded-2xl bg-white/15 px-3 py-2.5 text-xs font-bold text-white backdrop-blur-sm transition hover:bg-white/25"
                     >
@@ -156,11 +156,11 @@ export default function FloatingAIBuddy() {
               {/* CTA */}
               <div className="relative px-5 pb-5">
                 <a
-                  href="/student-dashboard/ai-lab"
+                  href="/student-dashboard/smart-lab"
                   onClick={() => setOpen(false)}
                   className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3 text-sm font-black text-purple-700 shadow-[0_8px_24px_rgba(255,255,255,0.25)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(255,255,255,0.35)]"
                 >
-                  Open AI Lab
+                  Open Smart Lab
                   <ArrowRight className="h-4 w-4" />
                 </a>
               </div>
@@ -177,7 +177,7 @@ export default function FloatingAIBuddy() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.93 }}
         className="fixed bottom-6 right-4 z-[91] flex flex-col items-center"
-        aria-label="Open AI Learning Buddy"
+        aria-label="Open Smart Learning Buddy"
         style={{ filter: "drop-shadow(0 12px 28px rgba(168,85,247,0.65))" }}
       >
         {/* Glow disc behind robot */}

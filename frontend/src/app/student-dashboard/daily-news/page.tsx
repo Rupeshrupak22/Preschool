@@ -9,7 +9,7 @@ import {
 import DashboardLayout from "@/components/student-dashboard/DashboardLayout";
 
 type Category =
-  | "All" | "Popular" | "Space" | "AI" | "Science"
+  | "All" | "Popular" | "Space" | "ML" | "Science"
   | "Coding" | "Nature" | "Fun Facts" | "Inspiring";
 
 interface Story {
@@ -39,8 +39,8 @@ const stories: Story[] = [
   },
   {
     id: "2", source: "AI Weekly", sourceColor: "bg-purple-600", sourceInitial: "A",
-    category: "AI", title: "AI Tutors Help Kids Learn Maths 3× Faster",
-    body: "A new study shows AI tutors improve problem-solving skills significantly in students aged 10–15.",
+    category: "ML", title: "ML Tutors Help Kids Learn Maths 3× Faster",
+    body: "A new study shows ML tutors improve problem-solving skills significantly in students aged 10–15.",
     readTime: "3 min", comments: 62, emoji: "🤖", hasImage: false,
     imageBg: "", tag: "#Trending",
   },
@@ -75,7 +75,7 @@ const stories: Story[] = [
   {
     id: "7", source: "Young Innovators", sourceColor: "bg-pink-600", sourceInitial: "Y",
     category: "Inspiring", title: "14-Year-Old Invents App to Help Blind Students Read",
-    body: "Aryan from Jaipur built an AI-powered app that converts textbook images to audio — and won a national award.",
+    body: "Aryan from Jaipur built a smart app that converts textbook images to audio — and won a national award.",
     readTime: "3 min", comments: 118, emoji: "🌟", hasImage: true,
     imageBg: "from-[#831843] to-[#ec4899]", tag: "#Inspiring",
   },
@@ -102,8 +102,8 @@ const stories: Story[] = [
   },
   {
     id: "11", source: "AI Weekly", sourceColor: "bg-indigo-600", sourceInitial: "A",
-    category: "AI", title: "AI Creates Music, Art & Stories in Seconds",
-    body: "Generative AI tools are changing how we create — learning how they work is becoming an essential skill for students.",
+    category: "ML", title: "Smart Technology Creates Music, Art & Stories in Seconds",
+    body: "Generative ML tools are changing how we create — learning how they work is becoming an essential skill for students.",
     readTime: "3 min", comments: 86, emoji: "🎨", hasImage: true,
     imageBg: "from-[#312e81] to-[#6366f1]", tag: "#Trending",
   },
@@ -116,13 +116,13 @@ const stories: Story[] = [
   },
 ];
 
-const tabs: Category[] = ["All", "Popular", "Space", "AI", "Science", "Coding", "Nature", "Fun Facts", "Inspiring"];
+const tabs: Category[] = ["All", "Popular", "Space", "ML", "Science", "Coding", "Nature", "Fun Facts", "Inspiring"];
 
 const tabIcons: Record<Category, React.ReactNode> = {
   All: <TrendingUp className="h-3 w-3" />,
   Popular: <Flame className="h-3 w-3" />,
   Space: <span>🚀</span>,
-  AI: <span>🤖</span>,
+  ML: <span>🤖</span>,
   Science: <span>🔬</span>,
   Coding: <span>💻</span>,
   Nature: <span>🌿</span>,
@@ -200,7 +200,7 @@ function StoryCard({ story, delay = 0 }: { story: Story; delay?: number }) {
             </span>
           </div>
           <a
-            href="/student-dashboard/ai-lab"
+            href="/student-dashboard/smart-lab"
             className="flex items-center gap-1 rounded-lg bg-purple-50 px-2.5 py-1 text-[10px] font-black text-purple-700 transition hover:bg-purple-100"
           >
             <Sparkles className="h-3 w-3" /> Explain
@@ -256,7 +256,7 @@ function FeaturedCard({ story }: { story: Story }) {
               <span className="flex items-center gap-1"><MessageCircle className="h-3.5 w-3.5" /> {story.comments} comments</span>
             </div>
             <a
-              href="/student-dashboard/ai-lab"
+              href="/student-dashboard/smart-lab"
               className="ml-auto flex items-center gap-1.5 rounded-xl bg-purple-600 px-4 py-2 text-xs font-black text-white shadow-[0_4px_16px_rgba(139,92,246,0.4)] transition hover:-translate-y-0.5"
             >
               <Sparkles className="h-3.5 w-3.5" /> Explain Simply

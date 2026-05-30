@@ -94,8 +94,8 @@ export default function DashboardLayout({ children, activeSection }: Props) {
         </div>
       </div>
 
-      {/* Global floating AI buddy */}
-      <FloatingAIBuddy />
+      {/* Global floating smart buddy */}
+      <FloatingSmartBuddy />
     </div>
   );
 }

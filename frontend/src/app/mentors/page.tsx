@@ -13,14 +13,10 @@ import {
   Lock,
   Radio,
   Shield,
-  Sparkles,
   Target,
-  TrendingUp,
   Users,
   Wifi,
   Zap,
-  Star,
-  Award,
   Rocket
 } from "lucide-react";
 
@@ -83,18 +79,18 @@ export default function MentorsPage() {
 
               <div className="mt-8 flex items-center gap-8">
                 <div>
-                  <p className="text-3xl font-black text-white">500+</p>
-                  <p className="text-sm text-purple-200">Schools Trust Us</p>
-                </div>
-                <div className="h-12 w-px bg-white/30" />
-                <div>
                   <p className="text-3xl font-black text-white">Growing</p>
-                  <p className="text-sm text-purple-200">Student Community</p>
+                  <p className="text-sm text-purple-200">School Community</p>
                 </div>
                 <div className="h-12 w-px bg-white/30" />
                 <div>
-                  <p className="text-3xl font-black text-white">98%</p>
-                  <p className="text-sm text-purple-200">Satisfaction Rate</p>
+                  <p className="text-3xl font-black text-white">Active</p>
+                  <p className="text-sm text-purple-200">Student Learning</p>
+                </div>
+                <div className="h-12 w-px bg-white/30" />
+                <div>
+                  <p className="text-3xl font-black text-white">Quality</p>
+                  <p className="text-sm text-purple-200">Education Focus</p>
                 </div>
               </div>
             </motion.div>
@@ -128,11 +124,11 @@ export default function MentorsPage() {
 
           <div className="mt-16 grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6">
             {[
-              { name: "Robotics", icon: Cpu, color: "from-blue-500 to-cyan-500" },
+              { name: "Economics", icon: Cpu, color: "from-blue-500 to-cyan-500" },
               { name: "Coding", icon: Code2, color: "from-green-500 to-emerald-500" },
-              { name: "IoT", icon: Wifi, color: "from-cyan-500 to-blue-500" },
-              { name: "Electronics", icon: Radio, color: "from-orange-500 to-red-500" },
-              { name: "AI/ML", icon: Brain, color: "from-purple-500 to-pink-500" },
+              { name: "Entrepreneurship", icon: Wifi, color: "from-cyan-500 to-blue-500" },
+              { name: "Finance", icon: Radio, color: "from-orange-500 to-red-500" },
+              { name: "Machine Learning", icon: Brain, color: "from-purple-500 to-pink-500" },
               { name: "Programming", icon: Code2, color: "from-pink-500 to-rose-500" },
             ].map((subject, index) => (
               <motion.div
@@ -172,7 +168,7 @@ export default function MentorsPage() {
             {[
               { icon: Target, title: "Comprehensive Platform", desc: "All-in-one solution for modern education", color: "blue" },
               { icon: LineChart, title: "Real-time Analytics", desc: "Track progress with powerful insights", color: "green" },
-              { icon: Brain, title: "AI-Powered Learning", desc: "Personalized education for every student", color: "purple" },
+              { icon: Brain, title: "Smart Learning", desc: "Personalized education for every student", color: "purple" },
               { icon: BookOpen, title: "Smart Curriculum", desc: "Organized and structured content", color: "orange" },
               { icon: Users, title: "Collaborative Tools", desc: "Foster teamwork and engagement", color: "pink" },
               { icon: Shield, title: "Secure & Reliable", desc: "Enterprise-grade security", color: "cyan" },
@@ -222,7 +218,7 @@ export default function MentorsPage() {
                 {[
                   "Personalized Learning Paths",
                   "Interactive Quizzes & Games",
-                  "AI Smart Chatbot Assistant",
+                  "Smart Chatbot Assistant",
                   "Gamified Progress Reports",
                   "Unlimited Practice Questions",
                   "Digital Library Access",
@@ -262,12 +258,12 @@ export default function MentorsPage() {
 
               <div className="mt-8 space-y-4">
                 {[
-                  "AI Lesson Plan Generator",
+                  "Lesson Plan Generator",
                   "Auto Question Paper Maker",
                   "Instant Auto-Grading",
                   "Assignment Management",
                   "Real-time Progress Tracking",
-                  "AI Teaching Assistant",
+                  "Teaching Assistant",
                   "Parent Communication Hub"
                 ].map((feature, i) => (
                   <motion.div
@@ -301,7 +297,7 @@ export default function MentorsPage() {
               Advanced Online Exam System
             </h2>
             <p className="mt-4 text-xl text-purple-100">
-              Conduct secure, AI-powered exams with instant results
+              Conduct secure, smart exams with instant results
             </p>
           </motion.div>
 
@@ -310,7 +306,7 @@ export default function MentorsPage() {
               { icon: BookOpen, title: "Multiple Formats", desc: "MCQs, Essays, Coding & More" },
               { icon: Zap, title: "Auto Evaluation", desc: "Instant Grading & Feedback" },
               { icon: Lock, title: "Secure Platform", desc: "Anti-Cheating Technology" },
-              { icon: Brain, title: "AI Proctoring", desc: "Smart Monitoring System" },
+              { icon: Brain, title: "Smart Proctoring", desc: "Smart Monitoring System" },
               { icon: Target, title: "Auto Grading", desc: "Save Hours of Work" },
               { icon: LineChart, title: "Instant Reports", desc: "Real-time Analytics" },
             ].map((feature, index) => (
@@ -332,10 +328,10 @@ export default function MentorsPage() {
 
           <div className="mt-16 grid grid-cols-2 gap-8 md:grid-cols-4">
             {[
-              { value: "100%", label: "Student Monitoring" },
+              { value: "Secure", label: "Student Monitoring" },
               { value: "Instant", label: "Auto Grading" },
-              { value: "20+", label: "Question Types" },
-              { value: "15+", label: "Security Features" },
+              { value: "Multiple", label: "Question Types" },
+              { value: "Advanced", label: "Security Features" },
             ].map((stat, index) => (
               <motion.div
                 key={index}

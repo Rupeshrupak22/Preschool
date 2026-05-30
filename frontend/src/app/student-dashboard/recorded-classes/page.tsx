@@ -31,7 +31,7 @@ const recordings = [
   },
   {
     id: "r3",
-    subject: "AI Basics",
+    subject: "ML Basics",
     title: "Introduction to Neural Networks",
     teacher: "Mr. Arjun",
     duration: "40 min",
@@ -79,7 +79,7 @@ const recordings = [
   },
 ];
 
-const subjects = ["All", "Mathematics", "Science", "English", "AI Basics", "Computer Science"];
+const subjects = ["All", "Mathematics", "Science", "English", "ML Basics", "Computer Science"];
 
 export default function RecordedClassesPage() {
   return (

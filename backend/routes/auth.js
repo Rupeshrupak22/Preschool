@@ -7,6 +7,10 @@ const { sendResponse } = require('../utils/response');
 const { validateBody, validateEmail, validatePassword } = require('../middleware/validate');
 const { recordFailedAttempt, clearFailedAttempts } = require('../utils/progressive-delay');
 const { authenticate } = require('../middleware/auth');
+const { isLocked, recordFailure, clearFailures } = require('../utils/account-lockout');
+const { blacklistToken, isBlacklisted, revokeAllUserTokens } = require('../utils/token-blacklist');
+const { logLoginSuccess, logLoginFailed, logAccountLocked, logPasswordChanged, logSuspiciousActivity } = require('../utils/security-logger');
+const { generateFingerprint, trackAttempt } = require('../utils/fingerprint');
 
 const router = express.Router();
 
@@ -14,41 +18,73 @@ const router = express.Router();
 router.post('/login', validateBody('email', 'password'), validateEmail, async (req, res) => {
   try {
     const { email, password } = req.body;
+    const fingerprint = generateFingerprint(req);
+    const ip = req.ip || req.connection?.remoteAddress || 'unknown';
 
+    // 1. Check account lockout
+    const lockStatus = isLocked(email);
+    if (lockStatus.locked) {
+      const minutes = Math.ceil(lockStatus.remainingMs / 60000);
+      logLoginFailed({ email, ip, fingerprint, details: `Account locked. ${minutes}min remaining.` });
+      return sendResponse(res, 423, false, `Account locked due to too many failed attempts. Try again in ${minutes} minutes.`);
+    }
+
+    // 2. Check fingerprint for credential stuffing
+    const fpResult = trackAttempt(fingerprint, email);
+    if (fpResult.suspicious) {
+      logSuspiciousActivity({ email, ip, fingerprint, details: `Credential stuffing detected. ${fpResult.uniqueEmails} unique emails from same client.` });
+      return sendResponse(res, 429, false, 'Suspicious activity detected. Please try again later.');
+    }
+
+    // 3. Find user
     const user = await prisma.users.findUnique({
       where: { email: email.toLowerCase().trim() },
     });
 
     if (!user) {
-      // Apply delay even for non-existent emails (prevent enumeration)
       await recordFailedAttempt(email);
+      recordFailure(email);
+      logLoginFailed({ email, ip, fingerprint, details: 'User not found' });
       return sendResponse(res, 401, false, 'Invalid email or password');
     }
 
-    // Verify password (Argon2id > bcrypt > plain text fallback)
+    // 4. Verify password
     const storedHash = user.password_hash || user.password;
     const isValid = await verifyPassword(password, storedHash);
 
     if (!isValid) {
       const { attempts } = await recordFailedAttempt(email);
+      const lockResult = recordFailure(email);
+
+      if (lockResult.locked) {
+        const minutes = Math.ceil(lockResult.lockDurationMs / 60000);
+        logAccountLocked({ email, userId: user.id, ip, fingerprint, details: `Locked after ${lockResult.attempts} failures for ${minutes}min` });
+        return sendResponse(res, 423, false, `Account locked after ${lockResult.attempts} failed attempts. Try again in ${minutes} minutes.`);
+      }
+
+      logLoginFailed({ email, userId: user.id, ip, fingerprint, details: `Wrong password. Attempt ${lockResult.attempts}/${5}` });
       return sendResponse(res, 401, false, 'Invalid email or password', {
-        ...(attempts >= 3 && { hint: 'Multiple failed attempts. Please wait before retrying.' }),
+        ...(lockResult.attempts >= 3 && { hint: `${5 - lockResult.attempts} attempts remaining before lockout.` }),
       });
     }
 
-    // Success — clear progressive delay counter
+    // 5. Success — clear all counters
     clearFailedAttempts(email);
+    clearFailures(email);
 
-    // Auto-upgrade to Argon2id if using legacy hash
+    // 6. Auto-upgrade to Argon2id
     if (needsRehash(storedHash)) {
       const newHash = await hashPassword(password);
       await prisma.users.update({
         where: { id: user.id },
         data: { password_hash: newHash, password: newHash },
-      }).catch(() => {}); // non-critical, don't fail login
+      }).catch(() => {});
     }
 
-    // Log login event (fire-and-forget)
+    // 7. Log success
+    logLoginSuccess({ email, userId: user.id, ip, fingerprint });
+
+    // 8. Record login event in DB (fire-and-forget)
     prisma.login_events.create({
       data: {
         id: crypto.randomUUID(),
@@ -58,11 +94,12 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
         role: user.role,
         source: req.body.platform || detectPlatform(req),
         status: 'success',
-        ip_address: req.ip || null,
+        ip_address: ip,
         user_agent: (req.get('user-agent') || '').slice(0, 500),
       },
     }).catch(() => {});
 
+    // 9. Generate tokens
     const token = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
@@ -195,11 +232,31 @@ router.post('/change-password', authenticate, validateBody('currentPassword', 'n
       data: { password_hash: newHash, password: newHash, updated_at: new Date() },
     });
 
-    sendResponse(res, 200, true, 'Password changed successfully');
+    // Revoke all existing tokens for this user
+    revokeAllUserTokens(user.id);
+    logPasswordChanged({ email: user.email, userId: user.id, ip: req.ip });
+
+    sendResponse(res, 200, true, 'Password changed successfully. All sessions revoked.');
   } catch (err) {
     console.error('Change password error:', err.message);
     sendResponse(res, 500, false, 'Internal server error');
   }
+});
+
+// ─── POST /api/v1/auth/logout ───────────────────────────────────────
+router.post('/logout', authenticate, (req, res) => {
+  // Blacklist the current token
+  if (req.user && req.user.jti) {
+    blacklistToken(req.user.jti, 28800); // 8 hours
+  }
+  sendResponse(res, 200, true, 'Logged out successfully');
+});
+
+// ─── POST /api/v1/auth/logout-all ───────────────────────────────────
+router.post('/logout-all', authenticate, (req, res) => {
+  // Revoke ALL tokens for this user
+  revokeAllUserTokens(req.user.id);
+  sendResponse(res, 200, true, 'All sessions revoked');
 });
 
 // ─── Helpers ────────────────────────────────────────────────────────

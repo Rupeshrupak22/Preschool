@@ -36,7 +36,7 @@ const sidebarItems: SidebarItem[] = [
   { id: "/student-dashboard",                  label: "Dashboard",        icon: LayoutDashboard, href: "/student-dashboard",                  group: "primary" },
   { id: "/student-dashboard/my-courses",       label: "My Courses",       icon: BookOpen,        href: "/student-dashboard/my-courses",       group: "primary" },
   { id: "/student-dashboard/live-classes",     label: "Live Classes",     icon: Video,           href: "/student-dashboard/live-classes",     group: "primary", badge: "LIVE" },
-  { id: "/student-dashboard/ai-lab",           label: "AI Lab",           icon: Sparkles,        href: "/student-dashboard/ai-lab",           group: "primary", badge: "NEW" },
+  { id: "/student-dashboard/smart-lab",           label: "Smart Lab",           icon: Sparkles,        href: "/student-dashboard/smart-lab",           group: "primary", badge: "NEW" },
   { id: "/student-dashboard/homework",         label: "Homework",         icon: ClipboardList,   href: "/student-dashboard/homework",         group: "primary", badge: "3" },
   { id: "/student-dashboard/gamified",         label: "Gamified",         icon: Gamepad2,        href: "/student-dashboard/gamified",         group: "primary", badge: "NEW" },
   { id: "/student-dashboard/notes",            label: "Notes & PDFs",     icon: FileText,        href: "/student-dashboard/notes",            group: "secondary" },

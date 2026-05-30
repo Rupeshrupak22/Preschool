@@ -54,168 +54,176 @@ export default function ContactPage() {
 
       {/* Two Column Layout - Company Information & Personal Information */}
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-6 lg:py-24">
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 lg:items-stretch">
           
           {/* Left Column - Company Information Box */}
-          <div className="rounded-3xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-white to-purple-50 p-8 shadow-xl backdrop-blur-sm md:p-10">
-            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">Company information</h2>
-            <p className="mt-4 text-base text-gray-600 leading-relaxed">
-              Connect with ADYAPAN - where education meets innovation. We're here to support your learning journey.
-            </p>
+          <div className="relative overflow-hidden rounded-3xl border-4 border-blue-300 bg-gradient-to-br from-cyan-100 via-blue-50 to-purple-100 shadow-2xl flex flex-col">
+            {/* Header with gradient background */}
+            <div className="h-16 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-t-3xl flex items-center justify-center">
+              <h2 className="text-xl font-black text-white">Company Information</h2>
+            </div>
+            
+            <div className="flex-1 p-8 md:p-10 flex flex-col justify-between">
+              <div>
+                <p className="text-base text-gray-700 leading-relaxed font-medium mb-8">
+                  Connect with ADYAPAN - where education meets innovation. We're here to support your learning journey
+                </p>
 
-            <div className="mt-10 space-y-6">
-              {/* Phone */}
-              <a href="tel:+918179124566" className="flex items-start gap-4 group">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white shadow-sm">
-                  <PhoneCall className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Phone</h3>
-                  <p className="mt-1 text-lg font-bold text-gray-900">+91 81791 24566</p>
-                </div>
-              </a>
+                <div className="space-y-6">
+                  {/* Phone */}
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-400 to-purple-600 text-white shadow-lg">
+                      <PhoneCall className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-1">PHONE</h3>
+                      <p className="text-xl font-black text-gray-900">+91 8179124566</p>
+                    </div>
+                  </div>
 
-              {/* Email */}
-              <a href="mailto:support@adyapan.com" className="flex items-start gap-4 group">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white shadow-sm">
-                  <Mail className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Email</h3>
-                  <p className="mt-1 text-lg font-bold text-gray-900">support@adyapan.com</p>
-                </div>
-              </a>
+                  {/* Email */}
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-lg">
+                      <Mail className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-1">EMAIL</h3>
+                      <p className="text-xl font-black text-gray-900">support@adyapan.com</p>
+                    </div>
+                  </div>
 
-              {/* Address */}
-              <a 
-                href="https://www.google.com/maps?um=1&ie=UTF-8&fb=1&gl=in&sa=X&geocode=KdkGZDKLl8s7MSJtLa_4zSEV&daddr=Sattva+Magnus,+behind+Reliance+Bazaar+Shaikpet,+Sabza+Colony,+Ambedkar+Nagar,+Toli+Chowki,+Hyderabad,+Telangana+500008"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-start gap-4 group"
-              >
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white shadow-sm">
-                  <MapPin className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Address</h3>
-                  <p className="mt-1 text-base font-bold text-gray-900">ADYAPAN EDUTECH PRIVATE LIMITED</p>
-                  <p className="text-sm text-gray-600">Sattva Magnus, behind Reliance Bazaar Shaikpet,</p>
-                  <p className="text-sm text-gray-600">Sabza Colony, Ambedkar Nagar, Toli Chowki,</p>
-                  <p className="text-sm text-gray-600">Hyderabad, Telangana 500008</p>
-                </div>
-              </a>
+                  {/* Address */}
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-400 to-pink-500 text-white shadow-lg">
+                      <MapPin className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-1">ADDRESS</h3>
+                      <p className="text-lg font-black text-gray-900">ADYAPAN EDUTECH PRIVATE LTD</p>
+                      <p className="text-sm text-gray-700 font-medium">Sattva Magnus, behind Reliance Bazaar</p>
+                      <p className="text-sm text-gray-700 font-medium">Shaikpet, Sabza Colony, Ambedkar Nagar,</p>
+                      <p className="text-sm text-gray-700 font-medium">Hyderabad, Telangana 500008</p>
+                    </div>
+                  </div>
 
-              {/* Hours */}
-              <div className="flex items-start gap-4">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 shadow-sm">
-                  <Clock3 className="h-6 w-6" />
+                  {/* Hours */}
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-300 to-purple-500 text-white shadow-lg">
+                      <Clock3 className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-1">VISIT US</h3>
+                      <p className="text-xl font-black text-gray-900">Mon-Sat, 11 AM- 8 PM</p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Visit Us</h3>
-                  <p className="mt-1 text-lg font-bold text-gray-900">Mon-Sat, 11 AM - 8 PM</p>
+              </div>
+              
+              {/* Additional content to fill space */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-green-400 to-emerald-500 text-white">
+                    <MessageSquare className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-gray-700">Quick Response</p>
+                    <p className="text-xs text-gray-600">We reply within 24 hours</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Right Column - Personal Information Form Box */}
-          <div className="rounded-3xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 via-white to-pink-50 p-8 shadow-xl backdrop-blur-sm md:p-10">
-            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">Personal information</h2>
-            <p className="mt-4 text-base text-gray-600 leading-relaxed">
-              Fill out the form below and we'll get back to you as soon as possible.
-            </p>
+          <div className="relative overflow-hidden rounded-3xl border-4 border-purple-300 bg-gradient-to-br from-purple-100 via-pink-50 to-orange-100 shadow-2xl flex flex-col">
+            {/* Header with gradient background */}
+            <div className="h-16 bg-gradient-to-r from-orange-400 to-pink-500 rounded-t-3xl flex items-center justify-center">
+              <h2 className="text-xl font-black text-white">Personal Information</h2>
+            </div>
+            
+            <div className="flex-1 p-8 md:p-10 flex flex-col">
+              <p className="text-base text-gray-700 leading-relaxed font-medium mb-8">
+                Fill out the form below and we'll get back as soon as possible
+              </p>
 
-            <form id="contact-form" onSubmit={submitContact} className="mt-8 space-y-6">
-              {/* Full Name */}
-              <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
-                  Full Name *
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  placeholder="Your name"
-                  className="mt-2 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              <form id="contact-form" onSubmit={submitContact} className="flex-1 flex flex-col space-y-5">
+                {/* Full Name */}
+                <div>
+                  <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Full Name *
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    className="block w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
 
-              {/* Email */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
-                  Email *
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  placeholder="you@email.com"
-                  className="mt-2 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+                {/* Email */}
+                <div>
+                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Email *
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    className="block w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
 
-              {/* Phone */}
-              <div>
-                <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">
-                  Phone
-                </label>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  placeholder="+91 XXXXX XXXXX"
-                  className="mt-2 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+                {/* Phone */}
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Phone
+                  </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    className="block w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
 
-              {/* Company Name / Subject */}
-              <div>
-                <label htmlFor="interest" className="block text-sm font-semibold text-gray-700">
-                  Subject *
-                </label>
-                <select
-                  id="interest"
-                  name="interest"
-                  required
-                  defaultValue=""
-                  className="mt-2 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                {/* Subject */}
+                <div>
+                  <label htmlFor="interest" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Subject
+                  </label>
+                  <input
+                    id="interest"
+                    name="interest"
+                    type="text"
+                    className="block w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+
+                {/* Message */}
+                <div className="flex-1">
+                  <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={5}
+                    className="block w-full h-full min-h-[120px] resize-none rounded-lg border-2 border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  className="w-full rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-4 text-lg font-black text-white shadow-lg transition hover:from-cyan-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center gap-2 mt-auto"
                 >
-                  <option value="" disabled>
-                    Select a topic
-                  </option>
-                  <option value="Course enrollment">Course enrollment</option>
-                  <option value="Live class support">Live class support</option>
-                  <option value="School partnership">School partnership</option>
-                  <option value="Placement support">Placement support</option>
-                </select>
-              </div>
-
-              {/* Message */}
-              <div>
-                <label htmlFor="message" className="block text-sm font-semibold text-gray-700">
-                  Message *
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  rows={5}
-                  placeholder="Tell us how we can help..."
-                  className="mt-2 block w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                Submit request
-                <ArrowRight className="h-5 w-5" />
-              </button>
-            </form>
+                  Submit request
+                  <ArrowRight className="h-5 w-5" />
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </section>
@@ -283,7 +291,7 @@ export default function ContactPage() {
             Build smarter decisions, faster
           </h2>
           <p className="mx-auto mt-6 max-w-3xl text-lg text-white/90 md:text-xl">
-            Join thousands of students and schools who trust ADYAPAN for innovative learning solutions. 
+            Join our growing community of students and schools who trust ADYAPAN for innovative learning solutions. 
             Transform education with AI-powered insights, personalized learning paths, and comprehensive support.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
