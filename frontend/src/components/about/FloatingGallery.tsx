@@ -75,7 +75,7 @@ function ParallaxColumn({ cards: colCards, speed, className = "" }: { cards: Gal
 
 export default function FloatingGallery() {
   return (
-    <section className="relative overflow-hidden py-16 md:py-20">
+    <section className="relative overflow-hidden py-8 md:py-12">
       <div
         className="absolute inset-0"
         style={{
@@ -112,7 +112,7 @@ export default function FloatingGallery() {
         </motion.div>
 
         {/* Desktop: 3 parallax columns */}
-        <div className="hidden md:grid md:grid-cols-3 md:gap-5 md:items-start pb-16">
+        <div className="hidden md:grid md:grid-cols-3 md:gap-5 md:items-start pb-10">
           <ParallaxColumn cards={[cards[0], cards[3]]} speed={-40} className="mt-8" />
           <ParallaxColumn cards={[cards[2], cards[5]]} speed={-70} className="mt-0" />
           <ParallaxColumn cards={[cards[1], cards[4]]} speed={-50} className="mt-14" />

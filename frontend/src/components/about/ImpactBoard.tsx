@@ -16,6 +16,7 @@ const cards = [
     glowColor: "rgba(45,102,255,0.55)",
     stripIcon: GraduationCap,
     stripLabel: "STUDENT ILLUSTRATION",
+    textMinHeight: 186,
   },
   {
     id: 2,
@@ -119,7 +120,10 @@ function ImpactCard({ card }: { card: (typeof cards)[0] }) {
 
       {/* ── Heading + description + image ── */}
       <div className="mt-4 flex items-end justify-between gap-4">
-        <div className="flex-1 min-w-0">
+        <div
+          className="flex-1 min-w-0"
+          style={card.textMinHeight ? { minHeight: card.textMinHeight } : undefined}
+        >
           <h3 className="text-[42px] font-extrabold leading-[1.1] text-white tracking-tight">
             {card.heading}
           </h3>

@@ -78,7 +78,7 @@ export default function AboutVideoHero() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[780px] overflow-hidden md:min-h-[920px] lg:min-h-screen lg:min-h-[960px]"
+      className="relative min-h-[260px] overflow-hidden md:min-h-[420px] lg:min-h-[520px]"
     >
       {/* Layer 1 — background video */}
       <motion.div className="absolute inset-0 z-0 overflow-hidden" style={{ y: videoY }}>
@@ -105,7 +105,7 @@ export default function AboutVideoHero() {
 
       {/* Layer 3 — content */}
       <div className="relative z-[2] flex min-h-full flex-col">
-        <div className="flex flex-col px-8 pb-4 pt-24 md:px-8 md:pb-6 md:pt-28 lg:pt-32">
+        <div className="flex flex-col px-8 pb-4 pt-0 md:px-8 md:pb-6 md:pt-8 lg:pt-12">
           <motion.div
             initial="hidden"
             animate="visible"
@@ -125,8 +125,7 @@ export default function AboutVideoHero() {
 
             <motion.h1
               variants={fadeUp}
-              className="mt-4 max-w-4xl text-[34px] font-black leading-[1.08] text-white antialiased drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)] sm:text-[38px] md:mt-5 md:text-[46px] lg:text-[54px] xl:text-[62px]"
-            >
+              className="mt-4 max-w-4xl text-[24px] font-black leading-[1.08] text-white antialiased drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)] sm:text-[28px] md:mt-5 md:text-[36px] lg:text-[44px] xl:text-[52px]"            >
               <ColorLoopWord>Empowering</ColorLoopWord> Students
               <br />
               For The <ColorLoopWord>Future</ColorLoopWord>
@@ -193,7 +192,7 @@ export default function AboutVideoHero() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.65 + index * 0.08 }}
-                className="group flex aspect-[4/3] flex-col justify-center rounded-[30px] border border-white/20 bg-white/10 px-4 py-3.5 text-left shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl transition-all duration-300 hover:border-white/30 hover:bg-white/15 md:px-5 md:py-4 lg:px-6"
+                className="group flex aspect-[3/2] flex-col justify-center rounded-[30px] border border-white/20 bg-white/10 px-4 py-3.5 text-left shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl transition-all duration-300 hover:border-white/30 hover:bg-white/15 md:px-5 md:py-4 lg:px-6"
               >
                 <span className="text-[22px] font-black leading-[1.08] tracking-tight text-white antialiased drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)] transition-transform duration-300 group-hover:scale-[1.02] md:text-[26px] lg:text-[30px] xl:text-[34px]">
                   {stat.heading}

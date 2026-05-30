@@ -267,7 +267,7 @@ export default function AboutPage() {
               ))}
             </div>
 
-            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:col-start-2 lg:row-start-3 lg:mt-10 lg:self-start">
+            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:col-start-2 lg:row-start-3 lg:mt-16 lg:self-start">
               {pillars.map((pillar, index) => (
                 <motion.div
                   key={pillar.title}
