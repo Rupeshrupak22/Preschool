@@ -2,9 +2,10 @@
  * Progressive Delay for failed login attempts
  * 
  * 1st fail: 1 second
- * 2nd fail: 3.5 seconds
- * 3rd fail: 10 seconds
- * 4th+ fail: 15 seconds
+ * 2nd fail: 3 seconds
+ * 3rd fail: 5 seconds
+ * 4th fail: 7 seconds
+ * 5th+ fail: 10 seconds
  * 
  * Auto-resets after 15 minutes of inactivity.
  * In-memory store — for multi-instance deployments, replace with Redis.
@@ -25,17 +26,18 @@ cleanupTimer.unref();
 
 function getDelay(attemptCount) {
   if (attemptCount <= 1) return 1000;
-  if (attemptCount === 2) return 3500;
-  if (attemptCount === 3) return 10000;
-  return 15000;
+  if (attemptCount === 2) return 3000;
+  if (attemptCount === 3) return 5000;
+  if (attemptCount === 4) return 7000;
+  return 10000;
 }
 
 /**
  * Record a failed login attempt and apply progressive delay.
  * The delay happens server-side — attacker must wait regardless.
  */
-async function recordFailedAttempt(email) {
-  const key = email.toLowerCase().trim();
+async function recordFailedAttempt(email, role = 'student') {
+  const key = `${role}:${email.toLowerCase().trim()}`;
   const now = Date.now();
 
   let existing = failedAttempts.get(key);
@@ -59,6 +61,9 @@ async function recordFailedAttempt(email) {
  */
 function clearFailedAttempts(email) {
   failedAttempts.delete(email.toLowerCase().trim());
+  for (const role of ['student', 'teacher', 'principal', 'admin']) {
+    failedAttempts.delete(`${role}:${email.toLowerCase().trim()}`);
+  }
 }
 
 /**

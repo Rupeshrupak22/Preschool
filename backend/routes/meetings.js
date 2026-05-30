@@ -1,5 +1,6 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
+const { authenticate, authorize } = require('../middleware/auth');
 const router = express.Router();
 
 let pool;
@@ -20,7 +21,7 @@ function getPool() {
 }
 
 // GET /api/v1/meetings
-router.get('/', async (req, res) => {
+router.get('/', authenticate, authorize('teacher', 'principal', 'admin'), async (req, res) => {
   try {
     const [rows] = await getPool().query('SELECT * FROM meetings ORDER BY created_at DESC');
     res.json(rows);
@@ -30,7 +31,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/v1/meetings
-router.post('/', async (req, res) => {
+router.post('/', authenticate, authorize('principal', 'admin'), async (req, res) => {
   try {
     const { title, hostedBy, duration } = req.body;
     const id = require('crypto').randomUUID().replace(/-/g, '').slice(0, 25);
@@ -47,7 +48,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/v1/meetings/:id
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticate, authorize('principal', 'admin'), async (req, res) => {
   try {
     const { is_active, title } = req.body;
     const updates = [];

@@ -17,7 +17,13 @@ router.get('/', authenticate, async (req, res) => {
     if (req.user.role === 'student') {
       where.user_id = req.user.id;
     } else if (user_id) {
+      if (!(await canAccessStudentUser(req.user, user_id))) {
+        return sendResponse(res, 403, false, 'Access denied.');
+      }
       where.user_id = user_id;
+    } else if (req.user.role === 'teacher' || req.user.role === 'principal') {
+      const ids = await studentUserIdsForSchool(req.user.school_id);
+      where.user_id = { in: ids };
     }
 
     if (subject) where.subject = subject;
@@ -38,6 +44,9 @@ router.get('/', authenticate, async (req, res) => {
 router.post('/', authenticate, authorize('teacher', 'admin', 'principal'), validateBody('user_id', 'subject', 'status'), async (req, res) => {
   try {
     const { user_id, subject, status, time, source } = req.body;
+    if (!(await canAccessStudentUser(req.user, user_id))) {
+      return sendResponse(res, 403, false, 'Access denied.');
+    }
     const record = await prisma.attendance.create({
       data: {
         id: crypto.randomUUID(),
@@ -66,6 +75,11 @@ router.post('/bulk', authenticate, authorize('teacher', 'admin', 'principal'), a
       time: r.time || new Date().toISOString(),
       source: r.source || 'bulk',
     }));
+    for (const record of records) {
+      if (!(await canAccessStudentUser(req.user, record.user_id))) {
+        return sendResponse(res, 403, false, 'Access denied for one or more students.');
+      }
+    }
 
     const result = await prisma.attendance.createMany({ data });
     sendResponse(res, 201, true, `Attendance marked for ${result.count} students.`, { count: result.count });
@@ -79,6 +93,9 @@ router.get('/summary/:userId', authenticate, async (req, res) => {
   try {
     const { userId } = req.params;
     if (req.user.role === 'student' && req.user.id !== userId) {
+      return sendResponse(res, 403, false, 'Access denied.');
+    }
+    if (req.user.role !== 'student' && !(await canAccessStudentUser(req.user, userId))) {
       return sendResponse(res, 403, false, 'Access denied.');
     }
 
@@ -96,5 +113,26 @@ router.get('/summary/:userId', authenticate, async (req, res) => {
     sendResponse(res, 500, false, 'Failed to fetch attendance summary.');
   }
 });
+
+async function canAccessStudentUser(user, userId) {
+  if (user.role === 'admin') return true;
+  if (user.role === 'student') return user.id === userId;
+  if (!user.school_id) return false;
+
+  const student = await prisma.student.findFirst({
+    where: { user_id: userId, schoolId: user.school_id },
+    select: { id: true },
+  });
+  return Boolean(student);
+}
+
+async function studentUserIdsForSchool(schoolId) {
+  if (!schoolId) return [];
+  const students = await prisma.student.findMany({
+    where: { schoolId, user_id: { not: null } },
+    select: { user_id: true },
+  });
+  return students.map((student) => student.user_id);
+}
 
 module.exports = router;

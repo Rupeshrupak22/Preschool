@@ -43,15 +43,31 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const isProduction = process.env.NODE_ENV === 'production';
 
-// ─── Security Middleware ─────────────────────────────────────────────
-app.use(helmet());
-
 // ─── CORS Configuration ─────────────────────────────────────────────
 const allowedOrigins = (process.env.CORS_ORIGINS || '')
   .split(',')
   .map((o) => o.trim())
   .filter(Boolean);
 
+// ─── Security Middleware ─────────────────────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      "default-src": ["'self'"],
+      "base-uri": ["'self'"],
+      "frame-ancestors": ["'none'"],
+      "object-src": ["'none'"],
+      "script-src": ["'self'"],
+      "style-src": ["'self'", "'unsafe-inline'"],
+      "img-src": ["'self'", "data:", "https:"],
+      "connect-src": ["'self'", ...(allowedOrigins.length ? allowedOrigins : [])],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
+
+// ─── CORS Configuration ─────────────────────────────────────────────
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -64,7 +80,7 @@ app.use(
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
   })
 );
 

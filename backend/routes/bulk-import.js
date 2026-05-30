@@ -4,7 +4,7 @@ const multer = require('multer');
 const csv = require('csv-parser');
 const { Readable } = require('stream');
 const prisma = require('../lib/prisma');
-const { hashPassword } = require('../utils/password');
+const { hashPassword, generateAccessKey, hashAccessKey } = require('../utils/password');
 const { sendResponse } = require('../utils/response');
 const { authenticate, authorize } = require('../middleware/auth');
 
@@ -38,15 +38,10 @@ function generateTempPassword() {
 
 /**
  * Generate staff/access key
- * Format: KEY-{8 random alphanumeric}
+ * Format: 64 hex characters from crypto.randomBytes(32)
  */
 function generateKey() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-  let code = '';
-  for (let i = 0; i < 8; i++) {
-    code += chars[crypto.randomInt(chars.length)];
-  }
-  return `KEY-${code}`;
+  return generateAccessKey();
 }
 
 /**
@@ -96,8 +91,8 @@ router.post(
         return sendResponse(res, 400, false, `Missing required columns: ${missingCols.join(', ')}. Found: ${headers.join(', ')}`);
       }
 
-      const schoolId = req.body.school_id || req.user.school_id || 'school_001';
-      const schoolName = req.body.school_name || 'Adyapan School';
+      const schoolId = req.user.role === 'principal' ? req.user.school_id : (req.body.school_id || req.user.school_id || 'school_001');
+      const schoolName = req.user.role === 'principal' ? req.user.school_name : (req.body.school_name || 'Adyapan School');
 
       const results = { created: [], skipped: [], errors: [] };
 
@@ -130,7 +125,7 @@ router.post(
           const tempPassword = generateTempPassword();
           const staffKey = generateKey();
           const passwordHash = await hashPassword(tempPassword);
-          const staffKeyHash = await hashPassword(staffKey);
+          const staffKeyHash = hashAccessKey(staffKey);
 
           await prisma.teacher.create({
             data: {
@@ -224,7 +219,7 @@ router.post(
           const tempPassword = generateTempPassword();
           const accessKey = generateKey();
           const passwordHash = await hashPassword(tempPassword);
-          const accessKeyHash = await hashPassword(accessKey);
+          const accessKeyHash = hashAccessKey(accessKey);
 
           // Find or create school
           let schoolId = 'school_' + crypto.randomUUID().slice(0, 8);
@@ -328,6 +323,7 @@ router.post(
               class_level: row.class_level || row.class || null,
               class_name: row.class_level || row.class || null,
               school_name: row.school_name || null,
+              school_id: req.user.role === 'principal' ? req.user.school_id : (req.body.school_id || null),
               signup_source: 'bulk_import',
             },
           });
@@ -341,6 +337,7 @@ router.post(
               phone: row.phone || null,
               class_level: row.class_level || row.class || null,
               school_name: row.school_name || null,
+              schoolId: req.user.role === 'principal' ? req.user.school_id : (req.body.school_id || null),
               parent_name: row.parent_name || null,
               parent_phone: row.parent_phone || null,
               signup_source: 'bulk_import',

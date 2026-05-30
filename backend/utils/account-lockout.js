@@ -1,7 +1,9 @@
 /**
- * Account Lockout — Lock account after 5 consecutive failed attempts
+ * Account Lockout
+ * Student/teacher: 5 consecutive failed attempts.
+ * Principal/admin: 3 consecutive failed attempts.
  * 
- * Lockout duration: 15 minutes (escalates with repeated lockouts)
+ * Lockout duration: 15 minutes.
  * Auto-unlock after timer expires.
  * 
  * For multi-instance: replace Map with Redis HASH + TTL.
@@ -9,9 +11,15 @@
 
 const accounts = new Map(); // email → { failures, lockedUntil, lockCount }
 
-const LOCKOUT_THRESHOLD = 5;
 const BASE_LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
-const MAX_LOCKOUT_MS = 60 * 60 * 1000;  // 1 hour max
+
+function thresholdForRole(role = 'student') {
+  return ['principal', 'admin'].includes(role) ? 3 : 5;
+}
+
+function keyFor(email, role = 'student') {
+  return `${role}:${email.toLowerCase().trim()}`;
+}
 
 // Cleanup every 30 minutes
 const timer = setInterval(() => {
@@ -28,8 +36,8 @@ timer.unref();
  * Check if account is currently locked
  * @returns {{ locked: boolean, remainingMs: number, attempts: number }}
  */
-function isLocked(email) {
-  const key = email.toLowerCase().trim();
+function isLocked(email, role = 'student') {
+  const key = keyFor(email, role);
   const data = accounts.get(key);
   if (!data) return { locked: false, remainingMs: 0, attempts: 0 };
 
@@ -54,8 +62,9 @@ function isLocked(email) {
  * Record a failed login attempt
  * @returns {{ locked: boolean, attempts: number, lockDurationMs: number }}
  */
-function recordFailure(email) {
-  const key = email.toLowerCase().trim();
+function recordFailure(email, role = 'student') {
+  const key = keyFor(email, role);
+  const threshold = thresholdForRole(role);
   let data = accounts.get(key);
 
   if (!data) {
@@ -71,10 +80,9 @@ function recordFailure(email) {
 
   data.failures += 1;
 
-  if (data.failures >= LOCKOUT_THRESHOLD) {
+  if (data.failures >= threshold) {
     data.lockCount += 1;
-    // Escalating lockout: 15min, 30min, 45min, 60min max
-    const lockDuration = Math.min(BASE_LOCKOUT_MS * data.lockCount, MAX_LOCKOUT_MS);
+    const lockDuration = BASE_LOCKOUT_MS;
     data.lockedUntil = Date.now() + lockDuration;
     return { locked: true, attempts: data.failures, lockDurationMs: lockDuration };
   }
@@ -85,13 +93,14 @@ function recordFailure(email) {
 /**
  * Clear failures on successful login
  */
-function clearFailures(email) {
-  const key = email.toLowerCase().trim();
-  const data = accounts.get(key);
-  if (data) {
-    data.failures = 0;
-    data.lockedUntil = null;
-    // Keep lockCount for escalation history
+function clearFailures(email, role) {
+  const roles = role ? [role] : ['student', 'teacher', 'principal', 'admin'];
+  for (const currentRole of roles) {
+    const data = accounts.get(keyFor(email, currentRole));
+    if (data) {
+      data.failures = 0;
+      data.lockedUntil = null;
+    }
   }
 }
 
@@ -99,7 +108,9 @@ function clearFailures(email) {
  * Admin: manually unlock an account
  */
 function adminUnlock(email) {
-  accounts.delete(email.toLowerCase().trim());
+  for (const role of ['student', 'teacher', 'principal', 'admin']) {
+    accounts.delete(keyFor(email, role));
+  }
 }
 
-module.exports = { isLocked, recordFailure, clearFailures, adminUnlock };
+module.exports = { isLocked, recordFailure, clearFailures, adminUnlock, thresholdForRole };
