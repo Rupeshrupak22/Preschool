@@ -19,10 +19,10 @@ const quickLinks = [
 ];
 
 const portalLinks = [
-  ["Teacher Access", "/teacher/login", "emerald"],
-  ["Principal Access", "/principal/login", "cyan"],
-  ["Admin Access", "/admin", "orange"],
-] as const;
+  ["Teacher Access", "/teacher/login"],
+  ["Principal Access", "/principal/login"],
+  ["Admin Access", "/admin"],
+];
 
 const socials: [string, string, React.ComponentType<{ className?: string }>][] = [
   ["Instagram", "https://www.instagram.com/adyapanschool/", Instagram],
@@ -40,29 +40,29 @@ export default function SiteFooter() {
       <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '40px 40px' }} />
 
       <div className="relative mx-auto max-w-7xl px-6 pb-8 pt-16 md:px-8">
-        {/* Main Grid */}
-        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-12 lg:gap-8">
+        {/* Main Grid — 5 columns: Brand | Programs | Quick Links | Staff Portals | Contact */}
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-8">
 
-          {/* Brand Column */}
-          <div className="lg:col-span-4">
+          {/* 1. Brand Column */}
+          <div className="lg:col-span-1">
             <div className="flex items-center gap-3">
               <img
                 src="/adyapan-logo.svg"
                 alt="ADYAPAN"
-                className="h-14 w-14 shrink-0 rounded-full object-contain ring-2 ring-white/10"
+                className="h-12 w-12 shrink-0 rounded-full object-contain ring-2 ring-white/10"
               />
               <div>
-                <span className="text-3xl font-black tracking-tight text-white">Adyapan</span>
-                <span className="ml-2 inline-flex items-center rounded-md bg-gradient-to-r from-cyan-500 to-blue-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg shadow-cyan-500/20">
+                <span className="text-2xl font-black tracking-tight text-white">Adyapan</span>
+                <span className="ml-1.5 inline-flex items-center rounded-md bg-gradient-to-r from-cyan-500 to-blue-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white">
                   Future Skills
                 </span>
               </div>
             </div>
-            <p className="mt-5 max-w-sm text-sm leading-relaxed text-slate-400">
+            <p className="mt-4 text-sm leading-relaxed text-slate-400">
               We help students from Class 5 to 12 become confident creators through coding, AI, robotics,
               communication, design, and career-ready future skills.
             </p>
-            <div className="mt-6 flex gap-3">
+            <div className="mt-5 flex gap-3">
               {socials.map(([label, href, Icon]) => (
                 <a
                   key={label}
@@ -70,16 +70,16 @@ export default function SiteFooter() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={`ADYAPAN ${label}`}
-                  className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 text-slate-400 ring-1 ring-white/10 transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-500/20 hover:text-cyan-400 hover:ring-cyan-500/30"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 text-slate-400 ring-1 ring-white/10 transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-500/20 hover:text-cyan-400 hover:ring-cyan-500/30"
                 >
-                  <Icon className="h-4.5 w-4.5" />
+                  <Icon className="h-4 w-4" />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Learning Programs */}
-          <div className="lg:col-span-3">
+          {/* 2. Learning Programs */}
+          <div className="lg:col-span-1">
             <h3 className="text-sm font-bold uppercase tracking-wider text-white">
               Learning Programs
             </h3>
@@ -98,8 +98,8 @@ export default function SiteFooter() {
             </ul>
           </div>
 
-          {/* Quick Links */}
-          <div className="lg:col-span-2">
+          {/* 3. Quick Links */}
+          <div className="lg:col-span-1">
             <h3 className="text-sm font-bold uppercase tracking-wider text-white">
               Quick Links
             </h3>
@@ -116,26 +116,21 @@ export default function SiteFooter() {
                 </li>
               ))}
             </ul>
+          </div>
 
-            {/* Staff Portals */}
-            <h3 className="mt-8 text-sm font-bold uppercase tracking-wider text-white">
+          {/* 4. Staff Portals */}
+          <div className="lg:col-span-1">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-white">
               Staff Portals
             </h3>
             <div className="mt-1 h-0.5 w-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" />
-            <ul className="mt-5 space-y-2.5">
-              {portalLinks.map(([label, href, color]) => (
+            <ul className="mt-5 space-y-3">
+              {portalLinks.map(([label, href]) => (
                 <li key={label}>
                   <a
                     href={href}
-                    className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-bold ring-1 transition-all duration-200 hover:-translate-y-0.5 ${
-                      color === "emerald"
-                        ? "bg-emerald-500/10 text-emerald-400 ring-emerald-500/20 hover:bg-emerald-500/20 hover:text-emerald-300"
-                        : color === "cyan"
-                          ? "bg-cyan-500/10 text-cyan-400 ring-cyan-500/20 hover:bg-cyan-500/20 hover:text-cyan-300"
-                          : "bg-orange-500/10 text-orange-400 ring-orange-500/20 hover:bg-orange-500/20 hover:text-orange-300"
-                    }`}
+                    className="text-sm text-slate-400 transition-colors duration-200 hover:text-cyan-400"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-current" />
                     {label}
                   </a>
                 </li>
@@ -143,8 +138,8 @@ export default function SiteFooter() {
             </ul>
           </div>
 
-          {/* Get In Touch */}
-          <div className="lg:col-span-3">
+          {/* 5. Get In Touch */}
+          <div className="lg:col-span-1">
             <h3 className="text-sm font-bold uppercase tracking-wider text-white">
               Get In Touch
             </h3>
@@ -152,7 +147,7 @@ export default function SiteFooter() {
             <ul className="mt-5 space-y-4">
               <li>
                 <a href="mailto:support@adyapan.com" className="flex items-center gap-3 text-sm text-slate-400 transition-colors duration-200 hover:text-cyan-400">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
                     <Mail className="h-4 w-4" />
                   </div>
                   support@adyapan.com
@@ -160,14 +155,14 @@ export default function SiteFooter() {
               </li>
               <li>
                 <a href="tel:+918292244709" className="flex items-center gap-3 text-sm text-slate-400 transition-colors duration-200 hover:text-cyan-400">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
                     <Phone className="h-4 w-4" />
                   </div>
                   +91 82922 44709
                 </a>
               </li>
               <li className="flex items-center gap-3 text-sm text-slate-400">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
                   <MapPin className="h-4 w-4" />
                 </div>
                 India
@@ -187,7 +182,7 @@ export default function SiteFooter() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 sm:flex-row">
+        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-6 sm:flex-row">
           <p className="text-xs text-slate-500">
             © 2026 ADYAPAN Future Skills Platform. All rights reserved.
           </p>
