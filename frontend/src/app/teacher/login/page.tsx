@@ -188,7 +188,9 @@ export default function TeacherLoginPage() {
                     name="email"
                     type="email"
                     required
-                    className="h-14 w-full rounded-lg border border-slate-200 bg-white pl-12 pr-4 text-base font-semibold text-slate-950 outline-none transition focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
+                    placeholder="yourname@school.edu"
+                    autoComplete="email"
+                    className="h-14 w-full rounded-lg border border-slate-200 bg-white pl-12 pr-4 text-base font-semibold text-slate-950 outline-none transition placeholder:font-normal placeholder:text-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-100"
                   />
                 </div>
               </label>

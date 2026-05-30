@@ -118,14 +118,17 @@ export async function middleware(request: NextRequest) {
   for (const { prefix, allowedRoles } of PROTECTED_PATHS) {
     if (pathname === prefix || pathname.startsWith(prefix + "/")) {
       if (!session) {
+        // Admin page has its own embedded login form — let it render directly
+        // instead of redirecting to the student login page
+        if (prefix.startsWith("/admin")) {
+          return NextResponse.next();
+        }
+
         const url = request.nextUrl.clone();
         if (prefix.startsWith("/principal")) {
           url.pathname = "/principal/login";
         } else if (prefix.startsWith("/teacher")) {
           url.pathname = "/teacher/login";
-        } else if (prefix.startsWith("/admin")) {
-          url.pathname = "/login";
-          url.searchParams.set("next", "/admin");
         } else {
           url.pathname = "/login";
           url.searchParams.set("next", pathname);
