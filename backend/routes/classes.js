@@ -20,7 +20,7 @@ router.get('/', authenticate, async (req, res) => {
     if (mode) where.mode = mode;
 
     if (req.user.role === 'teacher') {
-      where.teacher_id = req.user.id;
+      where.teacher_id = req.user.teacher_id || req.user.id;
     }
 
     const [classes, total] = await Promise.all([
@@ -39,6 +39,9 @@ router.get('/:id', authenticate, async (req, res) => {
   try {
     const session = await prisma.teacher_class_sessions.findUnique({ where: { id: req.params.id } });
     if (!session) return sendResponse(res, 404, false, 'Class session not found.');
+    if (req.user.role === 'teacher' && session.teacher_id !== (req.user.teacher_id || req.user.id)) {
+      return sendResponse(res, 403, false, 'Access denied.');
+    }
     sendResponse(res, 200, true, 'Class session fetched.', session);
   } catch (error) {
     sendResponse(res, 500, false, 'Failed to fetch class session.');
@@ -53,7 +56,7 @@ router.post('/', authenticate, authorize('teacher', 'admin', 'principal'), valid
     const session = await prisma.teacher_class_sessions.create({
       data: {
         id: crypto.randomUUID(),
-        teacher_id: teacher_id || req.user.id,
+        teacher_id: req.user.role === 'teacher' ? (req.user.teacher_id || req.user.id) : teacher_id,
         title, class_level,
         subject: subject || null,
         start_time: new Date(start_time),
@@ -74,6 +77,11 @@ router.post('/', authenticate, authorize('teacher', 'admin', 'principal'), valid
 router.put('/:id', authenticate, authorize('teacher', 'admin', 'principal'), async (req, res) => {
   try {
     const { title, class_level, subject, start_time, end_time, room, mode, status } = req.body;
+    const existing = await prisma.teacher_class_sessions.findUnique({ where: { id: req.params.id } });
+    if (!existing) return sendResponse(res, 404, false, 'Class session not found.');
+    if (req.user.role === 'teacher' && existing.teacher_id !== (req.user.teacher_id || req.user.id)) {
+      return sendResponse(res, 403, false, 'Access denied.');
+    }
     const updateData = { updated_at: new Date() };
     if (title) updateData.title = title;
     if (class_level) updateData.class_level = class_level;

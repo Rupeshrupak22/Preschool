@@ -1,9 +1,10 @@
 const express = require('express');
 const prisma = require('../lib/prisma');
+const { authenticate, authorize } = require('../middleware/auth');
 const router = express.Router();
 
 // GET /api/v1/leads
-router.get('/', async (req, res) => {
+router.get('/', authenticate, authorize('admin', 'principal'), async (req, res) => {
   try {
     const leads = await prisma.leads.findMany({
       orderBy: { created_at: 'desc' },
@@ -45,7 +46,7 @@ router.post('/', async (req, res) => {
 });
 
 // DELETE /api/v1/leads/:id
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, authorize('admin'), async (req, res) => {
   try {
     await prisma.leads.delete({ where: { id: req.params.id } });
     res.json({ message: 'Lead deleted' });

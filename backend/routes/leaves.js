@@ -1,6 +1,7 @@
 const express = require('express');
 const prisma = require('../lib/prisma');
 const mysql = require('mysql2/promise');
+const { authenticate, authorize } = require('../middleware/auth');
 const router = express.Router();
 
 // Using raw mysql2 for leaves since there's no Prisma model for it yet
@@ -24,7 +25,7 @@ function getPool() {
 }
 
 // GET /api/v1/leaves
-router.get('/', async (req, res) => {
+router.get('/', authenticate, authorize('teacher', 'principal', 'admin'), async (req, res) => {
   try {
     const { status } = req.query;
     let query = 'SELECT * FROM leave_requests ORDER BY created_at DESC';
@@ -43,9 +44,12 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/v1/leaves
-router.post('/', async (req, res) => {
+router.post('/', authenticate, authorize('teacher'), async (req, res) => {
   try {
-    const { teacherName, subject, teacherUid, dates, reason } = req.body;
+    const { dates, reason } = req.body;
+    const teacherUid = req.user.teacher_id || req.user.id;
+    const teacherName = req.user.name;
+    const subject = req.body.subject || null;
     const id = require('crypto').randomUUID().replace(/-/g, '').slice(0, 25);
 
     await getPool().query(
@@ -60,7 +64,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/v1/leaves/:id
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticate, authorize('principal', 'admin'), async (req, res) => {
   try {
     const { status } = req.body;
 
@@ -76,7 +80,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/v1/leaves/:id
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, authorize('principal', 'admin'), async (req, res) => {
   try {
     await getPool().query('DELETE FROM leave_requests WHERE id = ?', [req.params.id]);
     res.json({ message: 'Leave request deleted' });

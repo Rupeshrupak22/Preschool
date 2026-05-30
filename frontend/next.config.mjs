@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  serverExternalPackages: ["argon2"],
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion", "recharts"]
   },

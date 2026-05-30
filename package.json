@@ -15,7 +15,7 @@
     "teacher:check": "node scripts/check-teacher.js",
     "build": "next build frontend",
     "start": "next start frontend -p 3000",
-    "lint": "next lint frontend"
+    "lint": "tsc -p frontend/tsconfig.json --noEmit"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.10",

@@ -1,14 +1,22 @@
 const express = require('express');
 const prisma = require('../lib/prisma');
+const { authenticate, authorize } = require('../middleware/auth');
 const router = express.Router();
 
 // GET /api/v1/students
-router.get('/', async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
   try {
     const { search, schoolId } = req.query;
     let where = {};
 
-    if (schoolId) where.schoolId = schoolId;
+    if (req.user.role === 'student') {
+      where.user_id = req.user.id;
+    } else if (req.user.role === 'teacher' || req.user.role === 'principal') {
+      where.schoolId = req.user.school_id || '__no_school__';
+    } else if (schoolId) {
+      where.schoolId = schoolId;
+    }
+
     if (search) {
       where.OR = [
         { name: { contains: search } },
@@ -28,13 +36,14 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/v1/students/:id
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticate, async (req, res) => {
   try {
     const student = await prisma.student.findUnique({
       where: { id: req.params.id },
     });
 
     if (!student) return res.status(404).json({ error: 'Student not found' });
+    if (!canAccessStudent(req.user, student)) return res.status(403).json({ error: 'Access denied' });
     res.json(student);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -42,9 +51,10 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/v1/students
-router.post('/', async (req, res) => {
+router.post('/', authenticate, authorize('admin', 'principal'), async (req, res) => {
   try {
     const { name, email, phone, class_level, school_name, parent_name, parent_phone, schoolId } = req.body;
+    const finalSchoolId = req.user.role === 'principal' ? req.user.school_id : schoolId;
 
     const student = await prisma.student.create({
       data: {
@@ -55,7 +65,7 @@ router.post('/', async (req, res) => {
         school_name: school_name || null,
         parent_name: parent_name || null,
         parent_phone: parent_phone || null,
-        schoolId: schoolId || null,
+        schoolId: finalSchoolId || null,
       },
     });
 
@@ -69,11 +79,20 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/v1/students/:id
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticate, authorize('admin', 'principal', 'teacher'), async (req, res) => {
   try {
+    const existing = await prisma.student.findUnique({ where: { id: req.params.id } });
+    if (!existing) return res.status(404).json({ error: 'Student not found' });
+    if (!canAccessStudent(req.user, existing)) return res.status(403).json({ error: 'Access denied' });
+
+    const allowed = (({ name, phone, class_level, school_name, parent_name, parent_phone, status }) => ({
+      name, phone, class_level, school_name, parent_name, parent_phone, status,
+    }))(req.body);
+    Object.keys(allowed).forEach((key) => allowed[key] === undefined && delete allowed[key]);
+
     const student = await prisma.student.update({
       where: { id: req.params.id },
-      data: req.body,
+      data: allowed,
     });
     res.json(student);
   } catch (err) {
@@ -82,13 +101,25 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/v1/students/:id
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, authorize('admin', 'principal'), async (req, res) => {
   try {
+    const existing = await prisma.student.findUnique({ where: { id: req.params.id } });
+    if (!existing) return res.status(404).json({ error: 'Student not found' });
+    if (!canAccessStudent(req.user, existing)) return res.status(403).json({ error: 'Access denied' });
     await prisma.student.delete({ where: { id: req.params.id } });
     res.json({ message: 'Student deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
+function canAccessStudent(user, student) {
+  if (user.role === 'admin') return true;
+  if (user.role === 'student') return student.user_id === user.id || student.email === user.email;
+  if (user.role === 'teacher' || user.role === 'principal') {
+    return Boolean(user.school_id && student.schoolId === user.school_id);
+  }
+  return false;
+}
 
 module.exports = router;

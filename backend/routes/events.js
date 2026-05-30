@@ -1,9 +1,10 @@
 const express = require('express');
 const prisma = require('../lib/prisma');
+const { authenticate, authorize } = require('../middleware/auth');
 const router = express.Router();
 
 // GET /api/v1/events
-router.get('/', async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
   try {
     const { limit } = req.query;
 
@@ -19,7 +20,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/v1/events
-router.post('/', async (req, res) => {
+router.post('/', authenticate, authorize('teacher', 'principal', 'admin'), async (req, res) => {
   try {
     const { user_email, title, message, channel } = req.body;
 
@@ -41,7 +42,7 @@ router.post('/', async (req, res) => {
 });
 
 // DELETE /api/v1/events/:id
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, authorize('admin'), async (req, res) => {
   try {
     await prisma.notifications.delete({ where: { id: req.params.id } });
     res.json({ message: 'Event deleted' });

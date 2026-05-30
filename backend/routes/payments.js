@@ -16,6 +16,8 @@ router.get('/', authenticate, async (req, res) => {
 
     if (req.user.role === 'student') {
       where.user_email = req.user.email;
+    } else if (req.user.role === 'principal') {
+      where.user_email = { in: await studentEmailsForSchool(req.user.school_id) };
     } else if (user_email) {
       where.user_email = user_email;
     }
@@ -43,6 +45,10 @@ router.get('/:id', authenticate, async (req, res) => {
     if (req.user.role === 'student' && payment.user_email !== req.user.email) {
       return sendResponse(res, 403, false, 'Access denied.');
     }
+    if (req.user.role === 'principal') {
+      const emails = await studentEmailsForSchool(req.user.school_id);
+      if (!emails.includes(payment.user_email)) return sendResponse(res, 403, false, 'Access denied.');
+    }
     sendResponse(res, 200, true, 'Payment fetched.', payment);
   } catch (error) {
     sendResponse(res, 500, false, 'Failed to fetch payment.');
@@ -53,6 +59,16 @@ router.get('/:id', authenticate, async (req, res) => {
 router.post('/', authenticate, validateBody('user_email', 'plan', 'amount'), async (req, res) => {
   try {
     const { user_email, plan, amount, currency, razorpay_order_id, razorpay_payment_id, status } = req.body;
+    if (req.user.role === 'student' && user_email !== req.user.email) {
+      return sendResponse(res, 403, false, 'Students can create payments only for their own account.');
+    }
+    if (req.user.role === 'teacher') {
+      return sendResponse(res, 403, false, 'Access denied.');
+    }
+    if (req.user.role === 'principal') {
+      const emails = await studentEmailsForSchool(req.user.school_id);
+      if (!emails.includes(user_email)) return sendResponse(res, 403, false, 'Access denied.');
+    }
     const payment = await prisma.payments.create({
       data: {
         id: crypto.randomUUID(),
@@ -90,16 +106,27 @@ router.put('/:id/status', authenticate, authorize('admin'), validateBody('status
 // GET /api/v1/payments/stats/summary
 router.get('/stats/summary', authenticate, authorize('admin', 'principal'), async (req, res) => {
   try {
+    const where = {};
+    if (req.user.role === 'principal') where.user_email = { in: await studentEmailsForSchool(req.user.school_id) };
     const [total, paid, pending, failed] = await Promise.all([
-      prisma.payments.count(),
-      prisma.payments.count({ where: { status: 'paid' } }),
-      prisma.payments.count({ where: { status: 'created' } }),
-      prisma.payments.count({ where: { status: 'failed' } }),
+      prisma.payments.count({ where }),
+      prisma.payments.count({ where: { ...where, status: 'paid' } }),
+      prisma.payments.count({ where: { ...where, status: 'created' } }),
+      prisma.payments.count({ where: { ...where, status: 'failed' } }),
     ]);
     sendResponse(res, 200, true, 'Payment stats fetched.', { total, paid, pending, failed });
   } catch (error) {
     sendResponse(res, 500, false, 'Failed to fetch payment stats.');
   }
 });
+
+async function studentEmailsForSchool(schoolId) {
+  if (!schoolId) return [];
+  const students = await prisma.student.findMany({
+    where: { schoolId },
+    select: { email: true },
+  });
+  return students.map((student) => student.email);
+}
 
 module.exports = router;
