@@ -15,7 +15,11 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
+const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 const prisma = require('./lib/prisma');
+const { inputSanitizer } = require('./middleware/sanitize');
+const { csrfProtection } = require('./middleware/csrf');
 
 // Route imports
 const authRoutes = require('./routes/auth');
@@ -90,6 +94,16 @@ app.use(compression());
 // ─── Body Parsing ───────────────────────────────────────────────────
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+app.use(cookieParser());
+
+// ─── HTTP Parameter Pollution Protection ────────────────────────────
+app.use(hpp());
+
+// ─── Input Sanitization (XSS Prevention) ────────────────────────────
+app.use(inputSanitizer);
+
+// ─── CSRF Protection (Double-Submit Cookie) ─────────────────────────
+app.use(csrfProtection);
 
 // ─── Logging ────────────────────────────────────────────────────────
 if (isProduction) {

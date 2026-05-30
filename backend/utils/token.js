@@ -27,6 +27,7 @@ function generateAccessToken(user) {
       role: user.role,
       name: user.name,
       type: 'access',
+      jti: crypto.randomUUID(), // Unique token ID for blacklisting
     },
     secrets.access,
     {
