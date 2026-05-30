@@ -1,5 +1,13 @@
 import { NextResponse } from "next/server";
-import { findPrincipalByEmail, recordPrincipalLoginEvent, updatePasswordHash, updateAccessKeyHash } from "@/lib/db";
+import { randomBytes } from "node:crypto";
+import {
+  createActiveSession,
+  findActiveSession,
+  findPrincipalByEmail,
+  recordPrincipalLoginEvent,
+  updatePasswordHash,
+  updateAccessKeyHash
+} from "@/lib/db";
 import { verifyPassword, hashPassword } from "@/lib/password";
 import { activeCookieSessions, clearAuthCookies, signToken } from "@/lib/security";
 import { principalLoginSchema } from "@/lib/validators";
@@ -40,6 +48,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid principal credentials or school key." }, { status: 401 });
   }
 
+  const existingSession = await findActiveSession(principal.id);
+  if (existingSession) {
+    return NextResponse.json(
+      {
+        error: "This principal account is already active on another device. Clear previous sessions, refresh, and login again.",
+        code: "ACTIVE_SESSION_EXISTS",
+        action: "CLEAR_PREVIOUS_SESSIONS_AND_RELOGIN"
+      },
+      { status: 409 }
+    );
+  }
+
   // Transparently upgrade bcrypt hashes to Argon2id
   if (passwordResult.needsRehash) {
     const newHash = await hashPassword(payload.data.password);
@@ -50,13 +70,23 @@ export async function POST(request: Request) {
     await updateAccessKeyHash("principals", principal.email, newHash);
   }
 
+  const sid = randomBytes(32).toString("hex");
   const token = signToken({
     id: principal.id,
     email: principal.email,
     role: "principal",
     name: principal.principalName,
     schoolId: principal.schoolId,
-    schoolName: principal.schoolName
+    schoolName: principal.schoolName,
+    sid
+  });
+
+  await createActiveSession({
+    userId: principal.id,
+    sid,
+    email: principal.email,
+    role: "principal",
+    ttlSeconds: 15 * 60
   });
 
   await recordPrincipalLoginEvent({
@@ -84,7 +114,7 @@ export async function POST(request: Request) {
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 60 * 60 * 8
+    maxAge: 15 * 60
   });
 
   return response;

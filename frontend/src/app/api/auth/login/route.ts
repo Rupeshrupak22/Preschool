@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { findUserByEmail, isMysqlConfigured, recordLoginEvent, updatePasswordHash } from "@/lib/db";
+import { randomBytes } from "node:crypto";
+import { createActiveSession, findActiveSession, findUserByEmail, isMysqlConfigured, recordLoginEvent, updatePasswordHash } from "@/lib/db";
 import { verifyPassword, hashPassword } from "@/lib/password";
 import { activeCookieSessions, clearAuthCookies, signToken } from "@/lib/security";
 import { publicUser } from "@/lib/store";
@@ -39,13 +40,34 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid password." }, { status: 401 });
   }
 
+  const existingSession = await findActiveSession(user.id);
+  if (existingSession) {
+    return NextResponse.json(
+      {
+        error: `This ${user.role} account is already active on another device. Clear previous sessions, refresh, and login again.`,
+        code: "ACTIVE_SESSION_EXISTS",
+        action: "CLEAR_PREVIOUS_SESSIONS_AND_RELOGIN"
+      },
+      { status: 409 }
+    );
+  }
+
   // Transparently upgrade bcrypt hash to Argon2id
   if (needsRehash) {
     const newHash = await hashPassword(payload.data.password);
     await updatePasswordHash("users", user.email, newHash);
   }
 
-  const token = signToken({ id: user.id, email: user.email, role: user.role, name: user.name });
+  const sid = randomBytes(32).toString("hex");
+  const token = signToken({ id: user.id, email: user.email, role: user.role, name: user.name, sid });
+
+  await createActiveSession({
+    userId: user.id,
+    sid,
+    email: user.email,
+    role: user.role,
+    ttlSeconds: 15 * 60
+  });
 
   await recordLoginEvent({
     user,
@@ -61,7 +83,7 @@ export async function POST(request: Request) {
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 60 * 60 * 8
+    maxAge: 15 * 60
   });
   return response;
 }

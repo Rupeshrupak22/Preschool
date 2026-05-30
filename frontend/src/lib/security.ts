@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
+import { validateActiveSession } from "@/lib/db";
 
 const fallbackSecret = "local-dev-secret-change-in-production";
 export const authCookieNames = ["adyapan_token", "adyapan_principal_token", "adyapan_teacher_token"] as const;
@@ -14,6 +15,7 @@ export type AuthPayload = {
   schoolId?: string;
   schoolName?: string;
   teacherId?: string;
+  sid?: string;
 };
 
 function jwtSecret() {
@@ -101,37 +103,37 @@ export function hasDifferentActiveSession(
 export async function currentUser(request?: Request) {
   const authUser = verifyToken(bearerToken(request));
 
-  if (authUser && (authUser.role === "student" || authUser.role === "admin")) {
+  if (authUser && (authUser.role === "student" || authUser.role === "admin") && await validateActiveSession(authUser.id, authUser.sid)) {
     return authUser;
   }
 
   const cookieStore = await cookies();
   const user = verifyToken(cookieStore.get("adyapan_token")?.value);
-  return user?.role === "student" || user?.role === "admin" ? user : null;
+  return (user?.role === "student" || user?.role === "admin") && await validateActiveSession(user.id, user.sid) ? user : null;
 }
 
 export async function currentPrincipal(request?: Request) {
   const authUser = verifyToken(bearerToken(request));
 
-  if (authUser?.role === "principal") {
+  if (authUser?.role === "principal" && await validateActiveSession(authUser.id, authUser.sid)) {
     return authUser;
   }
 
   const cookieStore = await cookies();
   const principal = verifyToken(cookieStore.get("adyapan_principal_token")?.value);
-  return principal?.role === "principal" ? principal : null;
+  return principal?.role === "principal" && await validateActiveSession(principal.id, principal.sid) ? principal : null;
 }
 
 export async function currentTeacher(request?: Request) {
   const authUser = verifyToken(bearerToken(request));
 
-  if (authUser?.role === "teacher") {
+  if (authUser?.role === "teacher" && await validateActiveSession(authUser.id, authUser.sid)) {
     return authUser;
   }
 
   const cookieStore = await cookies();
   const teacher = verifyToken(cookieStore.get("adyapan_teacher_token")?.value);
-  return teacher?.role === "teacher" ? teacher : null;
+  return teacher?.role === "teacher" && await validateActiveSession(teacher.id, teacher.sid) ? teacher : null;
 }
 
 export function strongPassword(password: string) {

@@ -55,6 +55,14 @@ type LeadRecord = Record<string, unknown>;
 type PaymentRecord = Record<string, unknown>;
 type CertificateRecord = Record<string, unknown>;
 
+type ActiveSessionRecord = {
+  userId: string;
+  sid: string;
+  email: string;
+  role: "student" | "admin" | "principal" | "teacher";
+  expiresAt: Date;
+};
+
 declare global {
   var mysqlPool: Pool | undefined;
   var mysqlSchemaReady: Promise<void> | undefined;
@@ -129,6 +137,20 @@ async function ensureSchema(pool: Pool) {
       unlocked_courses JSON,
       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS active_sessions (
+      user_id VARCHAR(64) NOT NULL PRIMARY KEY,
+      sid VARCHAR(64) NOT NULL UNIQUE,
+      email VARCHAR(190) NOT NULL,
+      role VARCHAR(30) NOT NULL,
+      created_at DATETIME NOT NULL,
+      last_seen_at DATETIME NOT NULL,
+      expires_at DATETIME NOT NULL,
+      KEY idx_active_sessions_sid (sid),
+      KEY idx_active_sessions_expires_at (expires_at)
     )
   `);
 
@@ -747,6 +769,83 @@ export async function updateStaffKeyHash(table: "teachers", email: string, newHa
   const pool = await connectDb();
   if (!pool) return;
   await pool.query(`UPDATE ${table} SET staff_key_hash = ? WHERE email = ?`, [newHash, email]);
+}
+
+export async function cleanupActiveSessions() {
+  const pool = await connectDb();
+  if (!pool) return;
+  await pool.query("DELETE FROM active_sessions WHERE expires_at <= NOW()");
+}
+
+export async function findActiveSession(userId: string) {
+  const pool = await connectDb();
+  if (!pool) return null;
+  await cleanupActiveSessions();
+
+  const [rows] = await pool.query<RowDataPacket[]>(
+    "SELECT user_id, sid, email, role, expires_at FROM active_sessions WHERE user_id = ? LIMIT 1",
+    [userId]
+  );
+  const row = rows[0];
+  if (!row) return null;
+
+  return {
+    userId: String(row.user_id),
+    sid: String(row.sid),
+    email: String(row.email),
+    role: row.role as ActiveSessionRecord["role"],
+    expiresAt: new Date(row.expires_at)
+  } satisfies ActiveSessionRecord;
+}
+
+export async function createActiveSession(data: {
+  userId: string;
+  sid: string;
+  email: string;
+  role: ActiveSessionRecord["role"];
+  ttlSeconds?: number;
+}) {
+  const pool = await connectDb();
+  if (!pool) return;
+  const ttlSeconds = data.ttlSeconds ?? 15 * 60;
+
+  await pool.query(
+    `INSERT INTO active_sessions (user_id, sid, email, role, created_at, last_seen_at, expires_at)
+     VALUES (?, ?, ?, ?, NOW(), NOW(), DATE_ADD(NOW(), INTERVAL ? SECOND))
+     ON DUPLICATE KEY UPDATE
+       sid = VALUES(sid),
+       email = VALUES(email),
+       role = VALUES(role),
+       created_at = VALUES(created_at),
+       last_seen_at = VALUES(last_seen_at),
+       expires_at = VALUES(expires_at)`,
+    [data.userId, data.sid, data.email, data.role, ttlSeconds]
+  );
+}
+
+export async function validateActiveSession(userId?: string, sid?: string, ttlSeconds = 15 * 60) {
+  if (!userId || !sid) return false;
+  const pool = await connectDb();
+  if (!pool) return false;
+  await cleanupActiveSessions();
+
+  const [rows] = await pool.query<RowDataPacket[]>(
+    "SELECT sid FROM active_sessions WHERE user_id = ? AND sid = ? LIMIT 1",
+    [userId, sid]
+  );
+  if (!rows[0]) return false;
+
+  await pool.query(
+    "UPDATE active_sessions SET last_seen_at = NOW(), expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND) WHERE user_id = ? AND sid = ?",
+    [ttlSeconds, userId, sid]
+  );
+  return true;
+}
+
+export async function clearActiveSessions(userId: string) {
+  const pool = await connectDb();
+  if (!pool) return;
+  await pool.query("DELETE FROM active_sessions WHERE user_id = ?", [userId]);
 }
 
 export async function findPrincipalByEmail(email: string) {
