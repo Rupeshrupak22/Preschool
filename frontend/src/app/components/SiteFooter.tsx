@@ -16,10 +16,13 @@ const quickLinks = [
   ["LMS Dashboard", "/student-dashboard"],
   ["Login", "/login"],
   ["Contact Us", "/contact"],
-  ["Principal Access", "/principal/dashboard"],
-  ["Teacher Access", "/teacher/login"],
-  ["Admin Access", "/login?next=/admin"]
 ];
+
+const portalLinks = [
+  ["Teacher Access", "/teacher/login", "emerald"],
+  ["Principal Access", "/principal/login", "cyan"],
+  ["Admin Access", "/admin", "orange"],
+] as const;
 
 const socials: [string, string, React.ComponentType<{ className?: string }>][] = [
   ["Instagram", "https://www.instagram.com/adyapanschool/", Instagram],
@@ -108,6 +111,31 @@ export default function SiteFooter() {
                     href={href}
                     className="text-sm text-slate-400 transition-colors duration-200 hover:text-cyan-400"
                   >
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            {/* Staff Portals */}
+            <h3 className="mt-8 text-sm font-bold uppercase tracking-wider text-white">
+              Staff Portals
+            </h3>
+            <div className="mt-1 h-0.5 w-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" />
+            <ul className="mt-5 space-y-2.5">
+              {portalLinks.map(([label, href, color]) => (
+                <li key={label}>
+                  <a
+                    href={href}
+                    className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-bold ring-1 transition-all duration-200 hover:-translate-y-0.5 ${
+                      color === "emerald"
+                        ? "bg-emerald-500/10 text-emerald-400 ring-emerald-500/20 hover:bg-emerald-500/20 hover:text-emerald-300"
+                        : color === "cyan"
+                          ? "bg-cyan-500/10 text-cyan-400 ring-cyan-500/20 hover:bg-cyan-500/20 hover:text-cyan-300"
+                          : "bg-orange-500/10 text-orange-400 ring-orange-500/20 hover:bg-orange-500/20 hover:text-orange-300"
+                    }`}
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-current" />
                     {label}
                   </a>
                 </li>
