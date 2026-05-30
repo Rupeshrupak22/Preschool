@@ -537,11 +537,11 @@ export default function AdminPage() {
           </div>
 
           <div className="overflow-x-auto">
-            {activeTab === "schools" && <SchoolsTable rows={activeRows} />}
-            {activeTab === "teachers" && <TeacherPerformanceTable rows={activeRows} />}
-            {activeTab === "principals" && <PrincipalsTable rows={activeRows} />}
+            {activeTab === "schools" && <SchoolsTable rows={activeRows} onView={setSelectedStudent} />}
+            {activeTab === "teachers" && <TeacherPerformanceTable rows={activeRows} onView={setSelectedStudent} />}
+            {activeTab === "principals" && <PrincipalsTable rows={activeRows} onView={setSelectedStudent} />}
             {activeTab === "students" && <StudentsTable rows={activeRows} onView={setSelectedStudent} />}
-            {activeTab === "payments" && <PaymentsTable rows={activeRows} />}
+            {activeTab === "payments" && <PaymentsTable rows={activeRows} onView={setSelectedStudent} />}
             {activeTab === "activity" && <ActivityTable rows={activeRows} />}
             {activeTab === "add-user" && <AddUserPanel onSuccess={loadOverview} />}
             {activeTab === "manage-users" && <ManageUsersPanel onSuccess={loadOverview} />}
@@ -566,9 +566,9 @@ function EmptyRow({ columns }: { columns: number }) {
   );
 }
 
-function SchoolsTable({ rows }: { rows: Row[] }) {
+function SchoolsTable({ rows, onView }: { rows: Row[]; onView: (row: Row) => void }) {
   return (
-    <table className="w-full min-w-[1040px] text-left text-sm">
+    <table className="w-full min-w-[1100px] text-left text-sm">
       <thead className="bg-slate-50 text-xs font-black uppercase tracking-[0.12em] text-slate-500">
         <tr>
           <th className="px-5 py-4">School</th>
@@ -578,6 +578,7 @@ function SchoolsTable({ rows }: { rows: Row[] }) {
           <th className="px-5 py-4">Principals</th>
           <th className="px-5 py-4">Revenue</th>
           <th className="px-5 py-4">Status</th>
+          <th className="px-5 py-4 text-right">Action</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-slate-100">
@@ -596,16 +597,21 @@ function SchoolsTable({ rows }: { rows: Row[] }) {
             <td className="px-5 py-4">{text(row.principals, "0")}</td>
             <td className="px-5 py-4 font-black text-slate-950">{formatCurrency(row.revenue)}</td>
             <td className="px-5 py-4"><StatusBadge value={row.status} /></td>
+            <td className="px-5 py-4 text-right">
+              <button type="button" onClick={() => onView(row)} className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-slate-950 px-3 text-xs font-black text-white transition hover:bg-cyan-700">
+                <Eye className="h-4 w-4" /> View
+              </button>
+            </td>
           </tr>
-        )) : <EmptyRow columns={7} />}
+        )) : <EmptyRow columns={8} />}
       </tbody>
     </table>
   );
 }
 
-function TeacherPerformanceTable({ rows }: { rows: Row[] }) {
+function TeacherPerformanceTable({ rows, onView }: { rows: Row[]; onView: (row: Row) => void }) {
   return (
-    <table className="w-full min-w-[1100px] text-left text-sm">
+    <table className="w-full min-w-[1200px] text-left text-sm">
       <thead className="bg-slate-50 text-xs font-black uppercase tracking-[0.12em] text-slate-500">
         <tr>
           <th className="px-5 py-4">Teacher</th>
@@ -616,11 +622,12 @@ function TeacherPerformanceTable({ rows }: { rows: Row[] }) {
           <th className="px-5 py-4">Score</th>
           <th className="px-5 py-4">Last Login</th>
           <th className="px-5 py-4">Status</th>
+          <th className="px-5 py-4 text-right">Action</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-slate-100">
         {rows.length ? rows.map((row) => (
-          <tr key={text(row.teacherId)} className="font-semibold text-slate-700">
+          <tr key={text(row.teacherId || row.id)} className="font-semibold text-slate-700">
             <td className="px-5 py-4">
               <span className="block font-black text-slate-950">{text(row.name)}</span>
               <span className="text-xs text-slate-500">{text(row.email)}</span>
@@ -634,16 +641,21 @@ function TeacherPerformanceTable({ rows }: { rows: Row[] }) {
             </td>
             <td className="px-5 py-4">{formatDate(row.lastLoginAt)}</td>
             <td className="px-5 py-4"><StatusBadge value={row.status} /></td>
+            <td className="px-5 py-4 text-right">
+              <button type="button" onClick={() => onView(row)} className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-slate-950 px-3 text-xs font-black text-white transition hover:bg-cyan-700">
+                <Eye className="h-4 w-4" /> View
+              </button>
+            </td>
           </tr>
-        )) : <EmptyRow columns={8} />}
+        )) : <EmptyRow columns={9} />}
       </tbody>
     </table>
   );
 }
 
-function PrincipalsTable({ rows }: { rows: Row[] }) {
+function PrincipalsTable({ rows, onView }: { rows: Row[]; onView: (row: Row) => void }) {
   return (
-    <table className="w-full min-w-[920px] text-left text-sm">
+    <table className="w-full min-w-[1000px] text-left text-sm">
       <thead className="bg-slate-50 text-xs font-black uppercase tracking-[0.12em] text-slate-500">
         <tr>
           <th className="px-5 py-4">Principal</th>
@@ -651,6 +663,7 @@ function PrincipalsTable({ rows }: { rows: Row[] }) {
           <th className="px-5 py-4">Phone</th>
           <th className="px-5 py-4">Last Login</th>
           <th className="px-5 py-4">Status</th>
+          <th className="px-5 py-4 text-right">Action</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-slate-100">
@@ -664,8 +677,13 @@ function PrincipalsTable({ rows }: { rows: Row[] }) {
             <td className="px-5 py-4">{text(row.phone)}</td>
             <td className="px-5 py-4">{formatDate(row.lastLoginAt)}</td>
             <td className="px-5 py-4"><StatusBadge value={row.status} /></td>
+            <td className="px-5 py-4 text-right">
+              <button type="button" onClick={() => onView(row)} className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-slate-950 px-3 text-xs font-black text-white transition hover:bg-cyan-700">
+                <Eye className="h-4 w-4" /> View
+              </button>
+            </td>
           </tr>
-        )) : <EmptyRow columns={5} />}
+        )) : <EmptyRow columns={6} />}
       </tbody>
     </table>
   );
@@ -774,9 +792,9 @@ function DetailBox({ label, value }: { label: string; value: unknown }) {
   );
 }
 
-function PaymentsTable({ rows }: { rows: Row[] }) {
+function PaymentsTable({ rows, onView }: { rows: Row[]; onView: (row: Row) => void }) {
   return (
-    <table className="w-full min-w-[960px] text-left text-sm">
+    <table className="w-full min-w-[1040px] text-left text-sm">
       <thead className="bg-slate-50 text-xs font-black uppercase tracking-[0.12em] text-slate-500">
         <tr>
           <th className="px-5 py-4">User</th>
@@ -785,6 +803,7 @@ function PaymentsTable({ rows }: { rows: Row[] }) {
           <th className="px-5 py-4">Order</th>
           <th className="px-5 py-4">Date</th>
           <th className="px-5 py-4">Status</th>
+          <th className="px-5 py-4 text-right">Action</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-slate-100">
@@ -796,8 +815,13 @@ function PaymentsTable({ rows }: { rows: Row[] }) {
             <td className="px-5 py-4">{text(row.razorpayOrderId)}</td>
             <td className="px-5 py-4">{formatDate(row.createdAt)}</td>
             <td className="px-5 py-4"><StatusBadge value={row.status} /></td>
+            <td className="px-5 py-4 text-right">
+              <button type="button" onClick={() => onView(row)} className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-slate-950 px-3 text-xs font-black text-white transition hover:bg-cyan-700">
+                <Eye className="h-4 w-4" /> View
+              </button>
+            </td>
           </tr>
-        )) : <EmptyRow columns={6} />}
+        )) : <EmptyRow columns={7} />}
       </tbody>
     </table>
   );
