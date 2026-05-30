@@ -13,7 +13,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const bcrypt = require("bcryptjs");
+const argon2 = require("argon2");
 const mysql = require("mysql2/promise");
 
 // Load env
@@ -77,7 +77,7 @@ async function addStudent(conn, args) {
     process.exit(1);
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
+  const passwordHash = await argon2.hash(password, { type: argon2.argon2id, memoryCost: 65536, timeCost: 3, parallelism: 4 });
   const userId = id("user");
   const studentId = id("student");
 
@@ -112,7 +112,7 @@ async function addAdmin(conn, args) {
     process.exit(1);
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
+  const passwordHash = await argon2.hash(password, { type: argon2.argon2id, memoryCost: 65536, timeCost: 3, parallelism: 4 });
   const userId = id("user");
 
   const [existing] = await conn.query("SELECT id FROM users WHERE email = ?", [email]);
@@ -140,8 +140,8 @@ async function addPrincipal(conn, args) {
     process.exit(1);
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
-  const accessKeyHash = await bcrypt.hash(schoolKey.toUpperCase(), 12);
+  const passwordHash = await argon2.hash(password, { type: argon2.argon2id, memoryCost: 65536, timeCost: 3, parallelism: 4 });
+  const accessKeyHash = await argon2.hash(schoolKey.toUpperCase(), { type: argon2.argon2id, memoryCost: 65536, timeCost: 3, parallelism: 4 });
   const principalId = id("principal");
   const finalSchoolId = schoolId || id("school");
 
@@ -183,8 +183,8 @@ async function addTeacher(conn, args) {
     process.exit(1);
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
-  const staffKeyHash = await bcrypt.hash(staffKey.toUpperCase(), 12);
+  const passwordHash = await argon2.hash(password, { type: argon2.argon2id, memoryCost: 65536, timeCost: 3, parallelism: 4 });
+  const staffKeyHash = await argon2.hash(staffKey.toUpperCase(), { type: argon2.argon2id, memoryCost: 65536, timeCost: 3, parallelism: 4 });
   const teacherId = id("teacher");
   const finalSchoolId = schoolId || id("school");
   const assignedClasses = classes ? classes.split(",").map(c => c.trim()) : [];

@@ -722,6 +722,33 @@ export async function recordLoginEvent(data: {
   );
 }
 
+/**
+ * Update password_hash for a user/principal/teacher after Argon2id rehash.
+ */
+export async function updatePasswordHash(table: "users" | "principals" | "teachers", email: string, newHash: string) {
+  const pool = await connectDb();
+  if (!pool) return;
+  await pool.query(`UPDATE ${table} SET password_hash = ? WHERE email = ?`, [newHash, email]);
+}
+
+/**
+ * Update access_key_hash for principals after Argon2id rehash.
+ */
+export async function updateAccessKeyHash(table: "principals", email: string, newHash: string) {
+  const pool = await connectDb();
+  if (!pool) return;
+  await pool.query(`UPDATE ${table} SET access_key_hash = ? WHERE email = ?`, [newHash, email]);
+}
+
+/**
+ * Update staff_key_hash for teachers after Argon2id rehash.
+ */
+export async function updateStaffKeyHash(table: "teachers", email: string, newHash: string) {
+  const pool = await connectDb();
+  if (!pool) return;
+  await pool.query(`UPDATE ${table} SET staff_key_hash = ? WHERE email = ?`, [newHash, email]);
+}
+
 export async function findPrincipalByEmail(email: string) {
   const pool = await connectDb();
   if (!pool) return null;

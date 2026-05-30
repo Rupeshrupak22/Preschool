@@ -1,6 +1,6 @@
-import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import { findPrincipalByEmail, recordPrincipalLoginEvent } from "@/lib/db";
+import { findPrincipalByEmail, recordPrincipalLoginEvent, updatePasswordHash, updateAccessKeyHash } from "@/lib/db";
+import { verifyPassword, hashPassword } from "@/lib/password";
 import { activeCookieSessions, clearAuthCookies, signToken } from "@/lib/security";
 import { principalLoginSchema } from "@/lib/validators";
 
@@ -26,10 +26,10 @@ export async function POST(request: Request) {
   }
 
   const principal = await findPrincipalByEmail(payload.data.email);
-  const passwordValid = principal ? await bcrypt.compare(payload.data.password, principal.passwordHash) : false;
-  const keyValid = principal ? await bcrypt.compare(payload.data.schoolKey, principal.accessKeyHash) : false;
+  const passwordResult = principal ? await verifyPassword(payload.data.password, principal.passwordHash) : { valid: false, needsRehash: false };
+  const keyResult = principal ? await verifyPassword(payload.data.schoolKey, principal.accessKeyHash) : { valid: false, needsRehash: false };
 
-  if (!principal || principal.status !== "active" || !passwordValid || !keyValid) {
+  if (!principal || principal.status !== "active" || !passwordResult.valid || !keyResult.valid) {
     await recordPrincipalLoginEvent({
       principal,
       email: payload.data.email,
@@ -38,6 +38,16 @@ export async function POST(request: Request) {
       status: "failed"
     });
     return NextResponse.json({ error: "Invalid principal credentials or school key." }, { status: 401 });
+  }
+
+  // Transparently upgrade bcrypt hashes to Argon2id
+  if (passwordResult.needsRehash) {
+    const newHash = await hashPassword(payload.data.password);
+    await updatePasswordHash("principals", principal.email, newHash);
+  }
+  if (keyResult.needsRehash) {
+    const newHash = await hashPassword(payload.data.schoolKey);
+    await updateAccessKeyHash("principals", principal.email, newHash);
   }
 
   const token = signToken({
@@ -71,7 +81,7 @@ export async function POST(request: Request) {
   clearAuthCookies(response, "adyapan_principal_token");
   response.cookies.set("adyapan_principal_token", token, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 60 * 60 * 8

@@ -25,12 +25,15 @@ function jwtSecret() {
     throw new Error("JWT_SECRET is required in production.");
   }
 
-  return fallbackSecret;
+  // Dev-only fallback — still unpredictable per machine
+  return "dev-" + require("os").hostname() + "-unsafe-local-only";
 }
 
 export function signToken(payload: AuthPayload) {
   return jwt.sign(payload, jwtSecret(), {
-    expiresIn: "8h"
+    expiresIn: "8h",
+    issuer: "adyapan-frontend",
+    audience: "adyapan-app",
   });
 }
 
@@ -40,7 +43,10 @@ export function verifyToken(token?: string): AuthPayload | null {
   }
 
   try {
-    return jwt.verify(token, jwtSecret()) as AuthPayload;
+    return jwt.verify(token, jwtSecret(), {
+      issuer: "adyapan-frontend",
+      audience: "adyapan-app",
+    }) as AuthPayload;
   } catch {
     return null;
   }

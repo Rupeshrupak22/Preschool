@@ -1,6 +1,6 @@
-import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import { findUserByEmail, isMysqlConfigured, recordLoginEvent } from "@/lib/db";
+import { findUserByEmail, isMysqlConfigured, recordLoginEvent, updatePasswordHash } from "@/lib/db";
+import { verifyPassword, hashPassword } from "@/lib/password";
 import { activeCookieSessions, clearAuthCookies, signToken } from "@/lib/security";
 import { publicUser } from "@/lib/store";
 import { loginSchema } from "@/lib/validators";
@@ -33,10 +33,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "This email is not registered. Only verified accounts can login." }, { status: 401 });
   }
 
-  const valid = await bcrypt.compare(payload.data.password, user.passwordHash);
+  const { valid, needsRehash } = await verifyPassword(payload.data.password, user.passwordHash);
 
   if (!valid) {
     return NextResponse.json({ error: "Invalid password." }, { status: 401 });
+  }
+
+  // Transparently upgrade bcrypt hash to Argon2id
+  if (needsRehash) {
+    const newHash = await hashPassword(payload.data.password);
+    await updatePasswordHash("users", user.email, newHash);
   }
 
   const token = signToken({ id: user.id, email: user.email, role: user.role, name: user.name });
@@ -52,7 +58,7 @@ export async function POST(request: Request) {
   clearAuthCookies(response, "adyapan_token");
   response.cookies.set("adyapan_token", token, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 60 * 60 * 8

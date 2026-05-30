@@ -592,6 +592,10 @@ video[autoplay] {
   color: #1e3a5f !important;
 }
 
+.lms-dashboard-page .lms-text-white {
+  color: #ffffff !important;
+}
+
 /* =========================================================
    LMS 3D HOVER TILT ANIMATION
    ========================================================= */

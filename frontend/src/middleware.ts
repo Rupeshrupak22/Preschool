@@ -17,7 +17,6 @@ const DASHBOARD_BY_ROLE: Record<string, string> = {
 // Protected dashboard paths and which role can access them
 const PROTECTED_PATHS: { prefix: string; allowedRoles: string[] }[] = [
   { prefix: "/student-dashboard", allowedRoles: ["student"] },
-  { prefix: "/admin", allowedRoles: ["admin"] },
   { prefix: "/principal/dashboard", allowedRoles: ["principal"] },
   { prefix: "/teacher/dashboard", allowedRoles: ["teacher"] },
 ];
@@ -106,7 +105,6 @@ export const config = {
     "/principal/login",
     "/teacher/login",
     "/student-dashboard/:path*",
-    "/admin/:path*",
     "/principal/dashboard/:path*",
     "/teacher/dashboard/:path*",
   ],
