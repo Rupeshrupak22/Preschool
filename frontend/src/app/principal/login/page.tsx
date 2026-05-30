@@ -124,7 +124,7 @@ export default function PrincipalLoginPage() {
             <div className="mt-8 grid gap-4">
               {[
                 ["Separate school login", "Every principal uses their own email, password, and school key."],
-                ["JWT protected session", "Access is stored in an httpOnly cookie and expires automatically."],
+                ["Principal Portal", "Manage students, staff, attendance, and school activities from one place."],
                 ["School-wise dashboard", "Data is filtered by the principal's assigned school."]
               ].map(([title, text]) => (
                 <div key={title} className="flex gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
