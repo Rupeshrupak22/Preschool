@@ -7,6 +7,7 @@
  */
 import argon2 from "argon2";
 import bcrypt from "bcryptjs";
+import { createHash, timingSafeEqual } from "crypto";
 
 /**
  * Hash a password using Argon2id (recommended by OWASP).
@@ -22,8 +23,9 @@ export async function hashPassword(password: string): Promise<string> {
 
 /**
  * Verify a password against a stored hash.
- * Supports both Argon2id hashes (start with $argon2) and legacy bcrypt hashes (start with $2).
- * Returns { valid, needsRehash } so callers can upgrade bcrypt hashes to argon2id.
+ * Supports Argon2id hashes (start with $argon2), legacy bcrypt hashes (start with $2),
+ * and SHA-256 hex hashes (64 hex chars) used by backend for access/staff keys.
+ * Returns { valid, needsRehash } so callers can upgrade hashes to argon2id.
  */
 export async function verifyPassword(
   password: string,
@@ -39,6 +41,17 @@ export async function verifyPassword(
   if (storedHash.startsWith("$2")) {
     const valid = await bcrypt.compare(password, storedHash);
     return { valid, needsRehash: valid }; // rehash only if password is correct
+  }
+
+  // SHA-256 hex hash (64 hex characters) — used by backend hashAccessKey()
+  if (/^[a-f0-9]{64}$/i.test(storedHash)) {
+    const computed = createHash("sha256").update(password).digest("hex");
+    try {
+      const valid = timingSafeEqual(Buffer.from(computed, "hex"), Buffer.from(storedHash, "hex"));
+      return { valid, needsRehash: valid };
+    } catch {
+      return { valid: false, needsRehash: false };
+    }
   }
 
   // Unknown hash format

@@ -35,7 +35,12 @@ export async function POST(request: Request) {
 
   const teacher = await findTeacherByEmail(payload.data.email);
   const passwordResult = teacher ? await verifyPassword(payload.data.password, teacher.passwordHash) : { valid: false, needsRehash: false };
-  const staffKeyResult = teacher ? await verifyPassword(payload.data.staffKey, teacher.staffKeyHash) : { valid: false, needsRehash: false };
+  // Staff key may be stored as uppercase hash (admin add-user uses .toUpperCase()) or as-is (backend/seed).
+  // Try exact match first, then uppercase fallback for compatibility.
+  let staffKeyResult = teacher ? await verifyPassword(payload.data.staffKey, teacher.staffKeyHash) : { valid: false, needsRehash: false };
+  if (!staffKeyResult.valid && teacher) {
+    staffKeyResult = await verifyPassword(payload.data.staffKey.toUpperCase(), teacher.staffKeyHash);
+  }
 
   if (!teacher || teacher.status !== "active" || !passwordResult.valid || !staffKeyResult.valid) {
     await recordTeacherLoginEvent({
@@ -66,7 +71,11 @@ export async function POST(request: Request) {
     await updatePasswordHash("teachers", teacher.email, newHash);
   }
   if (staffKeyResult.needsRehash) {
-    const newHash = await hashPassword(payload.data.staffKey);
+    // Rehash using the value that actually matched
+    const matchedKey = (await verifyPassword(payload.data.staffKey, teacher.staffKeyHash)).valid
+      ? payload.data.staffKey
+      : payload.data.staffKey.toUpperCase();
+    const newHash = await hashPassword(matchedKey);
     await updateStaffKeyHash("teachers", teacher.email, newHash);
   }
 

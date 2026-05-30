@@ -35,7 +35,12 @@ export async function POST(request: Request) {
 
   const principal = await findPrincipalByEmail(payload.data.email);
   const passwordResult = principal ? await verifyPassword(payload.data.password, principal.passwordHash) : { valid: false, needsRehash: false };
-  const keyResult = principal ? await verifyPassword(payload.data.schoolKey, principal.accessKeyHash) : { valid: false, needsRehash: false };
+  // School key may be stored as uppercase hash (admin add-user uses .toUpperCase()) or as-is (backend/seed).
+  // Try exact match first, then uppercase fallback for compatibility.
+  let keyResult = principal ? await verifyPassword(payload.data.schoolKey, principal.accessKeyHash) : { valid: false, needsRehash: false };
+  if (!keyResult.valid && principal) {
+    keyResult = await verifyPassword(payload.data.schoolKey.toUpperCase(), principal.accessKeyHash);
+  }
 
   if (!principal || principal.status !== "active" || !passwordResult.valid || !keyResult.valid) {
     await recordPrincipalLoginEvent({
@@ -66,7 +71,11 @@ export async function POST(request: Request) {
     await updatePasswordHash("principals", principal.email, newHash);
   }
   if (keyResult.needsRehash) {
-    const newHash = await hashPassword(payload.data.schoolKey);
+    // Rehash using the value that actually matched
+    const matchedKey = (await verifyPassword(payload.data.schoolKey, principal.accessKeyHash)).valid
+      ? payload.data.schoolKey
+      : payload.data.schoolKey.toUpperCase();
+    const newHash = await hashPassword(matchedKey);
     await updateAccessKeyHash("principals", principal.email, newHash);
   }
 
