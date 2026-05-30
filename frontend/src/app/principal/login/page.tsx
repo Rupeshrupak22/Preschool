@@ -190,6 +190,7 @@ export default function PrincipalLoginPage() {
                     name="email"
                     type="email"
                     required
+                    placeholder="Principal Email"
                     className="h-14 w-full rounded-lg border border-slate-200 bg-white pl-12 pr-4 text-base font-semibold text-slate-950 outline-none transition focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100"
                   />
                 </div>
