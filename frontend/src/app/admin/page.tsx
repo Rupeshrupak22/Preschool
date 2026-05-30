@@ -100,6 +100,58 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showAccessKey, setShowAccessKey] = useState(false);
+
+  async function handleAdminLogin(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoginLoading(true);
+    setLoginError("");
+
+    const form = new FormData(e.currentTarget);
+    const email = String(form.get("email") || "").trim();
+    const password = String(form.get("password") || "");
+    const accessKey = String(form.get("accessKey") || "");
+
+    if (!email || !password || !accessKey) {
+      setLoginError("All fields are required.");
+      setLoginLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, accessKey, captcha: "admin-bypass" }),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setLoginError(data.error || "Login failed.");
+        setLoginLoading(false);
+        return;
+      }
+
+      if (data.user?.role !== "admin") {
+        setLoginError("Access denied. Admin role required.");
+        setLoginLoading(false);
+        return;
+      }
+
+      // Login successful — reload dashboard
+      setShowLogin(false);
+      setLoginError("");
+      loadOverview();
+    } catch {
+      setLoginError("Network error. Please try again.");
+    } finally {
+      setLoginLoading(false);
+    }
+  }
 
   async function loadOverview() {
     setLoading(true);
@@ -109,7 +161,8 @@ export default function AdminPage() {
     const authData = await authResponse.json().catch(() => ({}));
 
     if (!authResponse.ok || authData.user?.role !== "admin") {
-      router.replace("/login?next=/admin");
+      setShowLogin(true);
+      setLoading(false);
       return;
     }
 
@@ -122,6 +175,7 @@ export default function AdminPage() {
       return;
     }
 
+    setShowLogin(false);
     setOverview(data);
     setLoading(false);
   }
@@ -130,7 +184,8 @@ export default function AdminPage() {
     await fetch("/api/auth/logout", { method: "POST" });
     broadcastLogout();
     window.dispatchEvent(new Event("adyapan-auth-change"));
-    window.location.href = "/login?next=/admin";
+    setOverview(null);
+    setShowLogin(true);
   }
 
   useEffect(() => {
@@ -142,7 +197,8 @@ export default function AdminPage() {
   useEffect(() => {
     const cleanup = onAuthChange((message) => {
       if (message.type === "logout") {
-        window.location.href = "/login?next=/admin";
+        setOverview(null);
+        setShowLogin(true);
       }
     });
     return cleanup;
@@ -191,7 +247,7 @@ export default function AdminPage() {
     ["Certificates", totals.certificates, Award, "bg-rose-50 text-rose-700"]
   ] as const;
 
-  if (loading) {
+  if (loading && !showLogin) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 text-slate-950">
         <div className="rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm">
@@ -202,14 +258,141 @@ export default function AdminPage() {
     );
   }
 
+  if (showLogin) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 px-4">
+        <div className="w-full max-w-md">
+          {/* Header */}
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-xs font-black text-white">
+              ady.
+            </div>
+            <span className="text-xl font-black text-slate-800">Adyapan</span>
+          </div>
+
+          {/* Login Card */}
+          <div className="rounded-xl border-t-4 border-orange-400 bg-white p-8 shadow-xl">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-orange-100">
+                <ShieldCheck className="h-6 w-6 text-orange-600" />
+              </div>
+              <div>
+                <h1 className="text-xl font-black text-slate-900">Admin Login</h1>
+                <p className="text-sm text-slate-500">Adyapan Admin Portal - Authorized access only</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleAdminLogin} className="space-y-5">
+              {/* Email */}
+              <div>
+                <label className="mb-2 block text-sm font-bold text-slate-700">Email Address</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-3 text-slate-400">
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                  </span>
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="admin@adyapan.com"
+                    className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="mb-2 block text-sm font-bold text-slate-700">Password</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-3 text-slate-400">
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                  </span>
+                  <input
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-12 text-sm font-medium text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
+                  >
+                    <Eye className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Access Key */}
+              <div>
+                <label className="mb-2 block text-sm font-bold text-slate-700">
+                  Access Key <span className="font-normal text-slate-400">(required for admin access)</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-3 text-slate-400">
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+                  </span>
+                  <input
+                    name="accessKey"
+                    type={showAccessKey ? "text" : "password"}
+                    placeholder="Enter your admin access key"
+                    className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-12 text-sm font-medium text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowAccessKey(!showAccessKey)}
+                    className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
+                  >
+                    <Eye className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Error */}
+              {loginError && (
+                <div className="rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                  {loginError}
+                </div>
+              )}
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loginLoading}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-400 to-orange-500 text-sm font-black text-white shadow-lg shadow-orange-200 transition hover:from-orange-500 hover:to-orange-600 disabled:opacity-60"
+              >
+                {loginLoading ? (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>Sign In to Admin →</>
+                )}
+              </button>
+            </form>
+
+            <p className="mt-5 text-center text-xs text-slate-400">
+              All login attempts are logged and monitored
+            </p>
+          </div>
+
+          {/* Back link */}
+          <p className="mt-4 text-center text-sm text-slate-500">
+            <a href="/" className="font-semibold hover:text-orange-600 transition">← Back to Adyapan</a>
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   if (!overview) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 text-slate-950">
         <div className="max-w-md rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm">
           <p className="text-base font-black text-slate-950">{status || "Admin dashboard not available."}</p>
-          <a href="/login?next=/admin" className="mt-5 inline-flex rounded-lg bg-slate-950 px-5 py-3 text-sm font-black text-white">
+          <button onClick={() => setShowLogin(true)} className="mt-5 inline-flex rounded-lg bg-slate-950 px-5 py-3 text-sm font-black text-white">
             Admin Login
-          </a>
+          </button>
         </div>
       </main>
     );

@@ -1,15 +1,28 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Eye, EyeOff, GraduationCap, Lock, Mail, RefreshCw } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // If someone comes to /login?next=/admin, redirect to /admin
+  useEffect(() => {
+    const next = searchParams.get("next");
+    if (next === "/admin") {
+      router.replace("/admin");
+    }
+  }, [searchParams, router]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setStatus("Checking credentials...");
+    setLoading(true);
+    setStatus("");
     const body = Object.fromEntries(new FormData(event.currentTarget).entries());
 
     try {
@@ -26,153 +39,156 @@ export default function LoginPage() {
         data = text ? JSON.parse(text) : {};
       } catch {
         setStatus("Server response error. Please try again.");
+        setLoading(false);
         return;
       }
 
       if (!response.ok) {
         setStatus(data.error || "Login failed. Please try again.");
+        setLoading(false);
         return;
       }
 
       window.dispatchEvent(new Event("adyapan-auth-change"));
-      const searchParams = new URLSearchParams(window.location.search);
-      const next = searchParams.get("next");
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get("next");
       const target = next && next.startsWith("/") ? next : data.user?.role === "admin" ? "/admin" : "/student-dashboard";
-      const windowName = data.user?.role === "admin" ? "adyapan_admin_dashboard" : "adyapan_student_dashboard";
-      const lmsWindow = window.open(target, windowName);
-
-      if (lmsWindow) {
-        lmsWindow.opener = null;
-        lmsWindow.focus();
-        setStatus("Dashboard opened in a new tab.");
-        window.setTimeout(() => {
-          window.location.replace("/");
-        }, 300);
-        return;
-      }
 
       window.location.href = target;
     } catch {
-      setStatus("Network error. Please check your connection and try again.");
+      setStatus("Network error. Please check your connection.");
+      setLoading(false);
     }
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#fff8ec] px-4 py-10 text-slate-950 md:px-6">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_0%_12%,rgba(181,101,242,0.30),transparent_19%),radial-gradient(circle_at_100%_12%,rgba(255,125,101,0.28),transparent_18%),radial-gradient(circle_at_50%_100%,rgba(255,85,145,0.28),transparent_24%),radial-gradient(circle_at_96%_84%,rgba(255,216,77,0.32),transparent_16%)]" />
-      <div className="pointer-events-none fixed inset-0 opacity-45 [background-image:linear-gradient(rgba(15,23,42,0.035)_1px,transparent_1px)] [background-size:100%_34px]" />
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 px-4 py-10">
+      {/* Background decorative elements */}
+      <div className="pointer-events-none absolute inset-0">
+        <svg className="absolute left-0 top-0 h-full w-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#1e3a5f" strokeWidth="0.5" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-orange-200/30 blur-3xl" />
+        <div className="absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-amber-200/30 blur-3xl" />
+        {/* Decorative icons */}
+        <div className="absolute left-[10%] top-[15%] text-5xl opacity-20">📚</div>
+        <div className="absolute right-[12%] top-[20%] text-4xl opacity-20">⭐</div>
+        <div className="absolute left-[8%] bottom-[20%] text-4xl opacity-20">🎓</div>
+        <div className="absolute right-[15%] bottom-[15%] text-5xl opacity-20">💡</div>
+        <div className="absolute left-[45%] top-[8%] text-3xl opacity-15">✏️</div>
+        <div className="absolute right-[30%] bottom-[10%] text-3xl opacity-15">🌟</div>
+      </div>
 
-      <div className="relative mx-auto grid min-h-[calc(100vh-160px)] max-w-7xl items-center gap-10 xl:grid-cols-[0.86fr_1fr]">
-        <section className="relative hidden min-h-[660px] xl:block">
-          <div className="flex items-center gap-5">
-            <img
-              src="/adyapan-logo.svg"
-              alt="ADYAPAN"
-              className="h-32 w-32 rounded-full object-contain drop-shadow-[0_22px_28px_rgba(15,23,42,0.2)]"
-            />
+      <div className="relative w-full max-w-md">
+        {/* Header */}
+        <div className="mb-6 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-xs font-black text-white shadow-lg">
+            ady.
+          </div>
+          <span className="text-xl font-black text-slate-800">Adyapan</span>
+        </div>
+
+        {/* Login Card */}
+        <div className="rounded-xl border-t-4 border-orange-400 bg-white p-8 shadow-xl">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-orange-100">
+              <GraduationCap className="h-6 w-6 text-orange-600" />
+            </div>
             <div>
-              <p className="text-5xl font-black tracking-tight text-[#08133f]">Adyapan</p>
-              <p className="mt-2 text-right text-lg font-black tracking-wide text-[#08133f]">SCHOOL</p>
+              <h1 className="text-xl font-black text-slate-900">Student Login</h1>
+              <p className="text-sm text-slate-500">Welcome back! Login to your dashboard</p>
             </div>
           </div>
 
-          <div className="absolute left-[350px] top-16 rotate-[-18deg] text-7xl">🛩️</div>
-          <div className="absolute left-[330px] top-36 h-20 w-44 rounded-full border-t-2 border-dashed border-[#08133f]" />
-          <div className="absolute right-0 top-10 text-7xl">💡</div>
-          <div className="absolute right-8 top-[245px] text-7xl">🌐</div>
-          <div className="absolute left-4 top-[275px] text-5xl">✏️</div>
-          <div className="absolute left-[72px] top-[195px] rotate-[-12deg] text-4xl">⭐</div>
-          <div className="absolute right-20 top-[205px] rotate-[-10deg] rounded-full border-2 border-rose-400 px-4 py-3 text-4xl font-black text-rose-500">A+</div>
-          <div className="absolute right-0 top-[345px] text-5xl">⚛️</div>
-          <div className="absolute left-1/2 top-[210px] -translate-x-1/2 text-center">
-            <p className="text-6xl font-black leading-none text-[#08133f]">Welcome</p>
-            <p className="text-8xl font-black leading-none text-[#4057c9] drop-shadow-[3px_4px_0_rgba(8,19,63,0.16)]">
-              Back
-            </p>
-            <p className="mx-auto mt-3 w-max rotate-[-6deg] bg-[#ff3d81] px-9 py-3 text-3xl font-black uppercase tracking-wide text-white shadow-[0_8px_0_rgba(15,23,42,0.12)]">
-              To School
-            </p>
-          </div>
-
-          <div className="absolute bottom-8 left-[72px] h-28 w-44 rounded-xl bg-[#233c89] shadow-[0_18px_28px_rgba(15,23,42,0.18)]">
-            <div className="absolute -top-20 left-7 h-28 w-32 rounded-t-[48px] bg-[#1f2f76]" />
-            <img
-              src="/adyapan-logo.svg"
-              alt="ADYAPAN"
-              className="absolute -top-6 left-14 h-16 w-16 rounded-full object-contain drop-shadow-[0_8px_12px_rgba(15,23,42,0.18)]"
-            />
-            <div className="absolute -top-28 left-4 h-24 w-20 rotate-[-10deg] rounded-lg bg-[#f04e72]" />
-            <div className="absolute -top-32 left-24 h-28 w-20 rotate-[10deg] rounded-lg bg-[#f7c948]" />
-            <div className="absolute -top-24 right-1 h-24 w-14 rotate-[18deg] rounded-lg bg-[#6ac76a]" />
-            <div className="absolute bottom-4 left-10 h-20 w-28 rounded-3xl bg-[#ffc02e] shadow-inner" />
-          </div>
-          <div className="absolute bottom-0 left-0 grid gap-2">
-            <div className="h-7 w-44 rounded-lg bg-[#2b67d1]" />
-            <div className="h-7 w-52 rounded-lg bg-[#ffce3f]" />
-            <div className="h-7 w-40 rounded-lg bg-[#f05276]" />
-          </div>
-        </section>
-
-        <section className="relative mx-auto w-full max-w-xl rounded-[34px] bg-white/92 p-6 shadow-[0_25px_60px_rgba(15,23,42,0.12)] ring-1 ring-slate-200/70 backdrop-blur md:p-10">
-          <form onSubmit={onSubmit}>
+          <form onSubmit={onSubmit} className="space-y-5">
             <input type="hidden" name="captcha" value="ADYAPAN" />
-            <div className="text-center">
-              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-[#f1e7ff] to-[#ffd6df] text-[#3d45d9]">
-                <Lock className="h-10 w-10" />
+
+            {/* Email */}
+            <div>
+              <label className="mb-2 block text-sm font-bold text-slate-700">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="student@example.com"
+                  className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                  required
+                />
               </div>
-              <h1 className="mt-7 text-4xl font-black text-[#08133f]">Welcome back</h1>
-              <p className="mt-3 text-base font-medium text-slate-600">Login with your registered account credentials.</p>
             </div>
 
-            <div className="mt-8 grid gap-6">
-              <label className="grid gap-3 text-base font-medium text-slate-700">
-                Email
-                <div className="relative">
-                  <Mail className="pointer-events-none absolute left-4 top-4 h-6 w-6 text-slate-500" />
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="your-email@example.com"
-                    className="h-16 w-full rounded-xl border border-slate-200 bg-white pl-14 pr-4 text-lg font-medium text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-200/50"
-                  />
-                </div>
-              </label>
-
-              <label className="grid gap-3 text-base font-medium text-slate-700">
-                Password
-                <div className="relative">
-                  <Lock className="pointer-events-none absolute left-4 top-4 h-6 w-6 text-slate-500" />
-                  <input
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    placeholder="Password"
-                    className="h-16 w-full rounded-xl border border-slate-200 bg-white pl-14 pr-14 text-lg font-medium text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-200/50"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((value) => !value)}
-                    className="absolute right-4 top-4 text-slate-500 transition hover:text-slate-950"
-                    aria-label="Toggle password visibility"
-                  >
-                    {showPassword ? <EyeOff className="h-6 w-6" /> : <Eye className="h-6 w-6" />}
-                  </button>
-                </div>
-              </label>
-
-              <button className="h-16 rounded-xl bg-gradient-to-r from-[#1e63ff] via-[#9b3bdc] to-[#ff2d72] text-xl font-black text-white shadow-[0_18px_32px_rgba(236,72,153,0.25)] transition hover:-translate-y-0.5">
-                Login
-              </button>
+            {/* Password */}
+            <div>
+              <label className="mb-2 block text-sm font-bold text-slate-700">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-12 text-sm font-medium text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600"
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
             </div>
 
-            <p className="mt-8 text-center text-sm font-medium text-slate-500">
-              Only pre-registered accounts can login. Contact your school admin for access.
-            </p>
-            {status && <p className="mt-5 rounded-xl bg-blue-50 px-4 py-3 text-center text-sm font-bold text-blue-900">{status}</p>}
+            {/* Error/Status */}
+            {status && (
+              <div className={`rounded-lg px-4 py-3 text-sm font-semibold ${status.includes("error") || status.includes("failed") || status.includes("Invalid") || status.includes("not registered") ? "bg-red-50 text-red-700" : "bg-blue-50 text-blue-700"}`}>
+                {status}
+              </div>
+            )}
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-400 to-orange-500 text-sm font-black text-white shadow-lg shadow-orange-200 transition hover:from-orange-500 hover:to-orange-600 disabled:opacity-60"
+            >
+              {loading ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <>Sign In to Dashboard →</>
+              )}
+            </button>
           </form>
-        </section>
+
+          <p className="mt-5 text-center text-xs text-slate-400">
+            Only pre-registered accounts can login. Contact your school admin for access.
+          </p>
+        </div>
+
+        {/* Back link */}
+        <p className="mt-4 text-center text-sm text-slate-500">
+          <a href="/" className="font-semibold transition hover:text-orange-600">← Back to Adyapan</a>
+        </p>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+        <RefreshCw className="h-8 w-8 animate-spin text-orange-500" />
+      </main>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -1,192 +1,217 @@
-const fs = require("fs");
-const http = require("http");
-const path = require("path");
-const mysql = require("mysql2/promise");
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 
-const PORT = Number(process.env.PORT || 4000);
-const rootDir = path.resolve(__dirname, "..");
-
-for (const file of [path.join(rootDir, ".env"), path.join(rootDir, "frontend", ".env.local")]) {
-  if (!fs.existsSync(file)) continue;
-
-  for (const line of fs.readFileSync(file, "utf8").split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
-
-    const index = trimmed.indexOf("=");
-    if (index === -1) continue;
-
-    const key = trimmed.slice(0, index).trim();
-    const value = trimmed.slice(index + 1).trim().replace(/^['"]|['"]$/g, "");
-    process.env[key] ||= value;
-  }
+// ─── Validate required env vars ─────────────────────────────────────
+const REQUIRED_ENV = ['DATABASE_URL', 'JWT_SECRET'];
+const missing = REQUIRED_ENV.filter((key) => !process.env[key]);
+if (missing.length > 0) {
+  console.error(`❌ Missing required env vars: ${missing.join(', ')}`);
+  console.error('   Check your .env file or Render environment settings.');
+  process.exit(1);
 }
 
-function mysqlSslConfig() {
-  const caPath = process.env.MYSQL_SSL_CA_PATH;
-  const ca =
-    process.env.MYSQL_SSL_CA ||
-    (caPath && fs.existsSync(caPath) ? fs.readFileSync(caPath, "utf8") : undefined);
-  const enabled =
-    process.env.MYSQL_SSL === "true" ||
-    Boolean(ca) ||
-    String(process.env.MYSQL_HOST || "").includes("tidbcloud.com");
+const express = require('express');
+const cors = require('cors');
+const morgan = require('morgan');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const compression = require('compression');
+const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
+const prisma = require('./lib/prisma');
+const { inputSanitizer } = require('./middleware/sanitize');
+const { csrfProtection } = require('./middleware/csrf');
 
-  if (!enabled) return undefined;
-  return ca
-    ? { ca, minVersion: "TLSv1.2", rejectUnauthorized: true }
-    : { minVersion: "TLSv1.2", rejectUnauthorized: true };
-}
+// Route imports
+const authRoutes = require('./routes/auth');
+const profileRoutes = require('./routes/profile');
+const studentRoutes = require('./routes/students');
+const teacherRoutes = require('./routes/teachers');
+const schoolRoutes = require('./routes/schools');
+const liveClassRoutes = require('./routes/liveClasses');
+const eventRoutes = require('./routes/events');
+const leaveRoutes = require('./routes/leaves');
+const meetingRoutes = require('./routes/meetings');
+const leadRoutes = require('./routes/leads');
+const attendanceRoutes = require('./routes/attendance');
+const classRoutes = require('./routes/classes');
+const paymentRoutes = require('./routes/payments');
+const noticeRoutes = require('./routes/notices');
+const dashboardRoutes = require('./routes/dashboard');
+const bulkImportRoutes = require('./routes/bulk-import');
 
-const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST || "127.0.0.1",
-  port: Number(process.env.MYSQL_PORT || 3306),
-  user: process.env.MYSQL_USER || "root",
-  password: process.env.MYSQL_PASSWORD || "",
-  database: process.env.MYSQL_DATABASE || "preschool",
-  ssl: mysqlSslConfig(),
-  waitForConnections: true,
-  connectionLimit: 5
+const app = express();
+const PORT = process.env.PORT || 4000;
+const isProduction = process.env.NODE_ENV === 'production';
+
+// ─── Security Middleware ─────────────────────────────────────────────
+app.use(helmet());
+
+// ─── CORS Configuration ─────────────────────────────────────────────
+const allowedOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman)
+      if (!origin) return callback(null, true);
+      // In dev, allow all; in production, check whitelist
+      if (!isProduction || allowedOrigins.length === 0) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
+
+// ─── Rate Limiting ──────────────────────────────────────────────────
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // 200 requests per window
+  message: { success: false, message: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-async function readBody(request) {
-  const chunks = [];
-  for await (const chunk of request) chunks.push(chunk);
-  const raw = Buffer.concat(chunks).toString("utf8");
-  return raw ? JSON.parse(raw) : {};
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20, // Stricter for auth routes (prevent brute force)
+  message: { success: false, message: 'Too many login attempts. Try again in 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use('/api/', generalLimiter);
+app.use('/api/v1/auth/', authLimiter);
+
+// ─── Compression ────────────────────────────────────────────────────
+app.use(compression());
+
+// ─── Body Parsing ───────────────────────────────────────────────────
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+app.use(cookieParser());
+
+// ─── HTTP Parameter Pollution Protection ────────────────────────────
+app.use(hpp());
+
+// ─── Input Sanitization (XSS Prevention) ────────────────────────────
+app.use(inputSanitizer);
+
+// ─── CSRF Protection (Double-Submit Cookie) ─────────────────────────
+app.use(csrfProtection);
+
+// ─── Logging ────────────────────────────────────────────────────────
+if (isProduction) {
+  app.use(morgan('combined'));
+} else {
+  app.use(morgan('dev'));
 }
 
-function id(prefix) {
-  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function errorMessage(error) {
-  if (error && typeof error.message === "string" && error.message) return error.message;
-  if (Array.isArray(error?.errors)) {
-    return error.errors.map((item) => item.message || item.code).filter(Boolean).join("; ");
-  }
-  return "Unknown error";
-}
-
-const routes = {
-  "/api/health": async () => {
-    try {
-      await pool.query("SELECT 1");
-      return {
-        ok: true,
-        service: "ADYAPAN backend",
-        status: "running",
-        database: "mysql"
-      };
-    } catch (error) {
-      return {
-        ok: false,
-        service: "ADYAPAN backend",
-        status: "running",
-        database: "unreachable",
-        error: errorMessage(error)
-      };
-    }
-  },
-  "/api/modules": async () => ({
-    ok: true,
-    modules: [
-      "auth",
-      "students",
-      "courses",
-      "certificates",
-      "payments",
-      "schools",
-      "notifications"
-    ]
-  }),
-  "/api/leads": async (request) => {
-    if (request.method !== "POST") {
-      return { ok: false, error: "Method not allowed" };
-    }
-
-    const body = await readBody(request);
-    if (!body.email || !String(body.email).includes("@")) {
-      return { ok: false, error: "Valid email required." };
-    }
-
-    const lead = {
-      id: id("lead"),
-      type: body.type || "demo",
-      name: body.name || null,
-      email: body.email,
-      phone: body.phone || null,
-      school: body.school || null,
-      city: body.city || null,
-      message: body.message || null,
-      classLevel: body.classLevel || null,
-      interest: body.interest || null
-    };
-
-    await pool.query(
-      `INSERT INTO leads (id, type, name, email, phone, school, city, message, class_level, interest)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        lead.id,
-        lead.type,
-        lead.name,
-        lead.email,
-        lead.phone,
-        lead.school,
-        lead.city,
-        lead.message,
-        lead.classLevel,
-        lead.interest
-      ]
-    );
-
-    return { ok: true, lead, mode: "mysql" };
-  }
-};
-
-function sendJson(response, status, body) {
-  response.writeHead(status, {
-    "Content-Type": "application/json",
-    "X-Content-Type-Options": "nosniff",
-    "X-Frame-Options": "SAMEORIGIN",
-    "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
-    "Content-Security-Policy": "base-uri 'self'; object-src 'none'; frame-ancestors 'self'",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type,Authorization"
-  });
-  response.end(JSON.stringify(body));
-}
-
-const server = http.createServer(async (request, response) => {
-  if (request.method === "OPTIONS") {
-    sendJson(response, 204, {});
-    return;
-  }
-
-  const url = new URL(request.url || "/", `http://${request.headers.host}`);
-  const handler = routes[url.pathname];
-
-  if (!handler) {
-    sendJson(response, 404, {
-      error: "Route not found",
-      path: url.pathname
-    });
-    return;
-  }
-
+// ─── Health Check (with DB ping) ────────────────────────────────────
+app.get('/', async (req, res) => {
+  let dbStatus = 'unknown';
   try {
-    const body = await handler(request);
-    sendJson(response, url.pathname === "/api/health" ? 200 : body.ok === false ? 400 : 200, body);
-  } catch (error) {
-    sendJson(response, 500, {
-      ok: false,
-      error: errorMessage(error)
-    });
+    await prisma.$queryRaw`SELECT 1`;
+    dbStatus = 'connected';
+  } catch {
+    dbStatus = 'disconnected';
   }
+
+  const response = {
+    status: dbStatus === 'connected' ? 'ok' : 'degraded',
+    message: 'Adyapan Unified Backend',
+    version: '3.0.0',
+    database: dbStatus,
+    uptime: Math.floor(process.uptime()) + 's',
+  };
+
+  // Only expose details in development
+  if (!isProduction) {
+    response.environment = 'development';
+    response.endpoints = [
+      '/api/v1/auth', '/api/v1/profile', '/api/v1/students',
+      '/api/v1/teachers', '/api/v1/schools', '/api/v1/live-classes',
+      '/api/v1/events', '/api/v1/leaves', '/api/v1/meetings',
+      '/api/v1/leads', '/api/v1/attendance', '/api/v1/classes',
+      '/api/v1/payments', '/api/v1/notices', '/api/v1/dashboard',
+    ];
+  }
+
+  res.json(response);
 });
 
-server.listen(PORT, () => {
-  console.log(`ADYAPAN backend running on http://localhost:${PORT}`);
+// ─── API Routes ─────────────────────────────────────────────────────
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/profile', profileRoutes);
+app.use('/api/v1/students', studentRoutes);
+app.use('/api/v1/teachers', teacherRoutes);
+app.use('/api/v1/schools', schoolRoutes);
+app.use('/api/v1/live-classes', liveClassRoutes);
+app.use('/api/v1/events', eventRoutes);
+app.use('/api/v1/leaves', leaveRoutes);
+app.use('/api/v1/meetings', meetingRoutes);
+app.use('/api/v1/leads', leadRoutes);
+app.use('/api/v1/attendance', attendanceRoutes);
+app.use('/api/v1/classes', classRoutes);
+app.use('/api/v1/payments', paymentRoutes);
+app.use('/api/v1/notices', noticeRoutes);
+app.use('/api/v1/dashboard', dashboardRoutes);
+app.use('/api/v1/bulk-import', bulkImportRoutes);
+
+// ─── 404 Handler ────────────────────────────────────────────────────
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: `Route ${req.method} ${req.path} not found` });
+});
+
+// ─── Global Error Handler ───────────────────────────────────────────
+app.use((err, req, res, next) => {
+  console.error('Server Error:', err.stack || err.message);
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
+    success: false,
+    message: isProduction ? 'Internal server error' : err.message,
+  });
+});
+
+// ─── Graceful Shutdown ──────────────────────────────────────────────
+const server = app.listen(PORT, () => {
+  console.log(`🚀 Adyapan Unified Backend running on http://localhost:${PORT}`);
+  console.log(`📦 Database: TiDB Cloud via Prisma`);
+  console.log(`🔐 Security: Helmet + Rate Limit + CORS`);
+  console.log(`🌐 Environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+});
+
+async function gracefulShutdown(signal) {
+  console.log(`\n${signal} received. Shutting down gracefully...`);
+  server.close(async () => {
+    await prisma.$disconnect();
+    console.log('✅ Database disconnected. Server closed.');
+    process.exit(0);
+  });
+
+  // Force shutdown after 10s
+  setTimeout(() => {
+    console.error('⚠️ Forced shutdown after timeout.');
+    process.exit(1);
+  }, 10000);
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// ─── Unhandled Errors (prevent silent crashes) ──────────────────────
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('⚠️ Unhandled Rejection:', reason);
+  // Don't exit — log and continue
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('💥 Uncaught Exception:', error);
+  // Exit on uncaught — state may be corrupted
+  gracefulShutdown('uncaughtException');
 });
