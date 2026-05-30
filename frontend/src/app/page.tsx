@@ -171,8 +171,8 @@ const heroPrograms: { title: string; range: string; icon: Icon; glow: string; av
     icon: BookOpen,
     glow: "from-fuchsia-400/25 via-purple-300/18 to-cyan-300/22",
     avatar: "P",
-    image: "/assets/primary-student.png",
-    video: "/primary.webm",
+    image: "/primary.png",
+    video: "/primary_nobg.mov",
     subjects: [
       "Maths",
       "Science", 
@@ -225,7 +225,7 @@ const heroPrograms: { title: string; range: string; icon: Icon; glow: string; av
     icon: School,
     glow: "from-purple-400/25 via-pink-300/18 to-emerald-300/22",
     avatar: "M",
-    image: "/assets/middle-student.png",
+    image: "/middle.png",
     video: "/middle.webm",
     subjects: [
       "Maths",
@@ -268,7 +268,7 @@ const heroPrograms: { title: string; range: string; icon: Icon; glow: string; av
     icon: GraduationCap,
     glow: "from-cyan-400/25 via-blue-300/18 to-fuchsia-300/22",
     avatar: "HS",
-    image: "/assets/highschool-student.png",
+    image: "/highschool.png",
     video: "/highschool_nobg.mov",
     subjects: [
       "Maths",
@@ -520,29 +520,11 @@ export default function Home() {
                 <div className="relative z-10 mx-auto mt-6 flex h-48 max-w-[168px] items-end justify-center sm:h-56">
                   <div className="absolute bottom-0 h-28 w-36 rounded-[32px] bg-white/72 shadow-[0_18px_40px_rgba(15,23,42,0.12)] transition duration-300 group-hover:scale-105 group-hover:shadow-[0_0_34px_rgba(34,211,238,0.30)]" />
                   
-                  {/* Try video first, fallback to image */}
-                  <video
-                    className="relative z-10 h-full w-auto object-contain rounded-[20px] drop-shadow-[0_22px_26px_rgba(88,28,135,0.20)] transition duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_24px_rgba(168,85,247,0.40)]"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    style={{ display: 'block' }}
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      const img = e.currentTarget.nextElementSibling as HTMLImageElement;
-                      if (img) img.style.display = 'block';
-                    }}
-                  >
-                    <source src={program.video} type="video/mp4" />
-                  </video>
-                  
-                  {/* Fallback image */}
+                  {/* Use image for all programs */}
                   <img
                     src={program.image}
                     alt={`${program.title} student`}
-                    className="relative z-10 h-full w-auto object-contain drop-shadow-[0_22px_26px_rgba(88,28,135,0.20)] transition duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_24px_rgba(168,85,247,0.40)]"
-                    style={{ display: 'none' }}
+                    className="relative z-10 h-full w-auto object-contain rounded-[20px] drop-shadow-[0_22px_26px_rgba(88,28,135,0.20)] transition duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_24px_rgba(168,85,247,0.40)]"
                   />
                   
                   <span
@@ -627,17 +609,57 @@ export default function Home() {
               className="rounded-[24px] border border-white/40 p-6 shadow-[0_8px_32px_rgba(31,38,135,0.12)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(31,38,135,0.18)]"
               style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.22) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 8px 32px rgba(31,38,135,0.12)' }}
             >
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-[0_14px_30px_rgba(168,85,247,0.3)] font-bold">
-                  <Code2 className="h-8 w-8" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black text-slate-900">Coding</h3>
-                  <p className="mt-2 max-w-2xl text-sm font-bold leading-7 text-slate-800">
-                    Introduce coding skills to young learners, promoting logical thinking, computational skills,
-                    and confidence to build real digital projects.
-                  </p>
-                </div>
+              {/* Only Video - No Text or Icons */}
+              <div className="relative overflow-hidden rounded-2xl border border-white/60 bg-white/20 backdrop-blur-sm shadow-[0_8px_24px_rgba(31,38,135,0.15)]">
+                <video
+                  ref={(video) => {
+                    if (video) {
+                      video.addEventListener('click', () => {
+                        const button = video.parentElement?.querySelector('.mute-button') as HTMLButtonElement;
+                        if (video.muted) {
+                          video.muted = false;
+                          if (button) button.innerHTML = '<svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.82L4.29 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.29l4.093-3.82a1 1 0 011.617.82zM8 5.414L5.707 7.293A1 1 0 015 8H3v4h2a1 1 0 01.707.293L8 14.586V5.414zM11.95 4.95a1 1 0 011.414 1.414L12.414 7.414l.95.95a1 1 0 11-1.414 1.414L11 8.828l-.95.95a1 1 0 11-1.414-1.414l.95-.95-.95-.95a1 1 0 111.414-1.414l.95.95.95-.95z" clipRule="evenodd"></path></svg>';
+                        } else {
+                          video.muted = true;
+                          if (button) button.innerHTML = '<svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.82L4.29 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.29l4.093-3.82a1 1 0 011.617.82zM8 5.414L5.707 7.293A1 1 0 015 8H3v4h2a1 1 0 01.707.293L8 14.586V5.414zM15.657 6.343a1 1 0 010 1.414L13.414 10l2.243 2.243a1 1 0 11-1.414 1.414L12 11.414l-2.243 2.243a1 1 0 01-1.414-1.414L10.586 10 8.343 7.757a1 1 0 011.414-1.414L12 8.586l2.243-2.243a1 1 0 011.414 0z" clipRule="evenodd"></path></svg>';
+                        }
+                      });
+                    }
+                  }}
+                  className="w-full cursor-pointer"
+                  style={{ height: 'auto', aspectRatio: '16/9' }}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                >
+                  <source src="/coding-demo.mp4" type="video/mp4" />
+                </video>
+                
+                {/* Mute/Unmute Button */}
+                <button
+                  className="mute-button absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all duration-200 hover:bg-black/70 hover:scale-110"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const video = e.currentTarget.parentElement?.querySelector('video') as HTMLVideoElement;
+                    if (video) {
+                      if (video.muted) {
+                        video.muted = false;
+                        e.currentTarget.innerHTML = '<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.82L4.29 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.29l4.093-3.82a1 1 0 011.617.82zM8 5.414L5.707 7.293A1 1 0 015 8H3v4h2a1 1 0 01.707.293L8 14.586V5.414zM11.95 4.95a1 1 0 011.414 1.414L12.414 7.414l.95.95a1 1 0 11-1.414 1.414L11 8.828l-.95.95a1 1 0 11-1.414-1.414l.95-.95-.95-.95a1 1 0 111.414-1.414l.95.95.95-.95z" clip-rule="evenodd"></path></svg>';
+                      } else {
+                        video.muted = true;
+                        e.currentTarget.innerHTML = '<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.82L4.29 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.29l4.093-3.82a1 1 0 011.617.82zM8 5.414L5.707 7.293A1 1 0 015 8H3v4h2a1 1 0 01.707.293L8 14.586V5.414zM15.657 6.343a1 1 0 010 1.414L13.414 10l2.243 2.243a1 1 0 11-1.414 1.414L12 11.414l-2.243 2.243a1 1 0 01-1.414-1.414L10.586 10 8.343 7.757a1 1 0 011.414-1.414L12 8.586l2.243-2.243a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>';
+                      }
+                    }
+                  }}
+                  title="Toggle mute"
+                >
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.82L4.29 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.29l4.093-3.82a1 1 0 011.617.82zM8 5.414L5.707 7.293A1 1 0 015 8H3v4h2a1 1 0 01.707.293L8 14.586V5.414zM15.657 6.343a1 1 0 010 1.414L13.414 10l2.243 2.243a1 1 0 11-1.414 1.414L12 11.414l-2.243 2.243a1 1 0 01-1.414-1.414L10.586 10 8.343 7.757a1 1 0 011.414-1.414L12 8.586l2.243-2.243a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                  </svg>
+                </button>
+                
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
               </div>
             </motion.div>
           </div>
