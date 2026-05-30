@@ -53,12 +53,12 @@ function validateEmail(req, res, next) {
 
 /**
  * Validate password strength
- * - Minimum 6 characters
+ * - Minimum 8 characters (raised from 6)
  */
 function validatePassword(req, res, next) {
   const { password } = req.body;
-  if (password && password.length < 6) {
-    return sendResponse(res, 400, false, 'Password must be at least 6 characters.');
+  if (password && password.length < 8) {
+    return sendResponse(res, 400, false, 'Password must be at least 8 characters.');
   }
   next();
 }

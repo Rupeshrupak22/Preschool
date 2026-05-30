@@ -18,7 +18,11 @@ export async function POST(request: Request) {
   if (sessions.length > 0) {
     const active = sessions[0].session;
     return NextResponse.json(
-      { error: `You are already logged in as ${active.role} (${active.email}). Please logout first before signing into another account.` },
+      {
+        error: `You are already logged in as ${active.role} (${active.email}). Please logout first before signing into another account.`,
+        code: "ACTIVE_SESSION_EXISTS",
+        action: "CLEAR_PREVIOUS_SESSIONS_AND_RELOGIN"
+      },
       { status: 409 }
     );
   }

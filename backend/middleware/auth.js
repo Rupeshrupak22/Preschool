@@ -68,22 +68,29 @@ async function authenticate(req, res, next) {
 
 /**
  * Role-based authorization middleware.
+ * Prevents both vertical and horizontal privilege escalation.
  */
 function authorize(...allowedRoles) {
   return (req, res, next) => {
     if (!req.user) {
       return sendResponse(res, 401, false, 'Authentication required.');
     }
+
+    // Strict role check — token role must exactly match one of the allowed roles
     if (!allowedRoles.includes(req.user.role)) {
       return sendResponse(
         res, 403, false,
-        `Access denied. Required: ${allowedRoles.join(' or ')}. Your role: ${req.user.role}`
+        'Access denied. You do not have permission to access this resource.'
       );
     }
     next();
   };
 }
 
+/**
+ * Minimum role level authorization.
+ * Prevents vertical privilege escalation (lower role accessing higher-level routes).
+ */
 function authorizeAtLeast(minRole) {
   return (req, res, next) => {
     if (!req.user) {
@@ -91,23 +98,76 @@ function authorizeAtLeast(minRole) {
     }
 
     if ((ROLE_LEVEL[req.user.role] || 0) < (ROLE_LEVEL[minRole] || 0)) {
-      return sendResponse(res, 403, false, 'Access denied.');
+      return sendResponse(res, 403, false, 'Access denied. Insufficient privileges.');
     }
 
     next();
   };
 }
 
+/**
+ * Check if actor role can access target role's data.
+ * Prevents horizontal privilege escalation (same-level cross-account access).
+ */
 function canAccessRole(actorRole, targetRole) {
   return (ROLE_LEVEL[actorRole] || 0) >= (ROLE_LEVEL[targetRole] || 0);
 }
 
+/**
+ * Allow same user OR a user with at least minRole.
+ * Prevents horizontal privilege escalation (user A accessing user B's data).
+ */
 function requireSameUserOrAtLeast(paramName, minRole) {
   return (req, res, next) => {
     if (!req.user) return sendResponse(res, 401, false, 'Authentication required.');
+
+    // Same user — always allowed
     if (req.user.id === req.params[paramName]) return next();
+
+    // Higher role — allowed if they meet the minimum
     if ((ROLE_LEVEL[req.user.role] || 0) >= (ROLE_LEVEL[minRole] || 0)) return next();
-    return sendResponse(res, 403, false, 'Access denied.');
+
+    return sendResponse(res, 403, false, 'Access denied. You can only access your own data.');
+  };
+}
+
+/**
+ * Prevent students from accessing teacher/principal/admin data.
+ * Prevent teachers from accessing principal/admin data.
+ * Enforce strict downward-only data access.
+ *
+ * Usage: router.get('/students', authenticate, enforceRoleHierarchy('teacher'), ...)
+ * Means: only teacher and above can access this route.
+ */
+function enforceRoleHierarchy(minimumRole) {
+  return authorizeAtLeast(minimumRole);
+}
+
+/**
+ * Prevent cross-school data access for principals and teachers.
+ * They can only access data belonging to their own school.
+ */
+function requireSameSchool(getSchoolId) {
+  return (req, res, next) => {
+    if (!req.user) return sendResponse(res, 401, false, 'Authentication required.');
+
+    // Admins bypass school restriction
+    if (req.user.role === 'admin') return next();
+
+    const userSchoolId = req.user.school_id;
+    const resourceSchoolId = typeof getSchoolId === 'function'
+      ? getSchoolId(req)
+      : req.params[getSchoolId] || req.query[getSchoolId] || req.body[getSchoolId];
+
+    if (!userSchoolId || !resourceSchoolId) {
+      return sendResponse(res, 403, false, 'Access denied. School context missing.');
+    }
+
+    if (String(userSchoolId) !== String(resourceSchoolId)) {
+      return sendResponse(res, 403, false, 'Access denied. You can only access data from your own school.');
+    }
+
+    next();
   };
 }
 
@@ -117,5 +177,7 @@ module.exports = {
   authorizeAtLeast,
   canAccessRole,
   requireSameUserOrAtLeast,
+  enforceRoleHierarchy,
+  requireSameSchool,
   ROLE_LEVEL,
 };

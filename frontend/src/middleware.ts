@@ -14,11 +14,24 @@ const DASHBOARD_BY_ROLE: Record<string, string> = {
   teacher: "/teacher/dashboard",
 };
 
-// Protected dashboard paths and which role can access them
+// Protected paths — only the listed roles can access them
+// This enforces both vertical (student can't access teacher routes)
+// and horizontal (teacher can't access principal routes) privilege escalation prevention
 const PROTECTED_PATHS: { prefix: string; allowedRoles: string[] }[] = [
   { prefix: "/student-dashboard", allowedRoles: ["student"] },
   { prefix: "/principal/dashboard", allowedRoles: ["principal"] },
   { prefix: "/teacher/dashboard", allowedRoles: ["teacher"] },
+  { prefix: "/admin", allowedRoles: ["admin"] },
+];
+
+// API routes that are role-restricted
+// Students cannot call teacher/principal/admin APIs
+// Teachers cannot call principal/admin APIs
+const PROTECTED_API_PATHS: { prefix: string; allowedRoles: string[] }[] = [
+  { prefix: "/api/admin", allowedRoles: ["admin"] },
+  { prefix: "/api/principal", allowedRoles: ["principal", "admin"] },
+  { prefix: "/api/teacher", allowedRoles: ["teacher", "admin"] },
+  { prefix: "/api/student-dashboard", allowedRoles: ["student", "admin"] },
 ];
 
 function getJwtSecret() {
@@ -31,11 +44,15 @@ type TokenPayload = {
   email: string;
   role: "student" | "admin" | "principal" | "teacher";
   name: string;
+  sid?: string;
 };
 
 async function verifyTokenEdge(token: string): Promise<TokenPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, getJwtSecret());
+    const { payload } = await jwtVerify(token, getJwtSecret(), {
+      issuer: "adyapan-frontend",
+      audience: "adyapan-app",
+    });
     return payload as unknown as TokenPayload;
   } catch {
     return null;
@@ -47,7 +64,12 @@ async function getActiveSession(request: NextRequest): Promise<TokenPayload | nu
     const cookie = request.cookies.get(cookieName);
     if (cookie?.value) {
       const payload = await verifyTokenEdge(cookie.value);
-      if (payload) return payload;
+      if (payload) {
+        // Validate cookie-role pairing to prevent token substitution attacks
+        if (cookieName === "adyapan_token" && (payload.role === "student" || payload.role === "admin")) return payload;
+        if (cookieName === "adyapan_principal_token" && payload.role === "principal") return payload;
+        if (cookieName === "adyapan_teacher_token" && payload.role === "teacher") return payload;
+      }
     }
   }
   return null;
@@ -57,7 +79,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const session = await getActiveSession(request);
 
-  // Block login/signup pages if already logged in
+  // Block login/signup pages if already logged in — redirect to their dashboard
   if (LOGIN_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
     if (session) {
       const dashboard = DASHBOARD_BY_ROLE[session.role] || "/";
@@ -68,16 +90,42 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Protect dashboard routes - only the correct role can access
+  // Protect API routes — enforce role-based access control
+  for (const { prefix, allowedRoles } of PROTECTED_API_PATHS) {
+    if (pathname.startsWith(prefix + "/") || pathname === prefix) {
+      // Skip the login and clear-sessions endpoints themselves
+      if (
+        pathname.endsWith("/login") ||
+        pathname.endsWith("/clear-sessions") ||
+        pathname.endsWith("/logout")
+      ) {
+        break;
+      }
+
+      if (!session) {
+        return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+      }
+
+      if (!allowedRoles.includes(session.role)) {
+        // Privilege escalation attempt — deny silently with generic message
+        return NextResponse.json({ error: "Access denied." }, { status: 403 });
+      }
+      break;
+    }
+  }
+
+  // Protect dashboard routes — only the correct role can access
   for (const { prefix, allowedRoles } of PROTECTED_PATHS) {
     if (pathname === prefix || pathname.startsWith(prefix + "/")) {
       if (!session) {
-        // Not logged in at all - redirect to appropriate login
         const url = request.nextUrl.clone();
         if (prefix.startsWith("/principal")) {
           url.pathname = "/principal/login";
         } else if (prefix.startsWith("/teacher")) {
           url.pathname = "/teacher/login";
+        } else if (prefix.startsWith("/admin")) {
+          url.pathname = "/login";
+          url.searchParams.set("next", "/admin");
         } else {
           url.pathname = "/login";
           url.searchParams.set("next", pathname);
@@ -86,7 +134,7 @@ export async function middleware(request: NextRequest) {
       }
 
       if (!allowedRoles.includes(session.role)) {
-        // Logged in but wrong role - redirect to their own dashboard
+        // Wrong role — redirect to their own dashboard, not an error page
         const dashboard = DASHBOARD_BY_ROLE[session.role] || "/";
         const url = request.nextUrl.clone();
         url.pathname = dashboard;
@@ -107,5 +155,10 @@ export const config = {
     "/student-dashboard/:path*",
     "/principal/dashboard/:path*",
     "/teacher/dashboard/:path*",
+    "/admin/:path*",
+    "/api/admin/:path*",
+    "/api/principal/:path*",
+    "/api/teacher/:path*",
+    "/api/student-dashboard/:path*",
   ],
 };

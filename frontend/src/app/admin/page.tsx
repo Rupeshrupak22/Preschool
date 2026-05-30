@@ -105,11 +105,15 @@ export default function AdminPage() {
   const [loginLoading, setLoginLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showAccessKey, setShowAccessKey] = useState(false);
+  const [showClearSession, setShowClearSession] = useState(false);
+  const [clearingSession, setClearingSession] = useState(false);
+  const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string; accessKey: string } | null>(null);
 
   async function handleAdminLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoginLoading(true);
     setLoginError("");
+    setShowClearSession(false);
 
     const form = new FormData(e.currentTarget);
     const email = String(form.get("email") || "").trim();
@@ -128,7 +132,16 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, accessKey, captcha: "admin-bypass" }),
       });
-      const data = await res.json().catch(() => ({}));
+      const data = await res.json().catch(() => ({})) as { error?: string; code?: string; user?: { role?: string } };
+
+      if (res.status === 409 && data.code === "ACTIVE_SESSION_EXISTS") {
+        // Store credentials so user doesn't have to re-enter after clearing
+        setPendingCredentials({ email, password, accessKey });
+        setShowClearSession(true);
+        setLoginError("");
+        setLoginLoading(false);
+        return;
+      }
 
       if (!res.ok) {
         setLoginError(data.error || "Login failed.");
@@ -150,6 +163,60 @@ export default function AdminPage() {
       setLoginError("Network error. Please try again.");
     } finally {
       setLoginLoading(false);
+    }
+  }
+
+  async function handleClearAdminSessions() {
+    if (!pendingCredentials) return;
+    setClearingSession(true);
+
+    try {
+      const res = await fetch("/api/admin/clear-sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pendingCredentials),
+      });
+      const data = await res.json().catch(() => ({})) as { error?: string };
+
+      if (!res.ok) {
+        setLoginError(data.error ?? "Failed to clear sessions. Please try again.");
+        setShowClearSession(false);
+        setClearingSession(false);
+        return;
+      }
+
+      // Sessions cleared — retry login automatically
+      setShowClearSession(false);
+      setLoginError("");
+
+      const loginRes = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...pendingCredentials, captcha: "admin-bypass" }),
+      });
+      const loginData = await loginRes.json().catch(() => ({})) as { error?: string; user?: { role?: string } };
+
+      if (!loginRes.ok) {
+        setLoginError(loginData.error ?? "Login failed after clearing sessions. Please try again.");
+        setClearingSession(false);
+        setPendingCredentials(null);
+        return;
+      }
+
+      if (loginData.user?.role !== "admin") {
+        setLoginError("Access denied. Admin role required.");
+        setClearingSession(false);
+        setPendingCredentials(null);
+        return;
+      }
+
+      setShowLogin(false);
+      setPendingCredentials(null);
+      loadOverview();
+    } catch {
+      setLoginError("Network error. Please try again.");
+    } finally {
+      setClearingSession(false);
     }
   }
 
@@ -282,6 +349,33 @@ export default function AdminPage() {
               </div>
             </div>
 
+            {/* Active session conflict banner */}
+            {showClearSession && (
+              <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <p className="text-sm font-black text-amber-900">⚠️ Active Session Detected</p>
+                <p className="mt-1 text-sm font-medium text-amber-800">
+                  This admin account is already logged in on another device. Clear the previous session to continue.
+                </p>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleClearAdminSessions}
+                    disabled={clearingSession}
+                    className="flex-1 rounded-lg bg-amber-600 px-3 py-2 text-xs font-black text-white transition hover:bg-amber-700 disabled:opacity-60"
+                  >
+                    {clearingSession ? "Clearing..." : "Clear Previous Sessions & Login"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowClearSession(false); setPendingCredentials(null); }}
+                    className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-black text-slate-700 transition hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleAdminLogin} className="space-y-5">
               {/* Email */}
               <div>
@@ -360,7 +454,7 @@ export default function AdminPage() {
               {/* Submit */}
               <button
                 type="submit"
-                disabled={loginLoading}
+                disabled={loginLoading || showClearSession}
                 className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-400 to-orange-500 text-sm font-black text-white shadow-lg shadow-orange-200 transition hover:from-orange-500 hover:to-orange-600 disabled:opacity-60"
               >
                 {loginLoading ? (

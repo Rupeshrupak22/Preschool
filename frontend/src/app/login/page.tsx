@@ -9,7 +9,11 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState("");
+  const [statusType, setStatusType] = useState<"error" | "info" | "warning">("info");
   const [loading, setLoading] = useState(false);
+  const [showClearSession, setShowClearSession] = useState(false);
+  const [pendingCredentials, setPendingCredentials] = useState<Record<string, string> | null>(null);
+  const [clearingSession, setClearingSession] = useState(false);
 
   // If someone comes to /login?next=/admin, redirect to /admin
   useEffect(() => {
@@ -23,7 +27,7 @@ function LoginForm() {
     event.preventDefault();
     setLoading(true);
     setStatus("");
-    const body = Object.fromEntries(new FormData(event.currentTarget).entries());
+    const body = Object.fromEntries(new FormData(event.currentTarget).entries()) as Record<string, string>;
 
     try {
       const response = await fetch("/api/auth/login", {
@@ -33,18 +37,29 @@ function LoginForm() {
       });
 
       const text = await response.text();
-      let data;
+      let data: Record<string, unknown>;
 
       try {
         data = text ? JSON.parse(text) : {};
       } catch {
         setStatus("Server response error. Please try again.");
+        setStatusType("error");
+        setLoading(false);
+        return;
+      }
+
+      if (response.status === 409 && (data as { code?: string }).code === "ACTIVE_SESSION_EXISTS") {
+        setPendingCredentials(body);
+        setShowClearSession(true);
+        setStatus("This account is already active on another device.");
+        setStatusType("warning");
         setLoading(false);
         return;
       }
 
       if (!response.ok) {
-        setStatus(data.error || "Login failed. Please try again.");
+        setStatus((data as { error?: string }).error || "Login failed. Please try again.");
+        setStatusType("error");
         setLoading(false);
         return;
       }
@@ -52,12 +67,63 @@ function LoginForm() {
       window.dispatchEvent(new Event("adyapan-auth-change"));
       const params = new URLSearchParams(window.location.search);
       const next = params.get("next");
-      const target = next && next.startsWith("/") ? next : data.user?.role === "admin" ? "/admin" : "/student-dashboard";
+      const target = next && next.startsWith("/") ? next : (data as { user?: { role?: string } }).user?.role === "admin" ? "/admin" : "/student-dashboard";
 
       window.location.href = target;
     } catch {
       setStatus("Network error. Please check your connection.");
+      setStatusType("error");
       setLoading(false);
+    }
+  }
+
+  async function handleClearSessions() {
+    if (!pendingCredentials) return;
+    setClearingSession(true);
+    setStatus("Clearing previous sessions...");
+    setStatusType("info");
+
+    try {
+      const response = await fetch("/api/auth/clear-sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pendingCredentials)
+      });
+      const data = await response.json().catch(() => ({})) as { error?: string };
+
+      if (!response.ok) {
+        setStatus(data.error ?? "Failed to clear sessions. Please try again.");
+        setStatusType("error");
+        setClearingSession(false);
+        return;
+      }
+
+      setShowClearSession(false);
+      setStatus("Previous sessions cleared. Logging you in...");
+      setStatusType("info");
+
+      const loginResponse = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pendingCredentials)
+      });
+      const loginData = await loginResponse.json().catch(() => ({})) as { error?: string; user?: { role?: string } };
+
+      if (!loginResponse.ok) {
+        setStatus(loginData.error ?? "Login failed after clearing sessions. Please try again.");
+        setStatusType("error");
+        setClearingSession(false);
+        setPendingCredentials(null);
+        return;
+      }
+
+      window.dispatchEvent(new Event("adyapan-auth-change"));
+      const target = loginData.user?.role === "admin" ? "/admin" : "/student-dashboard";
+      window.location.href = target;
+    } catch {
+      setStatus("Network error. Please check your connection.");
+      setStatusType("error");
+      setClearingSession(false);
     }
   }
 
@@ -75,7 +141,6 @@ function LoginForm() {
         </svg>
         <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-orange-200/30 blur-3xl" />
         <div className="absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-amber-200/30 blur-3xl" />
-        {/* Decorative icons */}
         <div className="absolute left-[10%] top-[15%] text-5xl opacity-20">📚</div>
         <div className="absolute right-[12%] top-[20%] text-4xl opacity-20">⭐</div>
         <div className="absolute left-[8%] bottom-[20%] text-4xl opacity-20">🎓</div>
@@ -104,6 +169,31 @@ function LoginForm() {
               <p className="text-sm text-slate-500">Welcome back! Login to your dashboard</p>
             </div>
           </div>
+
+          {/* Active session conflict banner */}
+          {showClearSession && (
+            <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-4">
+              <p className="text-sm font-black text-amber-900">⚠️ Active Session Detected</p>
+              <p className="mt-1 text-sm font-medium text-amber-800">
+                This account is already logged in on another device. Clear the previous session to continue.
+              </p>
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={handleClearSessions}
+                  disabled={clearingSession}
+                  className="flex-1 rounded-lg bg-amber-600 px-3 py-2 text-xs font-black text-white transition hover:bg-amber-700 disabled:opacity-60"
+                >
+                  {clearingSession ? "Clearing..." : "Clear & Login"}
+                </button>
+                <button
+                  onClick={() => { setShowClearSession(false); setPendingCredentials(null); setStatus(""); }}
+                  className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-black text-slate-700 transition hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={onSubmit} className="space-y-5">
             <input type="hidden" name="captcha" value="ADYAPAN" />
@@ -147,8 +237,12 @@ function LoginForm() {
             </div>
 
             {/* Error/Status */}
-            {status && (
-              <div className={`rounded-lg px-4 py-3 text-sm font-semibold ${status.includes("error") || status.includes("failed") || status.includes("Invalid") || status.includes("not registered") ? "bg-red-50 text-red-700" : "bg-blue-50 text-blue-700"}`}>
+            {status && !showClearSession && (
+              <div className={`rounded-lg px-4 py-3 text-sm font-semibold ${
+                statusType === "error" ? "bg-red-50 text-red-700" :
+                statusType === "warning" ? "bg-amber-50 text-amber-700" :
+                "bg-blue-50 text-blue-700"
+              }`}>
                 {status}
               </div>
             )}
@@ -156,7 +250,7 @@ function LoginForm() {
             {/* Submit */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || showClearSession}
               className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-400 to-orange-500 text-sm font-black text-white shadow-lg shadow-orange-200 transition hover:from-orange-500 hover:to-orange-600 disabled:opacity-60"
             >
               {loading ? (

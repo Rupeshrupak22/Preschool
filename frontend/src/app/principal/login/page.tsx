@@ -7,15 +7,20 @@ export default function PrincipalLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showKey, setShowKey] = useState(false);
   const [status, setStatus] = useState("");
+  const [statusType, setStatusType] = useState<"error" | "info" | "warning">("info");
   const [loading, setLoading] = useState(false);
+  const [showClearSession, setShowClearSession] = useState(false);
+  const [pendingCredentials, setPendingCredentials] = useState<Record<string, string> | null>(null);
+  const [clearingSession, setClearingSession] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
     setStatus("Verifying principal access...");
+    setStatusType("info");
 
     try {
-      const body = Object.fromEntries(new FormData(event.currentTarget).entries());
+      const body = Object.fromEntries(new FormData(event.currentTarget).entries()) as Record<string, string>;
       const response = await fetch("/api/principal/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -23,30 +28,81 @@ export default function PrincipalLoginPage() {
       });
       const data = await response.json().catch(() => ({}));
 
+      if (response.status === 409 && data.code === "ACTIVE_SESSION_EXISTS") {
+        // Store credentials so user doesn't have to re-enter after clearing
+        setPendingCredentials(body);
+        setShowClearSession(true);
+        setStatus("A session for this principal account is already active on another device.");
+        setStatusType("warning");
+        setLoading(false);
+        return;
+      }
+
       if (!response.ok) {
         setStatus(data.error ?? "Principal login failed.");
+        setStatusType("error");
+        setLoading(false);
         return;
       }
 
       window.dispatchEvent(new Event("adyapan-auth-change"));
-      const dashboardWindow = window.open("/principal/dashboard", "adyapan_principal_dashboard");
-
-      if (dashboardWindow) {
-        dashboardWindow.opener = null;
-        dashboardWindow.focus();
-        setStatus("Dashboard opened in a new tab.");
-        window.setTimeout(() => {
-          window.location.replace("/");
-        }, 300);
-        return;
-      }
-
       setStatus("Access granted. Opening dashboard...");
+      setStatusType("info");
       window.location.href = "/principal/dashboard";
     } catch {
       setStatus("Network issue. Please try again.");
-    } finally {
+      setStatusType("error");
       setLoading(false);
+    }
+  }
+
+  async function handleClearSessions() {
+    if (!pendingCredentials) return;
+    setClearingSession(true);
+    setStatus("Clearing previous sessions...");
+    setStatusType("info");
+
+    try {
+      const response = await fetch("/api/principal/clear-sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pendingCredentials)
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setStatus(data.error ?? "Failed to clear sessions. Please try again.");
+        setStatusType("error");
+        setClearingSession(false);
+        return;
+      }
+
+      // Sessions cleared — now attempt login again automatically
+      setShowClearSession(false);
+      setStatus("Previous sessions cleared. Logging you in...");
+      setStatusType("info");
+
+      const loginResponse = await fetch("/api/principal/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pendingCredentials)
+      });
+      const loginData = await loginResponse.json().catch(() => ({}));
+
+      if (!loginResponse.ok) {
+        setStatus(loginData.error ?? "Login failed after clearing sessions. Please try again.");
+        setStatusType("error");
+        setClearingSession(false);
+        setPendingCredentials(null);
+        return;
+      }
+
+      window.dispatchEvent(new Event("adyapan-auth-change"));
+      window.location.href = "/principal/dashboard";
+    } catch {
+      setStatus("Network issue. Please try again.");
+      setStatusType("error");
+      setClearingSession(false);
     }
   }
 
@@ -86,6 +142,31 @@ export default function PrincipalLoginPage() {
         </section>
 
         <section className="mx-auto w-full max-w-xl rounded-lg border border-slate-200 bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.10)] md:p-8">
+          {/* Active session conflict modal */}
+          {showClearSession && (
+            <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-5">
+              <p className="text-sm font-black text-amber-900">⚠️ Active Session Detected</p>
+              <p className="mt-2 text-sm font-medium text-amber-800">
+                This principal account is already logged in on another device. To log in here, you need to clear the previous session first.
+              </p>
+              <div className="mt-4 flex gap-3">
+                <button
+                  onClick={handleClearSessions}
+                  disabled={clearingSession}
+                  className="flex-1 rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-black text-white transition hover:bg-amber-700 disabled:opacity-60"
+                >
+                  {clearingSession ? "Clearing..." : "Clear Previous Sessions & Login"}
+                </button>
+                <button
+                  onClick={() => { setShowClearSession(false); setPendingCredentials(null); setStatus(""); }}
+                  className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-black text-slate-700 transition hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={onSubmit}>
             <input type="hidden" name="captcha" value="ADYAPAN" />
             <div className="flex items-start gap-4">
@@ -109,7 +190,6 @@ export default function PrincipalLoginPage() {
                     name="email"
                     type="email"
                     required
-                    defaultValue="rupeshrupak609@gmail.com"
                     className="h-14 w-full rounded-lg border border-slate-200 bg-white pl-12 pr-4 text-base font-semibold text-slate-950 outline-none transition focus:border-cyan-600 focus:ring-4 focus:ring-cyan-100"
                   />
                 </div>
@@ -162,7 +242,7 @@ export default function PrincipalLoginPage() {
               </label>
 
               <button
-                disabled={loading}
+                disabled={loading || showClearSession}
                 className="inline-flex h-14 items-center justify-center gap-2 rounded-lg bg-cyan-700 px-5 text-base font-black text-white shadow-[0_16px_34px_rgba(8,145,178,0.24)] transition hover:-translate-y-0.5 hover:bg-slate-950 disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {loading ? "Checking..." : "Open Dashboard"}
@@ -170,8 +250,12 @@ export default function PrincipalLoginPage() {
               </button>
             </div>
 
-            {status && (
-              <p className="mt-5 rounded-lg bg-slate-100 px-4 py-3 text-center text-sm font-black text-slate-800">
+            {status && !showClearSession && (
+              <p className={`mt-5 rounded-lg px-4 py-3 text-center text-sm font-black ${
+                statusType === "error" ? "bg-red-50 text-red-800" :
+                statusType === "warning" ? "bg-amber-50 text-amber-800" :
+                "bg-slate-100 text-slate-800"
+              }`}>
                 {status}
               </p>
             )}

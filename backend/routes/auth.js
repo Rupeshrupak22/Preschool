@@ -99,10 +99,14 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
     });
 
     if (sessionResult.conflict) {
-      return sendResponse(res, 409, false, 'This account is already active on another device. Confirm logout of previous sessions and login again.', {
-        code: 'ACTIVE_SESSION_EXISTS',
-        action: 'CLEAR_PREVIOUS_SESSIONS_AND_RELOGIN',
-      });
+      return sendResponse(res, 409, false,
+        `A session for this ${user.role} account is already active on another device. Click "Clear Previous Sessions" to log out all other devices, then log in again.`,
+        {
+          code: 'ACTIVE_SESSION_EXISTS',
+          action: 'CLEAR_PREVIOUS_SESSIONS_AND_RELOGIN',
+          role: user.role,
+        }
+      );
     }
 
     // 7. Auto-upgrade password to Argon2id where needed
