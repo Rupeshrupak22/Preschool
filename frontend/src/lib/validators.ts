@@ -27,16 +27,16 @@ export const loginSchema = z.object({
 
 export const principalLoginSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(8),
-  schoolKey: z.string().trim().min(8).transform((value) => value.toUpperCase()),
-  captcha: z.literal("ADYAPAN")
+  password: z.string().min(6),
+  schoolKey: z.string().trim().min(6),
+  captcha: z.string().min(1)
 });
 
 export const teacherLoginSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(8),
-  staffKey: z.string().trim().min(8).transform((value) => value.toUpperCase()),
-  captcha: z.literal("ADYAPAN")
+  password: z.string().min(6),
+  staffKey: z.string().trim().min(6),
+  captcha: z.string().min(1)
 });
 
 export const leadSchema = z.object({
