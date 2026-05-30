@@ -4,6 +4,7 @@
   "description": "Unified Adyapan Backend - Express + Prisma + TiDB",
   "main": "server.js",
   "scripts": {
+    "build": "npx prisma generate",
     "start": "node server.js",
     "dev": "nodemon server.js",
     "prisma:generate": "npx prisma generate",
