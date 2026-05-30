@@ -88,8 +88,8 @@ export default function MentorsPage() {
                 </div>
                 <div className="h-12 w-px bg-white/30" />
                 <div>
-                  <p className="text-3xl font-black text-white">25K+</p>
-                  <p className="text-sm text-purple-200">Happy Students</p>
+                  <p className="text-3xl font-black text-white">Growing</p>
+                  <p className="text-sm text-purple-200">Student Community</p>
                 </div>
                 <div className="h-12 w-px bg-white/30" />
                 <div>

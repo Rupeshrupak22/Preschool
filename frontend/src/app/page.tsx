@@ -161,21 +161,7 @@ const events = [
 ];
 
 const testimonials = [
-  {
-    name: "Ananya S.",
-    role: "Class 8 Student",
-    quote: "I built my first AI project and presented it confidently in school."
-  },
-  {
-    name: "Rohit Mehta",
-    role: "Parent",
-    quote: "The roadmap feels premium, practical, and very clear for future careers."
-  },
-  {
-    name: "Principal, Sunrise Public School",
-    role: "School Partner",
-    quote: "ADYAPAN made coding labs, teacher training, and certification easy to roll out."
-  }
+  // Testimonials will be added when we have real reviews from actual users
 ];
 
 const heroPrograms: { title: string; range: string; icon: Icon; glow: string; avatar: string; image: string; video: string; subjects: string[]; skills: string[]; activities?: string[]; competitive?: string[]; classes?: { [key: string]: { subjects: string[]; skills: string[]; examPrep?: string[] } } }[] = [
@@ -390,20 +376,12 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
 }
 
 export default function Home() {
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [status, setStatus] = useState("");
   const [leadSuccess, setLeadSuccess] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [alreadyLoggedInNotice, setAlreadyLoggedInNotice] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState<typeof heroPrograms[0] | null>(null);
   const [expandedSections, setExpandedSections] = useState<string[]>(["subjects"]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveTestimonial((index) => (index + 1) % testimonials.length);
-    }, 3600);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     let active = true;
@@ -621,8 +599,8 @@ export default function Home() {
               </p>
           <div className="mt-7 grid max-w-md gap-4 sm:grid-cols-2">
                 {[
-                  ["20K+", "Students enrolled"],
-                  ["250+", "School workshops"]
+                  ["Growing", "Student community"],
+                  ["Active", "School partnerships"]
                 ].map(([value, label]) => (
                   <div
                     key={label}
@@ -822,8 +800,8 @@ export default function Home() {
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Reviews"
-            title="Trusted by students, parents, and schools"
-            copy="Auto-sliding feedback, rating proof, and video-style cards built into the premium platform surface."
+            title="Building trust with students, parents, and schools"
+            copy="We're working with schools and students to create meaningful learning experiences."
           />
           <div className="glass mx-auto max-w-3xl rounded-2xl p-8 text-center">
             <div className="mx-auto flex justify-center gap-1 text-saffron-600">
@@ -831,19 +809,11 @@ export default function Home() {
                 <Star key={index} className="h-5 w-5 fill-current" />
               ))}
             </div>
-            <p className="mt-6 text-2xl font-medium leading-10">"{testimonials[activeTestimonial].quote}"</p>
-            <p className="mt-6 font-semibold">{testimonials[activeTestimonial].name}</p>
-            <p className="mt-1 text-sm text-saffron-900/52">{testimonials[activeTestimonial].role}</p>
-            <div className="mt-6 flex justify-center gap-2">
-              {testimonials.map((testimonial, index) => (
-                <button
-                  key={testimonial.name}
-                  onClick={() => setActiveTestimonial(index)}
-                  aria-label={`Show ${testimonial.name} review`}
-                  className={`h-2.5 rounded-full transition ${activeTestimonial === index ? "w-8 bg-saffron-400" : "w-2.5 bg-blue-200"}`}
-                />
-              ))}
-            </div>
+            <p className="mt-6 text-2xl font-medium leading-10">
+              "We're committed to creating exceptional learning experiences for every student."
+            </p>
+            <p className="mt-6 font-semibold">ADYAPAN Team</p>
+            <p className="mt-1 text-sm text-saffron-900/52">Future Skills Platform</p>
           </div>
         </div>
       </section>

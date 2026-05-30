@@ -63,9 +63,9 @@ const outcomes = [
 
 const stats = [
   ["360°", "Student tracking"],
-  ["20K+", "Learners supported"],
-  ["35+", "Expert mentors"],
-  ["4.9/5", "Parent trust"]
+  ["Growing", "Learning community"],
+  ["Expert", "Mentors available"],
+  ["Quality", "Education focus"]
 ];
 
 export default function OverviewPage() {
