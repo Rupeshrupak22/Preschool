@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ArrowRight,
   BarChart3,
@@ -15,33 +17,38 @@ import {
   Users,
   Zap
 } from "lucide-react";
+import { motion } from "framer-motion";
 
 type Icon = React.ComponentType<{ className?: string }>;
 
-const platformCards: { title: string; copy: string; icon: Icon; tone: string }[] = [
+const platformCards: { title: string; copy: string; icon: Icon; tone: string; accent: string }[] = [
   {
     title: "Future Skills Curriculum",
     copy: "Coding, AI, robotics, communication, design thinking, and career skills mapped class-wise.",
     icon: Brain,
-    tone: "from-purple-500 to-pink-500"
+    tone: "from-purple-500 to-pink-500",
+    accent: "purple"
   },
   {
     title: "AI Learning Dashboard",
     copy: "Subject-wise score, attendance, homework, rank, live classes, and AI improvement insights.",
     icon: BarChart3,
-    tone: "from-blue-500 to-cyan-400"
+    tone: "from-blue-500 to-cyan-400",
+    accent: "blue"
   },
   {
     title: "Mentor-Led Growth",
     copy: "Expert mentors guide students with doubt sessions, project reviews, and confidence building.",
     icon: Users,
-    tone: "from-emerald-400 to-teal-500"
+    tone: "from-emerald-400 to-teal-500",
+    accent: "emerald"
   },
   {
     title: "School Partnership",
     copy: "Curriculum rollout, teacher support, workshops, competitions, and progress reporting for schools.",
     icon: School,
-    tone: "from-amber-400 to-orange-500"
+    tone: "from-amber-400 to-orange-500",
+    accent: "amber"
   }
 ];
 
@@ -63,194 +70,239 @@ const outcomes = [
 
 const stats = [
   ["360°", "Student tracking"],
-  ["20K+", "Learners supported"],
   ["35+", "Expert mentors"],
   ["4.9/5", "Parent trust"]
 ];
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0 }
+};
+
 export default function OverviewPage() {
   return (
-    <main className="min-h-screen overflow-hidden text-slate-950">
-      {/* HERO SECTION - Matching Reference Image */}
-      <section className="relative overflow-hidden px-4 py-20 md:px-6">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img 
-            src="/overview_bg.png" 
-            alt="Background" 
-            className="h-full w-full object-cover"
-          />
-        </div>
-        
-        {/* Decorative stars */}
-        <div className="absolute left-1/4 top-16">
-          <Sparkles className="h-8 w-8 text-yellow-400 fill-yellow-400" />
-        </div>
-        <div className="absolute right-1/4 top-20">
-          <Sparkles className="h-6 w-6 text-yellow-400 fill-yellow-400" />
-        </div>
+    <main className="min-h-screen overflow-hidden text-slate-950 relative">
+      {/* Full-page background */}
+      <div className="fixed inset-0 -z-10">
+        <video autoPlay muted loop playsInline className="h-full w-full object-cover opacity-80">
+          <source src="/overview-bg.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0" />
+      </div>
 
-        <div className="relative mx-auto max-w-5xl text-center">
-          {/* Badge */}
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-purple-200 bg-white/80 px-4 py-2 text-sm font-bold text-slate-700 shadow-sm backdrop-blur">
-            <Sparkles className="h-4 w-4 text-purple-600" />
-            ADYAPAN Platform Overview
-          </div>
+      {/* HERO */}
+      <section className="relative px-4 pb-24 pt-16 md:px-6">
+        <div className="mx-auto max-w-5xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="rounded-3xl border border-white/20 bg-white/10 p-10 backdrop-blur-sm"
+          >
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-5 py-2.5 text-sm font-bold text-black backdrop-blur-sm">
+              <Sparkles className="h-4 w-4 text-purple-600" />
+              ADYAPAN Platform Overview
+            </div>
 
-          {/* Main Heading */}
-          <h1 className="text-5xl font-black leading-tight text-slate-900 md:text-6xl lg:text-7xl">
-            One connected
-            <br />
-            system for
-            <br />
-            <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-              school growth
-            </span>
-          </h1>
+            <h1 className="text-5xl font-black leading-[1.05] tracking-tight text-black md:text-6xl lg:text-7xl">
+              One connected
+              <br />
+              system for
+              <br />
+              <span className="text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+                school growth
+              </span>
+            </h1>
 
-          {/* Description */}
-          <div className="mx-auto mt-6 max-w-3xl rounded-2xl border-2 border-white/50 bg-white/80 px-6 py-4 shadow-lg backdrop-blur-sm">
-            <p className="text-lg font-semibold leading-relaxed text-slate-700 md:text-xl">
+            <p className="mx-auto mt-6 max-w-3xl text-lg font-bold leading-relaxed text-gray-900 md:text-xl">
               ADYAPAN combines academics, future skills, LMS, live classes, mentors, progress tracking, AI insights, and school partnerships into one smart learning ecosystem.
             </p>
-          </div>
 
-          {/* CTA Buttons */}
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a
-              href="/student-dashboard"
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-4 font-bold text-white shadow-xl transition hover:scale-105"
-            >
-              View Student Dashboard
-              <ArrowRight className="h-5 w-5" />
-            </a>
-            <a
-              href="/mentors"
-              className="inline-flex items-center gap-2 rounded-full border-2 border-slate-300 bg-white/80 px-8 py-4 font-bold text-slate-900 backdrop-blur transition hover:bg-white"
-            >
-              Explore Features
-              <MessageCircle className="h-5 w-5" />
-            </a>
-          </div>
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <a
+                href="/student-dashboard"
+                className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 px-8 py-4 font-bold text-white shadow-[0_16px_40px_rgba(124,58,237,0.3)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(124,58,237,0.4)]"
+              >
+                View Student Dashboard
+                <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
+              </a>
+              <a
+                href="/mentors"
+                className="inline-flex items-center gap-2 rounded-2xl border border-white/25 bg-white/10 px-8 py-4 font-bold text-black backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/20"
+              >
+                Explore Features
+                <MessageCircle className="h-5 w-5" />
+              </a>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Platform Cards Section */}
-      <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+      {/* Platform Cards */}
+      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ staggerChildren: 0.08 }}
+          className="grid gap-5 md:grid-cols-2 xl:grid-cols-4"
+        >
           {platformCards.map((card) => (
-            <article
+            <motion.article
               key={card.title}
-              className="group rounded-[24px] border-2 border-white/70 bg-white/76 p-6 shadow-[0_18px_44px_rgba(99,102,241,0.14)] backdrop-blur transition duration-300 hover:-translate-y-2 hover:border-purple-200 hover:bg-white hover:shadow-[0_26px_60px_rgba(168,85,247,0.22)]"
+              variants={fadeUp}
+              transition={{ duration: 0.5 }}
+              className="group relative overflow-hidden rounded-3xl border border-white/30 bg-white/20 p-7 shadow-[0_8px_32px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:bg-white/35 hover:shadow-[0_20px_50px_rgba(124,58,237,0.15)]"
             >
-              <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${card.tone} text-white shadow-lg transition group-hover:scale-110`}>
+              <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${card.tone} text-white shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
                 <card.icon className="h-7 w-7" />
               </div>
-              <h2 className="mt-6 text-xl font-black">{card.title}</h2>
-              <p className="mt-3 text-sm font-bold leading-6 text-slate-600">{card.copy}</p>
-            </article>
+              <h2 className="mt-6 text-xl font-black text-slate-900">{card.title}</h2>
+              <p className="mt-3 text-sm font-medium leading-6 text-slate-600">{card.copy}</p>
+              <div className={`absolute -bottom-1 left-0 h-1 w-0 rounded-full bg-gradient-to-r ${card.tone} transition-all duration-500 group-hover:w-full`} />
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* Journey Section */}
-      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-10 md:px-6 lg:grid-cols-[0.86fr_1.14fr]">
-        <div className="rounded-[28px] border-2 border-white/70 bg-slate-950 p-7 text-white shadow-[0_28px_80px_rgba(15,23,42,0.24)]">
-          <p className="text-sm font-black uppercase tracking-[0.22em] text-cyan-200">How it works</p>
-          <h2 className="mt-4 text-4xl font-black leading-tight">A complete student journey, not only a class.</h2>
-          <p className="mt-5 text-base font-semibold leading-7 text-white/70">
-            The platform is built to answer the most important parent and school question: what is the child learning,
-            where are they improving, and what should happen next?
-          </p>
-          <div className="mt-8 grid grid-cols-2 gap-3">
-            {stats.map(([value, label]) => (
-              <div key={label} className="rounded-2xl bg-white/10 p-4">
-                <p className="text-2xl font-black">{value}</p>
-                <p className="mt-1 text-xs font-bold text-white/60">{label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+        <div className="grid gap-6 lg:grid-cols-[0.86fr_1.14fr]">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 text-white shadow-[0_24px_60px_rgba(15,23,42,0.4)]"
+          >
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-300">How it works</p>
+            <h2 className="mt-4 text-4xl font-black leading-tight">A complete student journey, not only a class.</h2>
+            <p className="mt-5 text-base font-medium leading-7 text-slate-400">
+              The platform is built to answer the most important parent and school question: what is the child learning,
+              where are they improving, and what should happen next?
+            </p>
+            <div className="mt-8 grid grid-cols-3 gap-3">
+              {stats.map(([value, label]) => (
+                <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm text-center">
+                  <p className="text-2xl font-black text-white">{value}</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-400">{label}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {journey.map((item, index) => (
-            <article
-              key={item.title}
-              className="group rounded-[24px] border-2 border-white/70 bg-white/78 p-6 shadow-[0_18px_44px_rgba(37,99,235,0.12)] backdrop-blur transition hover:-translate-y-2 hover:border-blue-200 hover:bg-white"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg transition group-hover:scale-110 group-hover:bg-slate-950">
-                  <item.icon className="h-6 w-6" />
-                </span>
-                <span className="text-4xl font-black text-blue-100">0{index + 1}</span>
-              </div>
-              <h3 className="mt-6 text-2xl font-black">{item.title}</h3>
-              <p className="mt-3 text-sm font-bold leading-6 text-slate-600">{item.copy}</p>
-            </article>
-          ))}
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            transition={{ staggerChildren: 0.1 }}
+            className="grid gap-4 md:grid-cols-2"
+          >
+            {journey.map((item, index) => (
+              <motion.article
+                key={item.title}
+                variants={fadeUp}
+                transition={{ duration: 0.5 }}
+                className="group rounded-3xl border border-white/30 bg-white/20 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:bg-white/35 hover:shadow-[0_16px_40px_rgba(59,130,246,0.15)]"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
+                    <item.icon className="h-6 w-6" />
+                  </span>
+                  <span className="text-4xl font-black text-blue-100/60">0{index + 1}</span>
+                </div>
+                <h3 className="mt-5 text-2xl font-black text-slate-900">{item.title}</h3>
+                <p className="mt-3 text-sm font-medium leading-6 text-slate-600">{item.copy}</p>
+              </motion.article>
+            ))}
+          </motion.div>
         </div>
       </section>
 
       {/* Outcomes Section */}
-      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-10 md:px-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-[28px] border-2 border-white/70 bg-white/78 p-7 shadow-[0_20px_58px_rgba(99,102,241,0.14)] backdrop-blur">
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.22em] text-purple-700">What students get</p>
-              <h2 className="mt-3 text-4xl font-black">Everything needed for daily learning clarity</h2>
-            </div>
-            <a href="/dashboard" className="inline-flex h-12 items-center justify-center rounded-full bg-slate-950 px-5 text-sm font-black text-white transition hover:-translate-y-1 hover:bg-purple-700">
-              Open LMS
-            </a>
-          </div>
-          <div className="mt-7 grid gap-3 md:grid-cols-2">
-            {outcomes.map((item) => (
-              <div key={item} className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 font-bold text-slate-700 transition hover:-translate-y-1 hover:border-emerald-200 hover:bg-emerald-50">
-                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="relative overflow-hidden rounded-[28px] border-2 border-blue-300 bg-blue-100 p-7 shadow-[0_24px_70px_rgba(59,130,246,0.2)]">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="mx-auto h-72 w-auto rounded-xl object-contain"
+      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="rounded-3xl border border-white/30 bg-white/20 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.06)] backdrop-blur-xl"
           >
-            <source src="/overview_video.mp4" type="video/mp4" />
-          </video>
-          <h2 className="mt-4 text-3xl font-black text-slate-900">Built around the student</h2>
-          <p className="mt-3 text-sm font-bold leading-6 text-slate-700">
-            Each child sees the right subjects, right reports, right classes, and right improvement plan based on their
-            class and learning journey.
-          </p>
+            <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-700">What students get</p>
+                <h2 className="mt-3 text-4xl font-black text-slate-900">Everything needed for daily learning clarity</h2>
+              </div>
+              <a href="/dashboard" className="inline-flex h-12 shrink-0 items-center justify-center rounded-2xl bg-slate-900 px-6 text-sm font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-purple-700 hover:shadow-[0_12px_30px_rgba(124,58,237,0.3)]">
+                Open LMS
+              </a>
+            </div>
+            <div className="mt-7 grid gap-3 md:grid-cols-2">
+              {outcomes.map((item) => (
+                <div key={item} className="flex items-start gap-3 rounded-2xl border border-white/40 bg-white/30 p-4 font-medium text-slate-700 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/50 hover:shadow-md">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
+                  <span className="text-sm">{item}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="relative overflow-hidden rounded-3xl border border-blue-200/50 bg-gradient-to-br from-blue-50/80 to-indigo-50/80 p-7 shadow-[0_16px_48px_rgba(59,130,246,0.15)] backdrop-blur-xl"
+          >
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="mx-auto h-72 w-auto rounded-2xl object-contain shadow-lg"
+            >
+              <source src="/overview_video.mp4" type="video/mp4" />
+            </video>
+            <h2 className="mt-5 text-3xl font-black text-slate-900">Built around the student</h2>
+            <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
+              Each child sees the right subjects, right reports, right classes, and right improvement plan based on their
+              class and learning journey.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Final CTA Section */}
-      <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
-        <div className="rounded-[30px] border-2 border-white/70 bg-white/80 p-7 text-center shadow-[0_24px_70px_rgba(37,99,235,0.14)] backdrop-blur md:p-10">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 to-rose-500 text-white shadow-lg">
+      {/* Final CTA */}
+      <section className="mx-auto max-w-7xl px-4 py-16 pb-24 md:px-6">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="rounded-3xl border border-white/30 bg-white/25 p-8 text-center shadow-[0_16px_48px_rgba(0,0,0,0.08)] backdrop-blur-xl md:p-12"
+        >
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-rose-500 text-white shadow-lg">
             <Lightbulb className="h-8 w-8" />
           </div>
-          <h2 className="mx-auto mt-6 max-w-3xl text-4xl font-black">A modern overview for parents, students, and schools.</h2>
-          <p className="mx-auto mt-4 max-w-3xl text-base font-bold leading-7 text-slate-600">
+          <h2 className="mx-auto mt-6 max-w-3xl text-4xl font-black text-slate-900">A modern overview for parents, students, and schools.</h2>
+          <p className="mx-auto mt-4 max-w-3xl text-base font-medium leading-7 text-slate-600">
             Use this page as the quick explanation of ADYAPAN: what it does, how learning is tracked, and why it is
             different from a normal online class.
           </p>
-          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-            <a href="/login" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 font-black text-white shadow-lg transition hover:-translate-y-1 hover:bg-emerald-600">
-              Join Now <Zap className="h-5 w-5" />
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <a href="/login" className="group inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-7 font-bold text-white shadow-[0_12px_30px_rgba(16,185,129,0.3)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(16,185,129,0.4)]">
+              Join Now <Zap className="h-5 w-5 transition group-hover:rotate-12" />
             </a>
-            <a href="/#demo" className="inline-flex h-12 items-center justify-center gap-2 rounded-full border-2 border-slate-200 bg-white px-6 font-black text-slate-950 transition hover:-translate-y-1 hover:border-purple-200">
+            <a href="/#demo" className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-white/40 bg-white/30 px-7 font-bold text-slate-900 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/50">
               Book Demo <CalendarDays className="h-5 w-5" />
             </a>
           </div>
-        </div>
+        </motion.div>
       </section>
     </main>
   );

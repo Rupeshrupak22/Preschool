@@ -12,347 +12,317 @@ import {
   LineChart,
   Lock,
   Radio,
+  Rocket,
   Shield,
   Sparkles,
   Target,
-  TrendingUp,
   Users,
   Wifi,
   Zap,
-  Star,
-  Award,
-  Rocket
 } from "lucide-react";
+
+type Icon = React.ComponentType<{ className?: string }>;
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0 },
+};
+
+const subjects: { name: string; icon: Icon; color: string }[] = [
+  { name: "Robotics", icon: Cpu, color: "from-blue-500 to-cyan-400" },
+  { name: "Coding", icon: Code2, color: "from-green-500 to-emerald-400" },
+  { name: "IoT", icon: Wifi, color: "from-cyan-500 to-sky-400" },
+  { name: "Electronics", icon: Radio, color: "from-orange-500 to-amber-400" },
+  { name: "AI/ML", icon: Brain, color: "from-purple-500 to-violet-400" },
+  { name: "Programming", icon: Code2, color: "from-pink-500 to-rose-400" },
+];
+
+const features: { icon: Icon; title: string; desc: string; tone: string }[] = [
+  { icon: Target, title: "Comprehensive Platform", desc: "All-in-one solution for modern education", tone: "from-blue-500 to-indigo-600" },
+  { icon: LineChart, title: "Real-time Analytics", desc: "Track progress with powerful insights", tone: "from-green-500 to-emerald-600" },
+  { icon: Brain, title: "AI-Powered Learning", desc: "Personalized education for every student", tone: "from-purple-500 to-violet-600" },
+  { icon: BookOpen, title: "Smart Curriculum", desc: "Organized and structured content", tone: "from-orange-500 to-red-500" },
+  { icon: Users, title: "Collaborative Tools", desc: "Foster teamwork and engagement", tone: "from-pink-500 to-rose-600" },
+  { icon: Shield, title: "Secure & Reliable", desc: "Enterprise-grade security", tone: "from-cyan-500 to-blue-600" },
+];
+
+const studentFeatures = [
+  "Personalized Learning Paths",
+  "Interactive Quizzes & Games",
+  "AI Smart Chatbot Assistant",
+  "Gamified Progress Reports",
+  "Unlimited Practice Questions",
+  "Digital Library Access",
+  "Smart Study Planner",
+];
+
+const teacherFeatures = [
+  "AI Lesson Plan Generator",
+  "Auto Question Paper Maker",
+  "Instant Auto-Grading",
+  "Assignment Management",
+  "Real-time Progress Tracking",
+  "AI Teaching Assistant",
+  "Parent Communication Hub",
+];
+
+const examFeatures: { icon: Icon; title: string; desc: string }[] = [
+  { icon: BookOpen, title: "Multiple Formats", desc: "MCQs, Essays, Coding & More" },
+  { icon: Zap, title: "Auto Evaluation", desc: "Instant Grading & Feedback" },
+  { icon: Lock, title: "Secure Platform", desc: "Anti-Cheating Technology" },
+  { icon: Brain, title: "AI Proctoring", desc: "Smart Monitoring System" },
+  { icon: Target, title: "Auto Grading", desc: "Save Hours of Work" },
+  { icon: LineChart, title: "Instant Reports", desc: "Real-time Analytics" },
+];
+
+const examStats = [
+  { value: "100%", label: "Student Monitoring" },
+  { value: "Instant", label: "Auto Grading" },
+  { value: "20+", label: "Question Types" },
+  { value: "15+", label: "Security Features" },
+];
 
 export default function MentorsPage() {
   return (
-    <main className="min-h-screen bg-white">
-      {/* HERO SECTION */}
-      <section className="relative overflow-hidden pt-24 pb-20">
-        {/* Video Background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 h-full w-full object-cover"
+    <main className="min-h-screen overflow-hidden text-slate-950 relative">
+      {/* Full-page video background */}
+      <div className="fixed inset-0 -z-10">
+        <video autoPlay muted loop playsInline className="h-full w-full object-cover opacity-80">
+          <source src="/mentor-bg.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0" />
+      </div>
+
+      {/* ─── HERO ─── */}
+      <section className="relative px-4 pb-24 pt-16 md:px-6">
+        <div className="mx-auto max-w-5xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="rounded-3xl p-10"
           >
-            <source src="/mentor_bg.mp4" type="video/mp4" />
-          </video>
-          {/* Subtle overlay for text readability - very light */}
-          <div className="absolute inset-0 bg-black/20" />
-        </div>
-
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-            {/* Left Content */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <h1 className="text-5xl font-black leading-tight text-white sm:text-6xl lg:text-7xl">
-                Where Learning
-                <br />
-                <span className="text-yellow-300">Feels Fun Again</span>
-              </h1>
-
-              <p className="mt-6 text-xl text-purple-100">
-                Learning that feels exciting, personal, and interactive for every student — making education more engaging, creative, and enjoyable every day.
-              </p>
-
-              <div className="mt-8 flex flex-wrap gap-4">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-bold text-purple-600 shadow-2xl transition"
-                >
-                  <Rocket className="h-5 w-5" />
-                  Start Free Trial
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center gap-2 rounded-full border-2 border-white bg-white/10 px-8 py-4 font-bold text-white backdrop-blur-sm transition"
-                >
-                  <Calendar className="h-5 w-5" />
-                  Book a Demo
-                </motion.button>
-              </div>
-
-              <div className="mt-8 flex items-center gap-8">
-                <div>
-                  <p className="text-3xl font-black text-white">500+</p>
-                  <p className="text-sm text-purple-200">Schools Trust Us</p>
-                </div>
-                <div className="h-12 w-px bg-white/30" />
-                <div>
-                  <p className="text-3xl font-black text-white">25K+</p>
-                  <p className="text-sm text-purple-200">Happy Students</p>
-                </div>
-                <div className="h-12 w-px bg-white/30" />
-                <div>
-                  <p className="text-3xl font-black text-white">98%</p>
-                  <p className="text-sm text-purple-200">Satisfaction Rate</p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Right - Empty space for cleaner look */}
-            <div className="relative hidden lg:block">
-              <div className="relative h-[500px]">
-                {/* Cards removed for cleaner design */}
-              </div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white backdrop-blur-sm">
+              <Sparkles className="h-4 w-4 text-yellow-300" />
+              AI-Powered Education Platform
             </div>
-          </div>
+
+            <h1 className="text-5xl font-black leading-[1.05] tracking-tight text-white md:text-6xl lg:text-7xl">
+              Where Learning
+              <br />
+              <span className="bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Feels Fun Again
+              </span>
+            </h1>
+
+            <p className="mx-auto mt-6 max-w-3xl text-lg font-bold leading-relaxed text-white/90 md:text-xl">
+              Learning that feels exciting, personal, and interactive for every student — making education more engaging, creative, and enjoyable every day.
+            </p>
+
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <button className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 px-8 py-4 font-bold text-white shadow-[0_16px_40px_rgba(124,58,237,0.3)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(124,58,237,0.4)]">
+                <Rocket className="h-5 w-5 transition group-hover:rotate-12" />
+                Start Free Trial
+              </button>
+              <button className="inline-flex items-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-8 py-4 font-bold text-white backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/20">
+                <Calendar className="h-5 w-5" />
+                Book a Demo
+              </button>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* SUBJECTS SECTION */}
-      <section className="py-20 bg-gray-50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center"
-          >
-            <h2 className="text-4xl font-black text-gray-900 sm:text-5xl">
-              Master Future-Ready Skills
-            </h2>
-            <p className="mt-4 text-xl text-gray-600">
+      {/* ─── SUBJECTS ─── */}
+      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ staggerChildren: 0.08 }}
+          className="rounded-3xl border border-white/30 bg-white/20 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.06)] backdrop-blur-xl md:p-12"
+        >
+          <div className="text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-700">Future-Ready Skills</p>
+            <h2 className="mt-3 text-4xl font-black text-slate-900 sm:text-5xl">Master Future-Ready Skills</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-base font-medium text-slate-600">
               Learn from expert faculties in cutting-edge technologies
             </p>
-          </motion.div>
+          </div>
 
-          <div className="mt-16 grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6">
-            {[
-              { name: "Robotics", icon: Cpu, color: "from-blue-500 to-cyan-500" },
-              { name: "Coding", icon: Code2, color: "from-green-500 to-emerald-500" },
-              { name: "IoT", icon: Wifi, color: "from-cyan-500 to-blue-500" },
-              { name: "Electronics", icon: Radio, color: "from-orange-500 to-red-500" },
-              { name: "AI/ML", icon: Brain, color: "from-purple-500 to-pink-500" },
-              { name: "Programming", icon: Code2, color: "from-pink-500 to-rose-500" },
-            ].map((subject, index) => (
+          <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            {subjects.map((subject, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.1, y: -10 }}
+                variants={fadeUp}
+                transition={{ duration: 0.5 }}
+                whileHover={{ scale: 1.08, y: -6 }}
                 className="group cursor-pointer"
               >
-                <div className={`flex h-32 flex-col items-center justify-center rounded-2xl bg-gradient-to-br ${subject.color} p-6 shadow-lg transition-shadow group-hover:shadow-2xl`}>
-                  <subject.icon className="h-12 w-12 text-white" />
+                <div className={`flex h-32 flex-col items-center justify-center rounded-2xl bg-gradient-to-br ${subject.color} p-5 shadow-lg transition-shadow duration-300 group-hover:shadow-2xl`}>
+                  <subject.icon className="h-10 w-10 text-white drop-shadow-md" />
                   <p className="mt-3 text-sm font-bold text-white">{subject.name}</p>
                 </div>
               </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* FEATURES SECTION */}
-      <section className="py-20 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* ─── FEATURES (Glossy Cards like Overview) ─── */}
+      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ staggerChildren: 0.08 }}
+          className="grid gap-5 md:grid-cols-2 xl:grid-cols-3"
+        >
+          {features.map((feature) => (
+            <motion.article
+              key={feature.title}
+              variants={fadeUp}
+              transition={{ duration: 0.5 }}
+              className="group relative overflow-hidden rounded-3xl border border-white/30 bg-white/20 p-7 shadow-[0_8px_32px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:bg-white/35 hover:shadow-[0_20px_50px_rgba(124,58,237,0.15)]"
+            >
+              <div className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.tone} text-white shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                <feature.icon className="h-7 w-7" />
+              </div>
+              <h3 className="mt-6 text-xl font-black text-slate-900">{feature.title}</h3>
+              <p className="mt-3 text-sm font-medium leading-6 text-slate-600">{feature.desc}</p>
+              <div className={`absolute -bottom-1 left-0 h-1 w-0 rounded-full bg-gradient-to-r ${feature.tone} transition-all duration-500 group-hover:w-full`} />
+            </motion.article>
+          ))}
+        </motion.div>
+      </section>
+
+      {/* ─── FOR STUDENTS & TEACHERS ─── */}
+      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Students */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
             viewport={{ once: true }}
-            className="text-center"
+            transition={{ duration: 0.6 }}
+            className="rounded-3xl border border-white/30 bg-white/20 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.06)] backdrop-blur-xl"
           >
-            <h2 className="text-4xl font-black text-gray-900 sm:text-5xl">
-              Why Schools Love <span className="text-purple-600">ADYAPAN LMS</span>
-            </h2>
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 text-white shadow-lg">
+                <GraduationCap className="h-7 w-7" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-black text-slate-900">For Students</h3>
+                <p className="text-sm font-medium text-slate-600">Learn, grow, and achieve more</p>
+              </div>
+            </div>
+
+            <div className="mt-7 grid gap-3 md:grid-cols-2">
+              {studentFeatures.map((feature) => (
+                <div
+                  key={feature}
+                  className="flex items-start gap-3 rounded-2xl border border-white/40 bg-white/30 p-4 font-medium text-slate-700 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/50 hover:shadow-md"
+                >
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-pink-500" />
+                  <span className="text-sm">{feature}</span>
+                </div>
+              ))}
+            </div>
           </motion.div>
 
-          <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {[
-              { icon: Target, title: "Comprehensive Platform", desc: "All-in-one solution for modern education", color: "blue" },
-              { icon: LineChart, title: "Real-time Analytics", desc: "Track progress with powerful insights", color: "green" },
-              { icon: Brain, title: "AI-Powered Learning", desc: "Personalized education for every student", color: "purple" },
-              { icon: BookOpen, title: "Smart Curriculum", desc: "Organized and structured content", color: "orange" },
-              { icon: Users, title: "Collaborative Tools", desc: "Foster teamwork and engagement", color: "pink" },
-              { icon: Shield, title: "Secure & Reliable", desc: "Enterprise-grade security", color: "cyan" },
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -8 }}
-                className="group rounded-2xl border-2 border-gray-100 bg-white p-8 shadow-lg transition-all hover:border-purple-200 hover:shadow-2xl"
-              >
-                <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-${feature.color}-500 to-${feature.color}-600 shadow-lg`}>
-                  <feature.icon className="h-7 w-7 text-white" />
-                </div>
-                <h3 className="mt-6 text-xl font-bold text-gray-900">{feature.title}</h3>
-                <p className="mt-2 text-gray-600">{feature.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FOR STUDENTS & TEACHERS */}
-      <section className="py-20 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-2">
-            {/* Students */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="rounded-3xl bg-white p-10 shadow-xl"
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500">
-                  <GraduationCap className="h-8 w-8 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-3xl font-black text-gray-900">For Students</h3>
-                  <p className="text-gray-600">Learn, grow, and achieve more</p>
-                </div>
-              </div>
-
-              <div className="mt-8 space-y-4">
-                {[
-                  "Personalized Learning Paths",
-                  "Interactive Quizzes & Games",
-                  "AI Smart Chatbot Assistant",
-                  "Gamified Progress Reports",
-                  "Unlimited Practice Questions",
-                  "Digital Library Access",
-                  "Smart Study Planner"
-                ].map((feature, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.05 }}
-                    className="flex items-center gap-3"
-                  >
-                    <CheckCircle2 className="h-6 w-6 flex-shrink-0 text-green-500" />
-                    <p className="font-semibold text-gray-700">{feature}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Teachers */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="rounded-3xl bg-white p-10 shadow-xl"
-            >
-              <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500">
-                  <Users className="h-8 w-8 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-3xl font-black text-gray-900">For Teachers</h3>
-                  <p className="text-gray-600">Teach smarter, not harder</p>
-                </div>
-              </div>
-
-              <div className="mt-8 space-y-4">
-                {[
-                  "AI Lesson Plan Generator",
-                  "Auto Question Paper Maker",
-                  "Instant Auto-Grading",
-                  "Assignment Management",
-                  "Real-time Progress Tracking",
-                  "AI Teaching Assistant",
-                  "Parent Communication Hub"
-                ].map((feature, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.05 }}
-                    className="flex items-center gap-3"
-                  >
-                    <CheckCircle2 className="h-6 w-6 flex-shrink-0 text-green-500" />
-                    <p className="font-semibold text-gray-700">{feature}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* EXAM SYSTEM */}
-      <section className="py-20 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Teachers */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
             viewport={{ once: true }}
-            className="text-center"
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="rounded-3xl border border-white/30 bg-white/20 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.06)] backdrop-blur-xl"
           >
-            <h2 className="text-4xl font-black text-white sm:text-5xl">
-              Advanced Online Exam System
-            </h2>
-            <p className="mt-4 text-xl text-purple-100">
-              Conduct secure, AI-powered exams with instant results
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 text-white shadow-lg">
+                <Users className="h-7 w-7" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-black text-slate-900">For Teachers</h3>
+                <p className="text-sm font-medium text-slate-600">Teach smarter, not harder</p>
+              </div>
+            </div>
+
+            <div className="mt-7 grid gap-3 md:grid-cols-2">
+              {teacherFeatures.map((feature) => (
+                <div
+                  key={feature}
+                  className="flex items-start gap-3 rounded-2xl border border-white/40 bg-white/30 p-4 font-medium text-slate-700 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/50 hover:shadow-md"
+                >
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
+                  <span className="text-sm">{feature}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── EXAM SYSTEM ─── */}
+      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+        <div className="grid gap-6 lg:grid-cols-[0.86fr_1.14fr]">
+          {/* Left - Dark card */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 text-white shadow-[0_24px_60px_rgba(15,23,42,0.4)]"
+          >
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-300">Exam System</p>
+            <h2 className="mt-4 text-4xl font-black leading-tight">Advanced Online Exam System</h2>
+            <p className="mt-5 text-base font-medium leading-7 text-slate-400">
+              Conduct secure, AI-powered exams with instant results. Support for multiple formats, auto evaluation, and enterprise-grade security.
             </p>
+            <div className="mt-8 grid grid-cols-2 gap-3">
+              {examStats.map((stat) => (
+                <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+                  <p className="text-2xl font-black text-white">{stat.value}</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-400">{stat.label}</p>
+                </div>
+              ))}
+            </div>
           </motion.div>
 
-          <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[
-              { icon: BookOpen, title: "Multiple Formats", desc: "MCQs, Essays, Coding & More" },
-              { icon: Zap, title: "Auto Evaluation", desc: "Instant Grading & Feedback" },
-              { icon: Lock, title: "Secure Platform", desc: "Anti-Cheating Technology" },
-              { icon: Brain, title: "AI Proctoring", desc: "Smart Monitoring System" },
-              { icon: Target, title: "Auto Grading", desc: "Save Hours of Work" },
-              { icon: LineChart, title: "Instant Reports", desc: "Real-time Analytics" },
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-                className="rounded-2xl bg-white/10 p-8 backdrop-blur-sm transition-all hover:bg-white/20"
+          {/* Right - Glossy exam feature cards */}
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            transition={{ staggerChildren: 0.1 }}
+            className="grid gap-4 md:grid-cols-2"
+          >
+            {examFeatures.map((feature, index) => (
+              <motion.article
+                key={feature.title}
+                variants={fadeUp}
+                transition={{ duration: 0.5 }}
+                className="group rounded-3xl border border-white/30 bg-white/20 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:bg-white/35 hover:shadow-[0_16px_40px_rgba(59,130,246,0.15)]"
               >
-                <feature.icon className="h-12 w-12 text-yellow-300" />
-                <h3 className="mt-4 text-xl font-bold text-white">{feature.title}</h3>
-                <p className="mt-2 text-purple-100">{feature.desc}</p>
-              </motion.div>
+                <div className="flex items-center justify-between gap-4">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-6">
+                    <feature.icon className="h-6 w-6" />
+                  </span>
+                  <span className="text-4xl font-black text-blue-100/60">0{index + 1}</span>
+                </div>
+                <h3 className="mt-5 text-lg font-black text-slate-900">{feature.title}</h3>
+                <p className="mt-2 text-sm font-medium leading-6 text-slate-600">{feature.desc}</p>
+              </motion.article>
             ))}
-          </div>
-
-          <div className="mt-16 grid grid-cols-2 gap-8 md:grid-cols-4">
-            {[
-              { value: "100%", label: "Student Monitoring" },
-              { value: "Instant", label: "Auto Grading" },
-              { value: "20+", label: "Question Types" },
-              { value: "15+", label: "Security Features" },
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="text-center"
-              >
-                <p className="text-5xl font-black text-white">{stat.value}</p>
-                <p className="mt-2 text-purple-200">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
+      {/* Bottom spacing */}
+      <div className="h-20" />
     </main>
   );
 }
