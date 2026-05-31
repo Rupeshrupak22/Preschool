@@ -99,7 +99,7 @@ export default function TeacherDashboardPage() {
   }, []);
 
   // Session heartbeat — auto-logout if session is cleared from another device
-  useSessionHeartbeat({ checkUrl: "/api/teacher/me", loginUrl: "/teacher/login" });
+  useSessionHeartbeat({ checkUrl: "/api/teacher/me", loginUrl: "/teacher/login", enabled: !!dashboard });
 
   // Listen for logout from other tabs — redirect to login
   useEffect(() => {

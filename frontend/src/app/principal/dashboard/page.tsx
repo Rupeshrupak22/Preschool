@@ -85,7 +85,7 @@ export default function PrincipalDashboardPage() {
   }, []);
 
   // Session heartbeat — auto-logout if session is cleared from another device
-  useSessionHeartbeat({ checkUrl: "/api/principal/me", loginUrl: "/principal/login" });
+  useSessionHeartbeat({ checkUrl: "/api/principal/me", loginUrl: "/principal/login", enabled: !!dashboard });
 
   // Listen for logout from other tabs — redirect to login
   useEffect(() => {

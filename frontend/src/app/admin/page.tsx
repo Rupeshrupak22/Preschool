@@ -262,9 +262,11 @@ export default function AdminPage() {
   }, []);
 
   // Session heartbeat — auto-logout if session is cleared from another device
+  // Only runs when dashboard is showing (not on login form)
   useSessionHeartbeat({
     checkUrl: "/api/auth/me",
     loginUrl: "/admin",
+    enabled: !showLogin && !!overview,
     onSessionLost: () => {
       setOverview(null);
       setShowLogin(true);
