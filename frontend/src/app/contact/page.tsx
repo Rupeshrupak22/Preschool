@@ -33,11 +33,11 @@ export default function ContactPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Section with Scenic Background */}
-      <section className="relative min-h-[35vh] overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <section className="relative z-20 flex aspect-[16/9] min-h-[420px] items-center overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: "url('/contactus2.jpeg')",
+            backgroundImage: "url('/contactus.jpeg')",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/40 via-indigo-900/30 to-transparent" />
@@ -52,8 +52,21 @@ export default function ContactPage() {
         </div>
       </section>
 
+      <div className="relative isolate overflow-hidden">
+        <video
+          className="fixed inset-0 -z-20 h-screen w-screen object-cover"
+          src="/videos/contactus.mp4"
+          poster="/contactus2.jpeg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden="true"
+        />
+        <div className="fixed inset-0 -z-10 bg-white/75" />
+
       {/* Two Column Layout - Company Information & Personal Information */}
-      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16 lg:py-24">
+      <section className="relative z-10 mx-auto max-w-7xl px-4 py-16 md:px-6 lg:py-24">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
           
           {/* Left Column - Company Information Box */}
@@ -221,8 +234,8 @@ export default function ContactPage() {
       </section>
 
       {/* Map Section */}
-      <section className="bg-gray-50 py-16">
-        <div className="mx-auto max-w-7xl px-6 md:px-10 lg:px-16">
+      <section className="relative z-10 py-16">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
           <h2 className="mb-8 text-center text-3xl font-bold text-gray-900 md:text-4xl">Find Us</h2>
           <div className="relative overflow-hidden rounded-2xl shadow-xl">
             <iframe
@@ -249,7 +262,7 @@ export default function ContactPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16 lg:py-24">
+      <section className="relative z-10 mx-auto max-w-7xl px-4 py-16 md:px-6 lg:py-24">
         <h2 className="mb-8 text-center text-3xl font-bold text-gray-900 md:text-4xl">Frequently Asked Questions</h2>
         <div className="mx-auto grid max-w-3xl gap-4">
           <button
@@ -277,7 +290,7 @@ export default function ContactPage() {
       </section>
 
       {/* Build Smarter Decisions Section */}
-      <section className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 py-20">
+      <section className="relative z-10 bg-gradient-to-br from-blue-600/90 via-indigo-600/90 to-purple-600/90 py-20">
         <div className="mx-auto max-w-7xl px-4 text-center md:px-6">
           <h2 className="text-4xl font-bold text-white md:text-5xl lg:text-6xl">
             Build smarter decisions, faster
@@ -305,8 +318,8 @@ export default function ContactPage() {
       </section>
 
       {/* Social Media Section */}
-      <section className="bg-gray-50 py-16">
-        <div className="mx-auto max-w-7xl px-6 md:px-10 lg:px-16">
+      <section className="relative z-10 py-16">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
           <div className="rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 p-8 text-center shadow-xl md:p-12">
             <h3 className="text-2xl font-bold text-white md:text-3xl">Follow Us on Social Media</h3>
             <p className="mx-auto mt-4 max-w-2xl text-base text-gray-300">
@@ -335,6 +348,7 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+      </div>
 
       {/* Success Modal */}
       {success && (
