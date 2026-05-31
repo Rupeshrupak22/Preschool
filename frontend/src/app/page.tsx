@@ -549,11 +549,11 @@ export default function Home() {
                     className="relative z-10 h-full w-auto object-contain drop-shadow-[0_22px_26px_rgba(88,28,135,0.20)] transition duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_24px_rgba(168,85,247,0.40)]"
                   />
                   
-                  <span
+                  {/* <span
                     className={`absolute ${index % 2 === 0 ? "left-0" : "right-0"} bottom-8 z-20 rounded-2xl border border-white bg-white/92 px-3 py-2 text-sm font-black text-purple-700 shadow-[0_12px_28px_rgba(168,85,247,0.20)] transition duration-300 group-hover:-translate-y-1`}
                   >
                     {program.avatar}
-                  </span>
+                  </span> */}
                 </div>
               </a>
             ))}
