@@ -542,29 +542,11 @@ export default function Home() {
                 <div className="relative z-10 mx-auto mt-6 flex h-48 max-w-[168px] items-end justify-center sm:h-56">
                   <div className="absolute bottom-0 h-28 w-36 rounded-[32px] bg-white/72 shadow-[0_18px_40px_rgba(15,23,42,0.12)] transition duration-300 group-hover:scale-105 group-hover:shadow-[0_0_34px_rgba(34,211,238,0.30)]" />
                   
-                  {/* Try video first, fallback to image */}
-                  <video
-                    className="relative z-10 h-full w-auto object-contain rounded-[20px] drop-shadow-[0_22px_26px_rgba(88,28,135,0.20)] transition duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_24px_rgba(168,85,247,0.40)]"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    style={{ display: 'block' }}
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      const img = e.currentTarget.nextElementSibling as HTMLImageElement;
-                      if (img) img.style.display = 'block';
-                    }}
-                  >
-                    <source src={program.video} type="video/mp4" />
-                  </video>
-                  
-                  {/* Fallback image */}
+                  {/* Character image with transparent background */}
                   <img
                     src={program.image}
                     alt={`${program.title} student`}
                     className="relative z-10 h-full w-auto object-contain drop-shadow-[0_22px_26px_rgba(88,28,135,0.20)] transition duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_24px_rgba(168,85,247,0.40)]"
-                    style={{ display: 'none' }}
                   />
                   
                   <span
