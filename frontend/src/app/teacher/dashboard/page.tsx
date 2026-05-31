@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
+  ArrowLeft,
   Bell,
   BookOpenCheck,
   Calendar,
@@ -266,6 +267,17 @@ export default function TeacherDashboardPage() {
           </div>
         </div>
 
+        {/* Back to Main Site */}
+        <div className="px-4 pt-4">
+          <a
+            href="https://preschool-tau.vercel.app/"
+            className="flex w-full items-center gap-2 rounded-xl bg-gray-50 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Main Site
+          </a>
+        </div>
+
         {/* Nav Links */}
         <nav className="flex-1 px-4 py-4 space-y-1">
           {navItems.map((item) => (
@@ -512,6 +524,13 @@ export default function TeacherDashboardPage() {
       {/* ─── Mobile Bottom Navigation ───────────────────────────────────── */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-100 bg-white/95 backdrop-blur-md lg:hidden">
         <div className="flex items-center justify-around py-2.5 px-2">
+          <a
+            href="https://preschool-tau.vercel.app/"
+            className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-gray-400 hover:text-blue-600 transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span className="text-[10px] font-medium">Main Site</span>
+          </a>
           {navItems.map((item) => (
             <button
               key={item.id}
