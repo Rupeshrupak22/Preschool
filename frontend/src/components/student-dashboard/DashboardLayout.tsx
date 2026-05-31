@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import DashboardSidebar from "./DashboardSidebar";
 import FloatingAIBuddy from "./FloatingAIBuddy";
 import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
+import { useSessionHeartbeat } from "@/lib/use-session-heartbeat";
 
 interface Props {
   children: React.ReactNode;
@@ -17,6 +18,9 @@ export default function DashboardLayout({ children, activeSection }: Props) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isPublicLms = pathname === "/dashboard";
+
+  // Session heartbeat — auto-logout if session is cleared from another device
+  useSessionHeartbeat({ checkUrl: "/api/auth/me", loginUrl: "/login" });
 
   // Listen for logout from other tabs — redirect to login
   useEffect(() => {

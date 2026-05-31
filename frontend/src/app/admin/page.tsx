@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
+import { useSessionHeartbeat } from "@/lib/use-session-heartbeat";
 
 type Row = Record<string, unknown>;
 
@@ -259,6 +260,16 @@ export default function AdminPage() {
     setMounted(true);
     loadOverview();
   }, []);
+
+  // Session heartbeat — auto-logout if session is cleared from another device
+  useSessionHeartbeat({
+    checkUrl: "/api/auth/me",
+    loginUrl: "/admin",
+    onSessionLost: () => {
+      setOverview(null);
+      setShowLogin(true);
+    },
+  });
 
   // Listen for logout from other tabs
   useEffect(() => {

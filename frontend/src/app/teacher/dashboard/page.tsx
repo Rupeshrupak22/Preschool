@@ -18,6 +18,7 @@ import {
   Users
 } from "lucide-react";
 import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
+import { useSessionHeartbeat } from "@/lib/use-session-heartbeat";
 
 type TeacherDashboard = {
   teacher: {
@@ -96,6 +97,9 @@ export default function TeacherDashboardPage() {
   useEffect(() => {
     loadDashboard();
   }, []);
+
+  // Session heartbeat — auto-logout if session is cleared from another device
+  useSessionHeartbeat({ checkUrl: "/api/teacher/me", loginUrl: "/teacher/login" });
 
   // Listen for logout from other tabs — redirect to login
   useEffect(() => {

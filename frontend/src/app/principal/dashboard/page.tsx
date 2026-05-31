@@ -17,6 +17,7 @@ import {
   Users
 } from "lucide-react";
 import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
+import { useSessionHeartbeat } from "@/lib/use-session-heartbeat";
 
 type PrincipalDashboard = {
   principal: {
@@ -82,6 +83,9 @@ export default function PrincipalDashboardPage() {
   useEffect(() => {
     loadDashboard();
   }, []);
+
+  // Session heartbeat — auto-logout if session is cleared from another device
+  useSessionHeartbeat({ checkUrl: "/api/principal/me", loginUrl: "/principal/login" });
 
   // Listen for logout from other tabs — redirect to login
   useEffect(() => {
