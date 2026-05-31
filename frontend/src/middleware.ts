@@ -79,16 +79,10 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const session = await getActiveSession(request);
 
-  // Block login/signup pages if already logged in — redirect to their dashboard
-  if (LOGIN_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
-    if (session) {
-      const dashboard = DASHBOARD_BY_ROLE[session.role] || "/";
-      const url = request.nextUrl.clone();
-      url.pathname = dashboard;
-      url.searchParams.set("notice", "already_logged_in");
-      return NextResponse.redirect(url);
-    }
-  }
+  // Login pages are always accessible — never redirect away from them.
+  // The login pages themselves handle active session conflicts
+  // (showing "Clear Previous Sessions" prompt when needed).
+  // This ensures footer links always work: Teacher Access → /teacher/login, etc.
 
   // Protect API routes — enforce role-based access control
   for (const { prefix, allowedRoles } of PROTECTED_API_PATHS) {
