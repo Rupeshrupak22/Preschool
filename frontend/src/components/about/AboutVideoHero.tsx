@@ -87,9 +87,9 @@ export default function AboutVideoHero() {
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="none"
           src="/videos/about-video.mp4"
-          className="absolute inset-0 h-full w-full scale-[1.03] object-cover blur-[4px]"
+          className="absolute inset-0 h-full w-full scale-[1.03] object-cover blur-[4px] opacity-70"
           aria-hidden
         />
       </motion.div>

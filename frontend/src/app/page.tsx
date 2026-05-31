@@ -184,7 +184,7 @@ const heroPrograms: { title: string; range: string; icon: Icon; glow: string; av
     range: "Class 1-5",
     icon: BookOpen,
     glow: "from-fuchsia-400/25 via-purple-300/18 to-cyan-300/22",
-    avatar: "P",
+    avatar: "",
     image: "/assets/primary-student.png",
     video: "/primary.webm",
     subjects: [
@@ -238,7 +238,7 @@ const heroPrograms: { title: string; range: string; icon: Icon; glow: string; av
     range: "Class 6 to 8",
     icon: School,
     glow: "from-purple-400/25 via-pink-300/18 to-emerald-300/22",
-    avatar: "M",
+    avatar: "",
     image: "/assets/middle-student.png",
     video: "/middle.webm",
     subjects: [
@@ -281,7 +281,7 @@ const heroPrograms: { title: string; range: string; icon: Icon; glow: string; av
     range: "Class 9-12",
     icon: GraduationCap,
     glow: "from-cyan-400/25 via-blue-300/18 to-fuchsia-300/22",
-    avatar: "HS",
+    avatar: "",
     image: "/assets/highschool-student.png",
     video: "/highschool_nobg.mov",
     subjects: [
@@ -477,14 +477,15 @@ export default function Home() {
         muted
         loop
         playsInline
+        preload="none"
       >
         <source src="/newbackgroundvideohomepage.mp4" type="video/mp4" />
       </video>
 
-      <section id="top" className="relative !z-10 min-h-[92vh] overflow-hidden px-4 pt-10 md:px-6">
+      <section id="top" className="relative !z-10 min-h-[85vh] overflow-hidden px-4 pt-10 sm:min-h-[92vh] md:px-6">
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 pb-8 lg:grid-cols-[0.9fr_1.1fr]">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <h1 className="max-w-3xl text-5xl font-black leading-[0.96] tracking-tight text-slate-950 drop-shadow-[0_2px_0_rgba(255,255,255,0.9)] sm:text-6xl md:text-8xl">
+            <h1 className="max-w-3xl text-4xl font-black leading-[0.96] tracking-tight text-slate-950 drop-shadow-[0_2px_0_rgba(255,255,255,0.9)] sm:text-5xl md:text-6xl lg:text-8xl">
               Big Dreams <span className="block text-blue-700">Start Small</span>
             </h1>
             <p className="mt-7 max-w-2xl rounded-3xl border border-white/40 p-5 text-lg font-bold leading-8 text-slate-900 shadow-[0_8px_32px_rgba(31,38,135,0.1)] backdrop-blur-xl sm:text-xl md:text-2xl md:leading-9" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.20) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 8px 32px rgba(31,38,135,0.1)' }}>
@@ -526,7 +527,7 @@ export default function Home() {
                   e.preventDefault();
                   setSelectedProgram(program);
                 }}
-                className="group relative min-h-[390px] overflow-hidden rounded-[30px] border border-white/40 p-5 text-center shadow-[0_8px_32px_rgba(31,38,135,0.12)] backdrop-blur-xl transition duration-300 hover:-translate-y-3 hover:border-white/60 hover:shadow-[0_16px_48px_rgba(31,38,135,0.2)] sm:min-h-[455px] sm:rounded-[34px] sm:p-6"
+                className="group relative min-h-[320px] overflow-hidden rounded-[30px] border border-white/40 p-5 text-center shadow-[0_8px_32px_rgba(31,38,135,0.12)] backdrop-blur-xl transition duration-300 hover:-translate-y-3 hover:border-white/60 hover:shadow-[0_16px_48px_rgba(31,38,135,0.2)] sm:min-h-[390px] md:min-h-[455px] sm:rounded-[34px] sm:p-6"
                 style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.22) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 8px 32px rgba(31,38,135,0.12)' }}
               >
                 <div className={`absolute inset-x-4 bottom-4 top-24 rounded-[28px] bg-gradient-to-b ${program.glow} opacity-75 blur-sm transition duration-300 group-hover:scale-105 group-hover:opacity-100`} />
@@ -548,12 +549,6 @@ export default function Home() {
                     alt={`${program.title} student`}
                     className="relative z-10 h-full w-auto object-contain drop-shadow-[0_22px_26px_rgba(88,28,135,0.20)] transition duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_24px_rgba(168,85,247,0.40)]"
                   />
-                  
-                  {/* <span
-                    className={`absolute ${index % 2 === 0 ? "left-0" : "right-0"} bottom-8 z-20 rounded-2xl border border-white bg-white/92 px-3 py-2 text-sm font-black text-purple-700 shadow-[0_12px_28px_rgba(168,85,247,0.20)] transition duration-300 group-hover:-translate-y-1`}
-                  >
-                    {program.avatar}
-                  </span> */}
                 </div>
               </a>
             ))}
@@ -582,9 +577,9 @@ export default function Home() {
         </motion.div>
       </section>
 
-      <section id="curriculum" className="px-4 py-20 md:px-6 relative">
+      <section id="curriculum" className="px-4 py-24 md:px-6 relative">
         <div className="mx-auto max-w-7xl">
-          <div className="grid items-start gap-8 lg:grid-cols-[0.72fr_1fr]">
+          <div className="grid items-center gap-12 lg:grid-cols-[0.72fr_1fr]">
             <motion.div
               variants={fadeUp}
               initial="hidden"
@@ -605,21 +600,6 @@ export default function Home() {
                 Comprehensive learning pathways designed to equip students with essential 21st-century skills
                 through interactive, practical, and engaging classroom methodology.
               </p>
-          <div className="mt-7 grid max-w-md gap-4 sm:grid-cols-2">
-                {[
-                  ["20K+", "Students enrolled"],
-                  ["250+", "School workshops"]
-                ].map(([value, label]) => (
-                  <div
-                    key={label}
-                    className="rounded-2xl border border-white/40 p-5 text-center shadow-[0_4px_20px_rgba(31,38,135,0.1)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(168,85,247,0.2)] hover:border-purple-300/50"
-                    style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.25) 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 4px 20px rgba(31,38,135,0.1)' }}
-                  >
-                    <p className="text-2xl font-black text-slate-900">{value}</p>
-                    <p className="mt-1 text-xs font-bold text-slate-700">{label}</p>
-                  </div>
-                ))}
-              </div>
             </motion.div>
 
             <motion.div

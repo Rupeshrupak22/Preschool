@@ -11,13 +11,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const isPrincipalDashboard = pathname === "/principal/dashboard" || pathname.startsWith("/principal/dashboard/");
   const isTeacherDashboard = pathname === "/teacher/dashboard" || pathname.startsWith("/teacher/dashboard/") || pathname.startsWith("/teacher/dashboard-preview");
   const isOurApp = pathname === "/our";
-  const isAppRoute = isLmsRoute || isAdminRoute || isPrincipalDashboard || isTeacherDashboard || isOurApp;
+  const hideNav = isLmsRoute || isAdminRoute || isPrincipalDashboard || isTeacherDashboard;
 
   return (
     <>
-      {!isAppRoute && <SiteNavbar />}
-      <div className={isAppRoute ? undefined : "site-page-with-nav"}>{children}</div>
-      {!isAppRoute && <SiteFooter />}
+      {!hideNav && <SiteNavbar />}
+      <div className={hideNav ? undefined : "site-page-with-nav"}>{children}</div>
+      {!hideNav && !isOurApp && <SiteFooter />}
     </>
   );
 }

@@ -1,6 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -234,6 +232,18 @@ a {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Reduce backdrop-blur on low-power devices for better performance */
+@media (max-width: 768px) {
+  .backdrop-blur-xl {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+  .backdrop-blur-sm {
+    backdrop-filter: blur(2px) !important;
+    -webkit-backdrop-filter: blur(2px) !important;
   }
 }
 
@@ -603,7 +613,6 @@ video[autoplay] {
 .lms-tilt {
   transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.35s ease;
   transform-style: preserve-3d;
-  will-change: transform;
 }
 
 .lms-tilt:hover {
@@ -614,7 +623,6 @@ video[autoplay] {
 .lms-tilt-btn {
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
   transform-style: preserve-3d;
-  will-change: transform;
 }
 
 .lms-tilt-btn:hover {
@@ -630,7 +638,6 @@ video[autoplay] {
 .lms-tilt-feature {
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
   transform-style: preserve-3d;
-  will-change: transform;
 }
 
 .lms-tilt-feature:hover {

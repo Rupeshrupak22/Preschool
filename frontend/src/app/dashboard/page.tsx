@@ -118,7 +118,7 @@ export default function LMSPage() {
     <main className="lms-dashboard-page relative min-h-screen text-gray-900">
       {/* Video Background */}
       <div className="fixed inset-0 z-0 overflow-hidden">
-        <video autoPlay muted loop playsInline className="h-full w-full object-cover">
+        <video autoPlay muted loop playsInline preload="none" className="h-full w-full object-cover">
           <source src="/lms-bg.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-white/20" />
@@ -136,7 +136,7 @@ export default function LMSPage() {
                   <Sparkles className="h-5 w-5 text-cyan-600" />
                   AI-Powered Education Platform
                 </div>
-                <h1 className="lms-text-white text-5xl font-black leading-tight tracking-tight md:text-7xl">
+                <h1 className="lms-text-white text-3xl font-black leading-tight tracking-tight sm:text-5xl md:text-7xl">
                   <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Adyapan</span> LMS
                 </h1>
                 <p className="lms-text-white mt-6 max-w-xl text-lg font-bold leading-relaxed">
@@ -175,9 +175,6 @@ export default function LMSPage() {
 
               {/* Hero Video */}
               <div className="relative flex justify-center">
-                <div className="lms-tilt absolute -left-6 -top-6 z-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-[0_12px_30px_rgba(6,182,212,0.4)]">
-                  <Users className="h-8 w-8" />
-                </div>
                 <div className="lms-tilt relative overflow-hidden rounded-3xl border-4 border-white/80 shadow-[0_30px_80px_rgba(0,0,0,0.15)] inline-block">
                   <video
                     ref={videoRef}
@@ -199,9 +196,6 @@ export default function LMSPage() {
                     {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                   </button>
                 </div>
-                <div className="lms-tilt absolute -bottom-5 -right-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-[0_12px_30px_rgba(168,85,247,0.4)]">
-                  <GraduationCap className="h-8 w-8" />
-                </div>
               </div>
             </div>
           </div>
@@ -209,17 +203,17 @@ export default function LMSPage() {
 
         {/* Sticky Nav */}
         <div className="sticky top-24 z-40 mx-4 md:mx-auto md:max-w-3xl">
-          <div className="flex gap-2 rounded-2xl border border-white/50 bg-white/40 backdrop-blur-xl p-2 shadow-[0_12px_40px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.9)]" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
+          <div className="grid grid-cols-2 gap-2 rounded-2xl border border-white/50 bg-white/40 backdrop-blur-xl p-2 shadow-[0_12px_40px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.9)] sm:flex" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
             {[
               ["Overview", "overview"],
-              ["Student Features", "student-features"],
-              ["Teacher Features", "teacher-features"],
-              ["Exam Software", "exam-software"]
+              ["Students", "student-features"],
+              ["Teachers", "teacher-features"],
+              ["Exams", "exam-software"]
             ].map(([label, id], index) => (
               <button
                 key={id}
                 onClick={() => goTo(id)}
-                className={`lms-tilt-btn h-12 flex-1 rounded-xl text-xs font-black sm:text-sm ${
+                className={`lms-tilt-btn h-10 flex-1 rounded-xl text-xs font-black sm:h-12 sm:text-sm ${
                   index === 0 ? "bg-gradient-to-r from-cyan-600 to-blue-700 text-white shadow-md" : "text-gray-900 hover:bg-gradient-to-r hover:from-cyan-600 hover:to-blue-700 hover:text-white"
                 }`}
               >

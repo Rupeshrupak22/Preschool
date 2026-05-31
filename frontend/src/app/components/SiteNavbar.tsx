@@ -222,7 +222,7 @@ export default function SiteNavbar() {
               <a
                 key={item.label}
                 href={item.label === "LMS" ? "/dashboard" : item.href}
-                className={`inline-flex h-12 min-w-[94px] items-center justify-center whitespace-nowrap rounded-full px-3 text-[15px] font-black text-slate-950 transition hover:-translate-y-0.5 hover:bg-white/65 2xl:h-14 2xl:min-w-[108px] 2xl:px-5 2xl:text-[17px] ${
+                className={`inline-flex h-12 min-w-[80px] items-center justify-center whitespace-nowrap rounded-full px-2.5 text-[13px] font-black text-slate-950 transition hover:-translate-y-0.5 hover:bg-white/65 xl:min-w-[94px] xl:px-3 xl:text-[15px] 2xl:h-14 2xl:min-w-[108px] 2xl:px-5 2xl:text-[17px] ${
                   active
                     ? "bg-gradient-to-r from-[#ffd84d] to-[#ff9f2f] shadow-[0_12px_24px_rgba(249,158,47,0.35)]"
                     : ""

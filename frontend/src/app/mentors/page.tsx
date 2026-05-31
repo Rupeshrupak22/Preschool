@@ -87,7 +87,7 @@ export default function MentorsPage() {
     <main className="min-h-screen overflow-hidden text-slate-950 relative">
       {/* Full-page video background */}
       <div className="fixed inset-0 -z-10">
-        <video autoPlay muted loop playsInline className="h-full w-full object-cover opacity-80">
+        <video autoPlay muted loop playsInline preload="none" className="h-full w-full object-cover opacity-80">
           <source src="/mentor-bg.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0" />
@@ -107,7 +107,7 @@ export default function MentorsPage() {
               AI-Powered Education Platform
             </div>
 
-            <h1 className="text-5xl font-black leading-[1.05] tracking-tight text-white md:text-6xl lg:text-7xl">
+            <h1 className="text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
               Where Learning
               <br />
               <span className="bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 bg-clip-text text-transparent">

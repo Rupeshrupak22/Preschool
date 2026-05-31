@@ -84,7 +84,7 @@ export default function OverviewPage() {
     <main className="min-h-screen overflow-hidden text-slate-950 relative">
       {/* Full-page background */}
       <div className="fixed inset-0 -z-10">
-        <video autoPlay muted loop playsInline className="h-full w-full object-cover opacity-80">
+        <video autoPlay muted loop playsInline preload="none" className="h-full w-full object-cover opacity-80">
           <source src="/overview-bg.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0" />
@@ -104,7 +104,7 @@ export default function OverviewPage() {
               ADYAPAN Platform Overview
             </div>
 
-            <h1 className="text-5xl font-black leading-[1.05] tracking-tight text-black md:text-6xl lg:text-7xl">
+            <h1 className="text-4xl font-black leading-[1.05] tracking-tight text-black sm:text-5xl md:text-6xl lg:text-7xl">
               One connected
               <br />
               system for
@@ -182,7 +182,7 @@ export default function OverviewPage() {
               The platform is built to answer the most important parent and school question: what is the child learning,
               where are they improving, and what should happen next?
             </p>
-            <div className="mt-8 grid grid-cols-3 gap-3">
+            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
               {stats.map(([value, label]) => (
                 <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm text-center">
                   <p className="text-2xl font-black text-white">{value}</p>
@@ -263,6 +263,7 @@ export default function OverviewPage() {
               loop
               muted
               playsInline
+              preload="none"
               className="mx-auto h-72 w-auto rounded-2xl object-contain shadow-lg"
             >
               <source src="/overview_video.mp4" type="video/mp4" />

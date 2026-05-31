@@ -59,7 +59,7 @@ export default function MentorPage() {
     <main className="min-h-screen overflow-hidden text-slate-950 relative">
       {/* Full-page video background */}
       <div className="fixed inset-0 -z-10">
-        <video autoPlay muted loop playsInline className="h-full w-full object-cover opacity-80">
+        <video autoPlay muted loop playsInline preload="none" className="h-full w-full object-cover opacity-80">
           <source src="/mentor-bg.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0" />
