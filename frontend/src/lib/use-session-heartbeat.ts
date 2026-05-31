@@ -1,26 +1,24 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 /**
- * Session heartbeat — periodically checks if the session is still valid.
- * If the session was cleared (e.g. from another device or another browser),
- * forces logout immediately.
+ * Session heartbeat with INACTIVITY-BASED auto-logout.
  *
- * Works across:
- * - Different devices (Device A vs Device B)
- * - Same device, different browsers (Chrome vs Brave)
- * - Same browser, different tabs (handled by BroadcastChannel separately)
+ * How it works:
+ * - Tracks user activity (mouse, keyboard, clicks, scroll, touch)
+ * - If the user is ACTIVE → heartbeat pings the backend every 60s to keep session alive
+ * - If the user is INACTIVE for 15 minutes → stops pinging, forces logout
  *
- * The heartbeat runs every 10 seconds and also fires immediately on:
- * - Component mount (catches stale sessions on page load)
- * - Tab becoming visible (user switches back to this tab)
+ * The backend session also expires after 15 min of no API calls (sliding window),
+ * so both frontend and backend are in sync.
  *
- * IMPORTANT: Pass `enabled: false` when the user is not logged in
- * (e.g. login form is showing) to prevent redirect loops.
+ * Works for all roles: student, teacher, principal, admin.
  */
 
-const HEARTBEAT_INTERVAL_MS = 10_000; // Check every 10 seconds
+const INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+const HEARTBEAT_INTERVAL_MS = 60_000; // Ping backend every 60s (only when active)
+const ACTIVITY_THROTTLE_MS = 30_000; // Only update "last active" timestamp every 30s to avoid excessive writes
 
 type Options = {
   /** API endpoint to check session validity */
@@ -41,67 +39,162 @@ export function useSessionHeartbeat(options: Options = {}) {
     onSessionLost,
   } = options;
 
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastActivityRef = useRef<number>(Date.now());
+  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const redirectingRef = useRef(false);
+  const throttleRef = useRef<number>(0);
+
+  // ─── Force logout ──────────────────────────────────────────────────────────
+  const forceLogout = useCallback(() => {
+    if (redirectingRef.current) return;
+    redirectingRef.current = true;
+    if (onSessionLost) onSessionLost();
+    window.location.href = loginUrl;
+  }, [loginUrl, onSessionLost]);
+
+  // ─── Check session with backend ───────────────────────────────────────────
+  const checkSession = useCallback(async () => {
+    if (redirectingRef.current) return;
+
+    try {
+      const res = await fetch(checkUrl, { cache: "no-store" });
+      if (redirectingRef.current) return;
+
+      if (res.status === 401) {
+        // Session is gone on backend — force logout
+        forceLogout();
+      }
+    } catch {
+      // Network error — don't logout, just skip this check
+    }
+  }, [checkUrl, forceLogout]);
+
+  // ─── Reset inactivity timer ────────────────────────────────────────────────
+  const resetInactivityTimer = useCallback(() => {
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+    }
+    inactivityTimerRef.current = setTimeout(() => {
+      // User has been inactive for 15 minutes — force logout
+      forceLogout();
+    }, INACTIVITY_TIMEOUT_MS);
+  }, [forceLogout]);
+
+  // ─── Handle user activity ──────────────────────────────────────────────────
+  const handleActivity = useCallback(() => {
+    const now = Date.now();
+
+    // Throttle: only process activity events every 30 seconds
+    if (now - throttleRef.current < ACTIVITY_THROTTLE_MS) return;
+    throttleRef.current = now;
+
+    lastActivityRef.current = now;
+    resetInactivityTimer();
+  }, [resetInactivityTimer]);
 
   useEffect(() => {
-    // Don't run heartbeat if disabled (user not logged in)
     if (!enabled) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+      // Clean up everything if disabled
+      if (heartbeatRef.current) {
+        clearInterval(heartbeatRef.current);
+        heartbeatRef.current = null;
+      }
+      if (inactivityTimerRef.current) {
+        clearTimeout(inactivityTimerRef.current);
+        inactivityTimerRef.current = null;
       }
       return;
     }
 
     let active = true;
     redirectingRef.current = false;
+    lastActivityRef.current = Date.now();
+    throttleRef.current = 0;
 
-    async function checkSession() {
-      if (redirectingRef.current) return;
+    // ─── Activity listeners ────────────────────────────────────────────────
+    const activityEvents = [
+      "mousemove",
+      "mousedown",
+      "keydown",
+      "scroll",
+      "touchstart",
+      "touchmove",
+      "click",
+      "wheel",
+    ];
 
-      try {
-        const res = await fetch(checkUrl, { cache: "no-store" });
+    for (const event of activityEvents) {
+      document.addEventListener(event, handleActivity, { passive: true });
+    }
 
-        if (!active || redirectingRef.current) return;
+    // ─── Start inactivity timer ────────────────────────────────────────────
+    resetInactivityTimer();
 
-        if (res.status === 401) {
-          // Session is gone — force logout immediately
-          redirectingRef.current = true;
-          if (onSessionLost) onSessionLost();
-          window.location.href = loginUrl;
-        }
-      } catch {
-        // Network error — don't logout, just skip this check
+    // ─── Heartbeat: only ping backend if user was recently active ───────────
+    async function heartbeat() {
+      if (!active || redirectingRef.current) return;
+
+      const timeSinceActivity = Date.now() - lastActivityRef.current;
+
+      // Only ping if user was active within the last 14 minutes
+      // (gives 1 minute buffer before the 15-min backend timeout)
+      if (timeSinceActivity < INACTIVITY_TIMEOUT_MS - 60_000) {
+        await checkSession();
       }
     }
 
-    // Check immediately on mount — catches stale sessions right away
+    // Check immediately on mount
     checkSession();
 
     // Start periodic heartbeat
-    intervalRef.current = setInterval(checkSession, HEARTBEAT_INTERVAL_MS);
+    heartbeatRef.current = setInterval(heartbeat, HEARTBEAT_INTERVAL_MS);
 
-    // Also check immediately when tab becomes visible (user switches back)
+    // ─── Visibility change: check session when tab becomes visible ─────────
     function handleVisibilityChange() {
       if (document.visibilityState === "visible") {
-        checkSession();
+        const timeSinceActivity = Date.now() - lastActivityRef.current;
+
+        if (timeSinceActivity >= INACTIVITY_TIMEOUT_MS) {
+          // User was away for 15+ minutes — force logout
+          forceLogout();
+        } else {
+          // Tab is back — mark as active and check session
+          lastActivityRef.current = Date.now();
+          resetInactivityTimer();
+          checkSession();
+        }
       }
     }
 
-    // Also check when window regains focus (covers alt-tab scenarios)
     function handleFocus() {
-      checkSession();
+      const timeSinceActivity = Date.now() - lastActivityRef.current;
+
+      if (timeSinceActivity >= INACTIVITY_TIMEOUT_MS) {
+        forceLogout();
+      } else {
+        lastActivityRef.current = Date.now();
+        resetInactivityTimer();
+        checkSession();
+      }
     }
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("focus", handleFocus);
 
+    // ─── Cleanup ───────────────────────────────────────────────────────────
     return () => {
       active = false;
-      if (intervalRef.current) clearInterval(intervalRef.current);
+
+      for (const event of activityEvents) {
+        document.removeEventListener(event, handleActivity);
+      }
+
+      if (heartbeatRef.current) clearInterval(heartbeatRef.current);
+      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("focus", handleFocus);
     };
-  }, [checkUrl, loginUrl, enabled, onSessionLost]);
+  }, [checkUrl, loginUrl, enabled, onSessionLost, handleActivity, resetInactivityTimer, checkSession, forceLogout]);
 }
