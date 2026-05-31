@@ -9,7 +9,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const isLmsRoute = pathname === "/student-dashboard" || pathname.startsWith("/student-dashboard/");
   const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
   const isPrincipalDashboard = pathname === "/principal/dashboard" || pathname.startsWith("/principal/dashboard/");
-  const isTeacherDashboard = pathname === "/teacher/dashboard" || pathname.startsWith("/teacher/dashboard/");
+  const isTeacherDashboard = pathname === "/teacher/dashboard" || pathname.startsWith("/teacher/dashboard/") || pathname.startsWith("/teacher/dashboard-preview");
   const isOurApp = pathname === "/our";
   const isAppRoute = isLmsRoute || isAdminRoute || isPrincipalDashboard || isTeacherDashboard || isOurApp;
 

@@ -1,60 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Bell,
-  BookOpenCheck,
-  Calendar,
-  CheckSquare,
-  Compass,
-  Copy,
-  FileText,
-  Gamepad2,
-  Home,
-  LogOut,
-  Map,
-  MessageCircle,
-  MonitorPlay,
-  RefreshCw,
   Search,
-  Trophy,
-  Upload,
   Users,
   Video,
-  Wifi,
+  MessageCircle,
+  Calendar,
+  Upload,
+  MonitorPlay,
   BarChart3,
+  FileText,
+  CheckSquare,
   BookOpen,
+  Gamepad2,
+  Compass,
+  Home,
+  BookOpenCheck,
+  Map,
+  Trophy,
+  Wifi,
+  Copy,
+  Menu,
+  LogOut,
 } from "lucide-react";
-import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
-import { useSessionHeartbeat } from "@/lib/use-session-heartbeat";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-type TeacherDashboard = {
-  teacher: {
-    id: string;
-    name: string;
-    email: string;
-    schoolId: string;
-    schoolName: string;
-    subject?: string | null;
-    phone?: string | null;
-    assignedClasses: string[];
-    lastLoginAt?: string | null;
-  };
-  stats: {
-    students: number;
-    classes: number;
-    upcomingClasses: number;
-    certificates: number;
-    activeLogins: number;
-  };
-  classBreakdown: Array<{ classLevel: string; total: number }>;
-  students: Array<Record<string, string | number | null>>;
-  schedule: Array<Record<string, string | number | null>>;
-  logins: Array<Record<string, string | number | null>>;
-  certificates: Array<Record<string, string | number | null>>;
+// ─── Mock Data ───────────────────────────────────────────────────────────────
+const mockTeacher = {
+  name: "Charan",
+  email: "charan@gmail.com",
+  uid: "charan@gmail.com",
 };
 
+const mockStats = {
+  students: 0,
+  liveClass: 2,
+  pending: 0,
+};
+
+const mockLiveSession = {
+  active: true,
+  title: "Go Live: Stream on Classroom Smartboards",
+  description:
+    "Launch real-time interactive lectures & sync skills onto classroom devices.",
+};
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 type QuickAccessCard = {
   icon: React.ReactNode;
   title: string;
@@ -140,7 +132,7 @@ const academicsCards: QuickAccessCard[] = [
   },
 ];
 
-// ─── Nav Items ───────────────────────────────────────────────────────────────
+// ─── Bottom / Sidebar Nav Items ──────────────────────────────────────────────
 const navItems = [
   { id: "home" as const, icon: Home, label: "Home" },
   { id: "syllabus" as const, icon: BookOpenCheck, label: "Syllabus" },
@@ -157,99 +149,11 @@ function getGreeting() {
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
-export default function TeacherDashboardPage() {
-  const [dashboard, setDashboard] = useState<TeacherDashboard | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState("");
+export default function TeacherDashboardPreview() {
   const [activeTab, setActiveTab] = useState<"classroom" | "academics">("classroom");
   const [activeNav, setActiveNav] = useState<string>("home");
 
-  async function loadDashboard() {
-    setLoading(true);
-    setStatus("");
-    const response = await fetch("/api/teacher/dashboard", { cache: "no-store" });
-    const data = await response.json().catch(() => ({}));
-
-    if (response.status === 401) {
-      window.location.href = "/teacher/login";
-      return;
-    }
-
-    if (!response.ok) {
-      setStatus(data.error ?? "Teacher dashboard could not be loaded.");
-      setLoading(false);
-      return;
-    }
-
-    setDashboard(data);
-    setLoading(false);
-  }
-
-  async function logout() {
-    await fetch("/api/teacher/logout", { method: "POST" });
-    broadcastLogout();
-    window.location.href = "/teacher/login";
-  }
-
-  useEffect(() => {
-    loadDashboard();
-  }, []);
-
-  // Session heartbeat — auto-logout if session is cleared from another device
-  useSessionHeartbeat({ checkUrl: "/api/teacher/me", loginUrl: "/teacher/login", enabled: !!dashboard });
-
-  // Listen for logout from other tabs — redirect to login
-  useEffect(() => {
-    const cleanup = onAuthChange((message) => {
-      if (message.type === "logout") {
-        window.location.href = "/teacher/login";
-      }
-    });
-    return cleanup;
-  }, []);
-
-  // ─── Loading State ─────────────────────────────────────────────────────────
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50/40">
-        <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-100">
-          <RefreshCw className="mx-auto h-8 w-8 animate-spin text-blue-600" />
-          <p className="mt-4 text-sm font-semibold text-gray-600">Loading teacher dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // ─── Error State ───────────────────────────────────────────────────────────
-  if (!dashboard) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50/40">
-        <div className="max-w-md rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-100">
-          <p className="text-base font-bold text-gray-900">{status || "Dashboard not available."}</p>
-          <a
-            href="/teacher/login"
-            className="mt-5 inline-flex rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
-          >
-            Back to Login
-          </a>
-        </div>
-      </div>
-    );
-  }
-
-  // ─── Derive dynamic card data from API ─────────────────────────────────────
-  const dynamicClassroomCards = classroomCards.map((card) => {
-    if (card.title === "My Students") {
-      return {
-        ...card,
-        badge: `${dashboard.stats.students} Students`,
-        subtitle: dashboard.stats.students > 0 ? "View linked students" : "No students linked yet",
-      };
-    }
-    return card;
-  });
-
-  const cards = activeTab === "classroom" ? dynamicClassroomCards : academicsCards;
+  const cards = activeTab === "classroom" ? classroomCards : academicsCards;
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50/40">
@@ -288,17 +192,13 @@ export default function TeacherDashboardPage() {
         <div className="border-t border-gray-100 px-4 py-4">
           <div className="flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-400 text-sm font-bold text-white">
-              {dashboard.teacher.name.charAt(0)}
+              {mockTeacher.name.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">{dashboard.teacher.name}</p>
-              <p className="text-[11px] text-gray-500 truncate">{dashboard.teacher.email}</p>
+              <p className="text-sm font-semibold text-gray-900 truncate">{mockTeacher.name}</p>
+              <p className="text-[11px] text-gray-500 truncate">{mockTeacher.email}</p>
             </div>
-            <button
-              onClick={logout}
-              className="text-gray-400 hover:text-red-500 transition-colors"
-              title="Logout"
-            >
+            <button className="text-gray-400 hover:text-red-500 transition-colors">
               <LogOut className="h-4 w-4" />
             </button>
           </div>
@@ -315,33 +215,25 @@ export default function TeacherDashboardPage() {
               <div className="flex items-center gap-3">
                 {/* Mobile avatar */}
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-orange-400 text-lg font-bold text-white shadow-md lg:hidden">
-                  {dashboard.teacher.name.charAt(0)}
+                  {mockTeacher.name.charAt(0)}
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">{getGreeting()},</p>
-                  <h1 className="text-lg font-bold text-gray-900 md:text-xl">{dashboard.teacher.name}</h1>
+                  <h1 className="text-lg font-bold text-gray-900 md:text-xl">{mockTeacher.name}</h1>
                 </div>
               </div>
 
-              {/* Right: UID + Bell + Logout (mobile) */}
+              {/* Right: UID + Bell */}
               <div className="flex items-center gap-3">
                 {/* UID Badge - hidden on small mobile */}
                 <div className="hidden sm:flex items-center gap-1.5 rounded-full bg-gray-50 px-3 py-2 text-xs font-medium text-gray-600 ring-1 ring-gray-100">
                   <span className="text-[10px] uppercase tracking-wider text-gray-400">Your UID</span>
-                  <span className="font-semibold text-gray-800">{dashboard.teacher.email}</span>
+                  <span className="font-semibold text-gray-800">{mockTeacher.uid}</span>
                   <Copy className="h-3 w-3 text-gray-400 cursor-pointer hover:text-blue-500" />
                 </div>
                 <button className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 ring-1 ring-gray-100 hover:bg-gray-100 transition-colors">
                   <Bell className="h-5 w-5 text-orange-400" />
                   <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white" />
-                </button>
-                {/* Mobile logout */}
-                <button
-                  onClick={logout}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 ring-1 ring-gray-100 hover:bg-red-50 hover:ring-red-200 transition-colors lg:hidden"
-                  title="Logout"
-                >
-                  <LogOut className="h-4 w-4 text-gray-500" />
                 </button>
               </div>
             </div>
@@ -356,7 +248,7 @@ export default function TeacherDashboardPage() {
               </div>
               {/* UID on mobile */}
               <div className="flex sm:hidden items-center gap-1 rounded-full bg-gray-50 px-2.5 py-1.5 text-[11px] font-medium text-gray-600 ring-1 ring-gray-100">
-                <span className="font-semibold text-gray-800 truncate max-w-[120px]">{dashboard.teacher.email}</span>
+                <span className="font-semibold text-gray-800 truncate max-w-[120px]">{mockTeacher.uid}</span>
                 <Copy className="h-3 w-3 text-gray-400" />
               </div>
             </div>
@@ -376,7 +268,7 @@ export default function TeacherDashboardPage() {
           </div>
 
           {/* Live Session Banner */}
-          {dashboard.stats.upcomingClasses > 0 && (
+          {mockLiveSession.active && (
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 p-5 md:p-6 text-white shadow-lg shadow-blue-200/40">
               <div className="flex items-start gap-4">
                 <div className="mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/20">
@@ -390,11 +282,9 @@ export default function TeacherDashboardPage() {
                     <span className="text-xs text-blue-100">Interactive Presenter</span>
                   </div>
                   <h3 className="mt-2 text-base font-bold leading-snug md:text-lg">
-                    Go Live: Stream on Classroom Smartboards
+                    {mockLiveSession.title}
                   </h3>
-                  <p className="mt-1 text-sm text-blue-100 max-w-lg">
-                    Launch real-time interactive lectures & sync skills onto classroom devices.
-                  </p>
+                  <p className="mt-1 text-sm text-blue-100 max-w-lg">{mockLiveSession.description}</p>
                   <div className="mt-4 flex flex-wrap gap-3">
                     <button className="flex items-center gap-2 rounded-full bg-gray-900/80 px-5 py-2.5 text-xs font-semibold text-white hover:bg-gray-900 transition-colors">
                       <span className="h-2 w-2 rounded-full bg-white" />
@@ -421,7 +311,7 @@ export default function TeacherDashboardPage() {
             <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-white p-4 md:p-5 shadow-sm ring-1 ring-gray-100">
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-orange-500" />
-                <span className="text-2xl font-bold text-gray-900 md:text-3xl">{dashboard.stats.students}</span>
+                <span className="text-2xl font-bold text-gray-900 md:text-3xl">{mockStats.students}</span>
               </div>
               <span className="text-[11px] font-medium uppercase tracking-wider text-gray-400">
                 Students
@@ -430,7 +320,7 @@ export default function TeacherDashboardPage() {
             <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-white p-4 md:p-5 shadow-sm ring-1 ring-gray-100">
               <div className="flex items-center gap-2">
                 <Video className="h-5 w-5 text-blue-500" />
-                <span className="text-2xl font-bold text-gray-900 md:text-3xl">{dashboard.stats.upcomingClasses}</span>
+                <span className="text-2xl font-bold text-gray-900 md:text-3xl">{mockStats.liveClass}</span>
               </div>
               <span className="text-[11px] font-medium uppercase tracking-wider text-gray-400">
                 Live Class
@@ -439,7 +329,7 @@ export default function TeacherDashboardPage() {
             <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-white p-4 md:p-5 shadow-sm ring-1 ring-gray-100">
               <div className="flex items-center gap-2">
                 <MessageCircle className="h-5 w-5 text-green-500" />
-                <span className="text-2xl font-bold text-gray-900 md:text-3xl">0</span>
+                <span className="text-2xl font-bold text-gray-900 md:text-3xl">{mockStats.pending}</span>
               </div>
               <span className="text-[11px] font-medium uppercase tracking-wider text-gray-400">
                 Pending
