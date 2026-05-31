@@ -9,7 +9,7 @@ import {
   updateAccessKeyHash
 } from "@/lib/db";
 import { verifyPassword, hashPassword } from "@/lib/password";
-import { activeCookieSessions, clearAuthCookies, signToken } from "@/lib/security";
+import { clearAuthCookies, signToken } from "@/lib/security";
 import { principalLoginSchema } from "@/lib/validators";
 
 function clientIp(request: Request) {
@@ -21,16 +21,6 @@ export async function POST(request: Request) {
 
   if (!payload.success) {
     return NextResponse.json({ error: "Enter email, password, school key, and CAPTCHA." }, { status: 400 });
-  }
-
-  // Enforce single-session: block login if another role is already active
-  const sessions = await activeCookieSessions();
-  if (sessions.length > 0) {
-    const active = sessions[0].session;
-    return NextResponse.json(
-      { error: `You are already logged in as ${active.role} (${active.email}). Please logout first before signing into another account.` },
-      { status: 409 }
-    );
   }
 
   const principal = await findPrincipalByEmail(payload.data.email);

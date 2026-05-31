@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import { createActiveSession, findActiveSession, findUserByEmail, isMysqlConfigured, recordLoginEvent, updatePasswordHash } from "@/lib/db";
 import { verifyPassword, hashPassword } from "@/lib/password";
-import { activeCookieSessions, clearAuthCookies, signToken } from "@/lib/security";
+import { clearAuthCookies, signToken } from "@/lib/security";
 import { publicUser } from "@/lib/store";
 import { loginSchema } from "@/lib/validators";
 
@@ -11,20 +11,6 @@ export async function POST(request: Request) {
 
   if (!payload.success) {
     return NextResponse.json({ error: "Enter a valid email, password, and CAPTCHA." }, { status: 400 });
-  }
-
-  // Enforce single-session: block login if another role is already active
-  const sessions = await activeCookieSessions();
-  if (sessions.length > 0) {
-    const active = sessions[0].session;
-    return NextResponse.json(
-      {
-        error: `You are already logged in as ${active.role} (${active.email}). Please logout first before signing into another account.`,
-        code: "ACTIVE_SESSION_EXISTS",
-        action: "CLEAR_PREVIOUS_SESSIONS_AND_RELOGIN"
-      },
-      { status: 409 }
-    );
   }
 
   // Only users registered in the database can login — no self-registration
