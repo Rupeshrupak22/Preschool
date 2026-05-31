@@ -40,15 +40,25 @@ export default function ContactPage() {
             backgroundImage: "url('/contactus.jpeg')",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/40 via-indigo-900/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/45 via-blue-950/25 to-transparent" />
+        <div className="absolute inset-0 backdrop-blur-[3px]" />
         
-        <div className="relative mx-auto max-w-7xl px-6 py-12 md:px-10 lg:px-16 lg:py-16">
-          <h1 className="max-w-3xl text-3xl font-bold leading-tight text-white md:text-4xl lg:text-5xl">
-            Get in touch with our team
-          </h1>
-          <p className="mt-4 max-w-2xl text-base text-white/90 md:text-lg">
-            Have a question about our courses, classes, or school support? Reach out - our team responds within 24 hours.
-          </p>
+        <div className="relative mx-auto w-full max-w-7xl px-4 py-12 md:px-6 lg:py-16">
+          <div className="max-w-4xl">
+            <div className="mb-7 inline-flex items-center gap-3 rounded-full border border-white/55 bg-white/25 px-6 py-3 text-sm font-extrabold text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_14px_40px_rgba(15,23,42,0.2)] backdrop-blur-xl md:text-base">
+              <Sparkles className="h-5 w-5 text-sky-500" />
+              Contact ADYAPAN
+            </div>
+            <h1 className="max-w-4xl text-[46px] font-black leading-[1.05] tracking-normal text-white drop-shadow-[0_6px_24px_rgba(15,23,42,0.45)] sm:text-[58px] md:text-[72px] lg:text-[86px]">
+              <span className="bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-500 bg-clip-text text-transparent">
+                Get in touch
+              </span>{" "}
+              with our team
+            </h1>
+            <p className="mt-6 max-w-3xl text-lg font-extrabold leading-8 text-white drop-shadow-[0_4px_18px_rgba(15,23,42,0.5)] md:text-2xl md:leading-10">
+              Have a question about our courses, classes, or school support? Reach out - our team responds within 24 hours.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -235,9 +245,24 @@ export default function ContactPage() {
 
       {/* Map Section */}
       <section className="relative z-10 py-16">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <h2 className="mb-8 text-center text-3xl font-bold text-gray-900 md:text-4xl">Find Us</h2>
-          <div className="relative overflow-hidden rounded-2xl shadow-xl">
+        <div className="pointer-events-none absolute inset-0 bg-white/55" />
+        <div className="relative mx-auto max-w-[1400px] px-4 md:px-6">
+          <div className="mx-auto mb-8 rounded-[32px] border border-white/50 bg-white/45 px-6 py-6 text-center shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-[18px] md:px-10 md:py-10 lg:px-16 lg:py-12">
+            <h2
+              className="text-[40px] font-black leading-none md:text-[56px] lg:text-[72px]"
+              style={{ textShadow: "0 4px 20px rgba(0,0,0,0.12)" }}
+            >
+              <span className="bg-gradient-to-r from-[#67e8f9] via-[#38bdf8] to-[#3b82f6] bg-clip-text text-transparent">
+                Find
+              </span>{" "}
+              <span className="text-[#0f172a]">Us</span>
+            </h2>
+            {/* <p className="mx-auto mt-5 max-w-[900px] text-lg font-medium leading-[1.7] text-[#334155] md:text-2xl">
+              Visit our campus and discover a future-ready learning environment designed to help students grow through innovation, technology, and real-world skills.
+            </p> */}
+          </div>
+
+          <div className="relative overflow-hidden rounded-[32px] shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.844789!2d78.399023!3d17.413497!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb9158edcba987%3A0x123456789abcdef0!2sSattva%20Magnus%2C%20behind%20Reliance%20Bazaar%20Shaikpet%2C%20Sabza%20Colony%2C%20Ambedkar%20Nagar%2C%20Toli%20Chowki%2C%20Hyderabad%2C%20Telangana%20500008!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin"
               width="100%"
@@ -247,7 +272,7 @@ export default function ContactPage() {
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               title="ADYAPAN Office Location"
-              className="w-full"
+              className="h-[320px] w-full md:h-[400px] lg:h-[500px]"
             />
             <a
               href="https://www.google.com/maps?um=1&ie=UTF-8&fb=1&gl=in&sa=X&geocode=KdkGZDKLl8s7MSJtLa_4zSEV&daddr=Sattva+Magnus,+behind+Reliance+Bazaar+Shaikpet,+Sabza+Colony,+Ambedkar+Nagar,+Toli+Chowki,+Hyderabad,+Telangana+500008"
@@ -320,30 +345,33 @@ export default function ContactPage() {
       {/* Social Media Section */}
       <section className="relative z-10 py-16">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <div className="rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 p-8 text-center shadow-xl md:p-12">
-            <h3 className="text-2xl font-bold text-white md:text-3xl">Follow Us on Social Media</h3>
-            <p className="mx-auto mt-4 max-w-2xl text-base text-gray-300">
-              Stay connected with ADYAPAN for the latest updates, educational content, and community insights.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-              <a
-                href="https://www.instagram.com/adyapanschool/"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-6 py-3 text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
-              >
-                <Instagram className="h-5 w-5" />
-                Instagram
-              </a>
-              <a
-                href="https://www.linkedin.com/company/adyapan-edutech-pvt-ltd/posts/?feedView=all"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-6 py-3 text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
-              >
-                <Linkedin className="h-5 w-5" />
-                LinkedIn
-              </a>
+          <div className="relative">
+            <div className="absolute inset-x-8 -inset-y-6 -z-10 rounded-[32px] bg-blue-400/25 blur-3xl" />
+            <div className="rounded-[32px] border border-white/25 bg-gradient-to-br from-[#14b8e6] via-[#1d9bf0] to-[#2563eb] p-8 text-center shadow-[0_20px_60px_rgba(37,99,235,0.25)] transition duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_28px_80px_rgba(37,99,235,0.32)] md:p-12">
+              <h3 className="text-2xl font-black text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.15)] md:text-3xl">Follow Us on Social Media</h3>
+              <p className="mx-auto mt-4 max-w-2xl text-base text-white/90">
+                Stay connected with ADYAPAN for the latest updates, educational content, and community insights.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                <a
+                  href="https://www.instagram.com/adyapanschool/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/25 bg-white/[0.18] px-6 py-3 text-base font-semibold text-white shadow-sm backdrop-blur-[12px] transition duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:bg-white/25 hover:shadow-[0_15px_35px_rgba(0,0,0,0.15)]"
+                >
+                  <Instagram className="h-5 w-5" />
+                  Instagram
+                </a>
+                <a
+                  href="https://www.linkedin.com/company/adyapan-edutech-pvt-ltd/posts/?feedView=all"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/25 bg-white/[0.18] px-6 py-3 text-base font-semibold text-white shadow-sm backdrop-blur-[12px] transition duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:bg-white/25 hover:shadow-[0_15px_35px_rgba(0,0,0,0.15)]"
+                >
+                  <Linkedin className="h-5 w-5" />
+                  LinkedIn
+                </a>
+              </div>
             </div>
           </div>
         </div>
