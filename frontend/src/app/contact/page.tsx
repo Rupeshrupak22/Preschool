@@ -42,7 +42,7 @@ export default function ContactPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/40 via-indigo-900/30 to-transparent" />
         
-        <div className="relative mx-auto max-w-7xl px-4 py-12 md:px-6 lg:py-16">
+        <div className="relative mx-auto max-w-7xl px-6 py-12 md:px-10 lg:px-16 lg:py-16">
           <h1 className="max-w-3xl text-3xl font-bold leading-tight text-white md:text-4xl lg:text-5xl">
             Get in touch with our team
           </h1>
@@ -53,7 +53,7 @@ export default function ContactPage() {
       </section>
 
       {/* Two Column Layout - Company Information & Personal Information */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6 lg:py-24">
+      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16 lg:py-24">
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
           
           {/* Left Column - Company Information Box */}
@@ -222,7 +222,7 @@ export default function ContactPage() {
 
       {/* Map Section */}
       <section className="bg-gray-50 py-16">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
+        <div className="mx-auto max-w-7xl px-6 md:px-10 lg:px-16">
           <h2 className="mb-8 text-center text-3xl font-bold text-gray-900 md:text-4xl">Find Us</h2>
           <div className="relative overflow-hidden rounded-2xl shadow-xl">
             <iframe
@@ -249,7 +249,7 @@ export default function ContactPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6 lg:py-24">
+      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16 lg:py-24">
         <h2 className="mb-8 text-center text-3xl font-bold text-gray-900 md:text-4xl">Frequently Asked Questions</h2>
         <div className="mx-auto grid max-w-3xl gap-4">
           <button
@@ -306,7 +306,7 @@ export default function ContactPage() {
 
       {/* Social Media Section */}
       <section className="bg-gray-50 py-16">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
+        <div className="mx-auto max-w-7xl px-6 md:px-10 lg:px-16">
           <div className="rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 p-8 text-center shadow-xl md:p-12">
             <h3 className="text-2xl font-bold text-white md:text-3xl">Follow Us on Social Media</h3>
             <p className="mx-auto mt-4 max-w-2xl text-base text-gray-300">

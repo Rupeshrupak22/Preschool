@@ -66,7 +66,7 @@ export default function MentorPage() {
       </div>
 
       {/* HERO */}
-      <section className="relative px-4 pb-24 pt-16 md:px-6">
+      <section className="relative px-6 pb-24 pt-16 md:px-10 lg:px-16">
         <div className="mx-auto max-w-5xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -114,7 +114,7 @@ export default function MentorPage() {
       </section>
 
       {/* Stats */}
-      <section className="mx-auto max-w-7xl px-4 py-8 md:px-6">
+      <section className="mx-auto max-w-7xl px-6 py-8 md:px-10 lg:px-16">
         <motion.div
           initial="hidden"
           whileInView="show"
@@ -137,7 +137,7 @@ export default function MentorPage() {
       </section>
 
       {/* Benefits */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16">
         <div className="mb-10 text-center">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-700">Why Choose a Mentor</p>
           <h2 className="mt-3 text-4xl font-black text-slate-900">Guidance that makes a difference</h2>
@@ -168,7 +168,7 @@ export default function MentorPage() {
       </section>
 
       {/* How It Works */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16">
         <div className="grid gap-6 lg:grid-cols-[0.86fr_1.14fr]">
           <motion.div
             variants={fadeUp}
@@ -222,7 +222,7 @@ export default function MentorPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16">
         <div className="mb-10 text-center">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-purple-700">Student Stories</p>
           <h2 className="mt-3 text-4xl font-black text-slate-900">What students say</h2>

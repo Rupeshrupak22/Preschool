@@ -506,7 +506,7 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-950 md:px-6">
+    <main className="min-h-screen bg-slate-50 px-6 py-6 text-slate-950 md:px-10 lg:px-16">
       <div className="mx-auto max-w-[1500px]">
         <header className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm xl:flex-row xl:items-center xl:justify-between">
           <div className="flex gap-4">

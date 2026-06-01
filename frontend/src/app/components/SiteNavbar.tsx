@@ -194,19 +194,19 @@ export default function SiteNavbar() {
         ];
 
   return (
-    <nav className="fixed left-0 right-0 top-0 z-[100] bg-gradient-to-r from-[#b565f2] via-[#efb7df] to-[#8ec9f6] shadow-[0_12px_36px_rgba(99,102,241,0.24)] backdrop-blur-xl">
+    <nav className="fixed left-0 right-0 top-0 z-[100] bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#0f172a] shadow-[0_12px_36px_rgba(0,0,0,0.4)] backdrop-blur-xl">
       <div className="pointer-events-none absolute left-9 top-3 h-3 w-3 rounded-full bg-[#f6d748]" />
       <div className="pointer-events-none absolute left-[82px] top-5 text-sm font-black text-yellow-200">*</div>
 
-      <div className="relative z-10 mx-auto flex h-20 max-w-[1500px] items-center justify-between gap-3 px-3 sm:px-4 md:px-6">
+      <div className="relative z-10 mx-auto flex h-20 max-w-[1500px] items-center justify-between gap-3 px-3 sm:px-6 md:px-10 lg:px-16">
         <a href="/#top" className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3" aria-label="ADYAPAN School home">
           <img
-            src="/ady-logo.jpeg"
+            src="/ady-logo.png"
             alt="ADYAPAN"
             className="h-12 w-12 shrink-0 rounded-full object-contain drop-shadow-[0_12px_18px_rgba(234,88,12,0.26)] sm:h-14 sm:w-14"
           />
          <span className="relative min-w-0">
-  <span className="block text-[24px] font-black tracking-tight text-[#8b2ed3] sm:text-[28px] md:text-[32px]">
+  <span className="block text-[24px] font-black tracking-tight text-[#c084fc] sm:text-[28px] md:text-[32px]">
     Adyapan
   </span>
 
@@ -216,16 +216,16 @@ export default function SiteNavbar() {
 </span>
         </a>
 
-        <div className="hidden min-w-0 flex-1 items-center justify-center gap-2 rounded-full border-2 border-white/65 bg-white/36 px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.65),0_12px_30px_rgba(124,58,237,0.14)] backdrop-blur-xl xl:flex 2xl:gap-3 2xl:px-5">
+        <div className="hidden min-w-0 flex-1 items-center justify-center gap-2 rounded-full border-2 border-white/20 bg-white/10 px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_12px_30px_rgba(0,0,0,0.2)] backdrop-blur-xl xl:flex 2xl:gap-3 2xl:px-5">
           {navItems.map((item) => {
             const active = isActive(item.href);
             return (
               <a
                 key={item.label}
                 href={item.label === "LMS" ? "/dashboard" : item.href}
-                className={`inline-flex h-12 min-w-[80px] items-center justify-center whitespace-nowrap rounded-full px-2.5 text-[13px] font-black text-slate-950 transition hover:-translate-y-0.5 hover:bg-white/65 xl:min-w-[94px] xl:px-3 xl:text-[15px] 2xl:h-14 2xl:min-w-[108px] 2xl:px-5 2xl:text-[17px] ${
+                className={`inline-flex h-12 min-w-[80px] items-center justify-center whitespace-nowrap rounded-full px-2.5 text-[13px] font-black text-white transition hover:-translate-y-0.5 hover:bg-white/15 xl:min-w-[94px] xl:px-3 xl:text-[15px] 2xl:h-14 2xl:min-w-[108px] 2xl:px-5 2xl:text-[17px] ${
                   active
-                    ? "bg-gradient-to-r from-[#ffd84d] to-[#ff9f2f] shadow-[0_12px_24px_rgba(249,158,47,0.35)]"
+                    ? "bg-gradient-to-r from-[#ffd84d] to-[#ff9f2f] text-slate-950 shadow-[0_12px_24px_rgba(249,158,47,0.35)]"
                     : ""
                 }`}
               >
@@ -241,7 +241,7 @@ export default function SiteNavbar() {
               <button
                 type="button"
                 onClick={() => setProfileOpen((value) => !value)}
-                className="inline-flex h-12 max-w-[230px] items-center gap-3 rounded-full border-2 border-white bg-white/78 px-3 pr-4 text-left font-black text-slate-950 shadow-[0_10px_22px_rgba(255,255,255,0.24)] transition hover:-translate-y-0.5 hover:bg-white"
+                className="inline-flex h-12 max-w-[230px] items-center gap-3 rounded-full border-2 border-white/30 bg-white/10 px-3 pr-4 text-left font-black text-white shadow-[0_10px_22px_rgba(0,0,0,0.2)] transition hover:-translate-y-0.5 hover:bg-white/20"
                 aria-expanded={profileOpen}
                 aria-haspopup="menu"
               >
@@ -307,7 +307,7 @@ export default function SiteNavbar() {
             <>
               <a
                 href="/login"
-                className="inline-flex h-12 min-w-[92px] items-center justify-center rounded-full border-2 border-white bg-white/72 px-5 text-[15px] font-black text-slate-950 shadow-[0_10px_22px_rgba(255,255,255,0.24)] transition hover:-translate-y-0.5 hover:bg-white 2xl:min-w-[100px] 2xl:px-6"
+                className="inline-flex h-12 min-w-[92px] items-center justify-center rounded-full border-2 border-white/30 bg-white/10 px-5 text-[15px] font-black text-white shadow-[0_10px_22px_rgba(0,0,0,0.2)] transition hover:-translate-y-0.5 hover:bg-white/20 2xl:min-w-[100px] 2xl:px-6"
               >
                 Login
               </a>
@@ -316,7 +316,7 @@ export default function SiteNavbar() {
         </div>
 
         <button
-          className="shrink-0 rounded-full border-2 border-white bg-white/45 p-3 text-slate-950 shadow-[0_10px_22px_rgba(255,255,255,0.25)] transition hover:bg-white/75 xl:hidden"
+          className="shrink-0 rounded-full border-2 border-white/30 bg-white/10 p-3 text-white shadow-[0_10px_22px_rgba(0,0,0,0.2)] transition hover:bg-white/20 xl:hidden"
           onClick={() => setMenuOpen((value) => !value)}
           aria-label="Open navigation"
         >
@@ -325,15 +325,15 @@ export default function SiteNavbar() {
       </div>
 
       {menuOpen && (
-        <div className="max-h-[calc(100vh-80px)] overflow-y-auto border-t-2 border-white/40 bg-gradient-to-b from-[#eec3ef] to-[#afd7f7] px-4 py-5 shadow-[0_16px_36px_rgba(99,102,241,0.18)] backdrop-blur-xl xl:hidden">
+        <div className="max-h-[calc(100vh-80px)] overflow-y-auto border-t-2 border-white/10 bg-gradient-to-b from-[#0f172a] to-[#1e293b] px-4 py-5 shadow-[0_16px_36px_rgba(0,0,0,0.3)] backdrop-blur-xl xl:hidden">
           <div className="grid gap-3">
             {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.label === "LMS" ? "/dashboard" : item.href}
                 onClick={() => setMenuOpen(false)}
-                className={`rounded-full px-6 py-4 text-lg font-black text-slate-950 transition hover:bg-white/70 ${
-                  isActive(item.href) ? "bg-gradient-to-r from-[#ffd84d] to-[#ff9f2f]" : "bg-white/36"
+                className={`rounded-full px-6 py-4 text-lg font-black text-white transition hover:bg-white/15 ${
+                  isActive(item.href) ? "bg-gradient-to-r from-[#ffd84d] to-[#ff9f2f] text-slate-950" : "bg-white/10"
                 }`}
               >
                 {item.label}

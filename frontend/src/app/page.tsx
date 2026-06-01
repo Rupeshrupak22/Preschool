@@ -482,7 +482,7 @@ export default function Home() {
         <source src="/newbackgroundvideohomepage.mp4" type="video/mp4" />
       </video>
 
-      <section id="top" className="relative !z-10 min-h-[85vh] overflow-hidden px-4 pt-10 sm:min-h-[92vh] md:px-6">
+      <section id="top" className="relative !z-10 min-h-[85vh] overflow-hidden px-6 pt-10 sm:min-h-[92vh] md:px-10 lg:px-16">
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 pb-8 lg:grid-cols-[0.9fr_1.1fr]">
           <motion.div initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <h1 className="max-w-3xl text-4xl font-black leading-[0.96] tracking-tight text-slate-950 drop-shadow-[0_2px_0_rgba(255,255,255,0.9)] sm:text-5xl md:text-6xl lg:text-8xl">
@@ -577,7 +577,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      <section id="curriculum" className="px-4 py-24 md:px-6 relative">
+      <section id="curriculum" className="px-6 py-24 md:px-10 lg:px-16 relative">
         <div className="mx-auto max-w-7xl">
           <div className="grid items-center gap-12 lg:grid-cols-[0.72fr_1fr]">
             <motion.div
@@ -690,7 +690,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="path" className="px-4 py-20 md:px-6">
+      <section id="path" className="px-6 py-20 md:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Learning path"
@@ -735,7 +735,7 @@ export default function Home() {
 
 
 
-      <section id="schools" className="px-4 py-20 md:px-6">
+      <section id="schools" className="px-6 py-20 md:px-10 lg:px-16">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_.85fr]">
           <div>
             <SectionTitle
@@ -778,7 +778,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="events" className="px-4 py-20 md:px-6">
+      <section id="events" className="px-6 py-20 md:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Community"
@@ -804,7 +804,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="px-4 py-20 md:px-6">
+      <section className="px-6 py-20 md:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
           <SectionTitle
             eyebrow="Reviews"

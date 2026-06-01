@@ -107,7 +107,7 @@ export default function PrincipalLoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f9fb] px-4 py-8 text-slate-950 md:px-6">
+    <main className="min-h-screen bg-[#f7f9fb] px-6 py-8 text-slate-950 md:px-10 lg:px-16">
       <div className="mx-auto grid min-h-[calc(100vh-64px)] max-w-7xl items-center gap-8 lg:grid-cols-[0.9fr_1.1fr]">
         <section className="hidden lg:block">
           <div className="max-w-xl">

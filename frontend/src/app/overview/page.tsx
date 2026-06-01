@@ -91,7 +91,7 @@ export default function OverviewPage() {
       </div>
 
       {/* HERO */}
-      <section className="relative px-4 pb-24 pt-16 md:px-6">
+      <section className="relative px-6 pb-24 pt-16 md:px-10 lg:px-16">
         <div className="mx-auto max-w-5xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -139,7 +139,7 @@ export default function OverviewPage() {
       </section>
 
       {/* Platform Cards */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16">
         <motion.div
           initial="hidden"
           whileInView="show"
@@ -166,7 +166,7 @@ export default function OverviewPage() {
       </section>
 
       {/* Journey Section */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16">
         <div className="grid gap-6 lg:grid-cols-[0.86fr_1.14fr]">
           <motion.div
             variants={fadeUp}
@@ -221,7 +221,7 @@ export default function OverviewPage() {
       </section>
 
       {/* Outcomes Section */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16">
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <motion.div
             variants={fadeUp}

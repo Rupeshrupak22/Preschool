@@ -94,7 +94,7 @@ export default function MentorsPage() {
       </div>
 
       {/* ─── HERO ─── */}
-      <section className="relative px-4 pb-24 pt-16 md:px-6">
+      <section className="relative px-6 pb-24 pt-16 md:px-10 lg:px-16">
         <div className="mx-auto max-w-5xl text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -134,7 +134,7 @@ export default function MentorsPage() {
       </section>
 
       {/* ─── SUBJECTS ─── */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16">
         <motion.div
           initial="hidden"
           whileInView="show"
@@ -170,7 +170,7 @@ export default function MentorsPage() {
       </section>
 
       {/* ─── FEATURES (Glossy Cards like Overview) ─── */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16">
         <motion.div
           initial="hidden"
           whileInView="show"
@@ -197,7 +197,7 @@ export default function MentorsPage() {
       </section>
 
       {/* ─── FOR STUDENTS & TEACHERS ─── */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16">
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Students */}
           <motion.div
@@ -266,7 +266,7 @@ export default function MentorsPage() {
       </section>
 
       {/* ─── EXAM SYSTEM ─── */}
-      <section className="mx-auto max-w-7xl px-4 py-16 md:px-6">
+      <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16">
         <div className="grid gap-6 lg:grid-cols-[0.86fr_1.14fr]">
           {/* Left - Dark card */}
           <motion.div

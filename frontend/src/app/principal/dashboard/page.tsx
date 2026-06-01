@@ -141,7 +141,7 @@ export default function PrincipalDashboardPage() {
   ] as const;
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-950 md:px-6">
+    <main className="min-h-screen bg-slate-50 px-6 py-6 text-slate-950 md:px-10 lg:px-16">
       <div className="mx-auto max-w-7xl">
         <header className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
           <div className="flex gap-4">

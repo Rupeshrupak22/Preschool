@@ -91,7 +91,7 @@ export default function AboutPage() {
     <main className="min-h-screen overflow-hidden text-slate-950">
       <AboutVideoHero />
 
-      <section className="px-4 py-12 md:px-6 md:py-16">
+      <section className="px-6 py-12 md:px-10 lg:px-16 md:py-16">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -103,7 +103,7 @@ export default function AboutPage() {
         </motion.div>
       </section>
 
-      <section id="our-belief" className="relative overflow-hidden px-4 py-24 md:px-8 md:py-[120px]">
+      <section id="our-belief" className="relative overflow-hidden px-6 py-24 md:px-10 lg:px-16 md:py-[120px]">
         <img
           src="/learning-doodles.svg"
           alt=""
@@ -197,7 +197,7 @@ export default function AboutPage() {
 
       <FloatingGallery />
 
-      <section className="relative overflow-hidden border-y border-blue-100 px-4 py-20 md:px-6 md:py-24">
+      <section className="relative overflow-hidden border-y border-blue-100 px-6 py-20 md:px-10 lg:px-16 md:py-24">
         <div
           className="pointer-events-none absolute inset-0 opacity-80"
           style={{
@@ -300,7 +300,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-4 py-16 md:px-6">
+      <section className="px-6 py-16 md:px-10 lg:px-16">
         <div
           className="mx-auto max-w-7xl rounded-[32px] p-6 md:p-10"
           style={{
@@ -368,7 +368,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-4 pb-16 md:px-6">
+      <section className="px-6 pb-16 md:px-10 lg:px-16">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 rounded-[28px] border border-blue-100 bg-white p-6 shadow-[0_20px_60px_rgba(37,99,235,0.12)] md:flex-row md:items-center md:p-8">
           <div>
             <div className="flex items-center gap-3">

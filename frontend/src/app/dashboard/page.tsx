@@ -128,7 +128,7 @@ export default function LMSPage() {
       <div className="relative z-10">
 
         {/* Hero */}
-        <section className="px-4 pb-20 pt-10 md:px-6">
+        <section className="px-6 pb-20 pt-10 md:px-10 lg:px-16">
           <div className="mx-auto max-w-7xl">
             <div className="grid items-start gap-14 lg:grid-cols-2">
               <div className="rounded-3xl border border-white/5 bg-transparent backdrop-blur-sm p-8">
@@ -224,7 +224,7 @@ export default function LMSPage() {
         </div>
 
         {/* Overview */}
-        <section id="overview" className="px-4 py-20 md:px-6">
+        <section id="overview" className="px-6 py-20 md:px-10 lg:px-16">
           <div className="mx-auto max-w-6xl">
             <div className="text-center rounded-2xl bg-white/45 backdrop-blur-xl p-8 mb-14 border border-white/50 shadow-[0_8px_32px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.9)]" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
               <h2 className="text-3xl font-black text-gray-900 md:text-5xl drop-shadow-sm">Comprehensive Digital Platform</h2>
@@ -254,7 +254,7 @@ export default function LMSPage() {
         </section>
 
         {/* Student Features */}
-        <section id="student-features" className="px-4 py-20 md:px-6">
+        <section id="student-features" className="px-6 py-20 md:px-10 lg:px-16">
           <div className="lms-tilt mx-auto max-w-6xl rounded-3xl border border-white/50 bg-white/40 backdrop-blur-xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.9)] md:p-12" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
             <div className="text-center">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600">
@@ -278,7 +278,7 @@ export default function LMSPage() {
         </section>
 
         {/* Teacher Features */}
-        <section id="teacher-features" className="px-4 py-20 md:px-6">
+        <section id="teacher-features" className="px-6 py-20 md:px-10 lg:px-16">
           <div className="lms-tilt mx-auto max-w-6xl rounded-3xl border border-white/50 bg-white/40 backdrop-blur-xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.9)] md:p-12" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
             <div className="text-center">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500">
@@ -302,7 +302,7 @@ export default function LMSPage() {
         </section>
 
         {/* Exam Software */}
-        <section id="exam-software" className="px-4 py-20 md:px-6">
+        <section id="exam-software" className="px-6 py-20 md:px-10 lg:px-16">
           <div className="mx-auto max-w-6xl">
             <div className="text-center rounded-2xl bg-white/45 backdrop-blur-xl p-8 mb-14 border border-white/50 shadow-[0_8px_32px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.9)]" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.3) 100%)' }}>
               <h2 className="text-3xl font-black text-gray-900 md:text-5xl drop-shadow-sm">Online Exam Software</h2>
