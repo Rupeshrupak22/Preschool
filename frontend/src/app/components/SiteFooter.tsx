@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { motion } from "framer-motion";
 import { ArrowUp, Clock, Instagram, Linkedin, Mail, MapPin, Phone, Youtube } from "lucide-react";
 
 const learningPrograms = [
@@ -179,6 +180,35 @@ export default function SiteFooter() {
               <p className="mt-1 text-sm text-red-400/80">Sunday: Closed</p>
             </div>
           </div>
+        </div>
+
+        {/* Animated ADYAPAN SCHOOL text */}
+        <div className="mt-12 flex items-center justify-center flex-wrap px-4">
+          {'ADYAPAN SCHOOL'.split('').map((letter, i) => (
+            <motion.span
+              key={i}
+              initial={{ y: 0, x: 0, rotate: 0 }}
+              whileHover={{
+                y: [0, -10, 6, -5, 3, 0],
+                x: [0, -3, 3, -2, 2, 0],
+                rotate: [0, -6, 6, -3, 3, 0],
+                transition: { duration: 0.5, ease: 'easeInOut' },
+              }}
+              animate={{ y: 0, x: 0, rotate: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="inline-block cursor-default select-none font-black"
+              style={{
+                fontSize: 'clamp(2.8rem, 10vw, 7rem)',
+                color: '#0ea5e9',
+                textShadow: '0 6px 0 rgba(3,105,161,0.5), 0 12px 24px rgba(14,165,233,0.25)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1,
+                width: letter === ' ' ? '0.3em' : undefined,
+              }}
+            >
+              {letter === ' ' ? '\u00A0' : letter}
+            </motion.span>
+          ))}
         </div>
 
         {/* Bottom Bar */}
