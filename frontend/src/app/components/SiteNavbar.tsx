@@ -205,14 +205,15 @@ export default function SiteNavbar() {
             alt="ADYAPAN"
             className="h-12 w-12 shrink-0 rounded-full object-contain drop-shadow-[0_12px_18px_rgba(234,88,12,0.26)] sm:h-14 sm:w-14"
           />
-          <span className="min-w-0 leading-none">
-            <span className="block text-[24px] font-black tracking-tight text-[#8b2ed3] sm:text-[28px] md:text-[32px]">
-              Adyapan
-            </span>
-            <span className="ml-1 block text-[9px] font-black uppercase tracking-[0.34em] text-[#9f6fd0] sm:text-[10px] sm:tracking-[0.42em]">
-              School
-            </span>
-          </span>
+         <span className="relative min-w-0">
+  <span className="block text-[24px] font-black tracking-tight text-[#8b2ed3] sm:text-[28px] md:text-[32px]">
+    Adyapan
+  </span>
+
+  <span className="absolute left-[65%] top-[68%] text-[7px] font-black uppercase tracking-[0.28em] text-white sm:text-[8px] md:text-[9px]">
+    SCHOOL
+  </span>
+</span>
         </a>
 
         <div className="hidden min-w-0 flex-1 items-center justify-center gap-2 rounded-full border-2 border-white/65 bg-white/36 px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.65),0_12px_30px_rgba(124,58,237,0.14)] backdrop-blur-xl xl:flex 2xl:gap-3 2xl:px-5">
