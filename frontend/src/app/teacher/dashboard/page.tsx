@@ -1,35 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-  ArrowLeft,
-  Bell,
-  BookOpenCheck,
-  Calendar,
-  CheckSquare,
-  Compass,
-  Copy,
-  FileText,
-  Gamepad2,
-  Home,
-  LogOut,
-  Map,
-  MessageCircle,
-  MonitorPlay,
-  RefreshCw,
-  Search,
-  Trophy,
-  Upload,
   Users,
   Video,
-  Wifi,
-  BarChart3,
+  MessageSquare,
+  Search,
+  LogOut,
+  RefreshCw,
   BookOpen,
+  FileText,
+  Bell,
+  ClipboardList,
+  Calendar,
+  ChevronRight,
+  Home,
+  GraduationCap,
+  LayoutGrid,
+  HelpCircle,
+  Settings,
+  Menu,
+  X,
 } from "lucide-react";
 import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
 import { useSessionHeartbeat } from "@/lib/use-session-heartbeat";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
 type TeacherDashboard = {
   teacher: {
     id: string;
@@ -37,7 +32,7 @@ type TeacherDashboard = {
     email: string;
     schoolId: string;
     schoolName: string;
-    subject?: string | null;
+    subject: string;
     phone?: string | null;
     assignedClasses: string[];
     lastLoginAt?: string | null;
@@ -48,108 +43,40 @@ type TeacherDashboard = {
     upcomingClasses: number;
     certificates: number;
     activeLogins: number;
+    homework: number;
+    notes: number;
+    pendingDoubts: number;
+    notifications: number;
   };
   classBreakdown: Array<{ classLevel: string; total: number }>;
   students: Array<Record<string, string | number | null>>;
   schedule: Array<Record<string, string | number | null>>;
   logins: Array<Record<string, string | number | null>>;
   certificates: Array<Record<string, string | number | null>>;
+  homework: Array<Record<string, string | number | null>>;
+  notes: Array<Record<string, string | number | null>>;
+  doubts: Array<Record<string, string | number | null>>;
+  notifications: Array<Record<string, string | number | null>>;
 };
 
-type QuickAccessCard = {
-  icon: React.ReactNode;
-  title: string;
-  subtitle: string;
-  badge: string;
-  badgeColor: string;
-};
+type ActiveTab = "classroom" | "academics";
 
-// ─── Card Data ───────────────────────────────────────────────────────────────
-const classroomCards: QuickAccessCard[] = [
-  {
-    icon: <Users className="h-6 w-6 text-blue-600" />,
-    title: "My Students",
-    subtitle: "No students linked yet",
-    badge: "0 Students",
-    badgeColor: "bg-blue-50 text-blue-600",
-  },
-  {
-    icon: <Calendar className="h-6 w-6 text-blue-600" />,
-    title: "Attendance Log",
-    subtitle: "Mark class status",
-    badge: "Attendance Page",
-    badgeColor: "bg-blue-50 text-blue-600",
-  },
-  {
-    icon: <Upload className="h-6 w-6 text-blue-600" />,
-    title: "Upload Recorded Video",
-    subtitle: "Publish to Class Library",
-    badge: "Recorded Library",
-    badgeColor: "bg-green-50 text-green-600",
-  },
-  {
-    icon: <MonitorPlay className="h-6 w-6 text-blue-600" />,
-    title: "Live Class Console",
-    subtitle: "Manage pre-scheduled streams",
-    badge: "Live Manager",
-    badgeColor: "bg-blue-50 text-blue-600",
-  },
+const sidebarNav = [
+  { id: "home", label: "Home", icon: Home },
+  { id: "syllabus", label: "Syllabus", icon: BookOpen },
+  { id: "career", label: "Career Roadmap", icon: GraduationCap },
+  { id: "leaderboard", label: "Leaderboard", icon: LayoutGrid },
+  { id: "doubts", label: "Solve Doubts", icon: HelpCircle },
+  { id: "settings", label: "Settings", icon: Settings },
 ];
 
-const academicsCards: QuickAccessCard[] = [
-  {
-    icon: <BarChart3 className="h-6 w-6 text-blue-600" />,
-    title: "Class Progress",
-    subtitle: "Syllabus indexes",
-    badge: "Visual Page",
-    badgeColor: "bg-blue-50 text-blue-600",
-  },
-  {
-    icon: <FileText className="h-6 w-6 text-green-600" />,
-    title: "Assign Homework",
-    subtitle: "Upload student quests",
-    badge: "Worksheets Page",
-    badgeColor: "bg-green-50 text-green-600",
-  },
-  {
-    icon: <CheckSquare className="h-6 w-6 text-blue-600" />,
-    title: "Homework Submissions",
-    subtitle: "View & grade uploads",
-    badge: "Submissions",
-    badgeColor: "bg-blue-50 text-blue-600",
-  },
-  {
-    icon: <BookOpen className="h-6 w-6 text-blue-600" />,
-    title: "Upload Notes",
-    subtitle: "Chapter PDFs",
-    badge: "Resource Page",
-    badgeColor: "bg-blue-50 text-blue-600",
-  },
-  {
-    icon: <Gamepad2 className="h-6 w-6 text-blue-600" />,
-    title: "Arcade & Quiz Console",
-    subtitle: "Preview & manage 4 games",
-    badge: "MCQ Injector",
-    badgeColor: "bg-purple-50 text-purple-600",
-  },
-  {
-    icon: <Compass className="h-6 w-6 text-green-600" />,
-    title: "Future Skills Planner",
-    subtitle: "Classroom lesson manuals",
-    badge: "Superpower Hub",
-    badgeColor: "bg-green-50 text-green-600",
-  },
-];
+function formatDate(value?: string | number | null) {
+  if (!value) return "-";
+  const date = new Date(String(value));
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
+}
 
-// ─── Nav Items ───────────────────────────────────────────────────────────────
-const navItems = [
-  { id: "home" as const, icon: Home, label: "Home" },
-  { id: "syllabus" as const, icon: BookOpenCheck, label: "Syllabus" },
-  { id: "career" as const, icon: Map, label: "Career Roadmap" },
-  { id: "leaderboard" as const, icon: Trophy, label: "Leaderboard" },
-];
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 function getGreeting() {
   const hour = new Date().getHours();
   if (hour < 12) return "Good morning";
@@ -157,13 +84,14 @@ function getGreeting() {
   return "Good evening";
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
 export default function TeacherDashboardPage() {
   const [dashboard, setDashboard] = useState<TeacherDashboard | null>(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
-  const [activeTab, setActiveTab] = useState<"classroom" | "academics">("classroom");
-  const [activeNav, setActiveNav] = useState<string>("home");
+  const [query, setQuery] = useState("");
+  const [activeTab, setActiveTab] = useState<ActiveTab>("academics");
+  const [activeNav, setActiveNav] = useState("home");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   async function loadDashboard() {
     setLoading(true);
@@ -177,7 +105,7 @@ export default function TeacherDashboardPage() {
     }
 
     if (!response.ok) {
-      setStatus(data.error ?? "Teacher dashboard could not be loaded.");
+      setStatus(data.error ?? "Dashboard could not be loaded.");
       setLoading(false);
       return;
     }
@@ -196,10 +124,8 @@ export default function TeacherDashboardPage() {
     loadDashboard();
   }, []);
 
-  // Session heartbeat — auto-logout if session is cleared from another device
   useSessionHeartbeat({ checkUrl: "/api/teacher/me", loginUrl: "/teacher/login", enabled: !!dashboard });
 
-  // Listen for logout from other tabs — redirect to login
   useEffect(() => {
     const cleanup = onAuthChange((message) => {
       if (message.type === "logout") {
@@ -209,342 +135,460 @@ export default function TeacherDashboardPage() {
     return cleanup;
   }, []);
 
-  // ─── Loading State ─────────────────────────────────────────────────────────
+  const filteredStudents = useMemo(() => {
+    const text = query.trim().toLowerCase();
+    if (!dashboard || !text) return dashboard?.students ?? [];
+    return dashboard.students.filter((student) =>
+      [student.name, student.email, student.phone, student.classLevel]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(text)
+    );
+  }, [dashboard, query]);
+
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50/40">
-        <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-100">
+      <main className="flex min-h-screen items-center justify-center bg-[#f0f4ff]">
+        <div className="rounded-2xl border border-blue-100 bg-white p-8 text-center shadow-lg">
           <RefreshCw className="mx-auto h-8 w-8 animate-spin text-blue-600" />
-          <p className="mt-4 text-sm font-semibold text-gray-600">Loading teacher dashboard...</p>
+          <p className="mt-4 text-sm font-bold text-slate-700">Loading teacher dashboard...</p>
         </div>
-      </div>
+      </main>
     );
   }
 
-  // ─── Error State ───────────────────────────────────────────────────────────
   if (!dashboard) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50/40">
-        <div className="max-w-md rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-100">
-          <p className="text-base font-bold text-gray-900">{status || "Dashboard not available."}</p>
-          <a
-            href="/teacher/login"
-            className="mt-5 inline-flex rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
-          >
+      <main className="flex min-h-screen items-center justify-center bg-[#f0f4ff]">
+        <div className="max-w-md rounded-2xl border border-blue-100 bg-white p-8 text-center shadow-lg">
+          <p className="text-base font-bold text-slate-900">{status || "Dashboard not available."}</p>
+          <a href="/teacher/login" className="mt-5 inline-flex rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-700">
             Back to Login
           </a>
         </div>
-      </div>
+      </main>
     );
   }
 
-  // ─── Derive dynamic card data from API ─────────────────────────────────────
-  const dynamicClassroomCards = classroomCards.map((card) => {
-    if (card.title === "My Students") {
-      return {
-        ...card,
-        badge: `${dashboard.stats.students} Students`,
-        subtitle: dashboard.stats.students > 0 ? "View linked students" : "No students linked yet",
-      };
-    }
-    return card;
-  });
-
-  const cards = activeTab === "classroom" ? dynamicClassroomCards : academicsCards;
-
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50/40">
-      {/* ─── Desktop Sidebar ──────────────────────────────────────────── */}
-      <aside className="hidden lg:flex lg:w-64 xl:w-72 flex-col fixed inset-y-0 left-0 z-30 border-r border-gray-100 bg-white/80 backdrop-blur-md">
-        {/* Sidebar Header */}
-        <div className="flex items-center gap-3 px-6 py-6 border-b border-gray-100">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-sm">
+    <div className="flex min-h-screen bg-[#f0f4ff]">
+      {/* ─── SIDEBAR (Desktop) ─────────────────────────────────── */}
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 bg-white border-r border-slate-200 shadow-sm z-30">
+        {/* Logo */}
+        <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white font-black text-sm">
             A
           </div>
           <div>
-            <p className="text-sm font-bold text-gray-900">ADYAPAN</p>
-            <p className="text-[11px] text-gray-500">Educator Portal</p>
+            <p className="text-sm font-black text-slate-900">Adyapan</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Educator Portal</p>
           </div>
         </div>
 
-        {/* Back to Main Site */}
-        <div className="px-4 pt-4">
-          <a
-            href="https://preschool-tau.vercel.app/"
-            className="flex w-full items-center gap-2 rounded-xl bg-gray-50 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Main Site
-          </a>
-        </div>
-
-        {/* Nav Links */}
+        {/* Nav Items */}
         <nav className="flex-1 px-4 py-4 space-y-1">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveNav(item.id)}
-              className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
-                activeNav === item.id
-                  ? "bg-blue-50 text-blue-700 font-semibold"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              }`}
-            >
-              <item.icon className="h-5 w-5" />
-              {item.label}
-            </button>
-          ))}
+          {sidebarNav.map((item) => {
+            const isActive = activeNav === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveNav(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
+                  isActive
+                    ? "bg-blue-50 text-blue-700 shadow-sm"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                <item.icon className={`h-5 w-5 ${isActive ? "text-blue-600" : "text-slate-400"}`} />
+                {item.label}
+              </button>
+            );
+          })}
         </nav>
 
-        {/* Sidebar Footer */}
-        <div className="border-t border-gray-100 px-4 py-4">
-          <div className="flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-400 text-sm font-bold text-white">
-              {dashboard.teacher.name.charAt(0)}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">{dashboard.teacher.name}</p>
-              <p className="text-[11px] text-gray-500 truncate">{dashboard.teacher.email}</p>
-            </div>
-            <button
-              onClick={logout}
-              className="text-gray-400 hover:text-red-500 transition-colors"
-              title="Logout"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
-          </div>
+        {/* Logout */}
+        <div className="px-4 py-4 border-t border-slate-100">
+          <button
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-red-600 hover:bg-red-50 transition"
+          >
+            <LogOut className="h-5 w-5" />
+            Logout
+          </button>
         </div>
       </aside>
 
-      {/* ─── Main Content ─────────────────────────────────────────────── */}
-      <main className="flex-1 lg:ml-64 xl:ml-72 pb-20 lg:pb-8">
-        {/* ─── Top Header ───────────────────────────────────────────────── */}
-        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-100">
-          <div className="px-4 py-4 md:px-8 lg:px-10">
-            <div className="flex items-center justify-between">
-              {/* Left: Greeting */}
-              <div className="flex items-center gap-3">
-                {/* Mobile avatar */}
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-orange-400 text-lg font-bold text-white shadow-md lg:hidden">
-                  {dashboard.teacher.name.charAt(0)}
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">{getGreeting()},</p>
-                  <h1 className="text-lg font-bold text-gray-900 md:text-xl">{dashboard.teacher.name}</h1>
-                </div>
-              </div>
+      {/* ─── MOBILE HEADER ─────────────────────────────────────── */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button onClick={() => setMobileMenuOpen(true)} className="p-2 rounded-lg hover:bg-slate-100">
+            <Menu className="h-5 w-5 text-slate-700" />
+          </button>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white font-black text-xs">A</div>
+          <span className="text-sm font-black text-slate-900">Adyapan</span>
+        </div>
+        <button onClick={logout} className="p-2 rounded-lg hover:bg-red-50 text-red-600">
+          <LogOut className="h-5 w-5" />
+        </button>
+      </div>
 
-              {/* Right: UID + Bell + Logout (mobile) */}
-              <div className="flex items-center gap-3">
-                {/* UID Badge - hidden on small mobile */}
-                <div className="hidden sm:flex items-center gap-1.5 rounded-full bg-gray-50 px-3 py-2 text-xs font-medium text-gray-600 ring-1 ring-gray-100">
-                  <span className="text-[10px] uppercase tracking-wider text-gray-400">Your UID</span>
-                  <span className="font-semibold text-gray-800">{dashboard.teacher.email}</span>
-                  <Copy className="h-3 w-3 text-gray-400 cursor-pointer hover:text-blue-500" />
-                </div>
-                <button className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 ring-1 ring-gray-100 hover:bg-gray-100 transition-colors">
-                  <Bell className="h-5 w-5 text-orange-400" />
-                  <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white" />
-                </button>
-                {/* Mobile logout */}
-                <button
-                  onClick={logout}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 ring-1 ring-gray-100 hover:bg-red-50 hover:ring-red-200 transition-colors lg:hidden"
-                  title="Logout"
-                >
-                  <LogOut className="h-4 w-4 text-gray-500" />
-                </button>
+      {/* ─── MOBILE DRAWER ─────────────────────────────────────── */}
+      {mobileMenuOpen && (
+        <>
+          <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={() => setMobileMenuOpen(false)} />
+          <aside className="fixed left-0 top-0 z-50 h-full w-64 bg-white shadow-xl lg:hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white font-black text-xs">A</div>
+                <span className="text-sm font-black text-slate-900">Adyapan</span>
+              </div>
+              <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 rounded-lg hover:bg-slate-100">
+                <X className="h-5 w-5 text-slate-600" />
+              </button>
+            </div>
+            <nav className="px-4 py-4 space-y-1">
+              {sidebarNav.map((item) => {
+                const isActive = activeNav === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => { setActiveNav(item.id); setMobileMenuOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
+                      isActive ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    <item.icon className={`h-5 w-5 ${isActive ? "text-blue-600" : "text-slate-400"}`} />
+                    {item.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </aside>
+        </>
+      )}
+
+      {/* ─── MAIN CONTENT ──────────────────────────────────────── */}
+      <main className="flex-1 lg:ml-64 pt-16 lg:pt-0">
+        <div className="max-w-6xl mx-auto px-4 py-6 md:px-8 md:py-8">
+
+          {/* ─── HEADER SECTION ──────────────────────────────────── */}
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-orange-500 text-white text-xl font-black shadow-lg">
+                {dashboard.teacher.name?.charAt(0)?.toUpperCase() || "T"}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-blue-600">{getGreeting()},</p>
+                <h1 className="text-xl md:text-2xl font-black text-slate-900">{dashboard.teacher.name}</h1>
               </div>
             </div>
-
-            {/* Subtitle row */}
-            <div className="mt-2 flex items-center justify-between">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-                  Educator Portal
-                </p>
-                <p className="text-sm font-semibold text-gray-700">Supervision Control Center</p>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 shadow-sm">
+                <span className="text-xs font-bold text-slate-500 uppercase">Your UID</span>
+                <span className="text-sm font-bold text-slate-900">{dashboard.teacher.email}</span>
+                <ChevronRight className="h-4 w-4 text-slate-400" />
               </div>
-              {/* UID on mobile */}
-              <div className="flex sm:hidden items-center gap-1 rounded-full bg-gray-50 px-2.5 py-1.5 text-[11px] font-medium text-gray-600 ring-1 ring-gray-100">
-                <span className="font-semibold text-gray-800 truncate max-w-[120px]">{dashboard.teacher.email}</span>
-                <Copy className="h-3 w-3 text-gray-400" />
-              </div>
+              {dashboard.stats.notifications > 0 && (
+                <button className="relative p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm hover:bg-slate-50">
+                  <Bell className="h-5 w-5 text-slate-700" />
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                    {dashboard.stats.notifications}
+                  </span>
+                </button>
+              )}
             </div>
           </div>
-        </header>
 
-        {/* ─── Page Content ─────────────────────────────────────────────── */}
-        <div className="px-4 py-5 md:px-8 lg:px-10 space-y-6">
-          {/* Search Bar */}
-          <div className="relative max-w-2xl">
-            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+          {/* ─── PORTAL LABEL ────────────────────────────────────── */}
+          <div className="mb-6">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600">Educator Portal</p>
+            <h2 className="text-lg md:text-xl font-black text-slate-900">Supervision Control Center</h2>
+          </div>
+
+          {/* ─── SEARCH BAR ──────────────────────────────────────── */}
+          <div className="relative mb-8">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
             <input
-              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder="Search students, classes, homework, doubts..."
-              className="h-12 w-full rounded-2xl border-0 bg-white pl-12 pr-4 text-sm text-gray-700 shadow-sm ring-1 ring-gray-200 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-shadow"
+              className="w-full h-12 rounded-2xl border border-slate-200 bg-white pl-12 pr-4 text-sm font-medium text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
             />
           </div>
 
-          {/* Live Session Banner */}
-          {dashboard.stats.upcomingClasses > 0 && (
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 p-5 md:p-6 text-white shadow-lg shadow-blue-200/40">
-              <div className="flex items-start gap-4">
-                <div className="mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/20">
-                  <Wifi className="h-6 w-6" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-md bg-white/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">
-                      Smartboard Live
-                    </span>
-                    <span className="text-xs text-blue-100">Interactive Presenter</span>
-                  </div>
-                  <h3 className="mt-2 text-base font-bold leading-snug md:text-lg">
-                    Go Live: Stream on Classroom Smartboards
-                  </h3>
-                  <p className="mt-1 text-sm text-blue-100 max-w-lg">
-                    Launch real-time interactive lectures & sync skills onto classroom devices.
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    <button className="flex items-center gap-2 rounded-full bg-gray-900/80 px-5 py-2.5 text-xs font-semibold text-white hover:bg-gray-900 transition-colors">
-                      <span className="h-2 w-2 rounded-full bg-white" />
-                      End Session
-                    </button>
-                    <button className="flex items-center gap-2 rounded-full bg-red-500 px-5 py-2.5 text-xs font-semibold text-white hover:bg-red-600 transition-colors">
-                      <span className="h-2 w-2 rounded-full bg-white" />
-                      Push Quiz
-                    </button>
-                  </div>
-                </div>
+          {/* ─── STATS CARDS ─────────────────────────────────────── */}
+          <div className="grid grid-cols-3 gap-4 mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2">
+                <Users className="h-5 w-5 text-blue-600" />
+                <span className="text-2xl md:text-3xl font-black text-slate-900">{dashboard.stats.students}</span>
               </div>
-              {/* Decorative chevron */}
-              <div className="absolute right-5 top-1/2 -translate-y-1/2 text-white/20 hidden md:block">
-                <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 24l8-8-8-8" />
-                </svg>
-              </div>
+              <p className="mt-1 text-xs font-bold uppercase tracking-wider text-slate-500">Students</p>
             </div>
-          )}
-
-          {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-3 md:gap-4 lg:max-w-2xl">
-            <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-white p-4 md:p-5 shadow-sm ring-1 ring-gray-100">
-              <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-orange-500" />
-                <span className="text-2xl font-bold text-gray-900 md:text-3xl">{dashboard.stats.students}</span>
+            <div className="text-center border-x border-slate-100">
+              <div className="flex items-center justify-center gap-2">
+                <Calendar className="h-5 w-5 text-blue-600" />
+                <span className="text-2xl md:text-3xl font-black text-slate-900">{dashboard.stats.upcomingClasses}</span>
               </div>
-              <span className="text-[11px] font-medium uppercase tracking-wider text-gray-400">
-                Students
-              </span>
+              <p className="mt-1 text-xs font-bold uppercase tracking-wider text-slate-500">Live Class</p>
             </div>
-            <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-white p-4 md:p-5 shadow-sm ring-1 ring-gray-100">
-              <div className="flex items-center gap-2">
-                <Video className="h-5 w-5 text-blue-500" />
-                <span className="text-2xl font-bold text-gray-900 md:text-3xl">{dashboard.stats.upcomingClasses}</span>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2">
+                <MessageSquare className="h-5 w-5 text-blue-600" />
+                <span className="text-2xl md:text-3xl font-black text-slate-900">{dashboard.stats.pendingDoubts}</span>
               </div>
-              <span className="text-[11px] font-medium uppercase tracking-wider text-gray-400">
-                Live Class
-              </span>
-            </div>
-            <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-white p-4 md:p-5 shadow-sm ring-1 ring-gray-100">
-              <div className="flex items-center gap-2">
-                <MessageCircle className="h-5 w-5 text-green-500" />
-                <span className="text-2xl font-bold text-gray-900 md:text-3xl">0</span>
-              </div>
-              <span className="text-[11px] font-medium uppercase tracking-wider text-gray-400">
-                Pending
-              </span>
+              <p className="mt-1 text-xs font-bold uppercase tracking-wider text-slate-500">Pending</p>
             </div>
           </div>
 
-          {/* Supervision Quick Access Hub */}
-          <section>
-            <h2 className="text-lg font-bold text-gray-900 md:text-xl">Supervision Quick Access Hub</h2>
+          {/* ─── SUPERVISION QUICK ACCESS HUB ────────────────────── */}
+          <div className="mb-8">
+            <h3 className="text-base font-black text-slate-900 mb-4">Supervision Quick Access Hub</h3>
 
-            {/* Tabs */}
-            <div className="mt-3 flex gap-2 max-w-md">
+            {/* Tab Switcher */}
+            <div className="flex rounded-full bg-slate-100 p-1 mb-5 max-w-md">
               <button
                 onClick={() => setActiveTab("classroom")}
-                className={`flex-1 rounded-full py-2.5 text-sm font-semibold transition-all ${
+                className={`flex-1 rounded-full py-2.5 text-sm font-bold transition-all ${
                   activeTab === "classroom"
-                    ? "bg-blue-600 text-white shadow-md shadow-blue-200"
-                    : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50"
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"
                 }`}
               >
                 Classroom
               </button>
               <button
                 onClick={() => setActiveTab("academics")}
-                className={`flex-1 rounded-full py-2.5 text-sm font-semibold transition-all ${
+                className={`flex-1 rounded-full py-2.5 text-sm font-bold transition-all ${
                   activeTab === "academics"
-                    ? "bg-blue-600 text-white shadow-md shadow-blue-200"
-                    : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-slate-500 hover:text-slate-700"
                 }`}
               >
                 Academics
               </button>
             </div>
 
-            {/* Cards Grid — 2 cols on mobile, 3 on tablet, 4 on desktop */}
-            <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
-              {cards.map((card) => (
-                <button
-                  key={card.title}
-                  className="group flex flex-col items-start rounded-2xl bg-white p-4 md:p-5 text-left shadow-sm ring-1 ring-gray-100 transition-all hover:shadow-md hover:ring-blue-200 hover:-translate-y-0.5"
-                >
-                  <div className="flex w-full items-start justify-between">
-                    <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl bg-blue-50 group-hover:bg-blue-100 transition-colors">
-                      {card.icon}
+            {/* Quick Access Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {activeTab === "academics" ? (
+                <>
+                  <QuickCard
+                    icon={<ClipboardList className="h-6 w-6 text-blue-600" />}
+                    title="Assign Homework"
+                    subtitle="Send task with notification"
+                    badge={`${dashboard.stats.homework} Sent`}
+                  />
+                  <QuickCard
+                    icon={<FileText className="h-6 w-6 text-blue-600" />}
+                    title="Share Notes"
+                    subtitle="PDFs and chapter files"
+                    badge={`${dashboard.stats.notes} Files`}
+                  />
+                  <QuickCard
+                    icon={<HelpCircle className="h-6 w-6 text-blue-600" />}
+                    title="Solve Doubts"
+                    subtitle="Answer student questions"
+                    badge={`${dashboard.stats.pendingDoubts} Pending`}
+                  />
+                </>
+              ) : (
+                <>
+                  <QuickCard
+                    icon={<Users className="h-6 w-6 text-blue-600" />}
+                    title="My Students"
+                    subtitle="View all enrolled students"
+                    badge={`${dashboard.stats.students} Total`}
+                  />
+                  <QuickCard
+                    icon={<Video className="h-6 w-6 text-blue-600" />}
+                    title="Live Classes"
+                    subtitle="Schedule and manage sessions"
+                    badge={`${dashboard.stats.upcomingClasses} Upcoming`}
+                  />
+                  <QuickCard
+                    icon={<BookOpen className="h-6 w-6 text-blue-600" />}
+                    title="Class Breakdown"
+                    subtitle="Students per class"
+                    badge={`${dashboard.stats.classes} Classes`}
+                  />
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* ─── UPCOMING SCHEDULE ───────────────────────────────── */}
+          {dashboard.schedule.length > 0 && (
+            <section className="mb-8">
+              <h3 className="text-base font-black text-slate-900 mb-4">Upcoming Classes</h3>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {dashboard.schedule.slice(0, 6).map((session) => (
+                  <div key={String(session.id)} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm font-black text-slate-900">{session.title || "Class Session"}</p>
+                        <p className="mt-1 text-xs font-semibold text-slate-500">
+                          {session.subject} • {session.classLevel}
+                        </p>
+                      </div>
+                      <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+                        session.status === "scheduled" ? "bg-blue-50 text-blue-700" :
+                        session.status === "live" ? "bg-green-50 text-green-700 animate-pulse" :
+                        "bg-slate-100 text-slate-600"
+                      }`}>
+                        {session.status || "scheduled"}
+                      </span>
                     </div>
-                    <span
-                      className={`rounded-md px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap ${card.badgeColor}`}
-                    >
-                      {card.badge}
-                    </span>
+                    <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-slate-500">
+                      <Calendar className="h-3.5 w-3.5" />
+                      {formatDate(session.startTime)}
+                    </div>
+                    {session.mode && (
+                      <p className="mt-1 text-xs font-semibold text-slate-400">{session.mode}{session.room ? ` • ${session.room}` : ""}</p>
+                    )}
                   </div>
-                  <h3 className="mt-4 text-sm font-bold text-gray-900 md:text-base">{card.title}</h3>
-                  <p className="mt-0.5 text-xs text-gray-500 md:text-sm">{card.subtitle}</p>
-                </button>
-              ))}
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ─── STUDENTS TABLE ──────────────────────────────────── */}
+          <section className="mb-8">
+            <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-5 border-b border-slate-100">
+                <div>
+                  <h3 className="text-base font-black text-slate-900">Students</h3>
+                  <p className="text-xs font-semibold text-slate-500 mt-0.5">{dashboard.teacher.schoolName} • {dashboard.teacher.assignedClasses.join(", ") || "All Classes"}</p>
+                </div>
+                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full">
+                  {filteredStudents.length} students
+                </span>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[640px] text-left text-sm">
+                  <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-500">
+                    <tr>
+                      <th className="px-5 py-3">Name</th>
+                      <th className="px-5 py-3">Email</th>
+                      <th className="px-5 py-3">Phone</th>
+                      <th className="px-5 py-3">Class</th>
+                      <th className="px-5 py-3">Joined</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {filteredStudents.length ? (
+                      filteredStudents.slice(0, 20).map((student) => (
+                        <tr key={String(student.id)} className="hover:bg-slate-50/50 transition">
+                          <td className="px-5 py-3.5 font-bold text-slate-900">{student.name || "-"}</td>
+                          <td className="px-5 py-3.5 font-medium text-slate-600">{student.email || "-"}</td>
+                          <td className="px-5 py-3.5 font-medium text-slate-600">{student.phone || "-"}</td>
+                          <td className="px-5 py-3.5 font-medium text-slate-600">{student.classLevel || "-"}</td>
+                          <td className="px-5 py-3.5 font-medium text-slate-500">{formatDate(student.createdAt)}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="px-5 py-10 text-center font-bold text-slate-400">
+                          No students found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </section>
+
+          {/* ─── RECENT DOUBTS ───────────────────────────────────── */}
+          {dashboard.doubts.length > 0 && (
+            <section className="mb-8">
+              <h3 className="text-base font-black text-slate-900 mb-4">Recent Student Doubts</h3>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {dashboard.doubts.slice(0, 6).map((doubt) => (
+                  <div key={String(doubt.id)} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-bold text-slate-900 truncate">{doubt.question || "Question"}</p>
+                        <p className="mt-1 text-xs font-semibold text-slate-500">
+                          {doubt.studentName} • {doubt.subject} • {doubt.classLevel}
+                        </p>
+                      </div>
+                      <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+                        doubt.status === "solved" ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"
+                      }`}>
+                        {doubt.status || "pending"}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-xs font-medium text-slate-400">{formatDate(doubt.createdAt)}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ─── CLASS BREAKDOWN ──────────────────────────────────── */}
+          {dashboard.classBreakdown.length > 0 && (
+            <section className="mb-8">
+              <h3 className="text-base font-black text-slate-900 mb-4">Class Breakdown</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {dashboard.classBreakdown.map((item) => (
+                  <div key={item.classLevel} className="rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-sm">
+                    <p className="text-2xl font-black text-blue-600">{item.total}</p>
+                    <p className="mt-1 text-xs font-bold text-slate-600">{item.classLevel}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ─── RECENT HOMEWORK ─────────────────────────────────── */}
+          {dashboard.homework.length > 0 && (
+            <section className="mb-8">
+              <h3 className="text-base font-black text-slate-900 mb-4">Recent Homework</h3>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {dashboard.homework.slice(0, 6).map((hw) => (
+                  <div key={String(hw.id)} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <p className="text-sm font-bold text-slate-900">{hw.title || "Homework"}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-500">{hw.subject} • {hw.classLevel}</p>
+                    {hw.dueDate && <p className="mt-2 text-xs font-medium text-amber-600">Due: {formatDate(hw.dueDate)}</p>}
+                    <span className={`mt-2 inline-block rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${
+                      hw.status === "active" ? "bg-blue-50 text-blue-700" : "bg-slate-100 text-slate-600"
+                    }`}>
+                      {hw.status || "active"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
         </div>
       </main>
 
-      {/* ─── Solve Doubts FAB ───────────────────────────────────────────── */}
-      <div className="fixed bottom-24 right-4 z-50 lg:bottom-8 lg:right-8">
-        <button className="flex items-center gap-2 rounded-full bg-blue-700 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-300/40 transition-transform hover:scale-105 hover:bg-blue-800">
-          <MessageCircle className="h-4 w-4" />
+      {/* ─── FLOATING SOLVE DOUBTS BUTTON ────────────────────────── */}
+      {dashboard.stats.pendingDoubts > 0 && (
+        <button className="fixed bottom-6 right-6 z-20 flex items-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg hover:bg-blue-700 transition hover:shadow-xl">
+          <MessageSquare className="h-4 w-4" />
           Solve Doubts
         </button>
-      </div>
+      )}
+    </div>
+  );
+}
 
-      {/* ─── Mobile Bottom Navigation ───────────────────────────────────── */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-100 bg-white/95 backdrop-blur-md lg:hidden">
-        <div className="flex items-center justify-around py-2.5 px-2">
-          <a
-            href="https://preschool-tau.vercel.app/"
-            className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg text-gray-400 hover:text-blue-600 transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5" />
-            <span className="text-[10px] font-medium">Main Site</span>
-          </a>
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveNav(item.id)}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors ${
-                activeNav === item.id ? "text-blue-600" : "text-gray-400"
-              }`}
-            >
-              <item.icon className="h-5 w-5" />
-              <span className="text-[10px] font-medium">{item.label}</span>
-            </button>
-          ))}
+/* ─── QUICK CARD COMPONENT ─────────────────────────────────────── */
+function QuickCard({ icon, title, subtitle, badge }: { icon: React.ReactNode; title: string; subtitle: string; badge: string }) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition cursor-pointer group">
+      <div className="flex items-start justify-between">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 group-hover:bg-blue-100 transition">
+          {icon}
         </div>
-      </nav>
+        <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full">{badge}</span>
+      </div>
+      <p className="mt-3 text-sm font-black text-slate-900">{title}</p>
+      <p className="mt-0.5 text-xs font-medium text-slate-500">{subtitle}</p>
     </div>
   );
 }

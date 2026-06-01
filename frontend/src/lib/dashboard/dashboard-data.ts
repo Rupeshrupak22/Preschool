@@ -75,19 +75,44 @@ export interface HomeworkItem {
   id: string;
   subject: string;
   title: string;
+  description?: string;
   dueDate: string;
   status: "pending" | "submitted" | "overdue";
   priority: "high" | "medium" | "low";
+  teacher?: string;
 }
 
 export interface NoteItem {
   id: string;
   subject: string;
   title: string;
+  description?: string;
   type: "pdf" | "note" | "video";
   uploadDate: string;
   size: string;
   bookmarked: boolean;
+  teacher?: string;
+  fileName?: string;
+}
+
+export interface DashboardNotification {
+  id: string;
+  title: string;
+  message: string;
+  channel: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface StudentDoubt {
+  id: string;
+  subject: string;
+  question: string;
+  status: "pending" | "solved";
+  teacherReply?: string;
+  attachmentName?: string;
+  createdAt: string;
+  repliedAt?: string;
 }
 
 export interface SkillData {
@@ -149,6 +174,56 @@ export interface SubjectAttendance {
 export interface WeeklyScheduleDay {
   day: string;
   classes: string[];
+}
+
+export interface CourseProgress {
+  id: string;
+  title: string;
+  progress: number;
+  totalLessons: number;
+  completedLessons: number;
+  teacher: string;
+  color: string;
+  status: string;
+  topics: string[];
+  enrolledAt?: string;
+}
+
+export interface CertificateItem {
+  id: string;
+  course: string;
+  issuedDate: string;
+  credentialId: string;
+  status: string;
+  color: string;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  name: string;
+  score: number;
+  attendance: number;
+  consistency: number;
+  badge: string;
+  highlight: boolean;
+}
+
+export interface RecordedClass {
+  id: string;
+  subject: string;
+  title: string;
+  teacher: string;
+  duration: string;
+  date: string;
+  views: number;
+  gradient: string;
+  bookmarked: boolean;
+}
+
+export interface GamifiedStat {
+  xp: number;
+  gamesPlayed: number;
+  badgesWon: number;
 }
 
 // ============================================================
@@ -223,7 +298,7 @@ export const quickAccessCards: QuickAccessCard[] = [
     statLabel: "Mentors",
     icon: "help-circle",
     gradient: "from-orange-500 to-pink-500",
-    href: "/student-dashboard/homework",
+    href: "/student-dashboard/doubt-section",
   },
   {
     id: "recorded-classes",
@@ -442,6 +517,13 @@ export const dashboardData = {
   attendanceMonths,
   subjectAttendance,
   weeklySchedule,
+  courses: [] as CourseProgress[],
+  certificates: [] as CertificateItem[],
+  leaderboard: [] as LeaderboardEntry[],
+  recordedClasses: [] as RecordedClass[],
+  gamifiedStats: { xp: 0, gamesPlayed: 0, badgesWon: 0 } as GamifiedStat,
+  notifications: [] as DashboardNotification[],
+  doubts: [] as StudentDoubt[],
 };
 
 export type DashboardData = typeof dashboardData;
@@ -523,7 +605,7 @@ export function createEmptyDashboardData(student?: Partial<Student>): DashboardD
         statLabel: "Queries",
         icon: "help-circle",
         gradient: "from-orange-500 to-pink-500",
-        href: "/student-dashboard/homework",
+        href: "/student-dashboard/doubt-section",
       },
       {
         id: "recorded-classes",
@@ -571,5 +653,12 @@ export function createEmptyDashboardData(student?: Partial<Student>): DashboardD
     attendanceMonths: [],
     subjectAttendance: [],
     weeklySchedule: [],
+    courses: [],
+    certificates: [],
+    leaderboard: [],
+    recordedClasses: [],
+    gamifiedStats: { xp: 0, gamesPlayed: 0, badgesWon: 0 },
+    notifications: [],
+    doubts: [],
   };
 }

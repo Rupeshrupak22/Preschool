@@ -22,6 +22,7 @@ import {
   HelpCircle,
   PlayCircle,
 } from "lucide-react";
+import { useDashboardData } from "@/lib/dashboard/use-dashboard-data";
 
 interface SidebarItem {
   id: string;
@@ -35,16 +36,16 @@ interface SidebarItem {
 const sidebarItems: SidebarItem[] = [
   { id: "/student-dashboard",                  label: "Dashboard",        icon: LayoutDashboard, href: "/student-dashboard",                  group: "primary" },
   { id: "/student-dashboard/my-courses",       label: "My Courses",       icon: BookOpen,        href: "/student-dashboard/my-courses",       group: "primary" },
-  { id: "/student-dashboard/live-classes",     label: "Live Classes",     icon: Video,           href: "/student-dashboard/live-classes",     group: "primary", badge: "LIVE" },
-  { id: "/student-dashboard/ai-lab",           label: "AI Lab",           icon: Sparkles,        href: "/student-dashboard/ai-lab",           group: "primary", badge: "NEW" },
-  { id: "/student-dashboard/homework",         label: "Homework",         icon: ClipboardList,   href: "/student-dashboard/homework",         group: "primary", badge: "3" },
-  { id: "/student-dashboard/gamified",         label: "Gamified",         icon: Gamepad2,        href: "/student-dashboard/gamified",         group: "primary", badge: "NEW" },
+  { id: "/student-dashboard/live-classes",     label: "Live Classes",     icon: Video,           href: "/student-dashboard/live-classes",     group: "primary" },
+  { id: "/student-dashboard/ai-lab",           label: "AI Lab",           icon: Sparkles,        href: "/student-dashboard/ai-lab",           group: "primary" },
+  { id: "/student-dashboard/homework",         label: "Homework",         icon: ClipboardList,   href: "/student-dashboard/homework",         group: "primary" },
+  { id: "/student-dashboard/gamified",         label: "Gamified",         icon: Gamepad2,        href: "/student-dashboard/gamified",         group: "primary" },
   { id: "/student-dashboard/notes",            label: "Notes & PDFs",     icon: FileText,        href: "/student-dashboard/notes",            group: "secondary" },
   { id: "/student-dashboard/daily-news",       label: "Daily News",       icon: Newspaper,       href: "/student-dashboard/daily-news",       group: "secondary" },
   { id: "/student-dashboard/attendance",       label: "Attendance",       icon: CalendarCheck,   href: "/student-dashboard/attendance",       group: "secondary" },
   { id: "/student-dashboard/skill-progress",   label: "Skill Progress",   icon: Zap,             href: "/student-dashboard/skill-progress",   group: "secondary" },
   { id: "/student-dashboard/leaderboard",      label: "Leaderboard",      icon: Trophy,          href: "/student-dashboard/leaderboard",      group: "secondary" },
-  { id: "/student-dashboard/doubt-section",    label: "Doubt Section",    icon: HelpCircle,      href: "/student-dashboard/homework",         group: "secondary" },
+  { id: "/student-dashboard/doubt-section",    label: "Doubt Section",    icon: HelpCircle,      href: "/student-dashboard/doubt-section",   group: "secondary" },
   { id: "/student-dashboard/recorded-classes", label: "Recorded Classes", icon: PlayCircle,      href: "/student-dashboard/recorded-classes", group: "tertiary" },
   { id: "/student-dashboard/settings",         label: "Settings",         icon: Settings,        href: "/student-dashboard/settings",         group: "tertiary" },
 ];
@@ -68,6 +69,8 @@ export default function DashboardSidebar({
   onMobileOpen,
 }: Props) {
   const pathname = usePathname();
+  const data = useDashboardData();
+  const cardBadges = new Map(data.quickAccessCards.map((card) => [card.href, card.badge]));
 
   const NavItems = ({ forMobile = false }: { forMobile?: boolean }) => {
     const groups: Array<{ key: "primary" | "secondary" | "tertiary"; label: string }> = [
@@ -90,6 +93,7 @@ export default function DashboardSidebar({
               <div className="space-y-0.5">
                 {items.map((item) => {
                   const isActive = pathname === item.id;
+                  const badge = cardBadges.get(item.href) ?? item.badge;
                   return (
                     <a
                       key={item.id}
@@ -116,17 +120,17 @@ export default function DashboardSidebar({
                       {(!collapsed || forMobile) && (
                         <span className="flex-1 truncate">{item.label}</span>
                       )}
-                      {(!collapsed || forMobile) && item.badge && (
+                      {(!collapsed || forMobile) && badge && (
                         <span
                           className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${
-                            item.badge === "LIVE"
+                            badge === "LIVE"
                               ? "animate-pulse bg-rose-500 text-white"
-                              : item.badge === "NEW"
+                              : badge === "NEW"
                               ? "bg-emerald-500 text-white"
                               : "bg-white/20 text-white"
                           }`}
                         >
-                          {item.badge}
+                          {badge}
                         </span>
                       )}
                     </a>

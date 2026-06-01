@@ -1,6 +1,23 @@
 import fs from "node:fs";
 import mysql, { type Pool, type PoolOptions, type RowDataPacket } from "mysql2/promise";
-import { createEmptyDashboardData, type DashboardData, type Achievement, type FutureSkill } from "@/lib/dashboard/dashboard-data";
+import {
+  createEmptyDashboardData,
+  type Achievement,
+  type AttendanceMonth,
+  type CertificateItem,
+  type CourseProgress,
+  type DashboardData,
+  type DashboardNotification,
+  type FutureSkill,
+  type HomeworkItem,
+  type LeaderboardEntry,
+  type LiveClass,
+  type NoteItem,
+  type PerformanceTrend,
+  type StudentDoubt,
+  type SubjectAttendance,
+  type WeeklyScheduleDay,
+} from "@/lib/dashboard/dashboard-data";
 import { id } from "@/lib/store";
 
 type UserRecord = {
@@ -404,6 +421,72 @@ async function ensureSchema(pool: Pool) {
       KEY idx_teacher_class_sessions_teacher_id (teacher_id),
       KEY idx_teacher_class_sessions_class_level (class_level),
       KEY idx_teacher_class_sessions_start_time (start_time)
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS teacher_homework (
+      id VARCHAR(64) PRIMARY KEY,
+      teacher_id VARCHAR(64) NOT NULL,
+      school_id VARCHAR(64),
+      class_level VARCHAR(80),
+      student_email VARCHAR(190),
+      subject VARCHAR(120) NOT NULL,
+      title VARCHAR(190) NOT NULL,
+      description TEXT,
+      due_date VARCHAR(80),
+      priority VARCHAR(40) NOT NULL DEFAULT 'medium',
+      status VARCHAR(40) NOT NULL DEFAULT 'active',
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      KEY idx_teacher_homework_teacher_id (teacher_id),
+      KEY idx_teacher_homework_school_class (school_id, class_level),
+      KEY idx_teacher_homework_student_email (student_email)
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS teacher_notes (
+      id VARCHAR(64) PRIMARY KEY,
+      teacher_id VARCHAR(64) NOT NULL,
+      school_id VARCHAR(64),
+      class_level VARCHAR(80),
+      student_email VARCHAR(190),
+      subject VARCHAR(120) NOT NULL,
+      title VARCHAR(190) NOT NULL,
+      description TEXT,
+      file_name VARCHAR(190),
+      file_size VARCHAR(80),
+      note_type VARCHAR(40) NOT NULL DEFAULT 'pdf',
+      url TEXT,
+      status VARCHAR(40) NOT NULL DEFAULT 'active',
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      KEY idx_teacher_notes_teacher_id (teacher_id),
+      KEY idx_teacher_notes_school_class (school_id, class_level),
+      KEY idx_teacher_notes_student_email (student_email)
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS student_doubts (
+      id VARCHAR(64) PRIMARY KEY,
+      student_email VARCHAR(190) NOT NULL,
+      student_name VARCHAR(160),
+      teacher_id VARCHAR(64),
+      school_id VARCHAR(64),
+      class_level VARCHAR(80),
+      subject VARCHAR(120) NOT NULL,
+      question TEXT NOT NULL,
+      attachment_name VARCHAR(190),
+      attachment_type VARCHAR(40),
+      status VARCHAR(40) NOT NULL DEFAULT 'pending',
+      reply_text TEXT,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      replied_at DATETIME,
+      KEY idx_student_doubts_student_email (student_email),
+      KEY idx_student_doubts_teacher_id (teacher_id),
+      KEY idx_student_doubts_status (status)
     )
   `);
 
@@ -1124,6 +1207,272 @@ export async function recordTeacherLoginEvent(data: {
   }
 }
 
+type TeacherContentPayload = {
+  subject: string;
+  title: string;
+  description?: string;
+  classLevel?: string;
+  studentEmail?: string;
+  dueDate?: string;
+  priority?: "high" | "medium" | "low";
+  fileName?: string;
+  fileSize?: string;
+  noteType?: "pdf" | "note" | "video";
+  url?: string;
+};
+
+type StudentDoubtPayload = {
+  subject: string;
+  question: string;
+  attachmentName?: string;
+  attachmentType?: string;
+};
+
+function priorityValue(value: unknown): "high" | "medium" | "low" {
+  const normalized = String(value ?? "").toLowerCase();
+  return normalized === "high" || normalized === "low" ? normalized : "medium";
+}
+
+function statusForDueDate(value: unknown): HomeworkItem["status"] {
+  const due = asDate(value);
+  if (!due) return "pending";
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  due.setHours(23, 59, 59, 999);
+  return due < today ? "overdue" : "pending";
+}
+
+async function getTeacherTargetStudents(
+  pool: Pool,
+  teacher: TeacherRecord,
+  target: { classLevel?: string; studentEmail?: string }
+) {
+  if (target.studentEmail) {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT id, name, email, class_level, class_name, school_id, school_name, school
+       FROM students
+       WHERE email = ?
+       LIMIT 1`,
+      [target.studentEmail]
+    );
+    return rows;
+  }
+
+  const classFilter = target.classLevel || teacher.assignedClasses[0] || "";
+  const params: unknown[] = [teacher.schoolId, teacher.schoolName, teacher.schoolName];
+  let classClause = "";
+  if (classFilter) {
+    classClause = "AND (class_level = ? OR class_name = ?)";
+    params.push(classFilter, classFilter);
+  } else if (teacher.assignedClasses.length) {
+    classClause = `AND (class_level IN (${teacher.assignedClasses.map(() => "?").join(", ")}) OR class_name IN (${teacher.assignedClasses.map(() => "?").join(", ")}))`;
+    params.push(...teacher.assignedClasses, ...teacher.assignedClasses);
+  }
+
+  const [rows] = await pool.query<RowDataPacket[]>(
+    `SELECT id, name, email, class_level, class_name, school_id, school_name, school
+     FROM students
+     WHERE (school_id = ? OR TRIM(COALESCE(school_name, '')) = ? OR TRIM(COALESCE(school, '')) = ?)
+     ${classClause}
+     ORDER BY name ASC
+     LIMIT 300`,
+    params
+  );
+  return rows;
+}
+
+async function createStudentNotifications(
+  pool: Pool,
+  students: RowDataPacket[],
+  data: { title: string; message: string; channel: string }
+) {
+  await Promise.all(
+    students
+      .filter((student) => student.email)
+      .map((student) =>
+        pool.query(
+          `INSERT INTO notifications (id, user_email, title, message, channel, status)
+           VALUES (?, ?, ?, ?, ?, 'unread')`,
+          [id("notification"), student.email, data.title, data.message, data.channel]
+        )
+      )
+  );
+}
+
+export async function createTeacherHomework(teacherId: string, payload: TeacherContentPayload) {
+  const pool = await connectDb();
+  if (!pool) return null;
+
+  const [teacherRows] = await pool.query<RowDataPacket[]>("SELECT * FROM teachers WHERE id = ? LIMIT 1", [teacherId]);
+  const teacher = teacherRows[0] ? mapTeacher(teacherRows[0]) : null;
+  if (!teacher) return null;
+
+  const students = await getTeacherTargetStudents(pool, teacher, payload);
+  const classLevel = payload.classLevel || teacher.assignedClasses[0] || null;
+  const homeworkId = id("homework");
+
+  await pool.query(
+    `INSERT INTO teacher_homework
+       (id, teacher_id, school_id, class_level, student_email, subject, title, description, due_date, priority)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      homeworkId,
+      teacher.id,
+      teacher.schoolId,
+      classLevel,
+      payload.studentEmail || null,
+      payload.subject,
+      payload.title,
+      payload.description || null,
+      payload.dueDate || null,
+      priorityValue(payload.priority),
+    ]
+  );
+
+  await createStudentNotifications(pool, students, {
+    title: "New homework assigned",
+    message: `${teacher.teacherName} assigned: ${payload.title}`,
+    channel: "homework",
+  });
+
+  return { id: homeworkId, notified: students.length };
+}
+
+export async function createTeacherNote(teacherId: string, payload: TeacherContentPayload) {
+  const pool = await connectDb();
+  if (!pool) return null;
+
+  const [teacherRows] = await pool.query<RowDataPacket[]>("SELECT * FROM teachers WHERE id = ? LIMIT 1", [teacherId]);
+  const teacher = teacherRows[0] ? mapTeacher(teacherRows[0]) : null;
+  if (!teacher) return null;
+
+  const students = await getTeacherTargetStudents(pool, teacher, payload);
+  const classLevel = payload.classLevel || teacher.assignedClasses[0] || null;
+  const noteId = id("note");
+
+  await pool.query(
+    `INSERT INTO teacher_notes
+       (id, teacher_id, school_id, class_level, student_email, subject, title, description, file_name, file_size, note_type, url)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      noteId,
+      teacher.id,
+      teacher.schoolId,
+      classLevel,
+      payload.studentEmail || null,
+      payload.subject,
+      payload.title,
+      payload.description || null,
+      payload.fileName || null,
+      payload.fileSize || null,
+      payload.noteType || "pdf",
+      payload.url || null,
+    ]
+  );
+
+  await createStudentNotifications(pool, students, {
+    title: "New study material uploaded",
+    message: `${teacher.teacherName} shared: ${payload.title}`,
+    channel: "notes",
+  });
+
+  return { id: noteId, notified: students.length };
+}
+
+export async function replyToStudentDoubt(teacherId: string, doubtId: string, replyText: string) {
+  const pool = await connectDb();
+  if (!pool) return null;
+
+  const [teacherRows] = await pool.query<RowDataPacket[]>("SELECT * FROM teachers WHERE id = ? LIMIT 1", [teacherId]);
+  const teacher = teacherRows[0] ? mapTeacher(teacherRows[0]) : null;
+  if (!teacher) return null;
+
+  const [doubtRows] = await pool.query<RowDataPacket[]>(
+    `SELECT *
+     FROM student_doubts
+     WHERE id = ? AND (teacher_id = ? OR school_id = ?)
+     LIMIT 1`,
+    [doubtId, teacher.id, teacher.schoolId]
+  );
+  const doubt = doubtRows[0];
+  if (!doubt) return null;
+
+  await pool.query(
+    `UPDATE student_doubts
+     SET teacher_id = ?, status = 'solved', reply_text = ?, replied_at = NOW()
+     WHERE id = ?`,
+    [teacher.id, replyText, doubtId]
+  );
+
+  await createStudentNotifications(pool, [{ email: doubt.student_email } as RowDataPacket], {
+    title: "Your doubt was solved",
+    message: `${teacher.teacherName}: ${replyText.slice(0, 120)}`,
+    channel: "doubt",
+  });
+
+  return { id: doubtId };
+}
+
+export async function createStudentDoubt(user: UserRecord, payload: StudentDoubtPayload) {
+  const pool = await connectDb();
+  if (!pool) return null;
+
+  const [studentRows] = await pool.query<RowDataPacket[]>(
+    `SELECT *
+     FROM students
+     WHERE email = ? OR user_id = ?
+     ORDER BY updated_at DESC, created_at DESC
+     LIMIT 1`,
+    [user.email, user.id]
+  );
+  const profile = studentRows[0];
+  const classLevel = user.classLevel || profile?.class_level || profile?.class_name || null;
+  const schoolId = profile?.school_id || null;
+  const schoolName = user.schoolName || profile?.school_name || profile?.school || "";
+
+  const [teacherRows] = await pool.query<RowDataPacket[]>(
+    `SELECT id, email, assigned_classes
+     FROM teachers
+     WHERE (school_id = ? OR TRIM(COALESCE(school_name, '')) = ?)
+     ORDER BY updated_at DESC
+     LIMIT 50`,
+    [schoolId, schoolName]
+  );
+  const teacher = teacherRows.find((row) => {
+    const classes = parseAssignedClasses(row.assigned_classes);
+    return !classes.length || !classLevel || classes.includes(String(classLevel));
+  }) ?? teacherRows[0];
+
+  const doubtId = id("doubt");
+  await pool.query(
+    `INSERT INTO student_doubts
+       (id, student_email, student_name, teacher_id, school_id, class_level, subject, question, attachment_name, attachment_type)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      doubtId,
+      user.email,
+      user.name,
+      teacher?.id ?? null,
+      schoolId,
+      classLevel,
+      payload.subject,
+      payload.question,
+      payload.attachmentName || null,
+      payload.attachmentType || null,
+    ]
+  );
+
+  if (teacher?.email) {
+    await pool.query(
+      `INSERT INTO notifications (id, user_email, title, message, channel, status)
+       VALUES (?, ?, 'New student doubt', ?, 'doubt', 'unread')`,
+      [id("notification"), teacher.email, `${user.name}: ${payload.question.slice(0, 120)}`]
+    );
+  }
+
+  return { id: doubtId };
+}
+
 export async function getTeacherDashboard(teacherId: string) {
   const pool = await connectDb();
   if (!pool) return null;
@@ -1149,7 +1498,7 @@ export async function getTeacherDashboard(teacherId: string) {
     ? [schoolId, schoolScope, schoolScope]
     : [schoolScope, schoolScope];
 
-  const [studentRows, loginRows, sessionRows, certificateRows] = await Promise.all([
+  const [studentRows, loginRows, sessionRows, certificateRows, homeworkRows, noteRows, doubtRows, notificationRows] = await Promise.all([
     pool.query<RowDataPacket[]>(
       `SELECT id, name, email, phone, class_level, class_name, school_name, school, signup_source, status, created_at
        FROM students
@@ -1190,6 +1539,40 @@ export async function getTeacherDashboard(teacherId: string) {
        ORDER BY created_at DESC
        LIMIT 100`,
       [...schoolParams, ...classParams]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT h.*, t.teacher_name
+       FROM teacher_homework h
+       LEFT JOIN teachers t ON t.id = h.teacher_id
+       WHERE h.teacher_id = ?
+       ORDER BY h.created_at DESC
+       LIMIT 120`,
+      [teacher.id]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT n.*, t.teacher_name
+       FROM teacher_notes n
+       LEFT JOIN teachers t ON t.id = n.teacher_id
+       WHERE n.teacher_id = ?
+       ORDER BY n.created_at DESC
+       LIMIT 120`,
+      [teacher.id]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT id, student_email, student_name, class_level, subject, question, attachment_name, attachment_type, status, reply_text, created_at, replied_at
+       FROM student_doubts
+       WHERE teacher_id = ? OR school_id = ?
+       ORDER BY created_at DESC
+       LIMIT 120`,
+      [teacher.id, teacher.schoolId]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT id, title, message, channel, status, created_at
+       FROM notifications
+       WHERE user_email = ?
+       ORDER BY created_at DESC
+       LIMIT 40`,
+      [teacher.email]
     )
   ]);
 
@@ -1233,6 +1616,62 @@ export async function getTeacherDashboard(teacherId: string) {
     status: row.status
   }));
 
+  const homework = homeworkRows[0].map((row) => ({
+    id: row.id,
+    teacherId: row.teacher_id,
+    classLevel: row.class_level,
+    studentEmail: row.student_email,
+    subject: row.subject,
+    title: row.title,
+    description: row.description,
+    dueDate: row.due_date,
+    priority: row.priority,
+    status: row.status,
+    teacherName: row.teacher_name,
+    createdAt: dateValue(row.created_at)
+  }));
+
+  const notes = noteRows[0].map((row) => ({
+    id: row.id,
+    teacherId: row.teacher_id,
+    classLevel: row.class_level,
+    studentEmail: row.student_email,
+    subject: row.subject,
+    title: row.title,
+    description: row.description,
+    fileName: row.file_name,
+    fileSize: row.file_size,
+    noteType: row.note_type,
+    url: row.url,
+    status: row.status,
+    teacherName: row.teacher_name,
+    createdAt: dateValue(row.created_at)
+  }));
+
+  const doubts = doubtRows[0].map((row) => ({
+    id: row.id,
+    studentEmail: row.student_email,
+    studentName: row.student_name,
+    classLevel: row.class_level,
+    subject: row.subject,
+    question: row.question,
+    attachmentName: row.attachment_name,
+    attachmentType: row.attachment_type,
+    status: row.status,
+    replyText: row.reply_text,
+    createdAt: dateValue(row.created_at),
+    repliedAt: dateValue(row.replied_at)
+  }));
+
+  const notifications = notificationRows[0].map((row) => ({
+    id: row.id,
+    title: row.title,
+    message: row.message,
+    channel: row.channel,
+    status: row.status,
+    createdAt: dateValue(row.created_at)
+  }));
+
   const classBreakdown = students.reduce<Record<string, number>>((result, student) => {
     const className = String(student.classLevel || "Not assigned");
     result[className] = (result[className] ?? 0) + 1;
@@ -1265,13 +1704,21 @@ export async function getTeacherDashboard(teacherId: string) {
       classes: classBreakdownRows.length,
       upcomingClasses: upcomingClasses.length,
       certificates: certificates.length,
-      activeLogins: logins.filter((login) => login.status === "success" || login.status === "signup").length
+      activeLogins: logins.filter((login) => login.status === "success" || login.status === "signup").length,
+      homework: homework.length,
+      notes: notes.length,
+      pendingDoubts: doubts.filter((doubt) => doubt.status !== "solved").length,
+      notifications: notifications.filter((notification) => notification.status !== "read").length
     },
     classBreakdown: classBreakdownRows,
     students,
     schedule,
     logins,
-    certificates
+    certificates,
+    homework,
+    notes,
+    doubts,
+    notifications
   };
 }
 
@@ -1434,32 +1881,117 @@ export async function getStudentDashboardData(email?: string) {
   };
 }
 
-async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): Promise<DashboardData> {
-  const [studentCountRows] = await pool.query<RowDataPacket[]>(
-    "SELECT COUNT(*) AS count FROM users WHERE role = 'student'"
-  );
+const colorNames = ["blue", "purple", "emerald", "orange", "rose", "cyan", "yellow", "fuchsia"];
+const courseGradients = [
+  "from-blue-500 to-indigo-600",
+  "from-emerald-500 to-teal-600",
+  "from-rose-500 to-pink-600",
+  "from-cyan-500 to-blue-600",
+  "from-purple-500 to-fuchsia-600",
+  "from-orange-500 to-amber-600",
+];
+const subjectBars = ["bg-blue-500", "bg-emerald-500", "bg-rose-500", "bg-cyan-500", "bg-purple-500", "bg-orange-500"];
 
-  const totalStudents = Number(studentCountRows[0]?.count ?? 0);
+function percent(part: number, total: number) {
+  return total > 0 ? Math.round((part / total) * 100) : 0;
+}
+
+function asDate(value: unknown) {
+  const date = value instanceof Date ? value : value ? new Date(String(value)) : null;
+  return date && !Number.isNaN(date.getTime()) ? date : null;
+}
+
+function monthLabel(value: unknown) {
+  const date = asDate(value);
+  return date ? date.toLocaleString("en-US", { month: "short" }) : "Unknown";
+}
+
+function dateLabel(value: unknown) {
+  const date = asDate(value);
+  return date ? date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Not recorded";
+}
+
+function timeLabel(value: unknown) {
+  const date = asDate(value);
+  return date ? date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) : "Time TBA";
+}
+
+function minutesBetween(start: unknown, end: unknown) {
+  const startDate = asDate(start);
+  const endDate = asDate(end);
+  if (!startDate || !endDate) return "Duration TBA";
+
+  const minutes = Math.max(0, Math.round((endDate.getTime() - startDate.getTime()) / 60000));
+  return minutes > 0 ? `${minutes} min` : "Duration TBA";
+}
+
+function dayLabel(value: unknown) {
+  const date = asDate(value);
+  return date ? date.toLocaleString("en-US", { weekday: "long" }) : "Unscheduled";
+}
+
+function isPresentStatus(status: unknown) {
+  const value = String(status ?? "").trim().toLowerCase();
+  return value === "present" || value === "late" || value === "attended" || value === "joined";
+}
+
+function normalizeClass(value: unknown) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function sameText(first: unknown, second: unknown) {
+  return String(first ?? "").trim().toLowerCase() === String(second ?? "").trim().toLowerCase();
+}
+
+async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): Promise<DashboardData> {
+  const [studentCountRows, profileRows] = await Promise.all([
+    pool.query<RowDataPacket[]>("SELECT COUNT(*) AS count FROM users WHERE role = 'student'"),
+    user?.email
+      ? pool.query<RowDataPacket[]>(
+          `SELECT *
+           FROM students
+           WHERE email = ? OR user_id = ?
+           ORDER BY updated_at DESC, created_at DESC
+           LIMIT 1`,
+          [user.email, user.id]
+        )
+      : Promise.resolve<[RowDataPacket[], unknown]>([[], undefined])
+  ]);
+
+  const profile = profileRows[0][0];
+  const studentClass = user?.classLevel || profile?.class_level || profile?.class_name || "Not assigned";
+  const schoolName = user?.schoolName || profile?.school_name || profile?.school || "";
+  const totalStudents = Number(studentCountRows[0][0]?.count ?? 0);
   const dashboard = createEmptyDashboardData({
-    name: user?.name ?? "Student",
-    class: user?.classLevel || "Not assigned",
-    avatar: user?.name ? initials(user.name) : "S",
+    name: user?.name ?? profile?.name ?? "Student",
+    rollNumber: user?.id ?? profile?.id ?? "Not assigned",
+    class: studentClass,
+    avatar: user?.name ? initials(user.name) : profile?.name ? initials(String(profile.name)) : "S",
     totalStudents,
   });
 
-  dashboard.studentData.aiInsight = "No learning activity has been recorded yet.";
-  dashboard.metricCards = dashboard.metricCards.map((card) =>
-    card.id === "rank" ? { ...card, value: totalStudents > 0 ? "-" : "0" } : card
-  );
-
   if (!user?.email) return dashboard;
 
-  const [enrollmentRows, certificateRows, loginRows, paidPaymentRows] = await Promise.all([
+  const [
+    enrollmentRows,
+    certificateRows,
+    loginRows,
+    paidPaymentRows,
+    attendanceRows,
+    sessionRows,
+    leaderboardRows,
+    homeworkRows,
+    noteRows,
+    doubtRows,
+    notificationRows
+  ] = await Promise.all([
     pool.query<RowDataPacket[]>(
-      `SELECT id, course_title, status, enrolled_at, created_at
-       FROM enrollments
-       WHERE user_email = ?
-       ORDER BY enrolled_at DESC, created_at DESC`,
+      `SELECT e.id, e.course_title, e.status, e.enrolled_at, e.completed_at, e.created_at,
+              c.title AS catalog_title, c.category, c.level, c.duration
+       FROM enrollments e
+       LEFT JOIN courses c ON c.id = e.course_id
+       WHERE e.user_email = ?
+       ORDER BY e.enrolled_at DESC, e.created_at DESC`,
       [user.email]
     ),
     pool.query<RowDataPacket[]>(
@@ -1474,7 +2006,7 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
        FROM login_events
        WHERE email = ? AND status IN ('success', 'signup')
        ORDER BY created_at DESC
-       LIMIT 30`,
+       LIMIT 90`,
       [user.email]
     ),
     pool.query<RowDataPacket[]>(
@@ -1482,57 +2014,388 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
        FROM payments
        WHERE user_email = ? AND status = 'paid'`,
       [user.email]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT subject, status, created_at, time, source
+       FROM attendance
+       WHERE user_id = ? OR user_id = ?
+       ORDER BY created_at DESC`,
+      [user.id, user.email]
+    ),
+    schoolName || studentClass !== "Not assigned"
+      ? pool.query<RowDataPacket[]>(
+          `SELECT s.id, s.title, s.class_level, s.subject, s.start_time, s.end_time, s.room, s.mode, s.status,
+                  t.teacher_name, t.school_name
+           FROM teacher_class_sessions s
+           LEFT JOIN teachers t ON t.id = s.teacher_id
+           WHERE s.status <> 'cancelled'
+           ORDER BY s.start_time ASC
+           LIMIT 250`
+        )
+      : Promise.resolve<[RowDataPacket[], unknown]>([[], undefined]),
+    pool.query<RowDataPacket[]>(
+      `SELECT u.id, u.name, u.email, u.class_level, u.class_name, u.school_name, u.school,
+              COALESCE(a.total, 0) AS attendance_total,
+              COALESCE(a.present, 0) AS attendance_present,
+              COALESCE(l.login_count, 0) AS login_count,
+              COALESCE(c.certificate_count, 0) AS certificate_count,
+              COALESCE(p.paid_count, 0) AS paid_count
+       FROM users u
+       LEFT JOIN (
+         SELECT user_id, COUNT(*) AS total,
+                SUM(CASE WHEN LOWER(status) IN ('present', 'late', 'attended', 'joined') THEN 1 ELSE 0 END) AS present
+         FROM attendance
+         GROUP BY user_id
+       ) a ON a.user_id = u.id OR a.user_id = u.email
+       LEFT JOIN (
+         SELECT email, COUNT(*) AS login_count
+         FROM login_events
+         WHERE status IN ('success', 'signup')
+         GROUP BY email
+       ) l ON l.email = u.email
+       LEFT JOIN (
+         SELECT user_email, COUNT(*) AS certificate_count
+         FROM certificates
+         GROUP BY user_email
+       ) c ON c.user_email = u.email
+       LEFT JOIN (
+         SELECT user_email, COUNT(*) AS paid_count
+         FROM payments
+         WHERE status = 'paid'
+         GROUP BY user_email
+       ) p ON p.user_email = u.email
+       WHERE u.role = 'student'
+       ORDER BY u.created_at ASC
+       LIMIT 250`
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT h.*, t.teacher_name
+       FROM teacher_homework h
+       LEFT JOIN teachers t ON t.id = h.teacher_id
+       WHERE h.status = 'active'
+         AND (
+           h.student_email = ?
+           OR (
+             h.student_email IS NULL
+             AND (h.school_id = ? OR TRIM(COALESCE(t.school_name, '')) = ?)
+             AND (h.class_level IS NULL OR h.class_level = '' OR h.class_level = ?)
+           )
+         )
+       ORDER BY h.created_at DESC
+       LIMIT 80`,
+      [user.email, profile?.school_id ?? "", schoolName, studentClass]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT n.*, t.teacher_name
+       FROM teacher_notes n
+       LEFT JOIN teachers t ON t.id = n.teacher_id
+       WHERE n.status = 'active'
+         AND (
+           n.student_email = ?
+           OR (
+             n.student_email IS NULL
+             AND (n.school_id = ? OR TRIM(COALESCE(t.school_name, '')) = ?)
+             AND (n.class_level IS NULL OR n.class_level = '' OR n.class_level = ?)
+           )
+         )
+       ORDER BY n.created_at DESC
+       LIMIT 80`,
+      [user.email, profile?.school_id ?? "", schoolName, studentClass]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT id, subject, question, status, reply_text, attachment_name, created_at, replied_at
+       FROM student_doubts
+       WHERE student_email = ?
+       ORDER BY created_at DESC
+       LIMIT 80`,
+      [user.email]
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT id, title, message, channel, status, created_at
+       FROM notifications
+       WHERE user_email = ?
+       ORDER BY created_at DESC
+       LIMIT 80`,
+      [user.email]
     )
   ]);
 
   const enrollments = enrollmentRows[0];
   const certificates = certificateRows[0];
   const loginEvents = loginRows[0];
+  const attendance = attendanceRows[0];
   const paidPayments = Number(paidPaymentRows[0][0]?.count ?? 0);
-  const earnedCount = certificates.length;
+  const presentCount = attendance.filter((row) => isPresentStatus(row.status)).length;
+  const attendancePct = percent(presentCount, attendance.length);
+  const completedCertificates = certificates.filter((row) => String(row.status ?? "active") === "active");
 
-  dashboard.studentData.rollNumber = user.id;
-  dashboard.studentData.aiInsight =
-    loginEvents.length > 0
-      ? "Your activity has started. More reports will appear when classes, homework, tests, and attendance are recorded."
-      : "No learning activity has been recorded yet.";
-  dashboard.weeklyProgress = {
-    score: 0,
-    consistency: loginEvents.length > 0 ? Math.min(100, loginEvents.length * 10) : 0,
-    streak: 0,
-    classPercentile: 0,
-  };
+  const filteredSessions = sessionRows[0].filter((row) => {
+    const classOk = studentClass === "Not assigned" || normalizeClass(row.class_level) === normalizeClass(studentClass);
+    const schoolOk = !schoolName || sameText(row.school_name, schoolName);
+    return classOk && schoolOk;
+  });
+  const now = new Date();
+  const todayKey = now.toDateString();
+  const todaySessions = filteredSessions.filter((row) => asDate(row.start_time)?.toDateString() === todayKey);
+  const upcomingSessions = filteredSessions.filter((row) => {
+    const start = asDate(row.start_time);
+    return start ? start >= new Date(now.getTime() - 60 * 60 * 1000) : false;
+  });
 
-  dashboard.futureSkills = enrollments.map<FutureSkill>((row, index) => ({
-    id: String(row.id ?? `enrollment-${index}`),
-    title: String(row.course_title ?? "Course"),
-    progress: 0,
-    level: String(row.status ?? "active"),
-    badges: certificates.filter((certificate) => certificate.course === row.course_title).length,
-    nextMilestone: "Start learning activity",
-    color: ["blue", "purple", "emerald", "orange"][index % 4],
-    icon: "book-open",
+  const courses = enrollments.map<CourseProgress>((row, index) => {
+    const title = String(row.course_title ?? row.catalog_title ?? "Course");
+    const hasCertificate = certificates.some((certificate) => sameText(certificate.course, title));
+    const status = String(row.status ?? "active");
+    const progress = status === "completed" || hasCertificate ? 100 : 0;
+
+    return {
+      id: String(row.id ?? `course-${index}`),
+      title,
+      progress,
+      totalLessons: 1,
+      completedLessons: progress === 100 ? 1 : 0,
+      teacher: "Assigned teacher pending",
+      color: courseGradients[index % courseGradients.length],
+      status,
+      topics: [row.category, row.level, row.duration].map(String).filter((item) => item && item !== "null"),
+      enrolledAt: dateValue(row.enrolled_at ?? row.created_at) as string,
+    };
+  });
+
+  const certificateItems = completedCertificates.map<CertificateItem>((row, index) => ({
+    id: String(row.credential_id ?? `certificate-${index}`),
+    course: String(row.course ?? "Certificate"),
+    issuedDate: dateLabel(row.issued_at ?? row.created_at),
+    credentialId: String(row.credential_id ?? ""),
+    status: String(row.status ?? "active"),
+    color: courseGradients[index % courseGradients.length],
   }));
 
-  dashboard.achievements = certificates.map<Achievement>((row, index) => ({
-    id: String(row.credential_id ?? `certificate-${index}`),
-    title: String(row.course ?? "Certificate"),
+  const homeworkItems = homeworkRows[0].map<HomeworkItem>((row) => ({
+    id: String(row.id),
+    subject: String(row.subject ?? "General"),
+    title: String(row.title ?? "Homework"),
+    description: row.description ? String(row.description) : undefined,
+    dueDate: String(row.due_date ?? "No due date"),
+    status: statusForDueDate(row.due_date),
+    priority: priorityValue(row.priority),
+    teacher: row.teacher_name ? String(row.teacher_name) : undefined,
+  }));
+
+  const notesItems = noteRows[0].map<NoteItem>((row) => ({
+    id: String(row.id),
+    subject: String(row.subject ?? "General"),
+    title: String(row.title ?? "Study Material"),
+    description: row.description ? String(row.description) : undefined,
+    type: ["pdf", "note", "video"].includes(String(row.note_type)) ? String(row.note_type) as NoteItem["type"] : "pdf",
+    uploadDate: dateLabel(row.created_at),
+    size: String(row.file_size ?? "Shared"),
+    bookmarked: false,
+    teacher: row.teacher_name ? String(row.teacher_name) : undefined,
+    fileName: row.file_name ? String(row.file_name) : undefined,
+  }));
+
+  const doubtItems = doubtRows[0].map<StudentDoubt>((row) => ({
+    id: String(row.id),
+    subject: String(row.subject ?? "General"),
+    question: String(row.question ?? ""),
+    status: String(row.status ?? "pending") === "solved" ? "solved" : "pending",
+    teacherReply: row.reply_text ? String(row.reply_text) : undefined,
+    attachmentName: row.attachment_name ? String(row.attachment_name) : undefined,
+    createdAt: dateLabel(row.created_at),
+    repliedAt: row.replied_at ? dateLabel(row.replied_at) : undefined,
+  }));
+
+  const notificationItems = notificationRows[0].map<DashboardNotification>((row) => ({
+    id: String(row.id),
+    title: String(row.title ?? "Notification"),
+    message: String(row.message ?? ""),
+    channel: String(row.channel ?? "general"),
+    status: String(row.status ?? "unread"),
+    createdAt: dateLabel(row.created_at),
+  }));
+
+  const liveClasses = upcomingSessions.slice(0, 6).map<LiveClass>((row, index) => ({
+    id: String(row.id ?? `session-${index}`),
+    subject: String(row.subject ?? "Class Session"),
+    topic: String(row.title ?? "Scheduled class"),
+    teacher: String(row.teacher_name ?? "Teacher"),
+    time: timeLabel(row.start_time),
+    duration: minutesBetween(row.start_time, row.end_time),
+    isLive: asDate(row.start_time)?.toDateString() === todayKey,
+    color: colorNames[index % colorNames.length],
+  }));
+
+  const weeklyScheduleMap = new Map<string, string[]>();
+  for (const row of filteredSessions) {
+    const day = dayLabel(row.start_time);
+    const item = `${String(row.subject ?? row.title ?? "Class")} ${timeLabel(row.start_time)}`;
+    weeklyScheduleMap.set(day, [...(weeklyScheduleMap.get(day) ?? []), item]);
+  }
+  const weeklySchedule: WeeklyScheduleDay[] = Array.from(weeklyScheduleMap, ([day, classes]) => ({ day, classes }));
+
+  const monthlyAttendance = new Map<string, { present: number; total: number }>();
+  const subjectAttendanceMap = new Map<string, { present: number; total: number }>();
+  for (const row of attendance) {
+    const month = monthLabel(row.created_at);
+    const monthStats = monthlyAttendance.get(month) ?? { present: 0, total: 0 };
+    monthStats.total += 1;
+    if (isPresentStatus(row.status)) monthStats.present += 1;
+    monthlyAttendance.set(month, monthStats);
+
+    const subject = String(row.subject ?? "General");
+    const subjectStats = subjectAttendanceMap.get(subject) ?? { present: 0, total: 0 };
+    subjectStats.total += 1;
+    if (isPresentStatus(row.status)) subjectStats.present += 1;
+    subjectAttendanceMap.set(subject, subjectStats);
+  }
+
+  const attendanceMonths: AttendanceMonth[] = Array.from(monthlyAttendance, ([month, value]) => ({
+    month,
+    present: value.present,
+    total: value.total,
+    pct: percent(value.present, value.total),
+  })).reverse();
+
+  const subjectAttendance: SubjectAttendance[] = Array.from(subjectAttendanceMap, ([subject, value], index) => ({
+    subject,
+    pct: percent(value.present, value.total),
+    color: subjectBars[index % subjectBars.length],
+  }));
+
+  const performanceTrend: PerformanceTrend[] = attendanceMonths.map((month) => ({
+    month: month.month,
+    score: month.pct,
+    classAvg: 0,
+  }));
+
+  const leaderboardSource = leaderboardRows[0].filter((row) => {
+    const rowClass = row.class_level || row.class_name;
+    const rowSchool = row.school_name || row.school;
+    const classOk = studentClass === "Not assigned" || normalizeClass(rowClass) === normalizeClass(studentClass);
+    const schoolOk = !schoolName || sameText(rowSchool, schoolName);
+    return classOk && schoolOk;
+  });
+
+  const leaderboard: LeaderboardEntry[] = leaderboardSource
+    .map((row) => {
+      const rowAttendance = percent(Number(row.attendance_present ?? 0), Number(row.attendance_total ?? 0));
+      const consistency = Math.min(100, Number(row.login_count ?? 0) * 10);
+      const score =
+        rowAttendance +
+        consistency +
+        Number(row.certificate_count ?? 0) * 25 +
+        Number(row.paid_count ?? 0) * 10;
+
+      return {
+        row,
+        value: {
+          rank: 0,
+          name: String(row.name ?? "Student"),
+          score,
+          attendance: rowAttendance,
+          consistency,
+          badge: "",
+          highlight: sameText(row.email, user.email),
+        } satisfies LeaderboardEntry,
+      };
+    })
+    .sort((first, second) => second.value.score - first.value.score)
+    .map(({ value }, index) => ({
+      ...value,
+      rank: index + 1,
+      badge: index < 3 ? String(index + 1) : "",
+      score: Math.round(value.score),
+    }));
+
+  const rank = leaderboard.find((entry) => entry.highlight)?.rank ?? 0;
+  const consistency = Math.min(100, loginEvents.length * 10);
+  const earnedCount = certificateItems.length;
+  const overallScore = subjectAttendance.length
+    ? Math.round(subjectAttendance.reduce((sum, subject) => sum + subject.pct, 0) / subjectAttendance.length)
+    : 0;
+
+  dashboard.studentData = {
+    ...dashboard.studentData,
+    rollNumber: user.id,
+    class: studentClass,
+    rank,
+    totalStudents: leaderboard.length || totalStudents,
+    aiInsight:
+      attendance.length || courses.length || certificateItems.length || liveClasses.length
+        ? "Dashboard is showing live records from your school database."
+        : "No learning activity has been recorded yet.",
+  };
+
+  dashboard.courses = courses;
+  dashboard.certificates = certificateItems;
+  dashboard.liveClasses = liveClasses;
+  dashboard.weeklySchedule = weeklySchedule;
+  dashboard.homeworkItems = homeworkItems;
+  dashboard.notesLibrary = notesItems;
+  dashboard.doubts = doubtItems;
+  dashboard.notifications = notificationItems;
+  dashboard.attendanceMonths = attendanceMonths;
+  dashboard.subjectAttendance = subjectAttendance;
+  dashboard.performanceTrend = performanceTrend;
+  dashboard.leaderboard = leaderboard;
+  dashboard.gamifiedStats = {
+    xp: earnedCount * 100 + paidPayments * 50 + loginEvents.length * 5,
+    gamesPlayed: 0,
+    badgesWon: earnedCount,
+  };
+  dashboard.futureSkills = courses.map<FutureSkill>((course, index) => ({
+    id: course.id,
+    title: course.title,
+    progress: course.progress,
+    level: course.status,
+    badges: certificates.filter((certificate) => sameText(certificate.course, course.title)).length,
+    nextMilestone: course.progress === 100 ? "Completed" : "Start learning activity",
+    color: colorNames[index % colorNames.length],
+    icon: "book-open",
+  }));
+  dashboard.skillsData = courses.map((course) => ({
+    skill: course.title,
+    value: course.progress,
+    fullMark: 100,
+  }));
+  dashboard.achievements = certificateItems.map<Achievement>((certificate) => ({
+    id: certificate.id,
+    title: certificate.course,
     description: "Certificate issued from ADYAPAN records.",
     icon: "trophy",
     color: "yellow",
     earned: true,
-    date: dateValue(row.issued_at ?? row.created_at) as string,
+    date: certificate.issuedDate,
   }));
-
+  dashboard.circularPerformanceData = subjectAttendance.length
+    ? [
+        { name: "Excellent (>=85%)", value: subjectAttendance.filter((item) => item.pct >= 85).length, color: "#10b981" },
+        { name: "Good (70-84%)", value: subjectAttendance.filter((item) => item.pct >= 70 && item.pct < 85).length, color: "#f59e0b" },
+        { name: "Needs Work (<70%)", value: subjectAttendance.filter((item) => item.pct < 70).length, color: "#ef4444" },
+      ].filter((item) => item.value > 0)
+    : [];
+  dashboard.weeklyProgress = {
+    score: overallScore,
+    consistency,
+    streak: 0,
+    classPercentile: rank && leaderboard.length ? percent(leaderboard.length - rank + 1, leaderboard.length) : 0,
+  };
+  dashboard.metricCards = dashboard.metricCards.map((card) => {
+    if (card.id === "overall") return { ...card, value: `${overallScore}%` };
+    if (card.id === "attendance") return { ...card, value: `${attendancePct}%` };
+    if (card.id === "rank") return { ...card, value: rank > 0 ? `#${rank}` : "-" };
+    return card;
+  });
   dashboard.quickAccessCards = dashboard.quickAccessCards.map((card) => {
-    if (card.id === "skills") {
-      return { ...card, stat: earnedCount > 0 ? `${earnedCount}` : "0", statLabel: "Certificates" };
-    }
-
-    if (card.id === "gamified") {
-      return { ...card, stat: String(paidPayments), statLabel: "Paid Plans" };
-    }
-
+    if (card.id === "attendance") return { ...card, stat: `${attendancePct}%`, statLabel: "Recorded" };
+    if (card.id === "homework") return { ...card, stat: String(homeworkItems.length), statLabel: "Assigned", badge: homeworkItems.length ? String(homeworkItems.length) : undefined };
+    if (card.id === "live-classes") return { ...card, stat: String(todaySessions.length), statLabel: "Today", badge: todaySessions.length ? "LIVE" : undefined };
+    if (card.id === "notes") return { ...card, stat: String(notesItems.length), statLabel: "Files" };
+    if (card.id === "gamified") return { ...card, stat: String(dashboard.gamifiedStats.xp), statLabel: "XP", badge: undefined };
+    if (card.id === "doubt-section") return { ...card, stat: String(doubtItems.length), statLabel: "Queries", badge: doubtItems.some((doubt) => doubt.status === "solved") ? "NEW" : undefined };
+    if (card.id === "recorded-classes") return { ...card, stat: "0", statLabel: "Videos" };
+    if (card.id === "skills") return { ...card, stat: String(courses.length), statLabel: "Courses" };
     return card;
   });
 
