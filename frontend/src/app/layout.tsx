@@ -17,15 +17,15 @@ export const metadata: Metadata = {
     "India's premium future skills, certification, and school partnership platform for Classes 5-12.",
   keywords: ["ADYAPAN", "coding", "AI", "robotics", "school partnership", "future skills"],
   icons: {
-    icon: "/adyapan-logo.svg",
-    shortcut: "/adyapan-logo.svg",
-    apple: "/adyapan-logo.svg"
+    icon: "/ady-logo.jpeg",
+    shortcut: "/ady-logo.jpeg",
+    apple: "/ady-logo.jpeg"
   },
   openGraph: {
     title: "ADYAPAN Future Skills Platform",
     description: "Coding, AI, robotics, design, communication, and career skills for Classes 5-12.",
     type: "website",
-    images: ["/adyapan-logo.svg"]
+    images: ["/ady-logo.jpeg"]
   }
 };
 

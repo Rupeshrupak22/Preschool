@@ -47,7 +47,7 @@ export default function SiteFooter() {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3">
               <img
-                src="/adyapan-logo.svg"
+                src="/ady-logo.jpeg"
                 alt="ADYAPAN"
                 className="h-12 w-12 shrink-0 rounded-full object-contain ring-2 ring-white/10"
               />

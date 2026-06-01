@@ -201,7 +201,7 @@ export default function SiteNavbar() {
       <div className="relative z-10 mx-auto flex h-20 max-w-[1500px] items-center justify-between gap-3 px-3 sm:px-4 md:px-6">
         <a href="/#top" className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3" aria-label="ADYAPAN School home">
           <img
-            src="/adyapan-logo.svg"
+            src="/ady-logo.jpeg"
             alt="ADYAPAN"
             className="h-12 w-12 shrink-0 rounded-full object-contain drop-shadow-[0_12px_18px_rgba(234,88,12,0.26)] sm:h-14 sm:w-14"
           />
