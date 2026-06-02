@@ -214,7 +214,7 @@ export default function SiteFooter() {
         {/* Bottom Bar */}
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-6 sm:flex-row">
           <p className="text-xs text-slate-500">
-            © 2026 ADYAPAN Future Skills Platform. All rights reserved.
+            © 2026 SR's Adyapan  Future Skills Platform
           </p>
           <div className="flex gap-6 text-xs text-slate-500">
             <a href="#" className="transition hover:text-slate-300">Privacy Policy</a>
