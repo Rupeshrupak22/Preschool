@@ -109,6 +109,7 @@ export default function AdminPage() {
   const [showClearSession, setShowClearSession] = useState(false);
   const [clearingSession, setClearingSession] = useState(false);
   const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string; accessKey: string } | null>(null);
+  const [adminName, setAdminName] = useState("");
 
   async function handleAdminLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -233,6 +234,8 @@ export default function AdminPage() {
       setLoading(false);
       return;
     }
+
+    setAdminName(authData.user?.name || "Admin");
 
     const overviewResponse = await fetch("/api/admin/overview", { cache: "no-store" });
     const data = await overviewResponse.json().catch(() => ({}));
@@ -516,7 +519,7 @@ export default function AdminPage() {
             <div>
               <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-700">Admin Control Center</p>
               <h1 className="mt-1 text-2xl font-black tracking-tight text-slate-950 md:text-3xl">
-                Network operations dashboard
+                Welcome {adminName}
               </h1>
               <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-600">
                 Schools, principals, teachers, students, payments, certificates, and access logs are controlled from this secure admin view.
