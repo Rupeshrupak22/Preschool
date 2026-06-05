@@ -12,17 +12,17 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
-  title: "ADYAPAN Future Skills Platform",
+  title: "Adyapan School",
   description:
     "India's premium future skills, certification, and school partnership platform for Classes 5-12.",
-  keywords: ["ADYAPAN", "coding", "AI", "robotics", "school partnership", "future skills"],
+  keywords: ["ADYAPAN", "Adyapan School", "coding", "AI", "robotics", "school partnership", "future skills"],
   icons: {
     icon: "/ady-logo.png",
     shortcut: "/ady-logo.png",
     apple: "/ady-logo.png"
   },
   openGraph: {
-    title: "ADYAPAN Future Skills Platform",
+    title: "Adyapan School",
     description: "Coding, AI, robotics, design, communication, and career skills for Classes 5-12.",
     type: "website",
     images: ["/ady-logo.png"]
