@@ -1,40 +1,33 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { ArrowRight, Atom, BookOpen, BriefcaseBusiness, Building2, ChevronDown, Clock3, GraduationCap, Heart, Instagram, Linkedin, Mail, MapPin, MessageSquare, Pencil, PhoneCall, PlaySquare, Send, Sparkles, Star, X } from "lucide-react";
-
-const socialFaqs = [
-  {
-    question: "How do I enroll in a course?",
-    answer:
-      "Students can enroll by exploring our programs, selecting a suitable course, and completing the registration process through our admissions team.",
-    icon: BookOpen,
-  },
-  {
-    question: "Are classes live or recorded?",
-    answer:
-      "We provide a combination of live interactive sessions and recorded learning resources so students can learn at their own pace.",
-    icon: PlaySquare,
-  },
-  {
-    question: "Do you provide placement support?",
-    answer:
-      "Our programs focus on future skills, project-based learning, certifications and career readiness guidance to help students prepare for future opportunities.",
-    icon: BriefcaseBusiness,
-  },
-];
+import { useState } from "react";
+import { ArrowRight, Clock3, Instagram, Linkedin, Mail, MapPin, MessageSquare, PhoneCall, Sparkles } from "lucide-react";
 
 export default function ContactPage() {
   const [status, setStatus] = useState("");
   const [success, setSuccess] = useState(false);
-  const [activeSocialFaq, setActiveSocialFaq] = useState<number | null>(null);
+  const [attempted, setAttempted] = useState(false);
 
-  async function submitContact(event: FormEvent<HTMLFormElement>) {
+  async function submitContact(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setStatus("Submitting...");
+    setAttempted(true);
 
     const form = new FormData(event.currentTarget);
     const body = Object.fromEntries(form.entries());
+
+    // Check required fields
+    const name = (body.name as string)?.trim();
+    const email = (body.email as string)?.trim();
+    const interest = (body.interest as string)?.trim();
+    const message = (body.message as string)?.trim();
+
+    if (!name || !email || !interest || !message) {
+      setStatus("Please fill in all required fields.");
+      return;
+    }
+
+    setStatus("Submitting...");
+
     const response = await fetch("/api/leads", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -49,239 +42,332 @@ export default function ContactPage() {
 
     setStatus("");
     setSuccess(true);
+    setAttempted(false);
     event.currentTarget.reset();
   }
 
   return (
-    <main className="min-h-screen bg-white">
-      {/* Hero Section with Scenic Background */}
-      <section className="relative z-20 flex aspect-[16/9] min-h-[420px] items-center overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('/contactus.jpeg')",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/45 via-blue-950/25 to-transparent" />
-        <div className="absolute inset-0 backdrop-blur-[3px]" />
-        
-        <div className="relative mx-auto w-full max-w-7xl -translate-y-6 px-4 py-12 md:-translate-y-8 md:px-6 lg:-translate-y-10 lg:py-16">
-          <div className="max-w-4xl">
-            <div className="mb-7 inline-flex items-center gap-3 rounded-full border border-white/55 bg-white/25 px-6 py-3 text-sm font-extrabold text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_14px_40px_rgba(15,23,42,0.2)] backdrop-blur-xl md:text-base">
-              <Sparkles className="h-5 w-5 text-sky-500" />
-              Contact ADYAPAN
-            </div>
-            <h1 className="max-w-4xl text-[46px] font-black leading-[1.05] tracking-normal text-white drop-shadow-[0_6px_24px_rgba(15,23,42,0.45)] sm:text-[58px] md:text-[72px] lg:text-[86px]">
-              <span className="bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-500 bg-clip-text text-transparent">
-                Get in touch
-              </span>{" "}
-              with our team
+    <main className="relative min-h-screen">
+      {/* Full page background image */}
+      <div
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/contactus.jpeg')" }}
+      />
+      <div className="fixed inset-0 bg-black/20" />
+
+      {/* Content overlay */}
+      <div className="relative z-10">
+        {/* Hero Section */}
+        <section className="px-6 pb-8 pt-16 md:px-10 lg:px-16 lg:pt-20">
+          <div className="mx-auto max-w-7xl text-center">
+            <h1 className="text-4xl font-black leading-tight tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] md:text-5xl lg:text-6xl">
+              Get in touch with <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">our team</span>
             </h1>
-            <p className="mt-6 max-w-3xl rounded-2xl border border-white/35 bg-white/20 px-5 py-4 text-lg font-extrabold leading-8 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_16px_45px_rgba(15,23,42,0.18)] backdrop-blur-[18px] drop-shadow-[0_4px_18px_rgba(15,23,42,0.5)] md:text-2xl md:leading-10">
+            <p className="mx-auto mt-5 max-w-2xl text-base font-medium leading-relaxed text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)] md:text-lg">
               Have a question about our courses, classes, or school support? Reach out - our team responds within 24 hours.
             </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <div className="relative isolate overflow-hidden">
-        <video
-          className="fixed inset-0 -z-20 h-screen w-screen object-cover"
-          src="/videos/contactus.mp4"
-          poster="/contactus2.jpeg"
-          autoPlay
-          muted
-          loop
-          playsInline
-          aria-hidden="true"
-        />
-        <div className="fixed inset-0 -z-10 bg-white/75" />
+        {/* Two Column Layout - Company Information & Personal Information */}
+        <section className="mx-auto max-w-7xl px-6 py-12 md:px-10 lg:px-16 lg:py-16">
+          <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
 
-      {/* Two Column Layout - Company Information & Personal Information */}
-      <section className="relative z-10 mx-auto max-w-7xl px-4 py-16 md:px-6 lg:py-24">
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-          
-          {/* Left Column - Company Information Box */}
-          <div className="rounded-3xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-white to-purple-50 p-8 shadow-xl backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:border-blue-300 hover:shadow-[0_28px_80px_rgba(37,99,235,0.18)] md:p-10">
-            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">Company information</h2>
-            <p className="mt-4 text-base text-gray-600 leading-relaxed">
-              Connect with ADYAPAN - where education meets innovation. We're here to support your learning journey.
-            </p>
+            {/* Left Column - Company Information Box (Glossy Translucent) */}
+            <div className="rounded-3xl border border-white/20 bg-black/20 p-8 shadow-2xl backdrop-blur-sm md:p-10">
+              {/* Adyapan Branding - Cool 2D Style with Pop-up Effect */}
+              <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600/80 via-indigo-600/80 to-purple-700/80 p-8 shadow-lg backdrop-blur-sm transition-all duration-500 hover:scale-[1.03] hover:shadow-2xl hover:shadow-indigo-300/40">
+                {/* Decorative background shapes */}
+                <div className="absolute -left-6 -top-6 h-24 w-24 rounded-full bg-white/10 blur-sm" />
+                <div className="absolute -bottom-4 -right-4 h-32 w-32 rounded-full bg-purple-400/20 blur-md" />
+                <div className="absolute right-12 top-4 h-3 w-3 rounded-full bg-yellow-300 animate-pulse" />
+                <div className="absolute left-8 bottom-6 h-2 w-2 rounded-full bg-cyan-300 animate-pulse" />
+                <div className="absolute right-6 bottom-12 h-2.5 w-2.5 rounded-full bg-pink-300 animate-pulse" />
+                {/* Floating geometric shapes */}
+                <div className="absolute left-4 top-12 h-6 w-6 rotate-45 rounded-sm border-2 border-white/20 transition-transform duration-700 hover:rotate-90" />
+                <div className="absolute bottom-8 right-16 h-4 w-4 rotate-12 rounded-full border-2 border-white/15" />
 
-            <div className="mt-10 space-y-6">
-              {/* Phone */}
-              <a href="tel:+918179124566" className="group flex items-start gap-4 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/60 hover:p-3 hover:shadow-[0_12px_30px_rgba(37,99,235,0.12)]">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-[0_12px_28px_rgba(37,99,235,0.25)]">
-                  <PhoneCall className="h-6 w-6" />
+                <div className="relative flex flex-col items-center text-center">
+                  <div className="flex h-24 w-24 items-center justify-center transition-transform duration-500 hover:scale-110 hover:-translate-y-1">
+                    <img
+                      src="/ady-logo.png"
+                      alt="ADYAPAN"
+                      className="h-24 w-24 rounded-full object-cover shadow-xl"
+                    />
+                  </div>
+                  <h3 className="mt-4 text-2xl font-black text-white animate-[fadeInUp_0.6s_ease-out_both]">
+                    Adyapan <span className="text-cyan-300">School</span>
+                  </h3>
+                  <p className="mt-3 text-sm font-medium leading-relaxed text-white/85 animate-[fadeInUp_0.8s_ease-out_both]">
+                    Empowering young minds through innovative education, personalized learning paths, and dedicated mentorship.
+                  </p>
+                  <div className="mt-5 flex items-center gap-3 animate-[fadeInUp_1s_ease-out_both]">
+                    <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm transition-transform duration-300 hover:scale-110 hover:bg-white/30">🚀 AI Learning</span>
+                    <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm transition-transform duration-300 hover:scale-110 hover:bg-white/30">🎓 Mentorship</span>
+                    <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm transition-transform duration-300 hover:scale-110 hover:bg-white/30">💡 Innovation</span>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Phone</h3>
-                  <p className="mt-1 text-lg font-bold text-gray-900">+91 81791 24566</p>
-                </div>
-              </a>
+              </div>
 
-              {/* Email */}
-              <a href="mailto:support@adyapan.com" className="group flex items-start gap-4 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/60 hover:p-3 hover:shadow-[0_12px_30px_rgba(37,99,235,0.12)]">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-[0_12px_28px_rgba(37,99,235,0.25)]">
-                  <Mail className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Email</h3>
-                  <p className="mt-1 text-lg font-bold text-gray-900">support@adyapan.com</p>
-                </div>
-              </a>
+              <h2 className="text-3xl font-black tracking-tight text-white md:text-4xl">Company <span className="bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">information</span></h2>
+              <p className="mt-4 text-base font-medium text-white/80 leading-relaxed">
+                Connect with ADYAPAN School - where education meets innovation. We&apos;re here to support your learning journey.
+              </p>
 
-              {/* Address */}
-              <a 
-                href="https://www.google.com/maps?um=1&ie=UTF-8&fb=1&gl=in&sa=X&geocode=KdkGZDKLl8s7MSJtLa_4zSEV&daddr=Sattva+Magnus,+behind+Reliance+Bazaar+Shaikpet,+Sabza+Colony,+Ambedkar+Nagar,+Toli+Chowki,+Hyderabad,+Telangana+500008"
-                target="_blank"
-                rel="noreferrer"
-                className="group flex items-start gap-4 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/60 hover:p-3 hover:shadow-[0_12px_30px_rgba(37,99,235,0.12)]"
-              >
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-[0_12px_28px_rgba(37,99,235,0.25)]">
-                  <MapPin className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Address</h3>
-                  <p className="mt-1 text-base font-bold text-gray-900">ADYAPAN EDUTECH PRIVATE LIMITED</p>
-                  <p className="text-sm text-gray-600">Sattva Magnus, behind Reliance Bazaar Shaikpet,</p>
-                  <p className="text-sm text-gray-600">Sabza Colony, Ambedkar Nagar, Toli Chowki,</p>
-                  <p className="text-sm text-gray-600">Hyderabad, Telangana 500008</p>
-                </div>
-              </a>
+              <div className="mt-10 space-y-6">
+                {/* Phone */}
+                <a href="tel:+918179124566" className="flex items-start gap-4 group">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 text-white backdrop-blur-sm transition-all duration-300 shadow-sm group-hover:bg-green-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-green-500/30 group-hover:scale-110">
+                    <PhoneCall className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wide text-white/60 transition-colors duration-300 group-hover:text-green-300">Phone</h3>
+                    <p className="mt-1 text-lg font-bold text-white transition-colors duration-300 group-hover:text-green-200">+91 81791 24566</p>
+                  </div>
+                </a>
 
-              {/* Hours */}
-              <div className="group flex items-start gap-4 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/60 hover:p-3 hover:shadow-[0_12px_30px_rgba(37,99,235,0.12)]">
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-[0_12px_28px_rgba(37,99,235,0.25)]">
-                  <Clock3 className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wide text-gray-500">Visit Us</h3>
-                  <p className="mt-1 text-lg font-bold text-gray-900">Mon-Sat, 11 AM - 8 PM</p>
+                {/* Email */}
+                <a href="mailto:support@adyapan.com" className="flex items-start gap-4 group">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 text-white backdrop-blur-sm transition-all duration-300 shadow-sm group-hover:bg-red-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-red-500/30 group-hover:scale-110">
+                    <Mail className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wide text-white/60 transition-colors duration-300 group-hover:text-red-300">Email</h3>
+                    <p className="mt-1 text-lg font-bold text-white transition-colors duration-300 group-hover:text-red-200">support@adyapan.com</p>
+                  </div>
+                </a>
+
+                {/* Address */}
+                <a
+                  href="https://www.google.com/maps?um=1&ie=UTF-8&fb=1&gl=in&sa=X&geocode=KdkGZDKLl8s7MSJtLa_4zSEV&daddr=Sattva+Magnus,+behind+Reliance+Bazaar+Shaikpet,+Sabza+Colony,+Ambedkar+Nagar,+Toli+Chowki,+Hyderabad,+Telangana+500008"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-start gap-4 group"
+                >
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 text-white backdrop-blur-sm transition-all duration-300 shadow-sm group-hover:bg-blue-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-blue-500/30 group-hover:scale-110">
+                    <MapPin className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wide text-white/60 transition-colors duration-300 group-hover:text-blue-300">Address</h3>
+                    <p className="mt-1 text-base font-bold text-white transition-colors duration-300 group-hover:text-blue-200">ADYAPAN EDUTECH PRIVATE LIMITED</p>
+                    <p className="text-sm text-white/70 transition-colors duration-300 group-hover:text-blue-200/80">Sattva Magnus, behind Reliance Bazaar Shaikpet,</p>
+                    <p className="text-sm text-white/70 transition-colors duration-300 group-hover:text-blue-200/80">Sabza Colony, Ambedkar Nagar, Toli Chowki,</p>
+                    <p className="text-sm text-white/70 transition-colors duration-300 group-hover:text-blue-200/80">Hyderabad, Telangana 500008</p>
+                  </div>
+                </a>
+
+                {/* Hours */}
+                <div className="flex items-start gap-4 group">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 text-white backdrop-blur-sm transition-all duration-300 shadow-sm group-hover:bg-purple-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-purple-500/30 group-hover:scale-110">
+                    <Clock3 className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wide text-white/60 transition-colors duration-300 group-hover:text-purple-300">Visit Us</h3>
+                    <p className="mt-1 text-lg font-bold text-white transition-colors duration-300 group-hover:text-purple-200">Mon-Sat, 11 AM - 8 PM</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Column - Personal Information Form Box */}
-          <div className="rounded-3xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 via-white to-pink-50 p-8 shadow-xl backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:border-purple-300 hover:shadow-[0_28px_80px_rgba(147,51,234,0.18)] md:p-10">
-            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">Personal information</h2>
-            <p className="mt-4 text-base text-gray-600 leading-relaxed">
-              Fill out the form below and we'll get back to you as soon as possible.
-            </p>
+            {/* Right Column - Personal Information Form Box (Glossy Translucent) */}
+            <div className="rounded-3xl border border-white/20 bg-black/20 p-8 shadow-2xl backdrop-blur-sm md:p-10">
+              <h2 className="text-3xl font-black tracking-tight text-white md:text-4xl">Personal <span className="bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">information</span></h2>
+              <p className="mt-4 text-base font-medium text-white/80 leading-relaxed">
+                Fill out the form below and we&apos;ll get back to you as soon as possible.
+              </p>
 
-            <form id="contact-form" onSubmit={submitContact} className="mt-8 space-y-6">
-              {/* Full Name */}
-              <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
-                  Full Name *
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  placeholder="Your name"
-                  className="mt-2 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-[0_8px_24px_rgba(37,99,235,0.08)] focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:shadow-[0_12px_32px_rgba(37,99,235,0.14)]"
-                />
-              </div>
+              <form id="contact-form" onSubmit={submitContact} className="mt-8 space-y-6">
+                {/* Full Name */}
+                <div>
+                  <label htmlFor="name" className="block text-sm font-bold tracking-wide text-white/90">
+                    Full Name
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    placeholder="Your name"
+                    className={`mt-2 block w-full rounded-lg border px-4 py-3 text-white placeholder-white/50 shadow-sm backdrop-blur-sm transition focus:outline-none focus:ring-2 ${attempted ? "invalid:border-red-500 invalid:ring-red-500/50" : ""} border-white/20 bg-white/10 focus:border-blue-400 focus:ring-blue-400/50`}
+                    required
+                  />
+                  {attempted && (
+                    <p className="mt-1 hidden text-xs text-red-400 peer-invalid:block" />
+                  )}
+                </div>
 
-              {/* Email */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
-                  Email *
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  placeholder="you@email.com"
-                  className="mt-2 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-[0_8px_24px_rgba(37,99,235,0.08)] focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:shadow-[0_12px_32px_rgba(37,99,235,0.14)]"
-                />
-              </div>
+                {/* Email */}
+                <div>
+                  <label htmlFor="email" className="block text-sm font-bold tracking-wide text-white/90">
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="you@email.com"
+                    className={`mt-2 block w-full rounded-lg border px-4 py-3 text-white placeholder-white/50 shadow-sm backdrop-blur-sm transition focus:outline-none focus:ring-2 ${attempted ? "invalid:border-red-500 invalid:ring-red-500/50" : ""} border-white/20 bg-white/10 focus:border-blue-400 focus:ring-blue-400/50`}
+                    required
+                  />
+                </div>
 
-              {/* Phone */}
-              <div>
-                <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">
-                  Phone
-                </label>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  placeholder="+91 XXXXX XXXXX"
-                  className="mt-2 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-[0_8px_24px_rgba(37,99,235,0.08)] focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:shadow-[0_12px_32px_rgba(37,99,235,0.14)]"
-                />
-              </div>
+                {/* Phone */}
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-bold tracking-wide text-white/90">
+                    Phone
+                  </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    placeholder="+91 XXXXX XXXXX"
+                    className="mt-2 block w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/50 shadow-sm backdrop-blur-sm transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+                  />
+                </div>
 
-              {/* Company Name / Subject */}
-              <div>
-                <label htmlFor="interest" className="block text-sm font-semibold text-gray-700">
-                  Subject *
-                </label>
-                <select
-                  id="interest"
-                  name="interest"
-                  required
-                  defaultValue=""
-                  className="mt-2 block w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-[0_8px_24px_rgba(37,99,235,0.08)] focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:shadow-[0_12px_32px_rgba(37,99,235,0.14)]"
+                {/* Reason */}
+                <div>
+                  <label htmlFor="interest" className="block text-sm font-bold tracking-wide text-white/90">
+                    Reason
+                  </label>
+                  <select
+                    id="interest"
+                    name="interest"
+                    required
+                    defaultValue=""
+                    className={`mt-2 block w-full rounded-lg border px-4 py-3 text-white shadow-sm backdrop-blur-sm transition focus:outline-none focus:ring-2 ${attempted ? "invalid:border-red-500 invalid:ring-red-500/50" : ""} border-white/20 bg-white/10 focus:border-blue-400 focus:ring-blue-400/50`}
+                  >
+                    <option value="" disabled className="text-gray-900">
+                      Select a reason
+                    </option>
+                    <option value="Admission enquiry (Class 1-5)" className="text-gray-900">Admission enquiry (Class 1-5)</option>
+                    <option value="Admission enquiry (Class 6-8)" className="text-gray-900">Admission enquiry (Class 6-8)</option>
+                    <option value="Admission enquiry (Class 9-10)" className="text-gray-900">Admission enquiry (Class 9-10)</option>
+                    <option value="Admission enquiry (Class 11-12)" className="text-gray-900">Admission enquiry (Class 11-12)</option>
+                    <option value="Fee related issue" className="text-gray-900">Fee related issue</option>
+                    <option value="Teacher or class issue" className="text-gray-900">Teacher or class issue</option>
+                    <option value="Exam or result issue" className="text-gray-900">Exam or result issue</option>
+                    <option value="School partnership" className="text-gray-900">School partnership</option>
+                    <option value="Others" className="text-gray-900">Others</option>
+                  </select>
+                </div>
+
+                {/* Message */}
+                <div>
+                  <label htmlFor="message" className="block text-sm font-bold tracking-wide text-white/90">
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    required
+                    rows={5}
+                    placeholder="Tell us how we can help..."
+                    className={`mt-2 block w-full resize-none rounded-lg border px-4 py-3 text-white placeholder-white/50 shadow-sm backdrop-blur-sm transition focus:outline-none focus:ring-2 ${attempted ? "invalid:border-red-500 invalid:ring-red-500/50" : ""} border-white/20 bg-white/10 focus:border-blue-400 focus:ring-blue-400/50`}
+                  />
+                </div>
+
+                {/* Error message */}
+                {attempted && status && !success && (
+                  <p className="text-sm font-medium text-red-400">{status}</p>
+                )}
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[length:200%_200%] bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 px-6 py-4 text-base font-bold text-white shadow-lg shadow-blue-500/30 transition-all duration-300 animate-[colorShift_4s_ease_infinite] hover:scale-[1.02] hover:shadow-xl hover:shadow-purple-500/40 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
-                  <option value="" disabled>
-                    Select a topic
-                  </option>
-                  <option value="Course enrollment">Course enrollment</option>
-                  <option value="Live class support">Live class support</option>
-                  <option value="School partnership">School partnership</option>
-                  <option value="Placement support">Placement support</option>
-                </select>
-              </div>
+                  Submit request
+                  <ArrowRight className="h-5 w-5" />
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
 
-              {/* Message */}
-              <div>
-                <label htmlFor="message" className="block text-sm font-semibold text-gray-700">
-                  Message *
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  rows={5}
-                  placeholder="Tell us how we can help..."
-                  className="mt-2 block w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-[0_8px_24px_rgba(37,99,235,0.08)] focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:shadow-[0_12px_32px_rgba(37,99,235,0.14)]"
-                />
-              </div>
-
-              {/* Submit Button */}
+        {/* FAQ Section (Glossy Translucent) */}
+        <section className="mx-auto max-w-7xl px-6 py-16 md:px-10 lg:px-16 lg:py-24">
+          <div className="rounded-3xl border border-white/20 bg-black/20 p-8 shadow-2xl backdrop-blur-sm md:p-12">
+            <h2 className="mb-8 text-center text-3xl font-black tracking-tight text-white md:text-4xl">Frequently Asked <span className="bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">Questions</span></h2>
+            <div className="mx-auto grid max-w-3xl gap-4">
               <button
-                type="submit"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-4 text-base font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-[1.01] hover:bg-blue-700 hover:shadow-[0_18px_42px_rgba(37,99,235,0.28)] focus:outline-none focus:ring-4 focus:ring-blue-500/25 focus:ring-offset-2"
+                type="button"
+                className="flex items-center justify-between rounded-xl border border-white/20 bg-white/10 px-6 py-5 text-left text-base font-semibold text-white shadow-sm backdrop-blur-sm transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-500 hover:to-cyan-500 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-[1.02]"
               >
-                Submit request
-                <ArrowRight className="h-5 w-5" />
+                <span>What subjects are taught from Class 1 to 5?</span>
+                <MessageSquare className="h-5 w-5 text-white/60" />
               </button>
-            </form>
+              <button
+                type="button"
+                className="flex items-center justify-between rounded-xl border border-white/20 bg-white/10 px-6 py-5 text-left text-base font-semibold text-white shadow-sm backdrop-blur-sm transition-all duration-300 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/30 hover:scale-[1.02]"
+              >
+                <span>Is there special coaching for Class 10 board exams?</span>
+                <MessageSquare className="h-5 w-5 text-white/60" />
+              </button>
+              <button
+                type="button"
+                className="flex items-center justify-between rounded-xl border border-white/20 bg-white/10 px-6 py-5 text-left text-base font-semibold text-white shadow-sm backdrop-blur-sm transition-all duration-300 hover:bg-gradient-to-r hover:from-green-500 hover:to-emerald-500 hover:border-green-400 hover:shadow-lg hover:shadow-green-500/30 hover:scale-[1.02]"
+              >
+                <span>Do you provide live classes for Class 6 to 8?</span>
+                <MessageSquare className="h-5 w-5 text-white/60" />
+              </button>
+              <button
+                type="button"
+                className="flex items-center justify-between rounded-xl border border-white/20 bg-white/10 px-6 py-5 text-left text-base font-semibold text-white shadow-sm backdrop-blur-sm transition-all duration-300 hover:bg-gradient-to-r hover:from-orange-500 hover:to-yellow-500 hover:border-orange-400 hover:shadow-lg hover:shadow-orange-500/30 hover:scale-[1.02]"
+              >
+                <span>What curriculum is followed for Class 11 and 12?</span>
+                <MessageSquare className="h-5 w-5 text-white/60" />
+              </button>
+              <button
+                type="button"
+                className="flex items-center justify-between rounded-xl border border-white/20 bg-white/10 px-6 py-5 text-left text-base font-semibold text-white shadow-sm backdrop-blur-sm transition-all duration-300 hover:bg-gradient-to-r hover:from-rose-500 hover:to-red-500 hover:border-rose-400 hover:shadow-lg hover:shadow-rose-500/30 hover:scale-[1.02]"
+              >
+                <span>Are there activity-based learning sessions for primary classes?</span>
+                <MessageSquare className="h-5 w-5 text-white/60" />
+              </button>
+              <button
+                type="button"
+                className="flex items-center justify-between rounded-xl border border-white/20 bg-white/10 px-6 py-5 text-left text-base font-semibold text-white shadow-sm backdrop-blur-sm transition-all duration-300 hover:bg-gradient-to-r hover:from-indigo-500 hover:to-violet-500 hover:border-indigo-400 hover:shadow-lg hover:shadow-indigo-500/30 hover:scale-[1.02]"
+              >
+                <span>How can parents track progress from Class 1 to 12?</span>
+                <MessageSquare className="h-5 w-5 text-white/60" />
+              </button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Map Section */}
-      <section className="relative z-10 overflow-hidden py-16">
-        <div className="pointer-events-none absolute inset-0 bg-white/55" />
-        <div className="pointer-events-none absolute inset-0 text-blue-600/[0.06]">
-          <MapPin className="absolute left-[5%] top-[18%] h-16 w-16 -rotate-12" />
-          <Send className="absolute right-[8%] top-[12%] h-14 w-14 rotate-12" />
-          <GraduationCap className="absolute bottom-[10%] left-[12%] h-16 w-16 rotate-12" />
-        </div>
-        <div className="relative mx-auto max-w-[1400px] px-4 md:px-6">
-          <div className="mb-8 rounded-[32px] border border-white/50 bg-white/75 px-6 py-10 text-center shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur-[18px] md:px-10 md:py-14 lg:px-16">
-            <h1 className="bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-500 bg-clip-text text-[36px] font-black leading-none tracking-tight text-transparent drop-shadow-[0_4px_20px_rgba(15,23,42,0.12)] md:text-[56px] lg:text-[68px]">
-              Find Us Here
-            </h1>
+        {/* Build Smarter Decisions Section (Glossy Translucent) */}
+        <section className="px-6 py-20 md:px-10 lg:px-16">
+          <div className="mx-auto max-w-7xl rounded-3xl border border-white/20 bg-black/20 p-12 text-center shadow-2xl backdrop-blur-sm md:p-16">
+            <h2 className="text-4xl font-black tracking-tight text-white md:text-5xl lg:text-6xl">
+              Build smarter decisions, <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-300 bg-clip-text text-transparent">faster</span>
+            </h2>
+            <p className="mx-auto mt-6 max-w-3xl text-lg font-medium leading-relaxed text-white/90 md:text-xl">
+              Join thousands of students and schools who trust ADYAPAN School for innovative learning solutions.
+              Transform education with AI-powered insights, personalized learning paths, and comprehensive support.
+            </p>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+              <a
+                href="/login"
+                className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-4 text-base font-bold text-blue-600 shadow-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-500 hover:via-purple-500 hover:to-cyan-500 hover:text-white hover:shadow-2xl hover:shadow-purple-500/30 hover:scale-[1.03]"
+              >
+                Get Started
+                <ArrowRight className="h-5 w-5" />
+              </a>
+              <a
+                href="/overview"
+                className="inline-flex items-center gap-2 rounded-lg border-2 border-white px-8 py-4 text-base font-bold text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-cyan-500 hover:via-blue-500 hover:to-purple-500 hover:border-transparent hover:shadow-2xl hover:shadow-blue-500/30 hover:scale-[1.03]"
+              >
+                Learn More
+              </a>
+            </div>
           </div>
+        </section>
 
-          <div className="grid items-stretch gap-6 lg:grid-cols-[3fr_2fr] lg:gap-8">
-            <div className="relative h-[320px] overflow-hidden rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.12)] transition duration-300 ease-out hover:-translate-y-1 md:h-[400px] lg:h-[520px]">
+        {/* Map Section (Glossy Translucent) */}
+        <section className="px-6 py-16 md:px-10 lg:px-16">
+          <div className="mx-auto max-w-7xl">
+            <h2 className="mb-8 text-center text-3xl font-black tracking-tight text-white md:text-4xl">Find <span className="bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">Us</span></h2>
+            <div className="relative overflow-hidden rounded-2xl border border-white/20 bg-black/20 p-2 shadow-2xl backdrop-blur-sm">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.844789!2d78.399023!3d17.413497!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb9158edcba987%3A0x123456789abcdef0!2sSattva%20Magnus%2C%20behind%20Reliance%20Bazaar%20Shaikpet%2C%20Sabza%20Colony%2C%20Ambedkar%20Nagar%2C%20Toli%20Chowki%2C%20Hyderabad%2C%20Telangana%20500008!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin"
                 width="100%"
@@ -290,217 +376,52 @@ export default function ContactPage() {
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="ADYAPAN Office Location"
-                className="h-full w-full"
+                title="ADYAPAN School Office Location"
+                className="w-full rounded-xl"
               />
+              <a
+                href="https://www.google.com/maps?um=1&ie=UTF-8&fb=1&gl=in&sa=X&geocode=KdkGZDKLl8s7MSJtLa_4zSEV&daddr=Sattva+Magnus,+behind+Reliance+Bazaar+Shaikpet,+Sabza+Colony,+Ambedkar+Nagar,+Toli+Chowki,+Hyderabad,+Telangana+500008"
+                target="_blank"
+                rel="noreferrer"
+                className="absolute bottom-6 right-6 inline-flex items-center gap-2 rounded-lg bg-[length:200%_200%] bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 px-6 py-3 text-sm font-bold text-white shadow-lg transition-all duration-300 animate-[colorShift_4s_ease_infinite] hover:scale-[1.02] hover:shadow-xl"
+              >
+                Open in Google Maps
+              </a>
             </div>
+          </div>
+        </section>
 
-            <div className="relative h-auto overflow-hidden rounded-[24px] border border-white/40 bg-white/85 p-6 shadow-[0_20px_50px_rgba(0,0,0,0.12)] backdrop-blur-[16px] transition duration-300 ease-out hover:-translate-y-1 md:p-7 lg:h-[520px]">
-              <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-gradient-to-br from-blue-300/30 via-purple-300/20 to-pink-300/20 blur-3xl" />
-              <div className="relative flex h-full flex-col">
-                <div className="inline-flex items-center gap-2 rounded-full border border-blue-200/80 bg-blue-50/80 px-3.5 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-blue-700 shadow-sm backdrop-blur-md">
-                  <MapPin className="h-4 w-4" />
-                  VISIT OUR OFFICE
-                </div>
-
-                <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
-                  Visit our office for admissions, partnerships, student support, and future skills consultations.
-                </p>
-
-                <div className="mt-5 grid gap-3">
-                  <div className="flex items-center gap-3 rounded-2xl border border-blue-100 bg-white/75 p-3.5 shadow-sm">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-[0_10px_24px_rgba(37,99,235,0.25)]">
-                      <Building2 className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <p className="text-sm font-black text-slate-900">Office Location</p>
-                      <p className="text-sm font-medium text-slate-600">Hyderabad, Telangana</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 rounded-2xl border border-purple-100 bg-white/75 p-3.5 shadow-sm">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-[0_10px_24px_rgba(147,51,234,0.22)]">
-                      <Clock3 className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <p className="text-sm font-black text-slate-900">Working Hours</p>
-                      <p className="text-sm font-medium text-slate-600">Mon - Sat</p>
-                      <p className="text-sm font-medium text-slate-600">11:00 AM - 8:00 PM</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 rounded-2xl border border-pink-100 bg-white/75 p-3.5 shadow-sm">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-blue-500 text-white shadow-[0_10px_24px_rgba(236,72,153,0.2)]">
-                      <PhoneCall className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <p className="text-sm font-black text-slate-900">Contact Support</p>
-                      <p className="text-sm font-medium text-slate-600">+91 81791 24566</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-auto flex flex-col gap-3 pt-5 sm:flex-row">
-                  <a
-                    href="https://maps.app.goo.gl/k9gTre3rCq2ao2Vw6?g_st=awb"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-3.5 text-sm font-black text-white shadow-[0_14px_34px_rgba(37,99,235,0.25)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(37,99,235,0.34)]"
-                  >
-                    <MapPin className="h-5 w-5" />
-                    Open In Google Maps
-                  </a>
-                  <a
-                    href="#contact-form"
-                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-blue-200 bg-white/80 px-5 py-3.5 text-sm font-black text-blue-700 shadow-sm backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:border-purple-200 hover:text-purple-700 hover:shadow-[0_14px_34px_rgba(147,51,234,0.14)]"
-                  >
-                    <PhoneCall className="h-5 w-5" />
-                    Contact Us
-                  </a>
-                </div>
+        {/* Social Media Section (Glossy Translucent) */}
+        <section className="px-6 py-16 md:px-10 lg:px-16">
+          <div className="mx-auto max-w-7xl">
+            <div className="rounded-2xl border border-white/20 bg-black/20 p-8 text-center shadow-2xl backdrop-blur-sm md:p-12">
+              <h3 className="text-2xl font-black tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] md:text-3xl">Follow Us on <span className="bg-gradient-to-r from-pink-300 to-purple-300 bg-clip-text text-transparent drop-shadow-none">Social Media</span></h3>
+              <p className="mx-auto mt-4 max-w-2xl text-base font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                Stay connected with ADYAPAN School for the latest updates, educational content, and community insights.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                <a
+                  href="https://www.instagram.com/adyapanschool_?igsh=MXJ0b3FpNzh1YW1vNg=="
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-base font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-gradient-to-r hover:from-pink-500 hover:via-purple-500 hover:to-orange-400 hover:border-pink-400 hover:shadow-lg hover:shadow-pink-500/30 hover:scale-[1.03]"
+                >
+                  <Instagram className="h-5 w-5" />
+                  Instagram
+                </a>
+                <a
+                  href="https://www.linkedin.com/company/adyapan-edutech-pvt-ltd/posts/?feedView=all"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-6 py-3 text-base font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-600 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-[1.03]"
+                >
+                  <Linkedin className="h-5 w-5" />
+                  LinkedIn
+                </a>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Build Smarter Decisions Section */}
-      <section className="relative z-10 bg-gradient-to-br from-blue-600/90 via-indigo-600/90 to-purple-600/90 py-20">
-        <div className="mx-auto max-w-7xl px-4 text-center md:px-6">
-          <h2 className="text-4xl font-bold text-white md:text-5xl lg:text-6xl">
-            Build smarter decisions, faster
-          </h2>
-          <p className="mx-auto mt-6 max-w-3xl text-lg text-white/90 md:text-xl">
-            Join thousands of students and schools who trust ADYAPAN for innovative learning solutions. 
-            Transform education with AI-powered insights, personalized learning paths, and comprehensive support.
-          </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="/login"
-              className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-4 text-base font-semibold text-blue-600 shadow-xl transition hover:bg-gray-50"
-            >
-              Get Started
-              <ArrowRight className="h-5 w-5" />
-            </a>
-            <a
-              href="/overview"
-              className="inline-flex items-center gap-2 rounded-lg border-2 border-white px-8 py-4 text-base font-semibold text-white transition hover:bg-white/10"
-            >
-              Learn More
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Social Media Section */}
-      <section className="relative z-10 overflow-hidden bg-gradient-to-b from-[#eef7ff] via-[#f8fbff] to-white py-16">
-        <style jsx>{`
-          @keyframes social-float {
-            0%, 100% { transform: translate3d(0, 0, 0); }
-            50% { transform: translate3d(0, -12px, 0); }
-          }
-
-          @keyframes phone-float-left {
-            0%, 100% { transform: translate3d(0, 0, 0) rotate(-12deg); }
-            50% { transform: translate3d(0, -10px, 0) rotate(-12deg); }
-          }
-
-          @keyframes phone-float-right {
-            0%, 100% { transform: translate3d(0, 0, 0) rotate(12deg); }
-            50% { transform: translate3d(0, -10px, 0) rotate(12deg); }
-          }
-        `}</style>
-        <div className="pointer-events-none absolute inset-0 text-sky-600/[0.07]">
-          <Star className="absolute left-[4%] top-[12%] h-8 w-8" />
-          <GraduationCap className="absolute right-[9%] top-[9%] h-16 w-16 rotate-12" />
-          <BookOpen className="absolute left-[11%] top-[28%] h-12 w-12 -rotate-12" />
-          <Pencil className="absolute left-[3%] top-[48%] h-10 w-10 rotate-12" />
-          <Atom className="absolute right-[12%] top-[38%] h-14 w-14" />
-          <Send className="absolute bottom-[42%] left-[15%] h-9 w-9 rotate-12" />
-          <Sparkles className="absolute bottom-[16%] left-[20%] h-10 w-10" />
-          <MessageSquare className="absolute bottom-[28%] right-[5%] h-12 w-12 -rotate-12" />
-        </div>
-
-        <div className="relative mx-auto max-w-7xl px-4 text-center md:px-6">
-          <h3 className="bg-gradient-to-r from-[#2563eb] via-[#4f46e5] to-[#7c3aed] bg-clip-text text-[40px] font-black leading-tight text-transparent drop-shadow-[0_10px_24px_rgba(79,70,229,0.18)] md:text-[56px] lg:text-[72px]">
-            Follow Us on Social Media
-          </h3>
-          <p className="mx-auto mt-6 max-w-[800px] text-lg font-medium leading-relaxed text-[#334155] md:text-2xl">
-            Stay connected with ADYAPAN for the latest updates, educational content, and community insights.
-          </p>
-
-          <div className="relative mx-auto mt-16 flex min-h-[360px] max-w-5xl items-center justify-center sm:min-h-[460px] lg:mt-20 lg:min-h-[560px]">
-            <div className="absolute inset-x-12 top-14 h-72 rounded-full bg-blue-400/20 blur-3xl" />
-            <div className="absolute left-[3%] top-[30%] z-30 hidden h-16 w-16 items-center justify-center rounded-full border border-white/70 bg-white/95 shadow-[0_15px_35px_rgba(0,0,0,0.12)] backdrop-blur-[12px] sm:flex lg:h-[72px] lg:w-[72px]" style={{ animation: "social-float 5.4s ease-in-out infinite", animationDelay: "0s" }}>
-              <Instagram className="h-8 w-8 text-pink-500 lg:h-9 lg:w-9" />
-            </div>
-            <div className="absolute left-[14%] top-[11%] z-30 hidden h-14 w-14 items-center justify-center rounded-full border border-white/70 bg-white/95 text-rose-500 shadow-[0_15px_35px_rgba(0,0,0,0.12)] backdrop-blur-[12px] md:flex" style={{ animation: "social-float 6.2s ease-in-out infinite", animationDelay: "0.7s" }}>
-              <Heart className="h-7 w-7" />
-            </div>
-            <div className="absolute right-[4%] top-[39%] z-30 hidden h-16 w-16 items-center justify-center rounded-full border border-white/70 bg-white/95 shadow-[0_15px_35px_rgba(0,0,0,0.12)] backdrop-blur-[12px] sm:flex lg:h-[72px] lg:w-[72px]" style={{ animation: "social-float 5.8s ease-in-out infinite", animationDelay: "0.35s" }}>
-              <Linkedin className="h-8 w-8 text-blue-600 lg:h-9 lg:w-9" />
-            </div>
-            <div className="absolute right-[15%] top-[14%] z-30 hidden h-14 w-14 items-center justify-center rounded-full border border-white/70 bg-white/95 text-sky-500 shadow-[0_15px_35px_rgba(0,0,0,0.12)] backdrop-blur-[12px] md:flex" style={{ animation: "social-float 6.6s ease-in-out infinite", animationDelay: "1s" }}>
-              <Send className="h-7 w-7" />
-            </div>
-            <div className="absolute bottom-[13%] left-[9%] z-30 hidden h-14 w-14 items-center justify-center rounded-full border border-white/70 bg-white/95 text-indigo-500 shadow-[0_15px_35px_rgba(0,0,0,0.12)] backdrop-blur-[12px] lg:flex" style={{ animation: "social-float 7s ease-in-out infinite", animationDelay: "1.4s" }}>
-              <GraduationCap className="h-7 w-7" />
-            </div>
-
-            <div className="relative z-20 mx-auto w-full max-w-[900px] overflow-hidden transition duration-500 ease-out hover:-translate-y-2">
-              {/* Replace with a true transparent PNG for best visual quality. */}
-              <img
-                src="/social-showcase.png"
-                alt="ADYAPAN social media phone showcase"
-                className="h-auto w-full object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.25)]"
-              />
-            </div>
-          </div>
-
-          <div className="relative z-30 mt-10 grid gap-4 md:mt-12 md:grid-cols-2 lg:grid-cols-3">
-            {socialFaqs.map((faq, index) => {
-              const Icon = faq.icon;
-              const isActive = activeSocialFaq === index;
-
-              return (
-                <div key={faq.question} className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setActiveSocialFaq(isActive ? null : index)}
-                    className="flex w-full items-center justify-between gap-4 rounded-[20px] border border-indigo-500/15 bg-white/95 p-6 text-left text-sm font-black text-slate-950 shadow-[0_10px_30px_rgba(0,0,0,0.06)] transition duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-indigo-400/35 hover:shadow-[0_18px_42px_rgba(37,99,235,0.14)]"
-                  >
-                    <span className="flex items-center gap-3">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
-                        <Icon className="h-5 w-5" />
-                      </span>
-                      {faq.question}
-                    </span>
-                    <ChevronDown className={`h-5 w-5 shrink-0 text-blue-600 transition ${isActive ? "rotate-180" : ""}`} />
-                  </button>
-
-                  {isActive && (
-                    <div className="relative mt-4 rounded-[24px] border border-indigo-500/10 bg-white/95 p-5 text-left shadow-[0_25px_60px_rgba(0,0,0,0.12)] backdrop-blur-[16px] transition duration-300 animate-in fade-in slide-in-from-top-2">
-                      <button
-                        type="button"
-                        onClick={() => setActiveSocialFaq(null)}
-                        className="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900"
-                        aria-label="Close FAQ answer"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
-                        <Icon className="h-6 w-6" />
-                      </div>
-                      <h4 className="pr-8 text-base font-black text-slate-950">{faq.question}</h4>
-                      <p className="mt-3 text-sm font-medium leading-6 text-slate-600">{faq.answer}</p>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+        </section>
       </div>
 
       {/* Success Modal */}
@@ -510,18 +431,18 @@ export default function ContactPage() {
           onClick={() => setSuccess(false)}
           className="fixed inset-0 z-50 grid place-items-center bg-black/50 px-4 backdrop-blur-sm"
         >
-          <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl">
+          <div className="w-full max-w-md rounded-2xl border border-white/20 bg-white/90 p-8 text-center shadow-2xl backdrop-blur-sm">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600">
               <Sparkles className="h-8 w-8 text-white" />
             </div>
             <h3 className="mt-6 text-2xl font-bold text-gray-900">Message Sent!</h3>
             <p className="mx-auto mt-3 max-w-sm text-base text-gray-600">
-              Thanks for reaching out. ADYAPAN team will contact you soon.
+              Thanks for reaching out. ADYAPAN School team will contact you soon.
             </p>
             <button
               type="button"
               onClick={() => setSuccess(false)}
-              className="mt-6 inline-flex h-12 items-center justify-center rounded-lg bg-blue-600 px-8 text-base font-semibold text-white transition hover:bg-blue-700"
+              className="mt-6 inline-flex h-12 items-center justify-center rounded-lg bg-[length:200%_200%] bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 px-8 text-base font-bold text-white transition-all duration-300 animate-[colorShift_4s_ease_infinite] hover:scale-[1.02] hover:shadow-lg"
             >
               OK
             </button>
@@ -530,8 +451,8 @@ export default function ContactPage() {
       )}
 
       {/* Status Message */}
-      {status && !success && (
-        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-xl">
+      {status && !success && !attempted && (
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg border border-white/20 bg-white/90 px-6 py-3 text-sm font-semibold text-gray-900 shadow-xl backdrop-blur-sm">
           {status}
         </div>
       )}
