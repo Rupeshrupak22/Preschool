@@ -343,153 +343,171 @@ export default function AdminPage() {
 
   if (showLogin) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 px-4">
-        <div className="w-full max-w-md">
-          {/* Header */}
-          <div className="mb-6 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-xs font-black text-white">
-              ady.
-            </div>
-            <span className="text-xl font-black text-slate-800">Adyapan</span>
-          </div>
+      <main className="relative flex h-screen items-center justify-end overflow-hidden">
+        {/* Background video */}
+        <video
+          autoPlay
+          loop={true}
+          muted
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover opacity-80"
+          aria-hidden="true"
+        >
+          <source src="/newlogin-vid_qPNCEcV9.mp4" type="video/mp4" />
+        </video>
+        {/* Adyapan logo and branding centered on the left half */}
+        <div className="absolute left-0 top-0 hidden h-full w-1/2 flex-col items-center justify-center lg:flex z-10 pointer-events-none">
+          <img
+            src="/ady-logo.png"
+            alt="ADYAPAN"
+            className="h-36 w-36 rounded-full object-cover"
+          />
+          <h2 className="mt-6 text-5xl font-black text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+            Adyapan <span className="text-sky-400 drop-shadow-[0_2px_8px_rgba(56,189,248,0.5)]">School</span>
+          </h2>
+        </div>
 
-          {/* Login Card */}
-          <div className="rounded-xl border-t-4 border-orange-400 bg-white p-8 shadow-xl">
-            <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-orange-100">
-                <ShieldCheck className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <h1 className="text-xl font-black text-slate-900">Admin Login</h1>
-                <p className="text-sm text-slate-500">Adyapan Admin Portal - Authorized access only</p>
-              </div>
-            </div>
-
-            {/* Active session conflict banner */}
-            {showClearSession && (
-              <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-4">
-                <p className="text-sm font-black text-amber-900">⚠️ Active Session Detected</p>
-                <p className="mt-1 text-sm font-medium text-amber-800">
-                  This admin account is already logged in on another device. Clear the previous session to continue.
-                </p>
-                <div className="mt-3 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={handleClearAdminSessions}
-                    disabled={clearingSession}
-                    className="flex-1 rounded-lg bg-amber-600 px-3 py-2 text-xs font-black text-white transition hover:bg-amber-700 disabled:opacity-60"
-                  >
-                    {clearingSession ? "Clearing..." : "Clear Previous Sessions & Login"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setShowClearSession(false); setPendingCredentials(null); }}
-                    className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-black text-slate-700 transition hover:bg-slate-50"
-                  >
-                    Cancel
-                  </button>
+        {/* Right side form container */}
+        <div className="relative z-10 flex w-full items-center justify-center px-6 sm:w-[60%] md:w-[52%] lg:w-[48%]">
+          <div className="w-full max-w-[380px]">
+            {/* Login Card */}
+            <div className="rounded-2xl border border-white bg-white/90 px-6 py-6 shadow-[0_8px_40px_rgba(0,0,0,0.25)] backdrop-blur-md">
+              {/* Welcome heading */}
+              <div className="mb-5">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 shadow-md">
+                    <ShieldCheck className="h-4 w-4 text-white" />
+                  </div>
+                  <h1 className="text-[22px] font-black text-slate-900">Admin Login</h1>
                 </div>
-              </div>
-            )}
-
-            <form onSubmit={handleAdminLogin} className="space-y-5">
-              {/* Email */}
-              <div>
-                <label className="mb-2 block text-sm font-bold text-slate-700">Email Address</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-3 text-slate-400">
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                  </span>
-                  <input
-                    name="email"
-                    type="email"
-                    placeholder="admin@adyapan.com"
-                    className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
-                    required
-                  />
-                </div>
+                <p className="mt-1 pl-[46px] text-[13px] text-slate-700 font-medium">Authorized access only</p>
               </div>
 
-              {/* Password */}
-              <div>
-                <label className="mb-2 block text-sm font-bold text-slate-700">Password</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-3 text-slate-400">
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                  </span>
-                  <input
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-12 text-sm font-medium text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
-                  >
-                    <Eye className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Access Key */}
-              <div>
-                <label className="mb-2 block text-sm font-bold text-slate-700">
-                  Access Key <span className="font-normal text-slate-400">(required for admin access)</span>
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-3 text-slate-400">
-                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
-                  </span>
-                  <input
-                    name="accessKey"
-                    type={showAccessKey ? "text" : "password"}
-                    placeholder="Enter your admin access key"
-                    className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-12 text-sm font-medium text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowAccessKey(!showAccessKey)}
-                    className="absolute right-3 top-3 text-slate-400 hover:text-slate-600"
-                  >
-                    <Eye className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Error */}
-              {loginError && (
-                <div className="rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
-                  {loginError}
+              {/* Active session conflict banner */}
+              {showClearSession && (
+                <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                  <p className="text-sm font-black text-amber-900">⚠️ Active Session Detected</p>
+                  <p className="mt-1 text-sm font-medium text-amber-800">
+                    This admin account is already logged in on another device. Clear the previous session to continue.
+                  </p>
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      type="button"
+                      onClick={handleClearAdminSessions}
+                      disabled={clearingSession}
+                      className="flex-1 rounded-lg bg-amber-600 px-3 py-2.5 text-xs font-black text-white transition hover:bg-amber-700 disabled:opacity-60"
+                    >
+                      {clearingSession ? "Clearing..." : "Clear & Login"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowClearSession(false); setPendingCredentials(null); }}
+                      className="rounded-lg border border-slate-200 px-3 py-2.5 text-xs font-black text-slate-700 transition hover:bg-slate-50"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               )}
 
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={loginLoading || showClearSession}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-400 to-orange-500 text-sm font-black text-white shadow-lg shadow-orange-200 transition hover:from-orange-500 hover:to-orange-600 disabled:opacity-60"
-              >
-                {loginLoading ? (
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                ) : (
-                  <>Sign In to Admin →</>
-                )}
-              </button>
-            </form>
+              <form onSubmit={handleAdminLogin} className="space-y-4">
+                {/* Email */}
+                <div>
+                  <label className="mb-1.5 block text-sm font-bold text-slate-700">Email Address</label>
+                  <div className="relative">
+                    <svg className="absolute left-3.5 top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    <input
+                      name="email"
+                      type="email"
+                      placeholder="admin@adyapan.com"
+                      className="h-[44px] w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                      required
+                    />
+                  </div>
+                </div>
 
-            <p className="mt-5 text-center text-xs text-slate-400">
-              All login attempts are logged and monitored
+                {/* Password */}
+                <div>
+                  <label className="mb-1.5 block text-sm font-bold text-slate-700">Password</label>
+                  <div className="relative">
+                    <svg className="absolute left-3.5 top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    <input
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      className="h-[44px] w-full rounded-lg border border-slate-200 bg-white pl-10 pr-12 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
+                      aria-label="Toggle password visibility"
+                    >
+                      <Eye className="h-[16px] w-[16px]" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Access Key */}
+                <div>
+                  <label className="mb-1.5 block text-sm font-bold text-slate-700">Access Key</label>
+                  <div className="relative">
+                    <svg className="absolute left-3.5 top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+                    <input
+                      name="accessKey"
+                      type={showAccessKey ? "text" : "password"}
+                      placeholder="Enter your admin access key"
+                      className="h-[44px] w-full rounded-lg border border-slate-200 bg-white pl-10 pr-12 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowAccessKey(!showAccessKey)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
+                      aria-label="Toggle access key visibility"
+                    >
+                      <Eye className="h-[16px] w-[16px]" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Error */}
+                {loginError && (
+                  <div className="rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 border border-red-100">
+                    {loginError}
+                  </div>
+                )}
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  disabled={loginLoading || showClearSession}
+                  className="group flex h-[44px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-sm font-black text-white shadow-lg shadow-blue-200/50 transition-all hover:from-blue-600 hover:to-blue-700 active:scale-[0.98] disabled:opacity-60 disabled:shadow-none"
+                >
+                  {loginLoading ? (
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      Sign In to Admin
+                      <svg className="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <p className="mt-4 text-center text-[11px] text-slate-900 font-semibold leading-relaxed">
+                All login attempts are logged and monitored.
+              </p>
+            </div>
+
+            {/* Back link */}
+            <p className="mt-4 text-center text-sm">
+              <a href="/" className="inline-flex items-center gap-1 font-bold text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] transition hover:text-blue-300">
+                ← Back to Adyapan
+              </a>
             </p>
           </div>
-
-          {/* Back link */}
-          <p className="mt-4 text-center text-sm text-slate-500">
-            <a href="/" className="font-semibold hover:text-orange-600 transition">← Back to Adyapan</a>
-          </p>
         </div>
       </main>
     );
