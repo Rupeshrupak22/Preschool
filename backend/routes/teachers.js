@@ -2,6 +2,7 @@ const express = require('express');
 const prisma = require('../lib/prisma');
 const { authenticate, authorize } = require('../middleware/auth');
 const { hashPassword, hashAccessKey, generateAccessKey } = require('../utils/password');
+const { sendResponse } = require('../utils/response');
 const router = express.Router();
 
 // GET /api/v1/teachers
@@ -33,7 +34,8 @@ router.get('/', authenticate, authorize('admin', 'principal', 'teacher'), async 
 
     res.json(teachers);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch teachers error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -49,7 +51,8 @@ router.get('/:id', authenticate, authorize('admin', 'principal', 'teacher'), asy
     if (!canAccessTeacher(req.user, teacher)) return res.status(403).json({ error: 'Access denied' });
     res.json(teacher);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch teacher error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -82,7 +85,8 @@ router.post('/', authenticate, authorize('admin', 'principal'), async (req, res)
     if (err.code === 'P2002') {
       return res.status(409).json({ error: 'Teacher with this email already exists' });
     }
-    res.status(500).json({ error: err.message });
+    console.error('Create teacher error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -104,7 +108,8 @@ router.put('/:id', authenticate, authorize('admin', 'principal'), async (req, re
     });
     res.json(teacher);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Update teacher error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -117,7 +122,8 @@ router.delete('/:id', authenticate, authorize('admin', 'principal'), async (req,
     await prisma.teacher.delete({ where: { id: req.params.id } });
     res.json({ message: 'Teacher removed successfully' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Delete teacher error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 

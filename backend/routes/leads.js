@@ -1,6 +1,7 @@
 const express = require('express');
 const prisma = require('../lib/prisma');
 const { authenticate, authorize } = require('../middleware/auth');
+const { sendResponse } = require('../utils/response');
 const router = express.Router();
 
 // GET /api/v1/leads
@@ -11,7 +12,8 @@ router.get('/', authenticate, authorize('admin', 'principal'), async (req, res) 
     });
     res.json(leads);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch leads error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -41,7 +43,8 @@ router.post('/', async (req, res) => {
 
     res.status(201).json({ ok: true, lead });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Create lead error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -51,7 +54,8 @@ router.delete('/:id', authenticate, authorize('admin'), async (req, res) => {
     await prisma.leads.delete({ where: { id: req.params.id } });
     res.json({ message: 'Lead deleted' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Delete lead error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 

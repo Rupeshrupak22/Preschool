@@ -1,6 +1,7 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
 const { authenticate, authorize } = require('../middleware/auth');
+const { sendResponse } = require('../utils/response');
 const router = express.Router();
 
 let pool;
@@ -26,7 +27,8 @@ router.get('/', authenticate, authorize('teacher', 'principal', 'admin'), async 
     const [rows] = await getPool().query('SELECT * FROM meetings ORDER BY created_at DESC');
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch meetings error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -43,7 +45,8 @@ router.post('/', authenticate, authorize('principal', 'admin'), async (req, res)
 
     res.status(201).json({ id, title, hostedBy, duration, isActive: true });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Create meeting error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -63,7 +66,8 @@ router.put('/:id', authenticate, authorize('principal', 'admin'), async (req, re
     await getPool().query(`UPDATE meetings SET ${updates.join(', ')} WHERE id = ?`, params);
     res.json({ id: req.params.id, ...req.body });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Update meeting error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 

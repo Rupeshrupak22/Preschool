@@ -1,6 +1,7 @@
 const express = require('express');
 const prisma = require('../lib/prisma');
 const { authenticate, authorize } = require('../middleware/auth');
+const { sendResponse } = require('../utils/response');
 const router = express.Router();
 
 // GET /api/v1/students
@@ -31,7 +32,8 @@ router.get('/', authenticate, async (req, res) => {
 
     res.json(students);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch students error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -46,7 +48,8 @@ router.get('/:id', authenticate, async (req, res) => {
     if (!canAccessStudent(req.user, student)) return res.status(403).json({ error: 'Access denied' });
     res.json(student);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch student error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -74,7 +77,8 @@ router.post('/', authenticate, authorize('admin', 'principal'), async (req, res)
     if (err.code === 'P2002') {
       return res.status(409).json({ error: 'Student with this email already exists' });
     }
-    res.status(500).json({ error: err.message });
+    console.error('Create student error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -96,7 +100,8 @@ router.put('/:id', authenticate, authorize('admin', 'principal', 'teacher'), asy
     });
     res.json(student);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Update student error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -109,7 +114,8 @@ router.delete('/:id', authenticate, authorize('admin', 'principal'), async (req,
     await prisma.student.delete({ where: { id: req.params.id } });
     res.json({ message: 'Student deleted successfully' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Delete student error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 

@@ -308,8 +308,8 @@ router.post('/change-password', authenticate, validateBody('currentPassword', 'n
   try {
     const { currentPassword, newPassword } = req.body;
 
-    if (newPassword.length < 6) {
-      return sendResponse(res, 400, false, 'New password must be at least 6 characters.');
+    if (newPassword.length < 8) {
+      return sendResponse(res, 400, false, 'New password must be at least 8 characters.');
     }
 
     const identity = await findLoginIdentity(req.user.email, req.user.role);

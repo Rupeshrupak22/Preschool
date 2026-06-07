@@ -60,7 +60,6 @@ async function recordFailedAttempt(email, role = 'student') {
  * Clear failed attempts on successful login
  */
 function clearFailedAttempts(email) {
-  failedAttempts.delete(email.toLowerCase().trim());
   for (const role of ['student', 'teacher', 'principal', 'admin']) {
     failedAttempts.delete(`${role}:${email.toLowerCase().trim()}`);
   }

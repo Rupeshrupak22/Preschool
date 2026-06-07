@@ -1,6 +1,7 @@
 const express = require('express');
 const prisma = require('../lib/prisma');
 const { authenticate, authorize } = require('../middleware/auth');
+const { sendResponse } = require('../utils/response');
 const router = express.Router();
 
 // GET /api/v1/events
@@ -15,7 +16,8 @@ router.get('/', authenticate, async (req, res) => {
 
     res.json(events);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch events error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -37,7 +39,8 @@ router.post('/', authenticate, authorize('teacher', 'principal', 'admin'), async
 
     res.status(201).json(event);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Create event error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -47,7 +50,8 @@ router.delete('/:id', authenticate, authorize('admin'), async (req, res) => {
     await prisma.notifications.delete({ where: { id: req.params.id } });
     res.json({ message: 'Event deleted' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Delete event error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
