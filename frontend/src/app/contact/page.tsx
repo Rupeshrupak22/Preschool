@@ -91,7 +91,7 @@ export default function ContactPage() {
                   <div className="flex h-24 w-24 items-center justify-center transition-transform duration-500 hover:scale-110 hover:-translate-y-1">
                     <img
                       src="/ady-logo.png"
-                      alt="ADYAPAN"
+                      alt="Adyapan School"
                       className="h-24 w-24 rounded-full object-cover shadow-xl"
                     />
                   </div>
