@@ -78,7 +78,6 @@ const paths = [
       "Art Theory",
       "Current Affairs",
       "Olympiad Worksheets",
-      "Microsoft Office",
       "Digital Marketing and How Digital Platforms Work"
     ]
   },
@@ -91,6 +90,7 @@ const paths = [
       "Calligraphy & Course Learning",
       "Handwriting",
       "Current Affairs",
+      "Microsoft Office",
       "Information Sessions on Career Options",
       "Extempore"
     ]
