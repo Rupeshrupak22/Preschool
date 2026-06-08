@@ -78,7 +78,7 @@ const paths = [
       "Art Theory",
       "Current Affairs",
       "Olympiad Worksheets",
-      "Information Session on Puppets",
+      "Microsoft Office",
       "Digital Marketing and How Digital Platforms Work"
     ]
   },
@@ -91,8 +91,7 @@ const paths = [
       "Calligraphy & Course Learning",
       "Handwriting",
       "Current Affairs",
-      "JEE / NEET / KVPY / Olympiad / CUET / PMAT Preparation",
-      "Informational Session on Wildlife & Career Options",
+      "Information Sessions on Career Options",
       "Extempore"
     ]
   },
@@ -102,8 +101,7 @@ const paths = [
     skills: [
       "Personal Finance",
       "Coding (Python / SQL)",
-      "Microsoft Office",
-      "Exam Readiness",
+      "JEE / NEET / KVPY / Olympiad / CUET / IPMAT Preparation",
       "Resume / Career Coaching",
       "Current Affairs",
       "Foreign Language", 
