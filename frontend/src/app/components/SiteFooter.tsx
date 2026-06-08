@@ -6,7 +6,7 @@ import { ArrowUp, Clock, Instagram, Linkedin, Mail, MapPin, Phone, Youtube } fro
 const learningPrograms = [
   "Future Skills Foundation (Class 5 to 8)",
   "Coding & AI Creators (Class 6 to 10)",
-  "Robotics & Innovation Lab (Class 7 to 12)",
+  "Current Affairs & Innovation Lab (Class 7 to 12)",
   "Career, Communication & Design (Class 9 to 12)"
 ];
 
@@ -60,7 +60,7 @@ export default function SiteFooter() {
               </div>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-slate-400">
-              We help students from Class 5 to 12 become confident creators through coding, AI, robotics,
+              We help students from Class 5 to 12 become confident creators through coding, AI, current affairs,
               communication, design, and career-ready future skills.
             </p>
             <div className="mt-5 flex gap-3">

@@ -10,6 +10,7 @@ import {
   Cpu,
   GraduationCap,
   LineChart,
+  Newspaper,
   Lock,
   Radio,
   Rocket,
@@ -29,7 +30,7 @@ const fadeUp = {
 };
 
 const subjects: { name: string; icon: Icon; color: string }[] = [
-  { name: "Robotics", icon: Cpu, color: "from-blue-500 to-cyan-400" },
+  { name: "Current Affairs", icon: Newspaper, color: "from-blue-500 to-cyan-400" },
   { name: "Coding", icon: Code2, color: "from-green-500 to-emerald-400" },
   { name: "IoT", icon: Wifi, color: "from-cyan-500 to-sky-400" },
   { name: "Electronics", icon: Radio, color: "from-orange-500 to-amber-400" },

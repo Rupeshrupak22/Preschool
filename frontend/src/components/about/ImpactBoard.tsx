@@ -22,7 +22,7 @@ const cards = [
     id: 2,
     badge: "FUTURE SKILLS",
     heading: "25+ Future Skills",
-    description: "Coding, AI, Robotics, Communication, Design Thinking, Financial Literacy, Entrepreneurship, Public Speaking and more.",
+    description: "Coding, AI, Current Affairs, Communication, Design Thinking, Financial Literacy, Entrepreneurship, Public Speaking and more.",
     image: "/assets/inside-adyapan/box2.png",
     gradient: "linear-gradient(135deg, #a02cff 0%, #ff4aa2 100%)",
     glowColor: "rgba(160,44,255,0.55)",

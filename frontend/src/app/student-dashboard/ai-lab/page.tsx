@@ -29,7 +29,7 @@ const suggestedTopics = [
   { label: "Mathematics",    emoji: "📐", color: "bg-blue-50 text-blue-700 hover:bg-blue-100" },
   { label: "Science",        emoji: "🔬", color: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100" },
   { label: "AI & Coding",    emoji: "🤖", color: "bg-purple-50 text-purple-700 hover:bg-purple-100" },
-  { label: "Robotics",       emoji: "⚙️", color: "bg-orange-50 text-orange-700 hover:bg-orange-100" },
+  { label: "Current Affairs", emoji: "📰", color: "bg-orange-50 text-orange-700 hover:bg-orange-100" },
   { label: "Communication",  emoji: "🎤", color: "bg-rose-50 text-rose-700 hover:bg-rose-100" },
   { label: "History",        emoji: "📜", color: "bg-yellow-50 text-yellow-700 hover:bg-yellow-100" },
   { label: "English",        emoji: "📖", color: "bg-cyan-50 text-cyan-700 hover:bg-cyan-100" },

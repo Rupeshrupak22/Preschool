@@ -14,6 +14,7 @@ import {
   Github,
   GraduationCap,
   Mic,
+  Newspaper,
   Palette,
   Play,
   QrCode,
@@ -41,7 +42,7 @@ type Icon = React.ComponentType<{ className?: string }>;
 const skills: { title: string; icon: Icon; copy: string }[] = [
   { title: "Coding", icon: Code2, copy: "Scratch to Python, logic, algorithms, and product thinking." },
   { title: "Artificial Intelligence", icon: Brain, copy: "Prompting, ML concepts, AI tools, and ethical use cases." },
-  { title: "Robotics", icon: Cpu, copy: "Sensors, Arduino, automation, robotics models, and lab builds." },
+  { title: "Current Affairs", icon: Newspaper, copy: "National and global awareness, analysis, debates, and informed thinking." },
   { title: "Web Development", icon: Sparkles, copy: "HTML, CSS, React, APIs, hosting, and web portfolios." },
   { title: "App Development", icon: Smartphone, copy: "Mobile UI, no-code to code, app logic, and publishing." },
   { title: "Public Speaking", icon: Mic, copy: "Communication, pitching, debates, interviews, and stage confidence." },
@@ -126,9 +127,9 @@ const curriculumPrograms: { title: string; icon: Icon; copy: string }[] = [
     copy: "Introduce coding skills to young learners through logic, loops, projects, and computational thinking."
   },
   {
-    title: "Robotics",
-    icon: Cpu,
-    copy: "Hands-on robotics activities that build creativity, sensors knowledge, and innovation confidence."
+    title: "Current Affairs",
+    icon: Newspaper,
+    copy: "Stay informed with national and global events, develop analytical thinking and awareness."
   },
   {
     title: "Artificial Intelligence",
@@ -157,7 +158,7 @@ const events = [
   "Coding Championship",
   "Student Founder Club",
   "Career Webinar",
-  "Robotics Workshop"
+  "Current Affairs Workshop"
 ];
 
 const testimonials = [
@@ -741,10 +742,10 @@ export default function Home() {
             <SectionTitle
               eyebrow="School partnerships"
               title="Future Skills Programs built for modern schools"
-              copy="Deploy AI curriculum, coding labs, robotics workshops, teacher training, and certification dashboards."
+              copy="Deploy AI curriculum, coding labs, current affairs workshops, teacher training, and certification dashboards."
             />
             <div className="grid gap-4 sm:grid-cols-2">
-              {["AI Curriculum", "Coding Labs", "Robotics Workshops", "Teacher Training", "Future Skills Programs", "Analytics"].map((item) => (
+              {["AI Curriculum", "Coding Labs", "Current Affairs Workshops", "Teacher Training", "Future Skills Programs", "Analytics"].map((item) => (
                 <div
                   key={item}
                   className="rounded-xl border border-white/40 p-5 shadow-[0_4px_16px_rgba(31,38,135,0.06)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(31,38,135,0.14)] hover:border-purple-200/50"

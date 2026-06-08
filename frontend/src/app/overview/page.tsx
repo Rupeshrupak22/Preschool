@@ -24,7 +24,7 @@ type Icon = React.ComponentType<{ className?: string }>;
 const platformCards: { title: string; copy: string; icon: Icon; tone: string; accent: string }[] = [
   {
     title: "Future Skills Curriculum",
-    copy: "Coding, AI, robotics, communication, design thinking, and career skills mapped class-wise.",
+    copy: "Coding, AI, current affairs, communication, design thinking, and career skills mapped class-wise.",
     icon: Brain,
     tone: "from-purple-500 to-pink-500",
     accent: "purple"
