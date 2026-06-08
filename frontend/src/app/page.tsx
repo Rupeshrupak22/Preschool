@@ -63,7 +63,8 @@ const paths = [
       "Basic Digital Literacy",
       "General Knowledge",
       "Show & Tell / Storytelling",
-      "Olympiad Worksheets"
+      "Olympiad Worksheets",
+      "Nutrition"
     ]
   },
   {
@@ -78,7 +79,8 @@ const paths = [
       "Art Theory",
       "Current Affairs",
       "Olympiad Worksheets",
-      "Digital Marketing and How Digital Platforms Work"
+      "Digital Marketing and How Digital Platforms Work",
+      "Nutrition"
     ]
   },
   {
@@ -92,7 +94,8 @@ const paths = [
       "Current Affairs",
       "Microsoft Office",
       "Information Sessions on Career Options",
-      "Extempore"
+      "Extempore",
+      "Nutrition"
     ]
   },
   {
