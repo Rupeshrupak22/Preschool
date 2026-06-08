@@ -56,6 +56,7 @@ const paths = [
   {
     title: "Class 1–5",
     level: "Foundation Track",
+    icon: BookOpen,
     skills: [
       "Spoken English",
       "Puzzles", 
@@ -70,6 +71,7 @@ const paths = [
   {
     title: "Class 6–8", 
     level: "Development Track",
+    icon: Code2,
     skills: [
       "Communication & Public Speaking (MUN)",
       "Financial Literacy",
@@ -85,7 +87,8 @@ const paths = [
   },
   {
     title: "Class 9–10",
-    level: "Growth Track", 
+    level: "Growth Track",
+    icon: Target,
     skills: [
       "Art Tools & Productivity",
       "Coding",
@@ -101,6 +104,7 @@ const paths = [
   {
     title: "Class 11–12",
     level: "Mastery Track",
+    icon: Trophy,
     skills: [
       "Personal Finance",
       "Coding (Python / SQL)",
@@ -712,7 +716,7 @@ export default function Home() {
                     <h3 className="mt-1 text-2xl font-black text-slate-900">{path.title}</h3>
                   </div>
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-pink-200/50 bg-pink-50/60 backdrop-blur-sm">
-                    <GraduationCap className="h-7 w-7 text-pink-600" />
+                    <path.icon className="h-7 w-7 text-pink-600" />
                   </div>
                 </div>
                 
