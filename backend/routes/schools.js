@@ -64,9 +64,22 @@ router.post('/', authenticate, authorize('admin'), async (req, res) => {
 // PUT /api/v1/schools/:id
 router.put('/:id', authenticate, authorize('admin'), async (req, res) => {
   try {
+    // Whitelist allowed fields to prevent mass assignment
+    const allowedFields = ['name', 'email', 'phone', 'city', 'address', 'contact_person', 'status'];
+    const data = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        data[field] = req.body[field];
+      }
+    }
+
+    if (Object.keys(data).length === 0) {
+      return sendResponse(res, 400, false, 'No valid fields provided for update.');
+    }
+
     const school = await prisma.school.update({
       where: { id: req.params.id },
-      data: req.body,
+      data,
     });
     res.json(school);
   } catch (err) {

@@ -61,6 +61,14 @@ router.post('/', authenticate, authorize('admin', 'principal'), async (req, res)
   try {
     const { teacher_name, email, password, subject, phone, schoolId, school_name, assigned_classes } = req.body;
     if (!teacher_name || !email || !password) return res.status(400).json({ error: 'teacher_name, email and password are required' });
+
+    // Enforce password policy
+    const { checkPasswordStrength } = require('../middleware/validate');
+    const policyError = checkPasswordStrength(password);
+    if (policyError) {
+      return sendResponse(res, 400, false, policyError);
+    }
+
     const staffKey = req.body.staffKey || generateAccessKey();
     const finalSchoolId = req.user.role === 'principal' ? req.user.school_id : schoolId;
     const finalSchoolName = req.user.role === 'principal' ? req.user.school_name : school_name;

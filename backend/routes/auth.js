@@ -133,6 +133,7 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
       token,
       refreshToken,
       user: sanitizeUser(user),
+      mustChangePassword: Boolean(user.must_change_password),
     });
   } catch (err) {
     console.error('Login error:', err.message);
@@ -308,8 +309,11 @@ router.post('/change-password', authenticate, validateBody('currentPassword', 'n
   try {
     const { currentPassword, newPassword } = req.body;
 
-    if (newPassword.length < 8) {
-      return sendResponse(res, 400, false, 'New password must be at least 8 characters.');
+    // Enforce full password policy
+    const { checkPasswordStrength } = require('../middleware/validate');
+    const policyError = checkPasswordStrength(newPassword);
+    if (policyError) {
+      return sendResponse(res, 400, false, policyError);
     }
 
     const identity = await findLoginIdentity(req.user.email, req.user.role);
@@ -325,6 +329,9 @@ router.post('/change-password', authenticate, validateBody('currentPassword', 'n
 
     const newHash = await hashPassword(newPassword);
     await updatePasswordForSource(identity.source, user, newHash);
+
+    // Clear the must_change_password flag if set (bulk import accounts)
+    await clearMustChangePassword(identity.source, user);
 
     // Revoke all existing tokens for this user
     revokeAllUserTokens(user.id);
@@ -475,6 +482,20 @@ async function updatePasswordForSource(source, user, newHash) {
     return prisma.principals.update({ where: { id: user.id }, data: { password_hash: newHash, updated_at: new Date() } });
   }
   return prisma.users.update({ where: { id: user.id }, data: { password_hash: newHash, password: newHash, updated_at: new Date() } });
+}
+
+async function clearMustChangePassword(source, user) {
+  try {
+    if (source === 'teachers') {
+      return prisma.teacher.update({ where: { id: user.id }, data: { must_change_password: false } });
+    }
+    if (source === 'principals') {
+      return prisma.principals.update({ where: { id: user.id }, data: { must_change_password: false } });
+    }
+    return prisma.users.update({ where: { id: user.id }, data: { must_change_password: false } });
+  } catch {
+    // Column may not exist yet — fail silently
+  }
 }
 
 async function recordLoginEvent(source, user, req, ip) {

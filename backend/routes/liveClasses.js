@@ -57,9 +57,24 @@ router.put('/:id', authenticate, authorize('teacher', 'principal', 'admin'), asy
     if (req.user.role === 'teacher' && existing.teacher_id !== (req.user.teacher_id || req.user.id)) {
       return res.status(403).json({ error: 'Access denied' });
     }
+
+    // Whitelist allowed fields to prevent mass assignment
+    const allowedFields = ['title', 'class_level', 'subject', 'start_time', 'end_time', 'room', 'mode', 'status'];
+    const data = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        data[field] = req.body[field];
+      }
+    }
+    data.updated_at = new Date();
+
+    if (Object.keys(data).length <= 1) {
+      return sendResponse(res, 400, false, 'No valid fields provided for update.');
+    }
+
     const session = await prisma.teacher_class_sessions.update({
       where: { id: req.params.id },
-      data: req.body,
+      data,
     });
     res.json(session);
   } catch (err) {

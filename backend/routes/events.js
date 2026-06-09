@@ -8,10 +8,21 @@ const router = express.Router();
 router.get('/', authenticate, async (req, res) => {
   try {
     const { limit } = req.query;
+    const take = Math.min(parseInt(limit) || 50, 200);
+
+    // Scope events by role — students/teachers see only their own or broadcast events
+    let where = {};
+    if (req.user.role === 'student' || req.user.role === 'teacher') {
+      where.OR = [
+        { user_email: req.user.email },
+        { user_email: null }, // broadcast events
+      ];
+    }
 
     const events = await prisma.notifications.findMany({
+      where,
       orderBy: { created_at: 'desc' },
-      take: limit ? parseInt(limit) : 50,
+      take,
     });
 
     res.json(events);

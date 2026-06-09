@@ -85,9 +85,53 @@ async function getPrincipalDashboard(userId) {
   const [totalStudents, totalTeachers, recentLogins] = await Promise.all([
     prisma.student.count({ where }),
     prisma.teacher.count({ where }),
-    prisma.login_events.findMany({ orderBy: { created_at: 'desc' }, take: 10 }),
+    getRecentLoginEvents(schoolId),
   ]);
   return { totalStudents, totalTeachers, recentLogins, schoolId };
+}
+
+async function getRecentLoginEvents(schoolId) {
+  if (!schoolId) return [];
+
+  // 1. Student logins — filter by student emails belonging to this school
+  const students = await prisma.student.findMany({
+    where: { schoolId },
+    select: { email: true },
+  });
+  const schoolEmails = students.map((s) => s.email);
+
+  const [studentLogins, teacherLogins, principalLogins] = await Promise.all([
+    schoolEmails.length > 0
+      ? prisma.login_events.findMany({
+          where: { email: { in: schoolEmails } },
+          select: { id: true, email: true, name: true, role: true, status: true, created_at: true, ip_address: true },
+          take: 50,
+        })
+      : [],
+    // 2. Teacher logins — teacher_login_events has school_id directly
+    prisma.teacher_login_events.findMany({
+      where: { school_id: schoolId },
+      select: { id: true, email: true, status: true, created_at: true, ip_address: true },
+      take: 50,
+    }),
+    // 3. Principal logins — principal_login_events has school_id directly
+    prisma.principal_login_events.findMany({
+      where: { school_id: schoolId },
+      select: { id: true, email: true, status: true, created_at: true, ip_address: true },
+    }),
+  ]);
+
+  // Normalise to a common shape
+  const allLogins = [
+    ...studentLogins.map((e) => ({ ...e, role: e.role || 'student' })),
+    ...teacherLogins.map((e) => ({ ...e, name: null, role: 'teacher' })),
+    ...principalLogins.map((e) => ({ ...e, name: null, role: 'principal' })),
+  ];
+
+  // Sort by created_at descending, take top 10
+  return allLogins
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 10);
 }
 
 async function getAdminDashboard() {

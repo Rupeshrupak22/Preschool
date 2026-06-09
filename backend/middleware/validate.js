@@ -53,14 +53,50 @@ function validateEmail(req, res, next) {
 
 /**
  * Validate password strength
- * - Minimum 8 characters (raised from 6)
+ * - Minimum 8 characters
+ * - At least one uppercase letter (A-Z)
+ * - At least one lowercase letter (a-z)
+ * - At least one digit (0-9)
+ * - At least one special character (!@#$%^&*_-+=?.,;:)
  */
 function validatePassword(req, res, next) {
   const { password } = req.body;
-  if (password && password.length < 8) {
+  if (!password) return next();
+
+  if (password.length < 8) {
     return sendResponse(res, 400, false, 'Password must be at least 8 characters.');
   }
+
+  if (!/[A-Z]/.test(password)) {
+    return sendResponse(res, 400, false, 'Password must contain at least one uppercase letter.');
+  }
+
+  if (!/[a-z]/.test(password)) {
+    return sendResponse(res, 400, false, 'Password must contain at least one lowercase letter.');
+  }
+
+  if (!/[0-9]/.test(password)) {
+    return sendResponse(res, 400, false, 'Password must contain at least one number.');
+  }
+
+  if (!/[!@#$%^&*_\-+=?.,;:]/.test(password)) {
+    return sendResponse(res, 400, false, 'Password must contain at least one special character (!@#$%^&*_-+=?.,;:).');
+  }
+
   next();
 }
 
-module.exports = { validateBody, validateEmail, validatePassword };
+/**
+ * Validate password strength (inline — for use outside middleware chain)
+ * Returns error message string or null if valid
+ */
+function checkPasswordStrength(password) {
+  if (!password || password.length < 8) return 'Password must be at least 8 characters.';
+  if (!/[A-Z]/.test(password)) return 'Password must contain at least one uppercase letter.';
+  if (!/[a-z]/.test(password)) return 'Password must contain at least one lowercase letter.';
+  if (!/[0-9]/.test(password)) return 'Password must contain at least one number.';
+  if (!/[!@#$%^&*_\-+=?.,;:]/.test(password)) return 'Password must contain at least one special character (!@#$%^&*_-+=?.,;:).';
+  return null;
+}
+
+module.exports = { validateBody, validateEmail, validatePassword, checkPasswordStrength };
