@@ -670,7 +670,7 @@ export default function Home() {
             </p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <a
-                href="tel:+918292244709"
+                href="tel:+918179124566"
                 className="inline-flex h-11 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 text-sm font-bold text-white shadow-[0_12px_26px_rgba(168,85,247,0.3)] transition hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(168,85,247,0.4)]"
               >
                 WhatsApp
