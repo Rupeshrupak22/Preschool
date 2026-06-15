@@ -35,9 +35,15 @@ export async function POST(request: Request) {
   if (user.role === "admin") {
     const accessKey = body.accessKey;
     const expectedKey = process.env.ADMIN_ACCESS_KEY;
+    const expectedEmail = process.env.ADMIN_EMAIL;
 
     if (!accessKey || !expectedKey) {
       return NextResponse.json({ error: "Access key is required for admin login." }, { status: 401 });
+    }
+
+    // Only the designated admin email can use the admin access key
+    if (expectedEmail && user.email.toLowerCase() !== expectedEmail.toLowerCase()) {
+      return NextResponse.json({ error: "Access denied. This account is not authorized for admin access." }, { status: 403 });
     }
 
     if (accessKey !== expectedKey) {
