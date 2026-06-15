@@ -31,7 +31,7 @@ const certificates = [
   },
   {
     id: "cert4",
-    course: "Current Affairs & Awareness Basics",
+    course: "Robotics & Arduino Basics",
     issuedDate: "December 5, 2025",
     credentialId: "ADY-2025-RB-0009",
     status: "active",

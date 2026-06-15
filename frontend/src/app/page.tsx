@@ -14,7 +14,6 @@ import {
   Github,
   GraduationCap,
   Mic,
-  Newspaper,
   Palette,
   Play,
   QrCode,
@@ -42,7 +41,7 @@ type Icon = React.ComponentType<{ className?: string }>;
 const skills: { title: string; icon: Icon; copy: string }[] = [
   { title: "Coding", icon: Code2, copy: "Scratch to Python, logic, algorithms, and product thinking." },
   { title: "Artificial Intelligence", icon: Brain, copy: "Prompting, ML concepts, AI tools, and ethical use cases." },
-  { title: "Current Affairs", icon: Newspaper, copy: "National and global awareness, analysis, debates, and informed thinking." },
+  { title: "Robotics", icon: Cpu, copy: "Sensors, Arduino, automation, robotics models, and lab builds." },
   { title: "Web Development", icon: Sparkles, copy: "HTML, CSS, React, APIs, hosting, and web portfolios." },
   { title: "App Development", icon: Smartphone, copy: "Mobile UI, no-code to code, app logic, and publishing." },
   { title: "Public Speaking", icon: Mic, copy: "Communication, pitching, debates, interviews, and stage confidence." },
@@ -56,7 +55,6 @@ const paths = [
   {
     title: "Class 1–5",
     level: "Foundation Track",
-    icon: BookOpen,
     skills: [
       "Spoken English",
       "Puzzles", 
@@ -64,14 +62,12 @@ const paths = [
       "Basic Digital Literacy",
       "General Knowledge",
       "Show & Tell / Storytelling",
-      "Olympiad Worksheets",
-      "Nutrition"
+      "Olympiad Worksheets"
     ]
   },
   {
     title: "Class 6–8", 
     level: "Development Track",
-    icon: Code2,
     skills: [
       "Communication & Public Speaking (MUN)",
       "Financial Literacy",
@@ -81,34 +77,32 @@ const paths = [
       "Art Theory",
       "Current Affairs",
       "Olympiad Worksheets",
-      "Digital Marketing and How Digital Platforms Work",
-      "Nutrition"
+      "Information Session on Puppets",
+      "Digital Marketing and How Digital Platforms Work"
     ]
   },
   {
     title: "Class 9–10",
-    level: "Growth Track",
-    icon: Target,
+    level: "Growth Track", 
     skills: [
       "Art Tools & Productivity",
       "Coding",
       "Calligraphy & Course Learning",
       "Handwriting",
       "Current Affairs",
-      "Microsoft Office",
-      "Information Sessions on Career Options",
-      "Extempore",
-      "Nutrition"
+      "JEE / NEET / KVPY / Olympiad / CUET / PMAT Preparation",
+      "Informational Session on Wildlife & Career Options",
+      "Extempore"
     ]
   },
   {
     title: "Class 11–12",
     level: "Mastery Track",
-    icon: Trophy,
     skills: [
       "Personal Finance",
       "Coding (Python / SQL)",
-      "JEE / NEET / KVPY / Olympiad / CUET / IPMAT Preparation",
+      "Microsoft Office",
+      "Exam Readiness",
       "Resume / Career Coaching",
       "Current Affairs",
       "Foreign Language", 
@@ -132,9 +126,9 @@ const curriculumPrograms: { title: string; icon: Icon; copy: string }[] = [
     copy: "Introduce coding skills to young learners through logic, loops, projects, and computational thinking."
   },
   {
-    title: "Current Affairs",
-    icon: Newspaper,
-    copy: "Stay informed with national and global events, develop analytical thinking and awareness."
+    title: "Robotics",
+    icon: Cpu,
+    copy: "Hands-on robotics activities that build creativity, sensors knowledge, and innovation confidence."
   },
   {
     title: "Artificial Intelligence",
@@ -163,7 +157,7 @@ const events = [
   "Coding Championship",
   "Student Founder Club",
   "Career Webinar",
-  "Current Affairs Workshop"
+  "Robotics Workshop"
 ];
 
 const testimonials = [
@@ -670,7 +664,7 @@ export default function Home() {
             </p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <a
-                href="tel:+918179124566"
+                href="tel:+918292244709"
                 className="inline-flex h-11 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 text-sm font-bold text-white shadow-[0_12px_26px_rgba(168,85,247,0.3)] transition hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(168,85,247,0.4)]"
               >
                 WhatsApp
@@ -716,7 +710,7 @@ export default function Home() {
                     <h3 className="mt-1 text-2xl font-black text-slate-900">{path.title}</h3>
                   </div>
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-pink-200/50 bg-pink-50/60 backdrop-blur-sm">
-                    <path.icon className="h-7 w-7 text-pink-600" />
+                    <GraduationCap className="h-7 w-7 text-pink-600" />
                   </div>
                 </div>
                 
@@ -747,10 +741,10 @@ export default function Home() {
             <SectionTitle
               eyebrow="School partnerships"
               title="Future Skills Programs built for modern schools"
-              copy="Deploy AI curriculum, coding labs, current affairs workshops, teacher training, and certification dashboards."
+              copy="Deploy AI curriculum, coding labs, robotics workshops, teacher training, and certification dashboards."
             />
             <div className="grid gap-4 sm:grid-cols-2">
-              {["AI Curriculum", "Coding Labs", "Current Affairs Workshops", "Teacher Training", "Future Skills Programs", "Analytics"].map((item) => (
+              {["AI Curriculum", "Coding Labs", "Robotics Workshops", "Teacher Training", "Future Skills Programs", "Analytics"].map((item) => (
                 <div
                   key={item}
                   className="rounded-xl border border-white/40 p-5 shadow-[0_4px_16px_rgba(31,38,135,0.06)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(31,38,135,0.14)] hover:border-purple-200/50"

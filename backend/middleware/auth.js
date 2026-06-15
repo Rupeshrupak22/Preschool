@@ -2,7 +2,6 @@ const { verifyAccessToken } = require('../utils/token');
 const { sendResponse } = require('../utils/response');
 const { isBlacklisted, isUserTokenRevoked } = require('../utils/token-blacklist');
 const { validateSession } = require('../utils/sessions');
-const { logSuspiciousActivity } = require('../utils/security-logger');
 
 const ROLE_LEVEL = {
   student: 1,
@@ -54,25 +53,6 @@ async function authenticate(req, res, next) {
     const session = await validateSession({ userId: decoded.id, sid: decoded.sid });
     if (!session.valid) {
       return sendResponse(res, 401, false, session.reason);
-    }
-
-    // ─── Session Hijacking Detection ─────────────────────────────────
-    // Compare User-Agent to detect stolen tokens used from a different browser.
-    // IP is NOT checked here because it changes legitimately (WiFi→4G, VPN).
-    // The full fingerprint (with IP) is still used at login time for bot detection.
-    if (session.session.userAgent) {
-      const storedUA = session.session.userAgent;
-      const currentUA = req.get('user-agent') || '';
-      if (currentUA && storedUA !== currentUA) {
-        logSuspiciousActivity({
-          email: decoded.email,
-          userId: decoded.id,
-          ip: req.ip || req.connection?.remoteAddress || 'unknown',
-          userAgent: currentUA,
-          details: `Session hijacking attempt. User-Agent mismatch. Stored: "${storedUA.slice(0, 50)}...", Current: "${currentUA.slice(0, 50)}..."`,
-        });
-        return sendResponse(res, 401, false, 'Session fingerprint mismatch. Please login again.');
-      }
     }
 
     req.user = decoded;

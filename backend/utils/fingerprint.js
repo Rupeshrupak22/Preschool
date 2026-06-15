@@ -11,10 +11,7 @@
 const crypto = require('crypto');
 
 /**
- * Generate a FULL request fingerprint (includes IP)
- * Used for: credential stuffing detection at login time
- * IP is essential here — bots don't switch IPs mid-attack
- *
+ * Generate a request fingerprint
  * @param {object} req - Express request object
  * @returns {string} SHA-256 hash (first 16 chars)
  */
@@ -24,26 +21,6 @@ function generateFingerprint(req) {
     req.get('user-agent') || 'no-ua',
     req.get('accept-language') || 'no-lang',
     req.get('accept-encoding') || 'no-enc',
-    req.get('sec-ch-ua-platform') || '',
-  ];
-
-  const raw = components.join('|');
-  return crypto.createHash('sha256').update(raw).digest('hex').slice(0, 16);
-}
-
-/**
- * Generate a STABLE fingerprint (excludes IP)
- * Used for: session validation on every request
- * IP excluded because it changes legitimately (WiFi→4G, VPN, proxy)
- * Only checks browser-level signals that stay constant within a session
- *
- * @param {object} req - Express request object
- * @returns {string} SHA-256 hash (first 16 chars)
- */
-function generateStableFingerprint(req) {
-  const components = [
-    req.get('user-agent') || 'no-ua',
-    req.get('accept-language') || 'no-lang',
     req.get('sec-ch-ua-platform') || '',
   ];
 
@@ -88,4 +65,4 @@ function trackAttempt(fingerprint, email) {
   return { suspicious, uniqueEmails: data.emails.size, totalAttempts: data.attempts };
 }
 
-module.exports = { generateFingerprint, generateStableFingerprint, trackAttempt };
+module.exports = { generateFingerprint, trackAttempt };

@@ -20,7 +20,7 @@ const subjectColors: Record<string, string> = {
   "Computer Science": "from-cyan-500 to-blue-600",
   "AI Basics": "from-purple-500 to-fuchsia-600",
   English: "from-rose-500 to-pink-600",
-  "Current Affairs": "from-orange-500 to-amber-600",
+  Robotics: "from-orange-500 to-amber-600",
 };
 
 export default function NotesLibrary({ notes }: Props) {

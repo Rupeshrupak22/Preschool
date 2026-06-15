@@ -40,7 +40,7 @@ function ColorLoopWord({ children }: { children: React.ReactNode }) {
     <motion.span
       animate={{ color: [...colorLoop, colorLoop[0]] }}
       transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      className="contrast-125 saturate-150 antialiased drop-shadow-[0_4px_30px_rgba(0,0,0,0.35)] [-webkit-text-stroke:0.5px_rgba(255,255,255,0.1)]"
+      className="antialiased drop-shadow-[0_1px_12px_rgba(0,0,0,0.45)]"
     >
       {children}
     </motion.span>
@@ -89,7 +89,7 @@ export default function AboutVideoHero() {
           playsInline
           preload="none"
           src="/videos/about-video.mp4"
-          className="absolute inset-0 h-full w-full scale-[1.03] object-cover blur-[2px] brightness-110 contrast-105 saturate-110"
+          className="absolute inset-0 h-full w-full scale-[1.03] object-cover blur-[4px] opacity-70"
           aria-hidden
         />
       </motion.div>
@@ -99,7 +99,7 @@ export default function AboutVideoHero() {
         className="pointer-events-none absolute inset-0 z-[1]"
         style={{
           background:
-            "linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.12) 100%), linear-gradient(90deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.08) 40%, rgba(0,0,0,0) 70%)",
+            "linear-gradient(180deg, rgba(5,10,25,0.42) 0%, rgba(5,10,25,0.62) 100%)",
         }}
       />
 
@@ -110,7 +110,7 @@ export default function AboutVideoHero() {
             initial="hidden"
             animate="visible"
             transition={{ staggerChildren: 0.14, delayChildren: 0.15 }}
-            className="mx-auto w-[95%] max-w-[800px] rounded-[32px] border border-white/25 bg-white/[0.12] p-6 text-center shadow-[0_20px_60px_rgba(0,0,0,0.15)] backdrop-blur-[1px] sm:w-[90%] md:mx-0 md:p-8 md:text-left lg:p-10"
+            className="mx-auto w-full max-w-[1400px] text-center md:text-left"
           >
             <motion.div
               variants={fadeUp}
@@ -118,14 +118,14 @@ export default function AboutVideoHero() {
               transition={{
                 y: { duration: 4.5, repeat: Infinity, ease: "easeInOut" },
               }}
-              className="inline-flex items-center rounded-full border border-white/55 bg-white/30 px-5 py-2 text-xs font-black uppercase tracking-[0.22em] text-white antialiased shadow-[0_10px_34px_rgba(0,0,0,0.18)] drop-shadow-[0_4px_18px_rgba(0,0,0,0.28)] [-webkit-text-stroke:0.35px_rgba(0,0,0,0.12)] backdrop-blur-md md:text-sm"
+              className="inline-flex items-center rounded-full border border-white/45 bg-white/25 px-5 py-2 text-xs font-black uppercase tracking-[0.22em] text-white antialiased shadow-[0_8px_32px_rgba(0,0,0,0.22)] backdrop-blur-md md:text-sm"
             >
               ABOUT ADYAPAN
             </motion.div>
 
             <motion.h1
               variants={fadeUp}
-              className="mt-4 max-w-4xl text-[24px] font-black leading-[1.08] text-white antialiased drop-shadow-[0_4px_30px_rgba(0,0,0,0.35)] [-webkit-text-stroke:0.5px_rgba(0,0,0,0.15)] sm:text-[28px] md:mt-5 md:text-[36px] lg:text-[44px] xl:text-[52px]"            >
+              className="mt-4 max-w-4xl text-[24px] font-black leading-[1.08] text-white antialiased drop-shadow-[0_2px_20px_rgba(0,0,0,0.5)] sm:text-[28px] md:mt-5 md:text-[36px] lg:text-[44px] xl:text-[52px]"            >
               <ColorLoopWord>Empowering</ColorLoopWord> Students
               <br />
               For The <ColorLoopWord>Future</ColorLoopWord>
@@ -139,7 +139,7 @@ export default function AboutVideoHero() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -14 }}
                     transition={{ duration: 0.38, ease: "easeOut" }}
-                    className={`inline-block bg-gradient-to-r ${activeWord.className} bg-clip-text font-black text-transparent contrast-125 saturate-150 antialiased drop-shadow-[0_4px_30px_rgba(0,0,0,0.35)] [-webkit-text-stroke:0.5px_rgba(255,255,255,0.1)]`}
+                    className={`inline-block bg-gradient-to-r ${activeWord.className} bg-clip-text font-black text-transparent antialiased`}
                   >
                     {activeWord.text}
                   </motion.span>
@@ -149,7 +149,7 @@ export default function AboutVideoHero() {
 
             <motion.p
               variants={fadeUp}
-              className="mx-auto mt-4 max-w-[700px] text-base font-bold leading-relaxed text-white antialiased drop-shadow-[0_4px_24px_rgba(0,0,0,0.35)] [-webkit-text-stroke:0.35px_rgba(0,0,0,0.12)] md:mx-0 md:mt-5 md:text-lg lg:text-[22px] lg:leading-[1.65]"
+              className="mx-auto mt-4 max-w-[700px] text-base font-semibold leading-relaxed text-white antialiased md:mx-0 md:mt-5 md:text-lg lg:text-[22px] lg:leading-[1.65]"
             >
               ADYAPAN delivers future-ready education through AI-powered learning,
               project-based experiences, and technology-driven pathways that build

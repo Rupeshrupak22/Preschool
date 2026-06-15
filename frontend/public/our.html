@@ -72,7 +72,8 @@
       padding-top: 0;
     }
 
-    html.adyapan-embedded .adyapan-fixed-navbar {
+    html.adyapan-embedded .adyapan-fixed-navbar,
+    html.adyapan-embedded .adyapan-static-footer {
       display: none !important;
     }
 
@@ -2635,7 +2636,169 @@
       }
     }
     
-    /* Footer styles handled by inline <style> block at footer section */
+    .adyapan-static-footer {
+      position: relative !important;
+      overflow: hidden !important;
+      border-top: none !important;
+      background: linear-gradient(to bottom, #0f172a, #020617) !important;
+      color: #ffffff !important;
+      padding: 0 !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    }
+
+    .adyapan-static-footer,
+    .adyapan-static-footer *,
+    .adyapan-static-footer a,
+    .adyapan-static-footer p,
+    .adyapan-static-footer span,
+    .adyapan-static-footer li,
+    .adyapan-static-footer div {
+      color: inherit !important;
+    }
+
+    .adyapan-static-footer h3 {
+      font-size: 14px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      color: #ffffff !important;
+      margin: 0 0 4px 0 !important;
+      border: none !important;
+      border-bottom: none !important;
+      padding: 0 !important;
+      display: block !important;
+    }
+
+    .adyapan-static-footer-grid {
+      display: none !important;
+    }
+
+    .adyapan-static-footer-brand {
+      display: none !important;
+    }
+
+    .adyapan-static-footer-bottom {
+      display: none !important;
+    }
+      object-fit: contain;
+      filter: drop-shadow(0 12px 18px rgba(234, 88, 12, 0.2));
+    }
+
+    .adyapan-static-footer-brand strong {
+      font-size: 50px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: #0f172a;
+      font-weight: 900;
+    }
+
+    .adyapan-static-footer-badge {
+      margin-bottom: 4px;
+      border-radius: 6px;
+      background: #0891b2;
+      color: #ffffff;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }
+
+    .adyapan-static-footer-copy {
+      max-width: 380px;
+      margin-top: 24px;
+      color: #334155;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.9;
+    }
+
+    .adyapan-static-footer h3 {
+      display: inline-block;
+      border-bottom: none;
+      padding-bottom: 0;
+      color: #ffffff;
+      font-size: inherit;
+      font-weight: inherit;
+    }
+
+    .adyapan-static-footer-list {
+      display: grid;
+      gap: 18px;
+      margin-top: 28px;
+      color: #0f172a;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .adyapan-static-footer-list a,
+    .adyapan-static-footer-list span {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .adyapan-static-footer-list a:hover {
+      color: #0f766e;
+      transform: translateX(4px);
+    }
+
+    .adyapan-static-hours {
+      margin-top: 28px;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      background: #eff6ff;
+      padding: 20px;
+      color: #0f172a;
+      font-size: 16px;
+      box-shadow: 0 20px 50px rgba(37, 99, 235, 0.12);
+    }
+
+    .adyapan-static-hours strong {
+      display: block;
+      margin-bottom: 14px;
+      color: #1d4ed8;
+      font-size: 22px;
+    }
+
+    .adyapan-static-hours .closed {
+      margin-top: 8px;
+      color: #0f766e;
+    }
+
+    .adyapan-static-footer-bottom {
+      width: min(1280px, 100%);
+      margin: 48px auto 0;
+      border-top: 1px solid #dbeafe;
+      padding-top: 28px;
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .adyapan-static-top {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 9999;
+      width: 56px;
+      height: 56px;
+      border: 0;
+      border-radius: 999px;
+      background: #1d4ed8;
+      color: #ffffff;
+      box-shadow: 0 18px 38px rgba(37, 99, 235, 0.3);
+      font-size: 28px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .adyapan-static-top:hover {
+      transform: translateY(-4px);
+      background: #0891b2;
+    }
 
     @media (max-width: 768px) {
       .nav-menu {
@@ -2666,6 +2829,17 @@
       }
       .section-title {
         font-size: 2.2rem;
+      }
+      .footer-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+      .adyapan-static-footer-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .adyapan-static-footer-brand strong {
+        font-size: 42px;
       }
     }
 
@@ -2879,6 +3053,11 @@
     }
 
     @media (max-width: 640px) {
+      .adyapan-static-footer > div:first-of-type + div {
+        grid-template-columns: 1fr !important;
+        gap: 32px !important;
+        padding: 40px 16px 24px !important;
+      }
     }
 
     /* ==========================================
@@ -4843,165 +5022,98 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
-  <footer id="footer" class="adyapan-static-footer">
-    <div class="footer-top-line"></div>
-    <div class="footer-pattern"></div>
-    <div class="footer-container">
-      <div class="footer-grid">
-        <!-- Brand -->
-        <div>
-          <div class="footer-brand">
-            <img src="/ady-logo.png" alt="ADYAPAN" class="footer-logo">
-            <div>
-              <div class="footer-title">Adyapan</div>
-              <span class="footer-badge">Future Skills</span>
-            </div>
-          </div>
-          <p class="footer-description">We help students from Class 5 to 12 become confident creators through coding, AI, current affairs, communication, design, and career-ready future skills.</p>
-          <div class="footer-socials">
-            <a href="https://www.instagram.com/adyapanschool_?igsh=MXJ0b3FpNzh1YW1vNg==" target="_blank" rel="noreferrer" aria-label="Instagram">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-            </a>
-            <a href="https://www.linkedin.com/company/adyapan-edutech-pvt-ltd/posts/?feedView=all" target="_blank" rel="noreferrer" aria-label="LinkedIn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
-            </a>
-            <a href="https://www.youtube.com/@adyapan21" target="_blank" rel="noreferrer" aria-label="YouTube">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
-            </a>
+
+
+  <!-- ==========================================
+     13. MASTER INTERACTION JAVASCRIPT
+     ========================================== -->
+  <footer id="footer" class="adyapan-static-footer" style="background: linear-gradient(to bottom, #0f172a, #020617); color: #fff; border-top: none; padding: 0;">
+    <div style="height: 4px; width: 100%; background: linear-gradient(to right, #06b6d4, #3b82f6, #a855f7);"></div>
+    <div style="max-width: 1280px; margin: 0 auto; padding: 64px 24px 32px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 48px;">
+      
+      <div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <img src="/ady-logo.png" alt="ADYAPAN" style="width: 56px; height: 56px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1);">
+          <div>
+            <strong style="font-size: 28px; color: #ffffff !important; font-weight: 900;">Adyapan</strong>
+            <span style="margin-left: 8px; background: linear-gradient(to right, #06b6d4, #2563eb); padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #fff !important;">Future Skills</span>
           </div>
         </div>
-        <!-- Learning Programs -->
-        <div>
-          <h3 class="footer-heading">Learning Programs</h3>
-          <div class="footer-heading-line"></div>
-          <div class="footer-links">
-            <a href="/#curriculum" target="_top">Future Skills Foundation (Class 5 to 8)</a>
-            <a href="/#curriculum" target="_top">Coding & AI Creators (Class 6 to 10)</a>
-            <a href="/#curriculum" target="_top">Current Affairs & Innovation Lab (Class 7 to 12)</a>
-            <a href="/#curriculum" target="_top">Career, Communication & Design (Class 9 to 12)</a>
-          </div>
+        <p style="margin-top: 20px; max-width: 340px; font-size: 14px; line-height: 1.7; color: #94a3b8 !important;">
+          We help students from Class 5 to 12 become confident creators through coding, AI, robotics,
+          communication, design, and career-ready future skills.
+        </p>
+        <div style="margin-top: 24px; display: flex; gap: 12px;">
+          <a href="https://www.instagram.com/adyapanschool/" target="_blank" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-decoration: none; font-size: 14px; transition: all 0.2s;">IG</a>
+          <a href="https://www.linkedin.com/company/adyapan-edutech-pvt-ltd/" target="_blank" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-decoration: none; font-size: 14px; transition: all 0.2s;">in</a>
+          <a href="https://www.youtube.com/@adyapan21" target="_blank" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; text-decoration: none; font-size: 14px; transition: all 0.2s;">YT</a>
         </div>
-        <!-- Quick Links -->
-        <div>
-          <h3 class="footer-heading">Quick Links</h3>
-          <div class="footer-heading-line"></div>
-          <div class="footer-links">
-            <a href="/about" target="_top">About ADYAPAN</a>
-            <a href="/#certificates" target="_top">Certifications</a>
-            <a href="/#schools" target="_top">School Partnership</a>
-            <a href="/student-dashboard" target="_top">LMS Dashboard</a>
-            <a href="/login" target="_top">Login</a>
-            <a href="/contact" target="_top">Contact Us</a>
-          </div>
+      </div>
+
+      <div>
+        <h3 style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #ffffff !important; margin-bottom: 4px; border: none; padding: 0;">Learning Programs</h3>
+        <div style="height: 2px; width: 32px; border-radius: 2px; background: linear-gradient(to right, #06b6d4, #3b82f6); margin-bottom: 20px;"></div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <a href="/#curriculum" target="_top" style="font-size: 14px; color: #94a3b8 !important; text-decoration: none; transition: color 0.2s;">Future Skills Foundation (Class 5 to 8)</a>
+          <a href="/#curriculum" target="_top" style="font-size: 14px; color: #94a3b8 !important; text-decoration: none; transition: color 0.2s;">Coding & AI Creators (Class 6 to 10)</a>
+          <a href="/#curriculum" target="_top" style="font-size: 14px; color: #94a3b8 !important; text-decoration: none; transition: color 0.2s;">Robotics & Innovation Lab (Class 7 to 12)</a>
+          <a href="/#curriculum" target="_top" style="font-size: 14px; color: #94a3b8 !important; text-decoration: none; transition: color 0.2s;">Career, Communication & Design (Class 9 to 12)</a>
         </div>
-        <!-- Staff Portals -->
-        <div>
-          <h3 class="footer-heading">Staff Portals</h3>
-          <div class="footer-heading-line"></div>
-          <div class="footer-links">
-            <a href="/teacher/login" target="_top">Teacher Access</a>
-            <a href="/principal/login" target="_top">Principal Access</a>
-            <a href="/admin" target="_top">Admin Access</a>
-          </div>
+      </div>
+
+      <div>
+        <h3 style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #ffffff !important; margin-bottom: 4px; border: none; padding: 0;">Quick Links</h3>
+        <div style="height: 2px; width: 32px; border-radius: 2px; background: linear-gradient(to right, #06b6d4, #3b82f6); margin-bottom: 20px;"></div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <a href="/about" target="_top" style="font-size: 14px; color: #94a3b8 !important; text-decoration: none;">About ADYAPAN</a>
+          <a href="/#certificates" target="_top" style="font-size: 14px; color: #94a3b8 !important; text-decoration: none;">Certifications</a>
+          <a href="/#schools" target="_top" style="font-size: 14px; color: #94a3b8 !important; text-decoration: none;">School Partnership</a>
+          <a href="/student-dashboard" target="_top" style="font-size: 14px; color: #94a3b8 !important; text-decoration: none;">LMS Dashboard</a>
+          <a href="/login" target="_top" style="font-size: 14px; color: #94a3b8 !important; text-decoration: none;">Login</a>
+          <a href="/contact" target="_top" style="font-size: 14px; color: #94a3b8 !important; text-decoration: none;">Contact Us</a>
+          <a href="/principal/dashboard" target="_top" style="font-size: 14px; color: #94a3b8 !important; text-decoration: none;">Principal Access</a>
+          <a href="/teacher/login" target="_top" style="font-size: 14px; color: #94a3b8 !important; text-decoration: none;">Teacher Access</a>
+          <a href="/login?next=/admin" target="_top" style="font-size: 14px; color: #94a3b8 !important; text-decoration: none;">Admin Access</a>
         </div>
-        <!-- Get In Touch -->
-        <div>
-          <h3 class="footer-heading">Get In Touch</h3>
-          <div class="footer-heading-line"></div>
-          <a href="mailto:support@adyapan.com" class="footer-contact-item">
-            <div class="footer-contact-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></div>
+      </div>
+
+      <div>
+        <h3 style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #ffffff !important; margin-bottom: 4px; border: none; padding: 0;">Get In Touch</h3>
+        <div style="height: 2px; width: 32px; border-radius: 2px; background: linear-gradient(to right, #06b6d4, #3b82f6); margin-bottom: 20px;"></div>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <a href="mailto:support@adyapan.com" style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: #94a3b8 !important; text-decoration: none;">
+            <span style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(6,182,212,0.1); color: #22d3ee; font-size: 12px;">✉</span>
             support@adyapan.com
           </a>
-          <a href="tel:+918179124566" class="footer-contact-item">
-            <div class="footer-contact-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-            +91 81791 24566
+          <a href="tel:+918292244709" style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: #94a3b8 !important; text-decoration: none;">
+            <span style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(6,182,212,0.1); color: #22d3ee; font-size: 12px;">☎</span>
+            +91 82922 44709
           </a>
-          <div class="footer-contact-item">
-            <div class="footer-contact-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <span style="display: flex; align-items: center; gap: 12px; font-size: 14px; color: #94a3b8 !important;">
+            <span style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(6,182,212,0.1); color: #22d3ee; font-size: 12px;">📍</span>
             India
-          </div>
-          <div class="footer-hours">
-            <div class="footer-hours-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16.5 12"/></svg>Business Hours</div>
-            <p>Mon – Sat: 09:00 AM – 5:00 PM</p>
-            <p class="closed">Sunday: Closed</p>
-          </div>
+          </span>
         </div>
-      </div>
-      <div class="footer-school-name">
-        <span class="letter">A</span><span class="letter">D</span><span class="letter">Y</span><span class="letter">A</span><span class="letter">P</span><span class="letter">A</span><span class="letter">N</span><span class="letter space">&nbsp;</span><span class="letter">S</span><span class="letter">C</span><span class="letter">H</span><span class="letter">O</span><span class="letter">O</span><span class="letter">L</span>
-      </div>
-      <div class="footer-bottom">
-        <p>© 2026 SR's Adyapan Edutech Pvt. Ltd. All rights reserved.</p>
-        <div class="footer-bottom-links">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
+        <div style="margin-top: 24px; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02);">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #cbd5e1 !important;">
+            <span style="color: #22d3ee;">🕐</span> Business Hours
+          </div>
+          <p style="margin-top: 8px; font-size: 14px; color: #94a3b8 !important;">Mon – Sat: 09:00 AM – 5:00 PM</p>
+          <p style="margin-top: 4px; font-size: 14px; color: #f87171 !important;">Sunday: Closed</p>
         </div>
       </div>
     </div>
-    <button class="footer-back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
-  </footer>
 
-  <style>
-  .adyapan-static-footer{background:linear-gradient(180deg,#0f172a 0%,#020617 100%);position:relative;overflow:hidden}
-  .adyapan-static-footer,.adyapan-static-footer *,.adyapan-static-footer a,.adyapan-static-footer p,.adyapan-static-footer h3,.adyapan-static-footer span,.adyapan-static-footer div,.adyapan-static-footer li,.adyapan-static-footer button{color:#94a3b8 !important;text-decoration:none}
-  .adyapan-static-footer h3.footer-heading{color:#ffffff !important}
-  .adyapan-static-footer div.footer-title{color:#ffffff !important}
-  .adyapan-static-footer span.footer-badge{color:#ffffff !important}
-  .footer-description,.footer-contact-item,.footer-hours p{color:#94a3b8 !important}
-  .footer-links a,.footer-socials a{color:#94a3b8 !important;transition:color .2s}
-  .footer-socials a svg{stroke:#94a3b8 !important}
-  .footer-links a:hover{color:#22d3ee !important}
-  .footer-socials a:hover{color:#22d3ee !important;border-color:rgba(6,182,212,.3) !important;background:rgba(6,182,212,.2) !important}
-  .footer-socials a:hover svg{stroke:#22d3ee !important}
-  .footer-contact-icon{color:#22d3ee !important}
-  .footer-hours-title{color:#cbd5e1 !important}
-  .footer-hours .closed{color:rgba(248,113,113,.8) !important}
-  .footer-bottom p,.footer-bottom a{color:#64748b !important}
-  .footer-school-name .letter{color:#0ea5e9 !important}
-  .footer-back-to-top{color:#fff !important}
-  .footer-top-line{height:4px;background:linear-gradient(90deg,#06b6d4,#3b82f6,#a855f7)}
-  .footer-pattern{position:absolute;inset:0;opacity:.03;background-image:radial-gradient(circle at 1px 1px,#fff 1px,transparent 0);background-size:40px 40px}
-  .footer-container{max-width:1280px;margin:auto;padding:64px 24px 32px;position:relative}
-  .footer-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:32px}
-  .footer-brand{display:flex;align-items:center;gap:12px}
-  .footer-logo{width:48px;height:48px;border-radius:50%;object-fit:contain;box-shadow:0 0 0 2px rgba(255,255,255,.1);flex-shrink:0}
-  .footer-title{font-size:24px;font-weight:900;letter-spacing:-0.02em;color:white}
-  .footer-badge{display:inline-flex;align-items:center;margin-left:6px;padding:2px 8px;border-radius:6px;background:linear-gradient(90deg,#06b6d4,#2563eb);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#fff}
-  .footer-description{margin-top:16px;font-size:14px;line-height:1.7;color:#94a3b8}
-  .footer-socials{display:flex;gap:12px;margin-top:20px}
-  .footer-socials a{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;text-decoration:none;font-size:13px;transition:all .2s}
-  .footer-socials a:hover{transform:translateY(-2px);background:rgba(6,182,212,.2);color:#22d3ee;border-color:rgba(6,182,212,.3)}
-  .footer-heading{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;margin:0}
-  .footer-heading-line{width:32px;height:2px;border-radius:2px;background:linear-gradient(90deg,#06b6d4,#3b82f6);margin:4px 0 20px}
-  .footer-links{display:flex;flex-direction:column;gap:12px}
-  .footer-links a{color:#94a3b8;text-decoration:none;font-size:14px;transition:color .2s}
-  .footer-links a:hover{color:#22d3ee}
-  .footer-contact-item{display:flex;align-items:center;gap:12px;margin-bottom:16px;color:#94a3b8;font-size:14px;text-decoration:none;transition:color .2s}
-  a.footer-contact-item:hover{color:#22d3ee !important}
-  .footer-contact-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:rgba(6,182,212,.1);border-radius:8px;color:#22d3ee !important;font-size:12px;flex-shrink:0}
-  .footer-contact-icon svg{stroke:#22d3ee !important}
-  .footer-hours-title svg{stroke:#22d3ee !important}
-  .footer-hours{margin-top:24px;padding:16px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
-  .footer-hours-title{font-size:12px;font-weight:600;color:#cbd5e1;margin-bottom:8px}
-  .footer-hours p{font-size:14px;color:#94a3b8;margin:0}
-  .footer-hours p+p{margin-top:4px}
-  .footer-hours .closed{color:rgba(248,113,113,.8)}
-  .footer-school-name{text-align:center;margin-top:48px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;padding:0 16px}
-  .footer-school-name .letter{font-size:clamp(2.8rem,10vw,7rem);font-weight:900;line-height:1;letter-spacing:-0.02em;cursor:default;user-select:none;text-shadow:0 6px 0 rgba(3,105,161,.5),0 12px 24px rgba(14,165,233,.25);display:inline-block;transition:transform .3s ease}
-  .footer-school-name .letter:hover{animation:letterBounce .5s ease-in-out}
-  .footer-school-name .space{width:0.3em}
-  @keyframes letterBounce{0%{transform:translateY(0) rotate(0)}15%{transform:translateY(-10px) rotate(-6deg)}30%{transform:translateY(6px) rotate(6deg)}50%{transform:translateY(-5px) rotate(-3deg)}70%{transform:translateY(3px) rotate(3deg)}100%{transform:translateY(0) rotate(0)}}
-  .footer-bottom{margin-top:40px;padding-top:24px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
-  .footer-bottom p{font-size:12px;color:#64748b;margin:0}
-  .footer-bottom a{color:#64748b;text-decoration:none;font-size:12px;transition:color .2s}
-  .adyapan-static-footer .footer-bottom a:hover{color:#cbd5e1 !important}
-  .footer-bottom-links{display:flex;gap:24px}
-  .footer-back-to-top{position:fixed;bottom:20px;right:20px;width:44px;height:44px;border:none;border-radius:50%;background:linear-gradient(135deg,#06b6d4,#2563eb);color:white;font-size:18px;cursor:pointer;box-shadow:0 8px 24px rgba(6,182,212,.25);z-index:50;transition:all .2s;display:flex;align-items:center;justify-content:center}
-  .footer-back-to-top:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(6,182,212,.3)}
-  @media(max-width:1024px){.footer-grid{grid-template-columns:repeat(2,1fr);gap:40px}}
-  @media(max-width:640px){.footer-grid{grid-template-columns:1fr;gap:32px}.footer-bottom{flex-direction:column;align-items:center;text-align:center}}
-  </style>
+    <div style="max-width: 1280px; margin: 56px auto 0; padding: 32px 24px 0; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+      <p style="font-size: 12px; color: #64748b !important;">© 2026 ADYAPAN Future Skills Platform. All rights reserved.</p>
+      <div style="display: flex; gap: 24px; font-size: 12px;">
+        <a href="#" style="color: #64748b !important; text-decoration: none;">Privacy Policy</a>
+        <a href="#" style="color: #64748b !important; text-decoration: none;">Terms of Service</a>
+      </div>
+    </div>
+
+    <button class="adyapan-static-top" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" aria-label="Back to top" style="position: fixed; bottom: 20px; right: 20px; z-index: 50; width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(to right, #06b6d4, #2563eb); color: #fff; border: none; cursor: pointer; font-size: 18px; box-shadow: 0 8px 24px rgba(6,182,212,0.25);">↑</button>
+  </footer>
 
   <script>
     /* ==========================================
