@@ -60,11 +60,12 @@ export async function POST(request: Request) {
     }
   }
 
+  // Check for existing active session — prompt user to clear it first
   const existingSession = await findActiveSession(user.id);
   if (existingSession) {
     return NextResponse.json(
       {
-        error: `This ${user.role} account is already active on another device. Clear previous sessions, refresh, and login again.`,
+        error: "This admin account is already logged in on another device. Clear the previous session to continue.",
         code: "ACTIVE_SESSION_EXISTS",
         action: "CLEAR_PREVIOUS_SESSIONS_AND_RELOGIN"
       },
