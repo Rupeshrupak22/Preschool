@@ -31,22 +31,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid password." }, { status: 401 });
   }
 
-  // Verify access key for admin users
+  // Verify access key for admin users — each admin must use their OWN access key
   if (user.role === "admin") {
     const accessKey = body.accessKey;
-    const expectedKey = process.env.ADMIN_ACCESS_KEY;
-    const expectedEmail = process.env.ADMIN_EMAIL;
 
-    if (!accessKey || !expectedKey) {
+    if (!accessKey) {
       return NextResponse.json({ error: "Access key is required for admin login." }, { status: 401 });
     }
 
-    // Only the designated admin email can use the admin access key
-    if (expectedEmail && user.email.toLowerCase() !== expectedEmail.toLowerCase()) {
-      return NextResponse.json({ error: "Access denied. This account is not authorized for admin access." }, { status: 403 });
+    let keyValid = false;
+
+    if (user.accessKeyHash) {
+      // Verify against this user's own stored access key hash
+      const keyResult = await verifyPassword(accessKey, user.accessKeyHash);
+      keyValid = keyResult.valid;
+    } else {
+      // Fallback: only the designated ADMIN_EMAIL can use the global ADMIN_ACCESS_KEY
+      const expectedKey = process.env.ADMIN_ACCESS_KEY;
+      const expectedEmail = process.env.ADMIN_EMAIL;
+
+      if (expectedKey && expectedEmail && user.email.toLowerCase() === expectedEmail.toLowerCase()) {
+        keyValid = accessKey === expectedKey;
+      }
     }
 
-    if (accessKey !== expectedKey) {
+    if (!keyValid) {
       return NextResponse.json({ error: "Invalid access key." }, { status: 401 });
     }
   }

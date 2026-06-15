@@ -25,6 +25,7 @@ type UserRecord = {
   name: string;
   email: string;
   passwordHash: string;
+  accessKeyHash?: string | null;
   phone?: string | null;
   classLevel?: string | null;
   schoolName?: string | null;
@@ -143,6 +144,7 @@ async function ensureSchema(pool: Pool) {
       name VARCHAR(160) NOT NULL,
       email VARCHAR(190) NOT NULL UNIQUE,
       password_hash VARCHAR(255) NOT NULL,
+      access_key_hash VARCHAR(255),
       phone VARCHAR(30),
       class_level VARCHAR(80),
       class_name VARCHAR(80),
@@ -156,6 +158,11 @@ async function ensureSchema(pool: Pool) {
       updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
   `);
+
+  // Migration: add access_key_hash column to users if it doesn't exist
+  await pool.query(`
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS access_key_hash VARCHAR(255) AFTER password_hash
+  `).catch(() => {});
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS active_sessions (
@@ -598,6 +605,7 @@ function mapUser(row: RowDataPacket): UserRecord {
     name: String(row.name),
     email: String(row.email),
     passwordHash: String(row.password_hash),
+    accessKeyHash: row.access_key_hash ? String(row.access_key_hash) : null,
     phone: row.phone,
     classLevel: row.class_level ?? row.class_name,
     schoolName: row.school_name ?? row.school,
