@@ -2,7 +2,6 @@ const express = require('express');
 const prisma = require('../lib/prisma');
 const { authenticate, authorize } = require('../middleware/auth');
 const { hashPassword, hashAccessKey, generateAccessKey } = require('../utils/password');
-const { sendResponse } = require('../utils/response');
 const router = express.Router();
 
 // GET /api/v1/teachers
@@ -34,8 +33,7 @@ router.get('/', authenticate, authorize('admin', 'principal', 'teacher'), async 
 
     res.json(teachers);
   } catch (err) {
-    console.error('Fetch teachers error:', err.message);
-    sendResponse(res, 500, false, 'Internal server error');
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -51,8 +49,7 @@ router.get('/:id', authenticate, authorize('admin', 'principal', 'teacher'), asy
     if (!canAccessTeacher(req.user, teacher)) return res.status(403).json({ error: 'Access denied' });
     res.json(teacher);
   } catch (err) {
-    console.error('Fetch teacher error:', err.message);
-    sendResponse(res, 500, false, 'Internal server error');
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -61,14 +58,6 @@ router.post('/', authenticate, authorize('admin', 'principal'), async (req, res)
   try {
     const { teacher_name, email, password, subject, phone, schoolId, school_name, assigned_classes } = req.body;
     if (!teacher_name || !email || !password) return res.status(400).json({ error: 'teacher_name, email and password are required' });
-
-    // Enforce password policy
-    const { checkPasswordStrength } = require('../middleware/validate');
-    const policyError = checkPasswordStrength(password);
-    if (policyError) {
-      return sendResponse(res, 400, false, policyError);
-    }
-
     const staffKey = req.body.staffKey || generateAccessKey();
     const finalSchoolId = req.user.role === 'principal' ? req.user.school_id : schoolId;
     const finalSchoolName = req.user.role === 'principal' ? req.user.school_name : school_name;
@@ -93,8 +82,7 @@ router.post('/', authenticate, authorize('admin', 'principal'), async (req, res)
     if (err.code === 'P2002') {
       return res.status(409).json({ error: 'Teacher with this email already exists' });
     }
-    console.error('Create teacher error:', err.message);
-    sendResponse(res, 500, false, 'Internal server error');
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -116,8 +104,7 @@ router.put('/:id', authenticate, authorize('admin', 'principal'), async (req, re
     });
     res.json(teacher);
   } catch (err) {
-    console.error('Update teacher error:', err.message);
-    sendResponse(res, 500, false, 'Internal server error');
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -130,8 +117,7 @@ router.delete('/:id', authenticate, authorize('admin', 'principal'), async (req,
     await prisma.teacher.delete({ where: { id: req.params.id } });
     res.json({ message: 'Teacher removed successfully' });
   } catch (err) {
-    console.error('Delete teacher error:', err.message);
-    sendResponse(res, 500, false, 'Internal server error');
+    res.status(500).json({ error: err.message });
   }
 });
 

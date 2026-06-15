@@ -7,7 +7,8 @@ import { publicUser } from "@/lib/store";
 import { loginSchema } from "@/lib/validators";
 
 export async function POST(request: Request) {
-  const payload = loginSchema.safeParse(await request.json());
+  const body = await request.json();
+  const payload = loginSchema.safeParse(body);
 
   if (!payload.success) {
     return NextResponse.json({ error: "Enter a valid email, password, and CAPTCHA." }, { status: 400 });
@@ -28,6 +29,20 @@ export async function POST(request: Request) {
 
   if (!valid) {
     return NextResponse.json({ error: "Invalid password." }, { status: 401 });
+  }
+
+  // Verify access key for admin users
+  if (user.role === "admin") {
+    const accessKey = body.accessKey;
+    const expectedKey = process.env.ADMIN_ACCESS_KEY;
+
+    if (!accessKey || !expectedKey) {
+      return NextResponse.json({ error: "Access key is required for admin login." }, { status: 401 });
+    }
+
+    if (accessKey !== expectedKey) {
+      return NextResponse.json({ error: "Invalid access key." }, { status: 401 });
+    }
   }
 
   const existingSession = await findActiveSession(user.id);

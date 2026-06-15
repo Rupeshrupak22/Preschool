@@ -139,7 +139,6 @@ router.post(
               phone: row.phone || null,
               assigned_classes: row.classes ? JSON.parse(`[${row.classes.split(';').map((c) => `"${c.trim()}"`).join(',')}]`) : null,
               status: 'active',
-              must_change_password: true,
             },
           });
 
@@ -240,7 +239,6 @@ router.post(
               access_key_hash: accessKeyHash,
               phone: row.phone || null,
               status: 'active',
-              must_change_password: true,
             },
           });
 
@@ -327,7 +325,6 @@ router.post(
               school_name: row.school_name || null,
               school_id: req.user.role === 'principal' ? req.user.school_id : (req.body.school_id || null),
               signup_source: 'bulk_import',
-              must_change_password: true,
             },
           });
 
