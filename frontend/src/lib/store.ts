@@ -27,6 +27,6 @@ export function id(prefix: string) {
 }
 
 export function publicUser(user: AnyRecord) {
-  const { passwordHash, ...safeUser } = user;
+  const { passwordHash, accessKeyHash, staffKeyHash, ...safeUser } = user;
   return safeUser;
 }
