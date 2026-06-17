@@ -54,6 +54,7 @@ function csrfProtection(req, res, next) {
     '/api/v1/auth/login',
     '/api/v1/auth/register',
     '/api/v1/auth/refresh',
+    '/api/v1/auth/clear-previous-sessions',
     '/api/v1/leads',
   ];
   if (csrfExemptPaths.includes(req.path) || csrfExemptPaths.includes(req.originalUrl?.split('?')[0])) {
@@ -63,6 +64,12 @@ function csrfProtection(req, res, next) {
   // Exempt: requests with Bearer token (API clients, mobile apps)
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
+    return next();
+  }
+
+  // Exempt: requests from mobile apps (identified by user-agent)
+  const userAgent = (req.get('user-agent') || '').toLowerCase();
+  if (/dart|flutter|android|iphone|okhttp/.test(userAgent)) {
     return next();
   }
 

@@ -35,25 +35,39 @@ function fromRow(row) {
 
 async function ensureSessionTable() {
   if (!initPromise) {
-    initPromise = prisma.$executeRawUnsafe(`
-      CREATE TABLE IF NOT EXISTS active_sessions (
-        user_id VARCHAR(64) NOT NULL PRIMARY KEY,
-        sid VARCHAR(64) NOT NULL UNIQUE,
-        email VARCHAR(190) NOT NULL,
-        role VARCHAR(30) NOT NULL,
-        refresh_jti VARCHAR(64) NULL,
-        previous_refresh_jti VARCHAR(64) NULL,
-        previous_refresh_valid_until DATETIME NULL,
-        fingerprint VARCHAR(128) NULL,
-        user_agent TEXT NULL,
-        ip_address VARCHAR(80) NULL,
-        created_at DATETIME NOT NULL,
-        last_seen_at DATETIME NOT NULL,
-        expires_at DATETIME NOT NULL,
-        KEY idx_active_sessions_sid (sid),
-        KEY idx_active_sessions_expires_at (expires_at)
-      )
-    `);
+    initPromise = (async () => {
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS active_sessions (
+          user_id VARCHAR(64) NOT NULL PRIMARY KEY,
+          sid VARCHAR(64) NOT NULL UNIQUE,
+          email VARCHAR(190) NOT NULL,
+          role VARCHAR(30) NOT NULL,
+          refresh_jti VARCHAR(64) NULL,
+          previous_refresh_jti VARCHAR(64) NULL,
+          previous_refresh_valid_until DATETIME NULL,
+          fingerprint VARCHAR(128) NULL,
+          user_agent TEXT NULL,
+          ip_address VARCHAR(80) NULL,
+          created_at DATETIME NOT NULL,
+          last_seen_at DATETIME NOT NULL,
+          expires_at DATETIME NOT NULL,
+          KEY idx_active_sessions_sid (sid),
+          KEY idx_active_sessions_expires_at (expires_at)
+        )
+      `);
+      // Auto-add columns that may be missing from older table versions
+      const alterColumns = [
+        'ALTER TABLE active_sessions ADD COLUMN refresh_jti VARCHAR(64) NULL',
+        'ALTER TABLE active_sessions ADD COLUMN previous_refresh_jti VARCHAR(64) NULL',
+        'ALTER TABLE active_sessions ADD COLUMN previous_refresh_valid_until DATETIME NULL',
+        'ALTER TABLE active_sessions ADD COLUMN fingerprint VARCHAR(128) NULL',
+        'ALTER TABLE active_sessions ADD COLUMN user_agent TEXT NULL',
+        'ALTER TABLE active_sessions ADD COLUMN ip_address VARCHAR(80) NULL',
+      ];
+      for (const sql of alterColumns) {
+        try { await prisma.$executeRawUnsafe(sql); } catch (_) { /* column already exists */ }
+      }
+    })();
   }
   return initPromise;
 }
