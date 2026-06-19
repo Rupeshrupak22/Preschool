@@ -65,7 +65,12 @@ async function ensureSessionTable() {
         'ALTER TABLE active_sessions ADD COLUMN ip_address VARCHAR(80) NULL',
       ];
       for (const sql of alterColumns) {
-        try { await prisma.$executeRawUnsafe(sql); } catch (_) { /* column already exists */ }
+        try { await prisma.$executeRawUnsafe(sql); } catch (err) {
+          const msg = String(err?.message || err);
+          if (!/duplicate column|ER_DUP_FIELDNAME|1060/i.test(msg)) {
+            console.warn('Session table migration warning:', msg);
+          }
+        }
       }
     })();
   }
