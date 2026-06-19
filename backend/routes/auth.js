@@ -89,13 +89,16 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
     clearFailures(email, user.role);
 
     // 6. Enforce one active session per account
+    // Mobile apps auto-replace old sessions (they can't use CSRF-protected clear endpoint)
+    const ua = (req.get('user-agent') || '').toLowerCase();
+    const isMobile = /dart|flutter|android|iphone|okhttp/.test(ua);
     const sessionResult = await createSession({
       user,
       refreshJti: null,
       fingerprint,
       userAgent: req.get('user-agent') || '',
       ip,
-      replace: false,
+      replace: isMobile,
     });
 
     if (sessionResult.conflict) {
