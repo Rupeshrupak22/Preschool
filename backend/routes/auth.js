@@ -31,7 +31,7 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
     const requestedRole = ['student', 'teacher', 'principal', 'admin'].includes(role) ? role : null;
 
     // 1. Check fingerprint for credential stuffing
-    const fpResult = trackAttempt(fingerprint, email);
+    const fpResult = trackAttempt(fingerprint, email, req.get('user-agent'));
     if (fpResult.suspicious) {
       logSuspiciousActivity({ email, ip, fingerprint, details: `Credential stuffing detected. ${fpResult.uniqueEmails} unique emails from same client.` });
       return sendResponse(res, 429, false, 'Suspicious activity detected. Please try again later.');

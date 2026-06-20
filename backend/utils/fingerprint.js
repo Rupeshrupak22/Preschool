@@ -48,7 +48,13 @@ trackerTimer.unref();
  * Track a login attempt by fingerprint
  * @returns {{ suspicious: boolean, uniqueEmails: number }}
  */
-function trackAttempt(fingerprint, email) {
+function trackAttempt(fingerprint, email, userAgent) {
+  // Skip credential stuffing check for mobile apps — multiple users
+  // on the same network is normal (school/office scenario)
+  if (userAgent && /dart|flutter|okhttp/i.test(userAgent)) {
+    return { suspicious: false, uniqueEmails: 0, totalAttempts: 0 };
+  }
+
   let data = fingerprintTracker.get(fingerprint);
   if (!data) {
     data = { emails: new Set(), lastSeen: Date.now(), attempts: 0 };
