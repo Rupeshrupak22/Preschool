@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const prisma = require('../lib/prisma');
 
-const INACTIVITY_LIMIT_MS = 15 * 60 * 1000;
+const INACTIVITY_LIMIT_MS = 24 * 60 * 60 * 1000; // 24 hours
 const REFRESH_REUSE_GRACE_MS = 5000;
 
 let initPromise;

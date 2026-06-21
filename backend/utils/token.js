@@ -34,7 +34,7 @@ function generateAccessToken(user, sessionId) {
     },
     secrets.access,
     {
-      expiresIn: process.env.JWT_EXPIRES_IN || '15m',
+      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
       issuer: 'adyapan-backend',
       audience: 'adyapan-app',
     }
