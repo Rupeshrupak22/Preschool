@@ -2679,7 +2679,7 @@ export async function getAdminOverview() {
 
   return {
     totals: {
-      connections: schools.length + students.length + teachers.length + principals.length,
+      connections: students.length + teachers.length + principals.length,
       schools: schools.length,
       students: students.length,
       teachers: teachers.length,
