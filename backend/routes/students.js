@@ -12,7 +12,17 @@ router.get('/', authenticate, async (req, res) => {
     if (req.user.role === 'student') {
       where.user_id = req.user.id;
     } else if (req.user.role === 'teacher' || req.user.role === 'principal') {
-      where.schoolId = req.user.school_id || '__no_school__';
+      // Match by schoolId OR school_name (students may have school_name but no schoolId)
+      const userSchoolId = req.user.school_id;
+      const userSchoolName = req.user.school_name;
+      if (userSchoolId || userSchoolName) {
+        where.OR = [
+          ...(userSchoolId ? [{ schoolId: userSchoolId }] : []),
+          ...(userSchoolName ? [{ school_name: userSchoolName }] : []),
+        ];
+      } else {
+        where.schoolId = '__no_school__';
+      }
     } else if (schoolId) {
       where.schoolId = schoolId;
     }

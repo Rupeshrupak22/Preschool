@@ -13,7 +13,17 @@ router.get('/', authenticate, authorize('admin', 'principal', 'teacher'), async 
     if (req.user.role === 'teacher') {
       where.id = req.user.teacher_id || req.user.id;
     } else if (req.user.role === 'principal') {
-      where.schoolId = req.user.school_id || '__no_school__';
+      // Match by schoolId OR school_name (teachers may have school_name but different schoolId)
+      const userSchoolId = req.user.school_id;
+      const userSchoolName = req.user.school_name;
+      if (userSchoolId || userSchoolName) {
+        where.OR = [
+          ...(userSchoolId ? [{ schoolId: userSchoolId }] : []),
+          ...(userSchoolName ? [{ school_name: userSchoolName }] : []),
+        ];
+      } else {
+        where.schoolId = '__no_school__';
+      }
     } else if (schoolId) {
       where.schoolId = schoolId;
     }
