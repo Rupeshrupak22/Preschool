@@ -6,19 +6,27 @@ import { useEffect, useRef, useCallback } from "react";
  * Session heartbeat with INACTIVITY-BASED auto-logout.
  *
  * How it works:
- * - Tracks user activity (mouse, keyboard, clicks, scroll, touch)
- * - If the user is ACTIVE → heartbeat pings the backend every 60s to keep session alive
- * - If the user is INACTIVE for 15 minutes → stops pinging, forces logout
+ * - Tracks user activity (mouse, touch, pen, keyboard, scroll, click, input).
+ * - Listens on `window` in the CAPTURE phase so events are caught even when
+ *   a downstream component (modal, dropdown, animation library, etc.) calls
+ *   event.stopPropagation() — this was the primary cause of false logouts.
+ * - Includes `pointermove` so touchscreens and pen input are detected too,
+ *   and `input` / `keypress` so typing via IME, paste, and autofill counts.
+ * - The local inactivity timer is reset on EVERY activity event (cheap), so an
+ *   active user can never be logged out — even if it fires thousands of times
+ *   per minute. The "last activity" stamp used to gate backend heartbeats is
+ *   throttled separately (5s) to avoid excessive ref writes.
+ * - If the user is truly INACTIVE for 15 minutes → stops pinging, force logout.
  *
  * The backend session also expires after 15 min of no API calls (sliding window),
- * so both frontend and backend are in sync.
+ * so frontend and backend stay in sync.
  *
  * Works for all roles: student, teacher, principal, admin.
  */
 
 const INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
 const HEARTBEAT_INTERVAL_MS = 60_000; // Ping backend every 60s (only when active)
-const ACTIVITY_THROTTLE_MS = 30_000; // Only update "last active" timestamp every 30s to avoid excessive writes
+const ACTIVITY_THROTTLE_MS = 5_000; // Throttle "last activity" stamp to every 5s
 
 type Options = {
   /** API endpoint to check session validity */
@@ -83,19 +91,23 @@ export function useSessionHeartbeat(options: Options = {}) {
 
   // ─── Handle user activity ──────────────────────────────────────────────────
   const handleActivity = useCallback(() => {
+    // ALWAYS reset the inactivity timer on every activity event.
+    // clearTimeout + setTimeout is cheap; this guarantees a working user
+    // cannot be logged out, regardless of how many events fire.
+    resetInactivityTimer();
+
     const now = Date.now();
 
-    // Throttle: only process activity events every 30 seconds
+    // Throttle only the "last activity" stamp that the heartbeat uses to
+    // decide whether to ping the backend. Keeps ref writes negligible.
     if (now - throttleRef.current < ACTIVITY_THROTTLE_MS) return;
     throttleRef.current = now;
-
     lastActivityRef.current = now;
-    resetInactivityTimer();
   }, [resetInactivityTimer]);
 
   useEffect(() => {
     if (!enabled) {
-      // Clean up everything if disabled
+      // Defensive cleanup when disabled — prevent leaked timers between mounts
       if (heartbeatRef.current) {
         clearInterval(heartbeatRef.current);
         heartbeatRef.current = null;
@@ -113,10 +125,15 @@ export function useSessionHeartbeat(options: Options = {}) {
     throttleRef.current = 0;
 
     // ─── Activity listeners ────────────────────────────────────────────────
+    // Listening on `window` in the capture phase guarantees we catch every
+    // event regardless of whether a child component stops propagation.
     const activityEvents = [
       "mousemove",
+      "pointermove", // mouse + touch + pen, all in one
       "mousedown",
       "keydown",
+      "keypress",    // legacy browsers / IME composition
+      "input",       // paste, autofill, contenteditable, IME
       "scroll",
       "touchstart",
       "touchmove",
@@ -125,7 +142,7 @@ export function useSessionHeartbeat(options: Options = {}) {
     ];
 
     for (const event of activityEvents) {
-      document.addEventListener(event, handleActivity, { passive: true });
+      window.addEventListener(event, handleActivity, { capture: true, passive: true });
     }
 
     // ─── Start inactivity timer ────────────────────────────────────────────
@@ -187,7 +204,9 @@ export function useSessionHeartbeat(options: Options = {}) {
       active = false;
 
       for (const event of activityEvents) {
-        document.removeEventListener(event, handleActivity);
+        // `capture: true` must match the addEventListener options, or the
+        // listener will silently fail to be removed.
+        window.removeEventListener(event, handleActivity, true);
       }
 
       if (heartbeatRef.current) clearInterval(heartbeatRef.current);

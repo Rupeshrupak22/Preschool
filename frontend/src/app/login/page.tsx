@@ -67,7 +67,9 @@ function LoginForm() {
       window.dispatchEvent(new Event("adyapan-auth-change"));
       const params = new URLSearchParams(window.location.search);
       const next = params.get("next");
-      const target = next && next.startsWith("/") ? next : (data as { user?: { role?: string } }).user?.role === "admin" ? "/admin" : "/student-dashboard";
+      // Only allow safe relative paths — block protocol-relative URLs (//evil.com) and backslash tricks
+      const isSafeRedirect = next && next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\");
+      const target = isSafeRedirect ? next : (data as { user?: { role?: string } }).user?.role === "admin" ? "/admin" : "/student-dashboard";
 
       window.location.href = target;
     } catch {

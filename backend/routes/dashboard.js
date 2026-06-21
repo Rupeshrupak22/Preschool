@@ -45,15 +45,14 @@ router.get('/principal', authenticate, authorize('principal'), async (req, res) 
 });
 
 async function getStudentDashboard(userId, email) {
-  const [attendance, payments, notices, enrollments] = await Promise.all([
+  const [attendance, payments, notices, enrollments, totalAtt, presentCount] = await Promise.all([
     prisma.attendance.findMany({ where: { user_id: userId }, orderBy: { created_at: 'desc' }, take: 10 }),
     prisma.payments.findMany({ where: { user_email: email }, orderBy: { created_at: 'desc' }, take: 5 }),
     prisma.notifications.findMany({ where: { OR: [{ user_email: email }, { user_email: null }] }, orderBy: { created_at: 'desc' }, take: 5 }),
     prisma.enrollments.findMany({ where: { user_email: email }, orderBy: { enrolled_at: 'desc' }, take: 5 }),
+    prisma.attendance.count({ where: { user_id: userId } }),
+    prisma.attendance.count({ where: { user_id: userId, status: 'present' } }),
   ]);
-
-  const totalAtt = await prisma.attendance.count({ where: { user_id: userId } });
-  const presentCount = await prisma.attendance.count({ where: { user_id: userId, status: 'present' } });
 
   return {
     attendancePercentage: totalAtt > 0 ? Math.round((presentCount / totalAtt) * 100) : 0,

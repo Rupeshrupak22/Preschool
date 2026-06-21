@@ -61,9 +61,10 @@ router.put('/:id', authenticate, authorize('principal', 'admin'), async (req, re
 
     params.push(req.params.id);
     await getPool().query(`UPDATE meetings SET ${updates.join(', ')} WHERE id = ?`, params);
-    res.json({ id: req.params.id, ...req.body });
+    res.json({ id: req.params.id, is_active, title });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Update meeting error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 

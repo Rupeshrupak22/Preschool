@@ -18,8 +18,10 @@ export async function POST(request: Request) {
   }
 
   // Re-verify credentials before clearing sessions — prevents unauthorized session clearing
-  const passwordResult = await verifyPassword(payload.data.password, teacher.passwordHash);
-  const staffKeyResult = await verifyPassword(payload.data.staffKey, teacher.staffKeyHash);
+  const [passwordResult, staffKeyResult] = await Promise.all([
+    verifyPassword(payload.data.password, teacher.passwordHash),
+    verifyPassword(payload.data.staffKey, teacher.staffKeyHash),
+  ]);
 
   if (!passwordResult.valid || !staffKeyResult.valid) {
     return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });

@@ -15,7 +15,8 @@
     "teacher:check": "node scripts/check-teacher.js",
     "build": "next build frontend",
     "start": "next start frontend -p 3000",
-    "lint": "tsc -p frontend/tsconfig.json --noEmit"
+    "lint": "tsc -p frontend/tsconfig.json --noEmit",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.10",
