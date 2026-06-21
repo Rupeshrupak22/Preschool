@@ -28,10 +28,17 @@ router.get('/', authenticate, async (req, res) => {
     }
 
     if (search) {
-      where.OR = [
+      const searchCondition = [
         { name: { contains: search } },
         { class_level: { contains: search } },
       ];
+      if (where.OR) {
+        // Combine school filter AND search filter
+        where.AND = [{ OR: where.OR }, { OR: searchCondition }];
+        delete where.OR;
+      } else {
+        where.OR = searchCondition;
+      }
     }
 
     const students = await prisma.student.findMany({

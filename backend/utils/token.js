@@ -27,6 +27,7 @@ function generateAccessToken(user, sessionId) {
       role: user.role,
       name: user.name,
       school_id: user.school_id || user.schoolId || null,
+      school_name: user.school_name || user.schoolName || null,
       teacher_id: user.teacher_id || user.teacherId || null,
       sid: sessionId,
       type: 'access',
