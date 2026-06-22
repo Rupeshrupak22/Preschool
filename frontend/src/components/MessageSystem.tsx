@@ -54,7 +54,7 @@ export function MessageSystem({ userEmail, userRole, recipients = [] }: MessageS
     if (!messageText.trim() || !recipient) return;
     setSending(true);
     try {
-      await fetch("/api/admin/send-message", {
+      await fetch("/api/messages/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

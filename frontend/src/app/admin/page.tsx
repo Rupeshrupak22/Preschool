@@ -110,15 +110,17 @@ export default function AdminPage() {
   const [clearingSession, setClearingSession] = useState(false);
   const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string; accessKey: string } | null>(null);
   const [adminName, setAdminName] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Array<{id: string; text: string; time: string; sender_name?: string}>>([]);
   const [showMessageBox, setShowMessageBox] = useState(false);
 
   // Poll for received messages (from principals/teachers sending to admin)
   useEffect(() => {
+    if (!adminEmail) return; // wait until email is set after login
     async function fetchAdminMessages() {
       try {
-        const res = await fetch("/api/messages?email=admin&role=admin");
+        const res = await fetch(`/api/messages?email=${encodeURIComponent(adminEmail)}&role=admin`);
         if (res.ok) {
           const data = await res.json();
           const msgs = (data.messages ?? []) as Array<{id: string; sender_name: string; message: string; created_at: string; is_read: number}>;
@@ -134,7 +136,7 @@ export default function AdminPage() {
     fetchAdminMessages();
     const interval = setInterval(fetchAdminMessages, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [adminEmail]);
   const [messageRecipient, setMessageRecipient] = useState("all-teachers");
   const [messageText, setMessageText] = useState("");
   const [messageSending, setMessageSending] = useState(false);
@@ -265,6 +267,7 @@ export default function AdminPage() {
     }
 
     setAdminName(authData.user?.name || "Admin");
+    setAdminEmail(authData.user?.email || "");
 
     const overviewResponse = await fetch("/api/admin/overview", { cache: "no-store" });
     const data = await overviewResponse.json().catch(() => ({}));
@@ -827,10 +830,10 @@ export default function AdminPage() {
                       if (!messageText.trim()) return;
                       setMessageSending(true);
                       try {
-                        await fetch("/api/admin/send-message", {
+                        await fetch("/api/messages/send", {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ recipient: messageRecipient, message: messageText }),
+                          body: JSON.stringify({ recipient: messageRecipient, message: messageText, senderName: adminName, senderEmail: adminEmail, senderRole: "admin" }),
                         });
                       } catch {}
                       setMessageSending(false);
