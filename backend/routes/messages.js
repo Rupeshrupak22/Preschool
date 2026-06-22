@@ -12,16 +12,32 @@ router.get('/', authenticate, async (req, res) => {
     const email = req.user.email;
     const role = req.user.role;
 
-    const messages = await prisma.$queryRawUnsafe(
-      `SELECT id, sender_name, message, is_read, created_at
-       FROM admin_messages
-       WHERE (recipient_type = 'individual' AND recipient_email = ?)
-          OR (recipient_type = 'broadcast' AND recipient_role = ?)
-       ORDER BY created_at DESC
-       LIMIT 50`,
-      email.toLowerCase(),
-      role.toLowerCase()
-    );
+    let messages;
+
+    if (role === 'admin') {
+      // Admins see messages sent TO admins (from principals/teachers)
+      messages = await prisma.$queryRawUnsafe(
+        `SELECT id, sender_email, sender_name, recipient_type, recipient_email, recipient_role, message, is_read, created_at
+         FROM admin_messages
+         WHERE (recipient_type = 'individual' AND recipient_email = ?)
+            OR (recipient_type = 'broadcast' AND recipient_role = 'admin')
+         ORDER BY created_at DESC
+         LIMIT 50`,
+        email.toLowerCase()
+      );
+    } else {
+      // Teachers/Principals see messages sent to them individually or broadcast to their role
+      messages = await prisma.$queryRawUnsafe(
+        `SELECT id, sender_email, sender_name, recipient_type, recipient_email, recipient_role, message, is_read, created_at
+         FROM admin_messages
+         WHERE (recipient_type = 'individual' AND recipient_email = ?)
+            OR (recipient_type = 'broadcast' AND recipient_role = ?)
+         ORDER BY created_at DESC
+         LIMIT 50`,
+        email.toLowerCase(),
+        role.toLowerCase()
+      );
+    }
 
     sendResponse(res, 200, true, 'Messages fetched', { messages });
   } catch (err) {
@@ -30,8 +46,33 @@ router.get('/', authenticate, async (req, res) => {
   }
 });
 
-// POST /api/v1/messages — Send a message (admin only)
-router.post('/', authenticate, authorize('admin'), async (req, res) => {
+// GET /api/v1/messages/student — Get messages for a student (no auth needed beyond student role)
+router.get('/student', authenticate, async (req, res) => {
+  try {
+    const email = req.user.email;
+
+    const messages = await prisma.$queryRawUnsafe(
+      `SELECT id, sender_email, sender_name, message, is_read, created_at
+       FROM admin_messages
+       WHERE (recipient_type = 'individual' AND recipient_email = ?)
+          OR (recipient_type = 'broadcast' AND recipient_role = 'student')
+       ORDER BY created_at DESC
+       LIMIT 50`,
+      email.toLowerCase()
+    );
+
+    sendResponse(res, 200, true, 'Messages fetched', { messages });
+  } catch (err) {
+    console.error('Fetch student messages error:', err.message);
+    sendResponse(res, 500, false, 'Failed to fetch messages');
+  }
+});
+
+// POST /api/v1/messages — Send a message
+// Admin → principals, teachers
+// Principal → admin (all), teachers, students
+// Teacher → admin (all), principals, students
+router.post('/', authenticate, authorize('admin', 'principal', 'teacher'), async (req, res) => {
   try {
     const { recipient, message } = req.body;
 
@@ -39,16 +80,34 @@ router.post('/', authenticate, authorize('admin'), async (req, res) => {
       return sendResponse(res, 400, false, 'Recipient and message are required');
     }
 
-    const id = crypto.randomUUID();
-    const senderName = req.user.name || 'Admin';
+    const senderRole = req.user.role;
+    const senderName = req.user.name || senderRole;
     const senderEmail = req.user.email;
 
+    // Validate sender permissions
+    if (senderRole === 'admin') {
+      // Admin can only send to principals and teachers
+      if (recipient === 'all-students' || (recipient.includes(':') && recipient.startsWith('student:'))) {
+        return sendResponse(res, 403, false, 'Admin cannot message students directly');
+      }
+    }
+
+    const id = crypto.randomUUID();
+
     if (recipient.includes(':')) {
-      const [role, email] = recipient.split(':');
+      // Individual message: "teacher:email@example.com" or "principal:email" or "student:email" or "admin:email"
+      const [targetRole, targetEmail] = recipient.split(':');
       await prisma.$executeRawUnsafe(
         `INSERT INTO admin_messages (id, sender_email, sender_name, recipient_type, recipient_email, recipient_role, message)
          VALUES (?, ?, ?, 'individual', ?, ?, ?)`,
-        id, senderEmail, senderName, email, role, message.trim()
+        id, senderEmail, senderName, targetEmail, targetRole, message.trim()
+      );
+    } else if (recipient === 'all-admins' || recipient === 'admin') {
+      // Message to all admins (broadcast)
+      await prisma.$executeRawUnsafe(
+        `INSERT INTO admin_messages (id, sender_email, sender_name, recipient_type, recipient_role, message)
+         VALUES (?, ?, ?, 'broadcast', 'admin', ?)`,
+        id, senderEmail, senderName, message.trim()
       );
     } else if (recipient === 'all-teachers') {
       await prisma.$executeRawUnsafe(
@@ -62,7 +121,14 @@ router.post('/', authenticate, authorize('admin'), async (req, res) => {
          VALUES (?, ?, ?, 'broadcast', 'principal', ?)`,
         id, senderEmail, senderName, message.trim()
       );
-    } else {
+    } else if (recipient === 'all-students') {
+      await prisma.$executeRawUnsafe(
+        `INSERT INTO admin_messages (id, sender_email, sender_name, recipient_type, recipient_role, message)
+         VALUES (?, ?, ?, 'broadcast', 'student', ?)`,
+        id, senderEmail, senderName, message.trim()
+      );
+    } else if (recipient === 'all') {
+      // Send to all teachers AND principals
       const id2 = crypto.randomUUID();
       await prisma.$executeRawUnsafe(
         `INSERT INTO admin_messages (id, sender_email, sender_name, recipient_type, recipient_role, message)
@@ -74,6 +140,8 @@ router.post('/', authenticate, authorize('admin'), async (req, res) => {
          VALUES (?, ?, ?, 'broadcast', 'principal', ?)`,
         id2, senderEmail, senderName, message.trim()
       );
+    } else {
+      return sendResponse(res, 400, false, 'Invalid recipient');
     }
 
     sendResponse(res, 201, true, 'Message sent successfully');
