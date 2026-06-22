@@ -110,6 +110,13 @@ export default function AdminPage() {
   const [clearingSession, setClearingSession] = useState(false);
   const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string; accessKey: string } | null>(null);
   const [adminName, setAdminName] = useState("");
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<Array<{id: string; text: string; time: string}>>([]);
+  const [showMessageBox, setShowMessageBox] = useState(false);
+  const [messageRecipient, setMessageRecipient] = useState("all-teachers");
+  const [messageText, setMessageText] = useState("");
+  const [messageSending, setMessageSending] = useState(false);
+  const [messageSent, setMessageSent] = useState(false);
 
   async function handleAdminLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -528,6 +535,16 @@ export default function AdminPage() {
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
             <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-black text-slate-950 transition hover:bg-slate-950 hover:text-white"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+              Notifications
+              {notifications.length > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">{notifications.length}</span>
+              )}
+            </button>
+            <button
               onClick={() => exportCsv(`${activeTab}.csv`, activeRows)}
               className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-black text-slate-950 transition hover:bg-slate-950 hover:text-white"
             >
@@ -660,6 +677,147 @@ export default function AdminPage() {
 
         {selectedStudent && (
           <StudentDetailsModal student={selectedStudent} onClose={() => setSelectedStudent(null)} />
+        )}
+      </div>
+
+      {/* Notification Dropdown */}
+      {showNotifications && (
+        <div className="fixed right-6 top-20 z-50 w-80 rounded-lg border border-slate-200 bg-white p-4 shadow-xl">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 className="text-sm font-black text-slate-950">Notifications</h3>
+            <button onClick={() => setShowNotifications(false)} className="text-slate-400 hover:text-slate-700">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="mt-3 max-h-60 overflow-y-auto">
+            {notifications.length === 0 ? (
+              <p className="py-6 text-center text-xs text-slate-400">No new notifications</p>
+            ) : (
+              notifications.map((n) => (
+                <div key={n.id} className="border-b border-slate-50 py-2">
+                  <p className="text-xs font-semibold text-slate-700">{n.text}</p>
+                  <p className="text-[10px] text-slate-400">{n.time}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Floating Message Box - Bottom Right */}
+      <div className="fixed bottom-6 right-6 z-50">
+        {!showMessageBox ? (
+          <button
+            onClick={() => setShowMessageBox(true)}
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-cyan-700 text-white shadow-lg transition hover:bg-slate-950 hover:scale-105"
+            title="Send message to teachers/principals"
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </button>
+        ) : (
+          <div className="w-80 rounded-lg border border-slate-200 bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+              <h3 className="text-sm font-black text-slate-950">Send Message</h3>
+              <button onClick={() => { setShowMessageBox(false); setMessageSent(false); }} className="text-slate-400 hover:text-slate-700">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="p-4">
+              {messageSent ? (
+                <div className="py-4 text-center">
+                  <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+                    <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  </div>
+                  <p className="text-sm font-bold text-green-700">Message sent!</p>
+                  <button onClick={() => setMessageSent(false)} className="mt-2 text-xs text-cyan-700 hover:underline">Send another</button>
+                </div>
+              ) : (
+                <>
+                  <select
+                    value={messageRecipient}
+                    onChange={(e) => setMessageRecipient(e.target.value)}
+                    className="mb-3 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 focus:border-cyan-500 focus:outline-none"
+                  >
+                    <optgroup label="Broadcast">
+                      <option value="all-teachers">All Teachers</option>
+                      <option value="all-principals">All Principals</option>
+                      <option value="all">All Teachers & Principals</option>
+                    </optgroup>
+                    <optgroup label="Individual Teachers">
+                      {(overview?.teachers ?? []).map((t) => (
+                        <option key={`t-${text(t.email)}`} value={`teacher:${text(t.email)}`}>
+                          {text(t.name || t.teacher_name)}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Individual Principals">
+                      {(overview?.principals ?? []).map((p) => (
+                        <option key={`p-${text(p.email)}`} value={`principal:${text(p.email)}`}>
+                          {text(p.name || p.principal_name)}
+                        </option>
+                      ))}
+                    </optgroup>
+                  </select>
+
+                  {/* Show selected individual's details */}
+                  {messageRecipient.includes(":") && (
+                    <div className="mb-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
+                      {(() => {
+                        const [role, email] = messageRecipient.split(":");
+                        const person = role === "teacher"
+                          ? (overview?.teachers ?? []).find((t) => text(t.email) === email)
+                          : (overview?.principals ?? []).find((p) => text(p.email) === email);
+                        if (!person) return null;
+                        const name = text(person.name ?? person.teacher_name ?? person.principal_name);
+                        const school = text(person.school_name ?? person.schoolName ?? person.school, "No school");
+                        const phone = text(person.phone, "-");
+                        return (
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-bold text-slate-800">{name}</p>
+                              <p className="text-xs text-slate-500">{school}</p>
+                            </div>
+                            <p className="text-xs font-semibold text-cyan-700">{phone}</p>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+                  <textarea
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                    placeholder="Type your message..."
+                    rows={3}
+                    className="mb-3 w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none"
+                  />
+                  <button
+                    onClick={async () => {
+                      if (!messageText.trim()) return;
+                      setMessageSending(true);
+                      try {
+                        await fetch("/api/admin/send-message", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ recipient: messageRecipient, message: messageText }),
+                        });
+                      } catch {}
+                      setMessageSending(false);
+                      setMessageSent(true);
+                      const recipientLabel = messageRecipient.includes(":") ? messageRecipient.split(":")[1] : messageRecipient.replace("all-", "all ");
+                      setNotifications(prev => [{ id: Date.now().toString(), text: `Message sent to ${recipientLabel}`, time: "Just now" }, ...prev]);
+                      setMessageText("");
+                    }}
+                    disabled={messageSending || !messageText.trim()}
+                    className="w-full rounded-lg bg-cyan-700 py-2 text-sm font-black text-white transition hover:bg-slate-950 disabled:opacity-50"
+                  >
+                    {messageSending ? "Sending..." : "Send Message"}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         )}
       </div>
     </main>

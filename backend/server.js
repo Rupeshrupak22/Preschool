@@ -176,6 +176,7 @@ app.use('/api/v1/attendance', attendanceRoutes);
 app.use('/api/v1/classes', classRoutes);
 app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/notices', noticeRoutes);
+app.use('/api/v1/messages', require('./routes/messages'));
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/bulk-import', bulkImportRoutes);
 
