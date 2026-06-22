@@ -111,8 +111,30 @@ export default function AdminPage() {
   const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string; accessKey: string } | null>(null);
   const [adminName, setAdminName] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState<Array<{id: string; text: string; time: string}>>([]);
+  const [notifications, setNotifications] = useState<Array<{id: string; text: string; time: string; sender_name?: string}>>([]);
   const [showMessageBox, setShowMessageBox] = useState(false);
+
+  // Poll for received messages (from principals/teachers sending to admin)
+  useEffect(() => {
+    async function fetchAdminMessages() {
+      try {
+        const res = await fetch("/api/messages?email=admin&role=admin");
+        if (res.ok) {
+          const data = await res.json();
+          const msgs = (data.messages ?? []) as Array<{id: string; sender_name: string; message: string; created_at: string; is_read: number}>;
+          setNotifications(msgs.map(m => ({
+            id: m.id,
+            text: `${m.sender_name}: ${m.message}`,
+            time: m.created_at,
+            sender_name: m.sender_name,
+          })));
+        }
+      } catch {}
+    }
+    fetchAdminMessages();
+    const interval = setInterval(fetchAdminMessages, 3000);
+    return () => clearInterval(interval);
+  }, []);
   const [messageRecipient, setMessageRecipient] = useState("all-teachers");
   const [messageText, setMessageText] = useState("");
   const [messageSending, setMessageSending] = useState(false);
@@ -696,7 +718,15 @@ export default function AdminPage() {
               notifications.map((n) => (
                 <div key={n.id} className="border-b border-slate-50 py-2">
                   <p className="text-xs font-semibold text-slate-700">{n.text}</p>
-                  <p className="text-[10px] text-slate-400">{n.time}</p>
+                  <p className="text-[10px] text-slate-400">{(() => {
+                    const d = new Date(n.time);
+                    if (isNaN(d.getTime())) return n.time;
+                    const diff = Date.now() - d.getTime();
+                    if (diff < 0 || diff < 60000) return "Just now";
+                    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+                    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+                    return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+                  })()}</p>
                 </div>
               ))
             )}
