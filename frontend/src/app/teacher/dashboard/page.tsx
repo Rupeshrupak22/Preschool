@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
 import { useSessionHeartbeat } from "@/lib/use-session-heartbeat";
+import { MessageSystem } from "@/components/MessageSystem";
 
 type TeacherStudent = {
   id: string;
@@ -421,6 +422,21 @@ export default function TeacherDashboardPage() {
 
         {activeView !== "doubts" && <BottomNav activeView={activeView} setActiveView={setActiveView} />}
       </div>
+
+      {/* Messaging System */}
+      <MessageSystem
+        userEmail={dashboard.teacher.email}
+        userRole="teacher"
+        recipients={[
+          { label: "All Admins", value: "all-admins" },
+          { label: "All Principals", value: "all-principals" },
+          { label: "All Students", value: "all-students" },
+          ...dashboard.students.map((s) => ({
+            label: `${s.name} (Student)`,
+            value: `student:${s.email}`,
+          })),
+        ]}
+      />
     </main>
   );
 }

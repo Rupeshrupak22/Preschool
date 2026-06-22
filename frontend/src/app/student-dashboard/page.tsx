@@ -24,6 +24,7 @@ import CircularPerformanceChart from "@/components/student-dashboard/CircularPer
 import PerformanceTrendChart from "@/components/student-dashboard/PerformanceTrendChart";
 import AchievementsPanel from "@/components/student-dashboard/AchievementsPanel";
 import { useDashboardData } from "@/lib/dashboard/use-dashboard-data";
+import { MessageSystem } from "@/components/MessageSystem";
 
 function numberFromStat(value?: string) {
   const match = value?.match(/\d+/);
@@ -95,6 +96,7 @@ export default function StudentDashboardHome() {
   ];
 
   return (
+    <>
     <DashboardLayout activeSection="/student-dashboard">
       <div className="space-y-8">
         <motion.section
@@ -250,5 +252,10 @@ export default function StudentDashboardHome() {
         <AchievementsPanel achievements={data.achievements} />
       </div>
     </DashboardLayout>
+      <MessageSystem
+        userEmail={data.studentData.name ?? "student@adyapan.com"}
+        userRole="student"
+      />
+    </>
   );
 }
