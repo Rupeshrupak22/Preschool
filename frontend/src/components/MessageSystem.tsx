@@ -57,11 +57,17 @@ export function MessageSystem({ userEmail, userRole, recipients = [] }: MessageS
       await fetch("/api/admin/send-message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recipient, message: messageText, senderRole: userRole, senderEmail: userEmail }),
+        body: JSON.stringify({
+          recipient,
+          message: messageText,
+          senderRole: userRole,
+          senderEmail: userEmail,
+        }),
       });
       setSent(true);
       setMessageText("");
       setTimeout(() => setSent(false), 2000);
+      fetchMessages(); // refresh inbox
     } catch {}
     setSending(false);
   };
