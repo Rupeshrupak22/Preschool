@@ -6,6 +6,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const email = searchParams.get("email");
     const role = searchParams.get("role");
+    const unreadOnly = searchParams.get("unread") === "1";
 
     if (!email || !role) {
       return NextResponse.json({ error: "Email and role are required." }, { status: 400 });
@@ -16,12 +17,14 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Database not configured." }, { status: 503 });
     }
 
+    const readFilter = unreadOnly ? " AND is_read = 0" : "";
+
     // Get messages: individual ones for this email OR broadcast ones for this role
     const [rows] = await pool.query(
       `SELECT id, sender_name, message, is_read, created_at
        FROM admin_messages
-       WHERE (recipient_type = 'individual' AND recipient_email = ?)
-          OR (recipient_type = 'broadcast' AND recipient_role = ?)
+       WHERE ((recipient_type = 'individual' AND recipient_email = ?)
+          OR (recipient_type = 'broadcast' AND recipient_role = ?))${readFilter}
        ORDER BY created_at DESC
        LIMIT 50`,
       [email.toLowerCase(), role.toLowerCase()]

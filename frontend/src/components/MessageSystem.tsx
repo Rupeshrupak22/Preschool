@@ -34,8 +34,8 @@ export function MessageSystem({ userEmail, userRole, recipients = [] }: MessageS
 
   const fetchMessages = useCallback(async () => {
     try {
-      const endpoint = userRole === "student" ? "/api/messages?role=student" : "/api/messages";
-      const url = `${endpoint}${endpoint.includes("?") ? "&" : "?"}email=${encodeURIComponent(userEmail)}&role=${userRole}`;
+      const endpoint = userRole === "student" ? "/api/messages?role=student&unread=1" : "/api/messages";
+      const url = `${endpoint}${endpoint.includes("?") ? "&" : "?"}email=${encodeURIComponent(userEmail)}&role=${userRole}&unread=1`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();

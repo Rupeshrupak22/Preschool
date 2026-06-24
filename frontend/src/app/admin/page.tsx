@@ -120,7 +120,7 @@ export default function AdminPage() {
     if (!adminEmail) return; // wait until email is set after login
     async function fetchAdminMessages() {
       try {
-        const res = await fetch(`/api/messages?email=${encodeURIComponent(adminEmail)}&role=admin`);
+        const res = await fetch(`/api/messages?email=${encodeURIComponent(adminEmail)}&role=admin&unread=1`);
         if (res.ok) {
           const data = await res.json();
           const msgs = (data.messages ?? []) as Array<{id: string; sender_name: string; message: string; created_at: string; is_read: number}>;
@@ -707,29 +707,56 @@ export default function AdminPage() {
 
       {/* Notification Dropdown */}
       {showNotifications && (
-        <div className="fixed right-6 top-20 z-50 w-80 rounded-lg border border-slate-200 bg-white p-4 shadow-xl">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h3 className="text-sm font-black text-slate-950">Notifications</h3>
-            <button onClick={() => setShowNotifications(false)} className="text-slate-400 hover:text-slate-700">
-              <X className="h-4 w-4" />
-            </button>
+        <div className="fixed right-6 top-20 z-50 w-96 rounded-lg border border-slate-200 bg-white shadow-xl">
+          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+            <h3 className="text-sm font-black text-slate-950">Notifications ({notifications.length})</h3>
+            <div className="flex items-center gap-2">
+              {notifications.length > 0 && (
+                <button
+                  onClick={async () => {
+                    for (const n of notifications) {
+                      try { await fetch("/api/messages", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: n.id }) }); } catch {}
+                    }
+                    setNotifications([]);
+                  }}
+                  className="text-[10px] font-bold text-cyan-700 hover:underline"
+                >
+                  Mark all read
+                </button>
+              )}
+              <button onClick={() => setShowNotifications(false)} className="text-slate-400 hover:text-slate-700">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-          <div className="mt-3 max-h-60 overflow-y-auto">
+          <div className="max-h-72 overflow-y-auto">
             {notifications.length === 0 ? (
-              <p className="py-6 text-center text-xs text-slate-400">No new notifications</p>
+              <p className="py-8 text-center text-xs text-slate-400">No new notifications</p>
             ) : (
               notifications.map((n) => (
-                <div key={n.id} className="border-b border-slate-50 py-2">
-                  <p className="text-xs font-semibold text-slate-700">{n.text}</p>
-                  <p className="text-[10px] text-slate-400">{(() => {
-                    const d = new Date(n.time);
-                    if (isNaN(d.getTime())) return n.time;
-                    const diff = Date.now() - d.getTime();
-                    if (diff < 0 || diff < 60000) return "Just now";
-                    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-                    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-                    return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
-                  })()}</p>
+                <div key={n.id} className="flex items-start justify-between border-b border-slate-50 px-4 py-3 hover:bg-slate-50">
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold text-slate-700">{n.text}</p>
+                    <p className="text-[10px] text-slate-400">{(() => {
+                      const d = new Date(n.time);
+                      if (isNaN(d.getTime())) return n.time;
+                      const diff = Date.now() - d.getTime();
+                      if (diff < 0 || diff < 60000) return "Just now";
+                      if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+                      if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+                      return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+                    })()}</p>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      try { await fetch("/api/messages", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: n.id }) }); } catch {}
+                      setNotifications(prev => prev.filter(msg => msg.id !== n.id));
+                    }}
+                    className="ml-2 shrink-0 rounded-md border border-slate-200 px-2 py-1 text-[10px] font-bold text-cyan-700 hover:bg-cyan-50"
+                    title="Mark as read"
+                  >
+                    ✓ Read
+                  </button>
                 </div>
               ))
             )}
