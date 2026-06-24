@@ -315,9 +315,9 @@ export default function PrincipalDashboardPage() {
           { label: "All Admins", value: "all-admins" },
           { label: "All Teachers", value: "all-teachers" },
           { label: "All Students", value: "all-students" },
-          ...(dashboard.students ?? []).map((s) => ({
-            label: `${s.name} (Student)`,
-            value: `student:${s.email}`,
+          ...(dashboard.students ?? []).filter((s) => s.email).map((s) => ({
+            label: `${s.name || "Student"} (${s.class_level || s.class_name || "Student"})`,
+            value: `student:${String(s.email)}`,
           })),
         ]}
       />

@@ -431,8 +431,8 @@ export default function TeacherDashboardPage() {
           { label: "All Admins", value: "all-admins" },
           { label: "All Principals", value: "all-principals" },
           { label: "All Students", value: "all-students" },
-          ...dashboard.students.map((s) => ({
-            label: `${s.name} (Student)`,
+          ...dashboard.students.filter((s) => s.email).map((s) => ({
+            label: `${s.name || "Student"} (${s.classLevel || "Student"})`,
             value: `student:${s.email}`,
           })),
         ]}

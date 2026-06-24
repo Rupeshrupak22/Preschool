@@ -21,7 +21,7 @@ interface MessageSystemProps {
   recipients?: Recipient[];
 }
 
-export function MessageSystem({ userEmail, userRole, recipients = [] }: MessageSystemProps) {
+export function MessageSystem({ userEmail, userRole, recipients: staticRecipients = [] }: MessageSystemProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [showInbox, setShowInbox] = useState(false);
   const [showCompose, setShowCompose] = useState(false);
@@ -29,6 +29,33 @@ export function MessageSystem({ userEmail, userRole, recipients = [] }: MessageS
   const [messageText, setMessageText] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [dynamicRecipients, setDynamicRecipients] = useState<Recipient[]>([]);
+
+  // Fetch individual teachers/students for the dropdown
+  useEffect(() => {
+    async function loadRecipients() {
+      try {
+        if (userRole === "principal") {
+          // Fetch teachers for this principal's school
+          const res = await fetch("/api/principal/dashboard");
+          if (res.ok) {
+            const data = await res.json();
+            const students = (data.students ?? []) as Array<Record<string, unknown>>;
+            const individualStudents = students.map((s) => ({
+              label: `${s.name || "Student"} — ${s.class_level || s.class_name || ""}`,
+              value: `student:${String(s.email)}`,
+            }));
+            setDynamicRecipients(individualStudents);
+          }
+        } else if (userRole === "teacher") {
+          // Teacher students are passed via static recipients
+        }
+      } catch {}
+    }
+    loadRecipients();
+  }, [userRole]);
+
+  const recipients = [...staticRecipients, ...dynamicRecipients];
 
   const unreadCount = messages.filter((m) => !m.is_read).length;
 
