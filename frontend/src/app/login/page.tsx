@@ -2,7 +2,7 @@
 
 import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff, GraduationCap, Lock, Mail, RefreshCw } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, GraduationCap, Lock, Mail, RefreshCw } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -67,8 +67,8 @@ function LoginForm() {
       window.dispatchEvent(new Event("adyapan-auth-change"));
       const params = new URLSearchParams(window.location.search);
       const next = params.get("next");
-      const target = next && next.startsWith("/") ? next : (data as { user?: { role?: string } }).user?.role === "admin" ? "/admin" : "/student-dashboard";
-
+      const isSafeRedirect = next && next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\");
+      const target = isSafeRedirect ? next : (data as { user?: { role?: string } }).user?.role === "admin" ? "/admin" : "/student-dashboard";
       window.location.href = target;
     } catch {
       setStatus("Network error. Please check your connection.");
@@ -128,51 +128,40 @@ function LoginForm() {
   }
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 px-4 py-10">
-      {/* Background decorative elements */}
-      <div className="pointer-events-none absolute inset-0">
-        <svg className="absolute left-0 top-0 h-full w-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#1e3a5f" strokeWidth="0.5" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-orange-200/30 blur-3xl" />
-        <div className="absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-amber-200/30 blur-3xl" />
-        <div className="absolute left-[10%] top-[15%] text-5xl opacity-20">📚</div>
-        <div className="absolute right-[12%] top-[20%] text-4xl opacity-20">⭐</div>
-        <div className="absolute left-[8%] bottom-[20%] text-4xl opacity-20">🎓</div>
-        <div className="absolute right-[15%] bottom-[15%] text-5xl opacity-20">💡</div>
-        <div className="absolute left-[45%] top-[8%] text-3xl opacity-15">✏️</div>
-        <div className="absolute right-[30%] bottom-[10%] text-3xl opacity-15">🌟</div>
+    <main className="relative flex h-screen w-full overflow-hidden">
+      {/* Full-screen background video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 h-full w-full object-cover"
+        aria-hidden="true"
+      >
+        <source src="/newlogin-vid_qPNCEcV9.mp4" type="video/mp4" />
+      </video>
+      {/* Watermark cover — gradient at bottom */}
+      <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-40 w-full bg-gradient-to-t from-black via-black/90 to-transparent" />
+
+      {/* Left half — Adyapan branding (hidden on mobile) */}
+      <div className="relative z-10 hidden w-1/2 flex-col items-center justify-center lg:flex pointer-events-none">
+        <img
+          src="/ady-logo.png"
+          alt="Adyapan"
+          className="h-36 w-36 rounded-full object-cover shadow-2xl"
+        />
+        <h2 className="mt-6 text-5xl font-black text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+          Adyapan{" "}
+          <span className="text-sky-400 drop-shadow-[0_2px_8px_rgba(56,189,248,0.6)]">School</span>
+        </h2>
       </div>
 
-      <div className="relative w-full max-w-md">
-        {/* Header */}
-        <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-xs font-black text-white shadow-lg">
-            ady.
-          </div>
-          <span className="text-xl font-black text-slate-800">Adyapan</span>
-        </div>
-
-        {/* Login Card */}
-        <div className="rounded-xl border-t-4 border-orange-400 bg-white p-8 shadow-xl">
-          <div className="mb-6 flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-orange-100">
-              <GraduationCap className="h-6 w-6 text-orange-600" />
-            </div>
-            <div>
-              <h1 className="text-xl font-black text-slate-900">Student Login</h1>
-              <p className="text-sm text-slate-500">Welcome back! Login to your dashboard</p>
-            </div>
-          </div>
-
+      {/* Right half — login card */}
+      <div className="relative z-10 flex w-full items-center justify-center px-6 lg:w-1/2">
+        <div className="w-full max-w-sm">
           {/* Active session conflict banner */}
           {showClearSession && (
-            <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-4">
+            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
               <p className="text-sm font-black text-amber-900">⚠️ Active Session Detected</p>
               <p className="mt-1 text-sm font-medium text-amber-800">
                 This account is already logged in on another device. Clear the previous session to continue.
@@ -181,13 +170,13 @@ function LoginForm() {
                 <button
                   onClick={handleClearSessions}
                   disabled={clearingSession}
-                  className="flex-1 rounded-lg bg-amber-600 px-3 py-2 text-xs font-black text-white transition hover:bg-amber-700 disabled:opacity-60"
+                  className="flex-1 rounded-lg bg-amber-600 px-3 py-2.5 text-xs font-black text-white transition hover:bg-amber-700 disabled:opacity-60"
                 >
                   {clearingSession ? "Clearing..." : "Clear & Login"}
                 </button>
                 <button
                   onClick={() => { setShowClearSession(false); setPendingCredentials(null); setStatus(""); }}
-                  className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-black text-slate-700 transition hover:bg-slate-50"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-black text-slate-700 transition hover:bg-slate-50"
                 >
                   Cancel
                 </button>
@@ -195,81 +184,97 @@ function LoginForm() {
             </div>
           )}
 
-          <form onSubmit={onSubmit} className="space-y-5">
-            <input type="hidden" name="captcha" value="ADYAPAN" />
-
-            {/* Email */}
-            <div>
-              <label className="mb-2 block text-sm font-bold text-slate-700">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="student@example.com"
-                  className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
-                  required
-                />
+          {/* Card */}
+          <div className="rounded-2xl bg-white/95 px-7 py-7 shadow-[0_8px_40px_rgba(0,0,0,0.28)] backdrop-blur-md">
+            {/* Header */}
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-orange-100">
+                <GraduationCap className="h-5 w-5 text-orange-500" />
+              </div>
+              <div>
+                <h1 className="text-xl font-black text-slate-900">Student Login</h1>
+                <p className="text-xs text-slate-500">Welcome back! Login to your dashboard</p>
               </div>
             </div>
 
-            {/* Password */}
-            <div>
-              <label className="mb-2 block text-sm font-bold text-slate-700">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
-                <input
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  className="h-12 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-12 text-sm font-medium text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600"
-                  aria-label="Toggle password visibility"
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-            </div>
+            <form onSubmit={onSubmit} className="space-y-4">
+              <input type="hidden" name="captcha" value="ADYAPAN" />
 
-            {/* Error/Status */}
-            {status && !showClearSession && (
-              <div className={`rounded-lg px-4 py-3 text-sm font-semibold ${
-                statusType === "error" ? "bg-red-50 text-red-700" :
-                statusType === "warning" ? "bg-amber-50 text-amber-700" :
-                "bg-blue-50 text-blue-700"
-              }`}>
-                {status}
+              {/* Email */}
+              <div>
+                <label className="mb-1.5 block text-sm font-bold text-slate-700">Email Address</label>
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="student@example.com"
+                    className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                    required
+                  />
+                </div>
               </div>
-            )}
 
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading || showClearSession}
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-400 to-orange-500 text-sm font-black text-white shadow-lg shadow-orange-200 transition hover:from-orange-500 hover:to-orange-600 disabled:opacity-60"
-            >
-              {loading ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
-              ) : (
-                <>Sign In to Dashboard →</>
+              {/* Password */}
+              <div>
+                <label className="mb-1.5 block text-sm font-bold text-slate-700">Password</label>
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-11 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                    aria-label="Toggle password visibility"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Status */}
+              {status && !showClearSession && (
+                <div className={`rounded-lg px-4 py-3 text-sm font-semibold ${
+                  statusType === "error" ? "bg-red-50 text-red-700 border border-red-100" :
+                  statusType === "warning" ? "bg-amber-50 text-amber-700 border border-amber-100" :
+                  "bg-blue-50 text-blue-700 border border-blue-100"
+                }`}>
+                  {status}
+                </div>
               )}
-            </button>
-          </form>
 
-          <p className="mt-5 text-center text-xs text-slate-400">
-            Only pre-registered accounts can login. Contact your school admin for access.
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loading || showClearSession}
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-sm font-black text-white shadow-lg shadow-orange-300/40 transition hover:from-orange-500 hover:to-orange-600 active:scale-[0.98] disabled:opacity-60"
+              >
+                {loading ? (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>Sign In to Dashboard <ArrowRight className="h-4 w-4" /></>
+                )}
+              </button>
+            </form>
+
+            <p className="mt-4 text-center text-[11px] text-slate-500">
+              Only pre-registered accounts can login. Contact your school admin for access.
+            </p>
+          </div>
+
+          {/* Back link */}
+          <p className="mt-4 text-center text-sm">
+            <a href="/" className="font-semibold text-white drop-shadow transition hover:text-orange-300">
+              ← Back to Adyapan
+            </a>
           </p>
         </div>
-
-        {/* Back link */}
-        <p className="mt-4 text-center text-sm text-slate-500">
-          <a href="/" className="font-semibold transition hover:text-orange-600">← Back to Adyapan</a>
-        </p>
       </div>
     </main>
   );
@@ -278,7 +283,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+      <main className="flex h-screen items-center justify-center bg-slate-900">
         <RefreshCw className="h-8 w-8 animate-spin text-orange-500" />
       </main>
     }>
