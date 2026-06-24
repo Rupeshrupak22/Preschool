@@ -26,7 +26,7 @@ const portalLinks = [
 ];
 
 const socials: [string, string, React.ComponentType<{ className?: string }>][] = [
-  ["Instagram", "https://www.instagram.com/adyapanschool/", Instagram],
+  ["Instagram", "https://www.instagram.com/adyapanschool_?igsh=MXJ0b3FpNzh1YW1vNg==", Instagram],
   ["LinkedIn", "https://www.linkedin.com/company/adyapan-edutech-pvt-ltd/posts/?feedView=all", Linkedin],
   ["YouTube", "https://www.youtube.com/@adyapan21", Youtube]
 ];
@@ -155,11 +155,11 @@ export default function SiteFooter() {
                 </a>
               </li>
               <li>
-                <a href="tel:+918292244709" className="flex items-center gap-3 text-sm text-slate-400 transition-colors duration-200 hover:text-cyan-400">
+                <a href="tel:+918179124566" className="flex items-center gap-3 text-sm text-slate-400 transition-colors duration-200 hover:text-cyan-400">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-400">
                     <Phone className="h-4 w-4" />
                   </div>
-                  +91 82922 44709
+                  +91 81791 24566
                 </a>
               </li>
               <li className="flex items-center gap-3 text-sm text-slate-400">
@@ -214,7 +214,7 @@ export default function SiteFooter() {
         {/* Bottom Bar */}
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-6 sm:flex-row">
           <p className="text-xs text-slate-500">
-            © 2026 SR's Adyapan Future Skills Platform
+            © 2026 SR's Adyapan Edutech Pvt. Ltd. All rights reserved.
           </p>
           <div className="flex gap-6 text-xs text-slate-500">
             <a href="#" className="transition hover:text-slate-300">Privacy Policy</a>
