@@ -362,65 +362,104 @@ export default function TeacherDashboardPage() {
   const studentPreview = dashboard.students.slice(0, 3).map((student) => student.name).filter(Boolean).join(", ");
 
   return (
-    <main className="min-h-screen bg-white text-slate-950">
-      <div className="mx-auto min-h-screen max-w-[560px] overflow-hidden bg-[linear-gradient(180deg,#eef5ff_0%,#e9eeff_48%,#fff2f8_100%)] shadow-2xl shadow-slate-200 lg:my-6 lg:rounded-[32px]">
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50/40 text-slate-950">
+      <div className="flex min-h-screen">
+        {/* ─── Desktop Sidebar ──────────────────────────────────────────── */}
+        <aside className="hidden lg:flex lg:w-64 xl:w-72 flex-col fixed inset-y-0 left-0 z-30 border-r border-gray-100 bg-white/80 backdrop-blur-md">
+          <div className="flex items-center gap-3 px-6 py-6 border-b border-gray-100">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white font-bold text-sm">A</div>
+            <div>
+              <p className="text-sm font-bold text-gray-900">ADYAPAN</p>
+              <p className="text-[11px] text-gray-500">Educator Portal</p>
+            </div>
+          </div>
+          <div className="px-4 pt-4">
+            <a href="/" className="flex w-full items-center gap-2 rounded-xl bg-gray-50 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+              <ArrowLeft className="h-4 w-4" /> Back to Main Site
+            </a>
+          </div>
+          <nav className="flex-1 px-4 py-4 space-y-1">
+            {navItems.map((item) => (
+              <button key={item.id} onClick={() => setActiveView(item.id)} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${activeView === item.id ? "bg-blue-50 text-blue-700 font-semibold" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"}`}>
+                <item.icon className="h-5 w-5" /> {item.label}
+              </button>
+            ))}
+            <button onClick={() => setActiveView("doubts")} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${activeView === "doubts" ? "bg-blue-50 text-blue-700 font-semibold" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"}`}>
+              <MessageSquare className="h-5 w-5" /> Doubts
+              {pendingDoubts.length > 0 && <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">{pendingDoubts.length}</span>}
+            </button>
+          </nav>
+          <div className="border-t border-gray-100 px-4 py-4">
+            <div className="flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-400 text-sm font-bold text-white">{initials(dashboard.teacher.name)}</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-900 truncate">{dashboard.teacher.name}</p>
+                <p className="text-[11px] text-gray-500 truncate">{dashboard.teacher.email}</p>
+              </div>
+              <button onClick={logout} className="text-gray-400 hover:text-red-500 transition-colors"><LogOut className="h-4 w-4" /></button>
+            </div>
+          </div>
+        </aside>
+
+        {/* ─── Mobile Drawer ──────────────────────────────────────────── */}
         {drawerOpen && (
           <TeacherDrawer
             dashboard={dashboard}
             onClose={() => setDrawerOpen(false)}
             onLogout={logout}
-            setActiveView={(view) => {
-              setActiveView(view);
-              setDrawerOpen(false);
-            }}
+            setActiveView={(view) => { setActiveView(view); setDrawerOpen(false); }}
           />
         )}
 
-        {activeView === "home" && (
-          <HomeView
-            dashboard={dashboard}
-            hubTab={hubTab}
-            setHubTab={setHubTab}
-            query={query}
-            setQuery={setQuery}
-            onOpenDrawer={() => setDrawerOpen(true)}
-            setActiveView={setActiveView}
-            actionMode={actionMode}
-            setActionMode={setActionMode}
-            form={form}
-            setForm={(patch) => setForm((current) => ({ ...current, ...patch }))}
-            classOptions={classOptions}
-            submitting={submitting}
-            onSubmitAction={submitTeacherAction}
-            status={status}
-            studentPreview={studentPreview}
-            pendingDoubts={pendingDoubts}
-          />
-        )}
+        {/* ─── Main Content ─────────────────────────────────────────────── */}
+        <div className="flex-1 lg:ml-64 xl:ml-72 pb-24 lg:pb-8">
+          {activeView === "home" && (
+            <HomeView
+              dashboard={dashboard}
+              hubTab={hubTab}
+              setHubTab={setHubTab}
+              query={query}
+              setQuery={setQuery}
+              onOpenDrawer={() => setDrawerOpen(true)}
+              setActiveView={setActiveView}
+              actionMode={actionMode}
+              setActionMode={setActionMode}
+              form={form}
+              setForm={(patch) => setForm((current) => ({ ...current, ...patch }))}
+              classOptions={classOptions}
+              submitting={submitting}
+              onSubmitAction={submitTeacherAction}
+              status={status}
+              studentPreview={studentPreview}
+              pendingDoubts={pendingDoubts}
+            />
+          )}
 
-        {activeView === "syllabus" && (
-          <SyllabusView subject={subject} setSubject={setSubject} items={syllabusBySubject[subject]} />
-        )}
+          {activeView === "syllabus" && (
+            <SyllabusView subject={subject} setSubject={setSubject} items={syllabusBySubject[subject]} />
+          )}
 
-        {activeView === "roadmap" && <RoadmapView />}
+          {activeView === "roadmap" && <RoadmapView />}
 
-        {activeView === "leaderboard" && <LeaderboardView students={filteredStudents} />}
+          {activeView === "leaderboard" && <LeaderboardView students={filteredStudents} />}
 
-        {activeView === "doubts" && (
-          <DoubtsView
-            doubts={dashboard.doubts}
-            pendingDoubts={pendingDoubts}
-            solvedDoubts={solvedDoubts}
-            replyDrafts={replyDrafts}
-            setReplyDrafts={setReplyDrafts}
-            onReply={replyToDoubt}
-            submitting={submitting}
-            status={status}
-            setActiveView={setActiveView}
-          />
-        )}
+          {activeView === "doubts" && (
+            <DoubtsView
+              doubts={dashboard.doubts}
+              pendingDoubts={pendingDoubts}
+              solvedDoubts={solvedDoubts}
+              replyDrafts={replyDrafts}
+              setReplyDrafts={setReplyDrafts}
+              onReply={replyToDoubt}
+              submitting={submitting}
+              status={status}
+              setActiveView={setActiveView}
+            />
+          )}
 
-        {activeView !== "doubts" && <BottomNav activeView={activeView} setActiveView={setActiveView} />}
+          {/* Mobile Bottom Nav - hidden on desktop */}
+          {activeView !== "doubts" && <BottomNav activeView={activeView} setActiveView={setActiveView} />}
+        </div>
       </div>
 
       {/* Messaging System */}
@@ -462,7 +501,7 @@ function TeacherDrawer({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 mx-auto max-w-[560px]">
+    <div className="fixed inset-0 z-50 lg:hidden">
       <button aria-label="Close drawer" className="absolute inset-0 bg-black/55" onClick={onClose} />
       <aside className="absolute left-0 top-0 h-full w-[78%] min-w-[310px] max-w-[430px] overflow-hidden bg-[#edf4ff] shadow-2xl">
         <div className="rounded-br-[38px] bg-[#126bef] px-8 pb-9 pt-8 text-white">
@@ -561,143 +600,164 @@ function HomeView({
   pendingDoubts: TeacherDoubt[];
 }) {
   return (
-    <div className="min-h-screen pb-28">
-      <section className="px-7 pb-5 pt-8">
-        <div className="flex items-center justify-between">
-          <button onClick={onOpenDrawer} className="flex items-center gap-4 text-left">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full border-[3px] border-white bg-orange-400 text-2xl font-black text-white shadow-lg">
-              {initials(dashboard.teacher.name)}
+    <div className="min-h-screen pb-28 lg:pb-8">
+      {/* ─── Top Header ───────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <div className="px-5 py-4 md:px-8 lg:px-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {/* Mobile menu button */}
+              <button onClick={onOpenDrawer} className="lg:hidden flex h-11 w-11 items-center justify-center rounded-full bg-orange-400 text-lg font-bold text-white shadow-md">
+                {initials(dashboard.teacher.name)}
+              </button>
+              <div>
+                <p className="text-sm text-gray-500">{getGreeting()},</p>
+                <h1 className="text-lg font-bold text-gray-900 md:text-xl">{dashboard.teacher.name}</h1>
+              </div>
             </div>
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex items-center gap-1.5 rounded-full bg-gray-50 px-3 py-2 text-xs font-medium text-gray-600 ring-1 ring-gray-100">
+                <span className="text-[10px] uppercase tracking-wider text-gray-400">Your UID</span>
+                <span className="font-semibold text-gray-800">{dashboard.teacher.email}</span>
+                <Copy className="h-3 w-3 text-gray-400 cursor-pointer hover:text-blue-500" />
+              </div>
+              <button className="relative flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 ring-1 ring-gray-100 hover:bg-gray-100 transition-colors">
+                <Bell className="h-5 w-5 text-orange-400" />
+                {dashboard.stats.notifications > 0 && <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white" />}
+              </button>
+            </div>
+          </div>
+          <div className="mt-2 flex items-center justify-between">
             <div>
-              <p className="text-sm font-black text-blue-800">{getGreeting()},</p>
-              <h1 className="text-2xl font-black leading-tight text-blue-950">{dashboard.teacher.name}</h1>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Educator Portal</p>
+              <p className="text-sm font-semibold text-gray-700">Supervision Control Center</p>
             </div>
-          </button>
-          <button className="relative flex h-14 w-14 items-center justify-center rounded-full border border-blue-100 bg-blue-50 shadow-sm">
-            <Bell className="h-6 w-6 fill-yellow-400 text-yellow-400" />
-            {dashboard.stats.notifications > 0 && <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-red-500" />}
-          </button>
-        </div>
-
-        <div className="mt-8 flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[11px] font-black uppercase tracking-[0.22em] text-slate-500">Educator Portal</p>
-            <h2 className="text-xl font-black leading-tight text-blue-950">Supervision Control Center</h2>
-          </div>
-          <div className="min-w-[180px] rounded-[18px] border border-blue-200 bg-blue-50/80 px-4 py-3">
-            <p className="text-[10px] font-black uppercase tracking-wider text-blue-950">Your UID</p>
-            <div className="flex items-center gap-2">
-              <p className="max-w-[140px] truncate text-sm font-black text-blue-950">{dashboard.teacher.email}</p>
-              <Copy className="h-4 w-4 text-blue-600" />
+            <div className="flex sm:hidden items-center gap-1 rounded-full bg-gray-50 px-2.5 py-1.5 text-[11px] font-medium text-gray-600 ring-1 ring-gray-100">
+              <span className="font-semibold text-gray-800 truncate max-w-[120px]">{dashboard.teacher.email}</span>
+              <Copy className="h-3 w-3 text-gray-400" />
             </div>
           </div>
         </div>
-      </section>
+      </header>
 
-      <section className="px-7">
-        <div className="relative">
-          <Search className="absolute left-6 top-1/2 h-6 w-6 -translate-y-1/2 text-blue-600" />
+      {/* ─── Page Content ─────────────────────────────────────────────── */}
+      <div className="px-5 py-5 md:px-8 lg:px-10 space-y-6">
+        {/* Search Bar */}
+        <div className="relative max-w-2xl">
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="h-[64px] w-full rounded-[28px] border border-blue-200 bg-white pl-16 pr-5 text-lg font-semibold text-slate-800 shadow-lg shadow-blue-100 outline-none"
+            className="h-12 w-full rounded-2xl border-0 bg-white pl-12 pr-4 text-sm text-gray-700 shadow-sm ring-1 ring-gray-200 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-shadow"
             placeholder="Search students, classes, homework, doubts..."
           />
         </div>
 
-        <div className="mt-5 grid grid-cols-3 rounded-[30px] bg-white px-4 py-6 shadow-lg shadow-blue-100">
-          <StatCell icon={Users} value={dashboard.stats.students} label="Students" />
-          <StatCell icon={Calendar} value={dashboard.stats.upcomingClasses} label="Live Class" bordered />
-          <StatCell icon={MessageSquare} value={dashboard.stats.pendingDoubts} label="Pending" />
+        {/* Stats Row */}
+        <div className="grid grid-cols-3 gap-3 md:gap-4 lg:max-w-2xl">
+          <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-white p-4 md:p-5 shadow-sm ring-1 ring-gray-100">
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-orange-500" />
+              <span className="text-2xl font-bold text-gray-900 md:text-3xl">{dashboard.stats.students}</span>
+            </div>
+            <span className="text-[11px] font-medium uppercase tracking-wider text-gray-400">Students</span>
+          </div>
+          <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-white p-4 md:p-5 shadow-sm ring-1 ring-gray-100">
+            <div className="flex items-center gap-2">
+              <Video className="h-5 w-5 text-blue-500" />
+              <span className="text-2xl font-bold text-gray-900 md:text-3xl">{dashboard.stats.upcomingClasses}</span>
+            </div>
+            <span className="text-[11px] font-medium uppercase tracking-wider text-gray-400">Live Class</span>
+          </div>
+          <div className="flex flex-col items-center gap-1.5 rounded-2xl bg-white p-4 md:p-5 shadow-sm ring-1 ring-gray-100">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-green-500" />
+              <span className="text-2xl font-bold text-gray-900 md:text-3xl">{dashboard.stats.pendingDoubts}</span>
+            </div>
+            <span className="text-[11px] font-medium uppercase tracking-wider text-gray-400">Pending</span>
+          </div>
         </div>
 
-        <h3 className="mt-5 text-2xl font-black text-slate-950">Supervision Quick Access Hub</h3>
-        <div className="mt-3 grid grid-cols-2 gap-3 rounded-[28px]">
-          <button
-            onClick={() => setHubTab("classroom")}
-            className={`h-14 rounded-[24px] text-lg font-black shadow-sm transition ${hubTab === "classroom" ? "bg-blue-600 text-white" : "bg-white text-slate-950"}`}
-          >
-            Classroom
-          </button>
-          <button
-            onClick={() => setHubTab("academics")}
-            className={`h-14 rounded-[24px] text-lg font-black shadow-sm transition ${hubTab === "academics" ? "bg-blue-600 text-white" : "bg-white text-slate-950"}`}
-          >
-            Academics
-          </button>
-        </div>
+        {/* Supervision Quick Access Hub */}
+        <section>
+          <h2 className="text-lg font-bold text-gray-900 md:text-xl">Supervision Quick Access Hub</h2>
+          <div className="mt-3 flex gap-2 max-w-md">
+            <button
+              onClick={() => setHubTab("classroom")}
+              className={`flex-1 rounded-full py-2.5 text-sm font-semibold transition-all ${hubTab === "classroom" ? "bg-blue-600 text-white shadow-md shadow-blue-200" : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50"}`}
+            >
+              Classroom
+            </button>
+            <button
+              onClick={() => setHubTab("academics")}
+              className={`flex-1 rounded-full py-2.5 text-sm font-semibold transition-all ${hubTab === "academics" ? "bg-blue-600 text-white shadow-md shadow-blue-200" : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50"}`}
+            >
+              Academics
+            </button>
+          </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-4">
-          {hubTab === "classroom" ? (
-            <>
-              <HubCard icon={Users} badge={`${dashboard.stats.students} Students`} title="My Students" subtitle={studentPreview ? `${studentPreview} +${Math.max(0, dashboard.stats.students - 3)}` : "No students linked"} />
-              <HubCard icon={Calendar} badge="Attendance Page" title="Attendance Log" subtitle="Mark class status" />
-              <HubCard icon={Video} badge="Recorded Library" title="Upload Recorded Video" subtitle="Publish to Class Library" />
-              <HubCard icon={PlayCircle} badge="Live Manager" title="Live Class Console" subtitle="Manage pre-scheduled streams" />
-            </>
-          ) : (
-            <>
-              <HubCard icon={TrendingUp} badge="Visual Page" title="Class Progress" subtitle="Syllabus indexes" />
-              <HubCard icon={CheckCircle2} badge="Worksheets Page" title="Assign Homework" subtitle="Upload student quests" />
-              <HubCard icon={ClipboardList} badge="Submissions" title="Homework Submissions" subtitle="View & grade uploads" />
-              <HubCard icon={FileText} badge="Resource Page" title="Upload Notes" subtitle="Chapter PDFs" />
-              <HubCard icon={Gamepad2} badge="MCQ Injector" title="Arcade & Quiz Console" subtitle="Preview & manage 4 games" />
-              <HubCard icon={Rocket} badge="Superpower Hub" title="Future Skills Planner" subtitle="Classroom lesson manuals" />
-            </>
+          {/* Cards Grid — 2 cols on mobile, 3 on tablet, 4 on desktop */}
+          <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+            {hubTab === "classroom" ? (
+              <>
+                <HubCard icon={Users} badge={`${dashboard.stats.students} Students`} title="My Students" subtitle={studentPreview ? `${studentPreview} +${Math.max(0, dashboard.stats.students - 3)}` : "No students linked"} />
+                <HubCard icon={Calendar} badge="Attendance Page" title="Attendance Log" subtitle="Mark class status" />
+                <HubCard icon={Video} badge="Recorded Library" title="Upload Recorded Video" subtitle="Publish to Class Library" />
+                <HubCard icon={PlayCircle} badge="Live Manager" title="Live Class Console" subtitle="Manage pre-scheduled streams" />
+              </>
+            ) : (
+              <>
+                <HubCard icon={TrendingUp} badge="Visual Page" title="Class Progress" subtitle="Syllabus indexes" />
+                <HubCard icon={CheckCircle2} badge="Worksheets Page" title="Assign Homework" subtitle="Upload student quests" />
+                <HubCard icon={ClipboardList} badge="Submissions" title="Homework Submissions" subtitle="View & grade uploads" />
+                <HubCard icon={FileText} badge="Resource Page" title="Upload Notes" subtitle="Chapter PDFs" />
+                <HubCard icon={Gamepad2} badge="MCQ Injector" title="Arcade & Quiz Console" subtitle="Preview & manage 4 games" />
+                <HubCard icon={Rocket} badge="Superpower Hub" title="Future Skills Planner" subtitle="Classroom lesson manuals" />
+              </>
+            )}
+          </div>
+
+          {hubTab === "academics" && (
+            <TeacherActionForm
+              mode={actionMode}
+              setMode={setActionMode}
+              form={form}
+              setForm={setForm}
+              classOptions={classOptions}
+              submitting={submitting}
+              onSubmit={onSubmitAction}
+              status={status}
+            />
           )}
-        </div>
-
-        {hubTab === "academics" && (
-          <TeacherActionForm
-            mode={actionMode}
-            setMode={setActionMode}
-            form={form}
-            setForm={setForm}
-            classOptions={classOptions}
-            submitting={submitting}
-            onSubmit={onSubmitAction}
-            status={status}
-          />
-        )}
-      </section>
-
-      <button
-        onClick={() => setActiveView("doubts")}
-        className="fixed bottom-24 right-[max(1.75rem,calc((100vw-560px)/2+1.75rem))] z-20 flex h-[78px] items-center gap-3 rounded-[22px] bg-blue-600 px-7 text-xl font-black text-white shadow-xl shadow-blue-300"
-      >
-        <MessageSquare className="h-7 w-7" />
-        Solve Doubts
-        {pendingDoubts.length > 0 && <span className="absolute -top-2 left-10 flex h-7 w-7 items-center justify-center rounded-full bg-rose-500 text-sm">{pendingDoubts.length}</span>}
-      </button>
-    </div>
-  );
-}
-
-function StatCell({ icon: Icon, value, label, bordered = false }: { icon: typeof Users; value: number; label: string; bordered?: boolean }) {
-  return (
-    <div className={`text-center ${bordered ? "border-x border-slate-200" : ""}`}>
-      <div className="flex items-center justify-center gap-2">
-        <Icon className="h-7 w-7 text-blue-600" />
-        <span className="text-3xl font-black text-blue-950">{value}</span>
+        </section>
       </div>
-      <p className="mt-1 text-[12px] font-black uppercase tracking-wider text-slate-600">{label}</p>
+
+      {/* Solve Doubts FAB */}
+      <div className="fixed bottom-24 right-4 z-20 lg:bottom-8 lg:right-8">
+        <button
+          onClick={() => setActiveView("doubts")}
+          className="flex items-center gap-2 rounded-full bg-blue-700 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-300/40 transition-transform hover:scale-105 hover:bg-blue-800"
+        >
+          <MessageSquare className="h-4 w-4" />
+          Solve Doubts
+          {pendingDoubts.length > 0 && <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold">{pendingDoubts.length}</span>}
+        </button>
+      </div>
     </div>
   );
 }
 
 function HubCard({ icon: Icon, badge, title, subtitle }: { icon: typeof Users; badge: string; title: string; subtitle: string }) {
   return (
-    <div className="min-h-[170px] rounded-[28px] bg-white p-5 shadow-lg shadow-blue-100">
-      <div className="flex items-start justify-between">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-blue-100 bg-blue-50">
+    <div className="group flex flex-col items-start rounded-2xl bg-white p-4 md:p-5 text-left shadow-sm ring-1 ring-gray-100 transition-all hover:shadow-md hover:ring-blue-200 hover:-translate-y-0.5">
+      <div className="flex w-full items-start justify-between">
+        <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl bg-blue-50 group-hover:bg-blue-100 transition-colors">
           <Icon className="h-6 w-6 text-blue-600" />
         </div>
-        <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-black text-blue-600">{badge}</span>
+        <span className="rounded-md px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap bg-blue-50 text-blue-600">{badge}</span>
       </div>
-      <div className="mt-12">
-        <h4 className="text-xl font-black leading-tight text-slate-950">{title}</h4>
-        <p className="mt-1 line-clamp-2 text-sm font-semibold text-slate-500">{subtitle}</p>
-      </div>
+      <h4 className="mt-4 text-sm font-bold text-gray-900 md:text-base">{title}</h4>
+      <p className="mt-0.5 text-xs text-gray-500 md:text-sm line-clamp-2">{subtitle}</p>
     </div>
   );
 }
@@ -780,9 +840,9 @@ function SyllabusView({
   items: readonly (readonly [string, string, string])[];
 }) {
   return (
-    <section className="min-h-screen pb-28">
-      <div className="bg-white px-7 py-5">
-        <div className="grid grid-cols-3 gap-5">
+    <section className="min-h-screen pb-28 lg:pb-8">
+      <div className="bg-white px-5 py-5 md:px-8 lg:px-10 border-b border-gray-100">
+        <div className="grid grid-cols-3 gap-3 max-w-md">
           {subjects.map((item) => (
             <button
               key={item}
@@ -802,10 +862,10 @@ function SyllabusView({
 
 function RoadmapView() {
   return (
-    <section className="min-h-screen px-6 pb-28 pt-10">
-      <h1 className="text-2xl font-black leading-tight text-slate-950">Future Skills Curriculum Pathway</h1>
-      <p className="mt-1 text-base font-semibold text-slate-500">Prepare students with essential, modern future-ready career skills.</p>
-      <div className="mt-6">
+    <section className="min-h-screen px-5 pb-28 pt-8 md:px-8 lg:px-10 lg:pb-8">
+      <h1 className="text-xl font-bold leading-tight text-slate-950 md:text-2xl">Future Skills Curriculum Pathway</h1>
+      <p className="mt-1 text-sm font-medium text-slate-500 md:text-base">Prepare students with essential, modern future-ready career skills.</p>
+      <div className="mt-6 max-w-2xl">
         <Timeline items={roadmapItems} />
       </div>
       <FloatingAction icon={Rocket} label="Manage Skills" />
@@ -845,9 +905,9 @@ function LeaderboardView({ students }: { students: TeacherStudent[] }) {
   ] as const;
 
   return (
-    <section className="min-h-screen px-6 pb-28 pt-10">
-      <h1 className="text-[34px] font-black leading-tight text-slate-950">Student Leaderboard Standings</h1>
-      <div className="mt-8 space-y-6">
+    <section className="min-h-screen px-5 pb-28 pt-8 md:px-8 lg:px-10 lg:pb-8">
+      <h1 className="text-xl font-bold leading-tight text-slate-950 md:text-2xl">Student Leaderboard Standings</h1>
+      <div className="mt-6 grid gap-5 md:grid-cols-2 max-w-4xl">
         {arenas.map(([title, color, arenaNames]) => (
           <LeaderboardCard key={title} title={title} color={color} names={[...arenaNames]} />
         ))}
@@ -905,16 +965,16 @@ function DoubtsView({
   const visible = filter === "pending" ? pendingDoubts : filter === "solved" ? solvedDoubts : doubts;
 
   return (
-    <section className="min-h-screen bg-[linear-gradient(180deg,#f4f8ff_0%,#e9eeff_56%,#fff2f8_100%)] pb-12">
-      <div className="flex h-[88px] items-center gap-5 bg-white px-7">
-        <button onClick={() => setActiveView("home")} className="rounded-full p-1">
-          <ArrowLeft className="h-9 w-9 text-slate-950" />
+    <section className="min-h-screen pb-12">
+      <div className="flex h-[64px] items-center gap-4 bg-white px-5 md:px-8 lg:px-10 border-b border-gray-100">
+        <button onClick={() => setActiveView("home")} className="rounded-full p-1 lg:hidden">
+          <ArrowLeft className="h-6 w-6 text-slate-950" />
         </button>
-        <h1 className="text-[26px] font-black text-slate-950">Student Doubts Solver</h1>
+        <h1 className="text-xl font-bold text-slate-950">Student Doubts Solver</h1>
       </div>
 
-      <div className="px-6 py-5">
-        <div className="grid grid-cols-3 rounded-[24px] bg-white/75 p-2 shadow-sm">
+      <div className="px-5 py-5 md:px-8 lg:px-10 max-w-4xl">
+        <div className="grid grid-cols-3 rounded-2xl bg-white/75 p-2 shadow-sm ring-1 ring-gray-100">
           <DoubtTab active={filter === "all"} label="All Doubts" count={doubts.length} onClick={() => setFilter("all")} />
           <DoubtTab active={filter === "pending"} label="Pending" count={pendingDoubts.length} dot onClick={() => setFilter("pending")} />
           <DoubtTab active={filter === "solved"} label="Solved" count={solvedDoubts.length} onClick={() => setFilter("solved")} />
@@ -1029,8 +1089,8 @@ function DoubtCard({
 
 function FloatingAction({ icon: Icon, label }: { icon: typeof Plus; label: string }) {
   return (
-    <button className="fixed bottom-24 right-[max(1.5rem,calc((100vw-560px)/2+1.5rem))] z-20 flex h-[76px] items-center gap-4 rounded-[22px] bg-blue-600 px-7 text-xl font-black text-white shadow-xl shadow-blue-300">
-      <Icon className="h-7 w-7" />
+    <button className="fixed bottom-24 right-4 z-20 lg:bottom-8 lg:right-8 flex items-center gap-2 rounded-full bg-blue-700 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-300/40 transition-transform hover:scale-105 hover:bg-blue-800">
+      <Icon className="h-5 w-5" />
       {label}
     </button>
   );
@@ -1038,16 +1098,18 @@ function FloatingAction({ icon: Icon, label }: { icon: typeof Plus; label: strin
 
 function BottomNav({ activeView, setActiveView }: { activeView: ActiveView; setActiveView: (view: ActiveView) => void }) {
   return (
-    <nav className="fixed bottom-0 left-1/2 z-30 grid h-[86px] w-full max-w-[560px] -translate-x-1/2 grid-cols-4 border-t border-slate-100 bg-white">
-      {navItems.map((item) => {
-        const active = activeView === item.id;
-        return (
-          <button key={item.id} onClick={() => setActiveView(item.id)} className={`flex flex-col items-center justify-center gap-1 text-sm font-black ${active ? "text-blue-600" : "text-slate-500"}`}>
-            <item.icon className={`h-7 w-7 ${active ? "fill-blue-50" : ""}`} />
-            <span>{item.label}</span>
-          </button>
-        );
-      })}
+    <nav className="fixed bottom-0 left-0 right-0 z-30 border-t border-gray-100 bg-white/95 backdrop-blur-md lg:hidden">
+      <div className="flex items-center justify-around py-2.5 px-2">
+        {navItems.map((item) => {
+          const active = activeView === item.id;
+          return (
+            <button key={item.id} onClick={() => setActiveView(item.id)} className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors ${active ? "text-blue-600" : "text-gray-400"}`}>
+              <item.icon className="h-5 w-5" />
+              <span className="text-[10px] font-medium">{item.label}</span>
+            </button>
+          );
+        })}
+      </div>
     </nav>
   );
 }
