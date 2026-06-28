@@ -81,10 +81,17 @@ export default function NotesLibrary({ notes }: Props) {
                   <p className="text-[10px] font-semibold text-slate-400">{note.uploadDate}</p>
                   <p className="text-[10px] font-semibold text-slate-400">{note.size}</p>
                 </div>
-                <button className="flex items-center gap-1.5 rounded-lg bg-slate-950 px-3 py-1.5 text-[11px] font-black text-white transition hover:bg-blue-700">
-                  <Download className="h-3 w-3" />
-                  Download
-                </button>
+                {note.url ? (
+                  <a href={note.url} download={note.fileName || true} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg bg-slate-950 px-3 py-1.5 text-[11px] font-black text-white transition hover:bg-blue-700">
+                    <Download className="h-3 w-3" />
+                    Download
+                  </a>
+                ) : (
+                  <span className="flex items-center gap-1.5 rounded-lg bg-slate-200 px-3 py-1.5 text-[11px] font-black text-slate-500">
+                    <Download className="h-3 w-3" />
+                    No file
+                  </span>
+                )}
               </div>
             </motion.div>
           );

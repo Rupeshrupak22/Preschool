@@ -1270,10 +1270,10 @@ async function getTeacherTargetStudents(
   const params: unknown[] = [teacher.schoolId, teacher.schoolName, teacher.schoolName];
   let classClause = "";
   if (classFilter) {
-    classClause = "AND (class_level = ? OR class_name = ?)";
+    classClause = "AND (LOWER(class_level) = LOWER(?) OR LOWER(class_name) = LOWER(?))";
     params.push(classFilter, classFilter);
   } else if (teacher.assignedClasses.length) {
-    classClause = `AND (class_level IN (${teacher.assignedClasses.map(() => "?").join(", ")}) OR class_name IN (${teacher.assignedClasses.map(() => "?").join(", ")}))`;
+    classClause = `AND (LOWER(class_level) IN (${teacher.assignedClasses.map(() => "LOWER(?)").join(", ")}) OR LOWER(class_name) IN (${teacher.assignedClasses.map(() => "LOWER(?)").join(", ")}))`;
     params.push(...teacher.assignedClasses, ...teacher.assignedClasses);
   }
 
@@ -1321,8 +1321,8 @@ export async function createTeacherHomework(teacherId: string, payload: TeacherC
 
   await pool.query(
     `INSERT INTO teacher_homework
-       (id, teacher_id, school_id, class_level, student_email, subject, title, description, due_date, priority)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (id, teacher_id, school_id, class_level, student_email, subject, title, description, due_date, priority, file_name, file_size, url)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       homeworkId,
       teacher.id,
@@ -1334,6 +1334,9 @@ export async function createTeacherHomework(teacherId: string, payload: TeacherC
       payload.description || null,
       payload.dueDate || null,
       priorityValue(payload.priority),
+      payload.fileName || null,
+      payload.fileSize || null,
+      payload.url || null,
     ]
   );
 
@@ -1493,7 +1496,7 @@ export async function getTeacherDashboard(teacherId: string) {
   const schoolId = teacher.schoolId;
   const classFilters = teacher.assignedClasses;
   const classClause = classFilters.length
-    ? ` AND (class_level IN (${classFilters.map(() => "?").join(", ")}) OR class_name IN (${classFilters.map(() => "?").join(", ")}))`
+    ? ` AND (LOWER(class_level) IN (${classFilters.map(() => "LOWER(?)").join(", ")}) OR LOWER(class_name) IN (${classFilters.map(() => "LOWER(?)").join(", ")}))`
     : "";
   const classParams = classFilters.length ? [...classFilters, ...classFilters] : [];
 
@@ -2086,7 +2089,7 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
            OR (
              h.student_email IS NULL
              AND (h.school_id = ? OR TRIM(COALESCE(t.school_name, '')) = ?)
-             AND (h.class_level IS NULL OR h.class_level = '' OR h.class_level = ?)
+             AND (h.class_level IS NULL OR h.class_level = '' OR LOWER(h.class_level) = LOWER(?))
            )
          )
        ORDER BY h.created_at DESC
@@ -2103,7 +2106,7 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
            OR (
              n.student_email IS NULL
              AND (n.school_id = ? OR TRIM(COALESCE(t.school_name, '')) = ?)
-             AND (n.class_level IS NULL OR n.class_level = '' OR n.class_level = ?)
+             AND (n.class_level IS NULL OR n.class_level = '' OR LOWER(n.class_level) = LOWER(?))
            )
          )
        ORDER BY n.created_at DESC
@@ -2188,6 +2191,9 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
     status: statusForDueDate(row.due_date),
     priority: priorityValue(row.priority),
     teacher: row.teacher_name ? String(row.teacher_name) : undefined,
+    fileName: row.file_name ? String(row.file_name) : undefined,
+    fileSize: row.file_size ? String(row.file_size) : undefined,
+    url: row.url ? String(row.url) : undefined,
   }));
 
   const notesItems = noteRows[0].map<NoteItem>((row) => ({
@@ -2201,6 +2207,7 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
     bookmarked: false,
     teacher: row.teacher_name ? String(row.teacher_name) : undefined,
     fileName: row.file_name ? String(row.file_name) : undefined,
+    url: row.url ? String(row.url) : undefined,
   }));
 
   const doubtItems = doubtRows[0].map<StudentDoubt>((row) => ({

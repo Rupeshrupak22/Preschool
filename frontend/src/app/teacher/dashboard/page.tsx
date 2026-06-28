@@ -33,6 +33,17 @@ import {
 import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
 import { useSessionHeartbeat } from "@/lib/use-session-heartbeat";
 import { MessageSystem } from "@/components/MessageSystem";
+import {
+  RecordedVideoView,
+  LiveClassView,
+  ClassProgressView,
+  AssignHomeworkView,
+  HomeworkSubmissionsView,
+  UploadNotesView,
+  QuizConsoleView,
+  SkillsPlannerView,
+  type ActiveView,
+} from "./views";
 
 type TeacherStudent = {
   id: string;
@@ -112,7 +123,6 @@ type TeacherDashboard = {
   notifications: Array<Record<string, string | number | null>>;
 };
 
-type ActiveView = "home" | "syllabus" | "roadmap" | "leaderboard" | "doubts";
 type HubTab = "classroom" | "academics";
 type ActionMode = "homework" | "note";
 
@@ -388,6 +398,12 @@ export default function TeacherDashboardPage() {
               <MessageSquare className="h-5 w-5" /> Doubts
               {pendingDoubts.length > 0 && <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">{pendingDoubts.length}</span>}
             </button>
+            <button onClick={() => setActiveView("students")} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${activeView === "students" ? "bg-blue-50 text-blue-700 font-semibold" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"}`}>
+              <Users className="h-5 w-5" /> My Students
+            </button>
+            <button onClick={() => setActiveView("attendance")} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${activeView === "attendance" ? "bg-blue-50 text-blue-700 font-semibold" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"}`}>
+              <Calendar className="h-5 w-5" /> Attendance
+            </button>
           </nav>
           <div className="border-t border-gray-100 px-4 py-4">
             <div className="flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-3">
@@ -442,6 +458,75 @@ export default function TeacherDashboardPage() {
           {activeView === "roadmap" && <RoadmapView />}
 
           {activeView === "leaderboard" && <LeaderboardView students={filteredStudents} />}
+
+          {activeView === "students" && (
+            <StudentsView
+              students={filteredStudents}
+              classBreakdown={dashboard.classBreakdown}
+              query={query}
+              setQuery={setQuery}
+              setActiveView={setActiveView}
+            />
+          )}
+
+          {activeView === "attendance" && (
+            <AttendanceView
+              students={dashboard.students}
+              classBreakdown={dashboard.classBreakdown}
+              setActiveView={setActiveView}
+            />
+          )}
+
+          {activeView === "recorded-video" && (
+            <RecordedVideoView setActiveView={setActiveView} />
+          )}
+
+          {activeView === "live-class" && (
+            <LiveClassView setActiveView={setActiveView} schedule={dashboard.schedule} />
+          )}
+
+          {activeView === "class-progress" && (
+            <ClassProgressView setActiveView={setActiveView} classBreakdown={dashboard.classBreakdown} students={dashboard.students} />
+          )}
+
+          {activeView === "assign-homework" && (
+            <AssignHomeworkView
+              setActiveView={setActiveView}
+              form={form}
+              setForm={(patch) => setForm((current) => ({ ...current, ...patch }))}
+              classOptions={classOptions}
+              submitting={submitting}
+              onSubmit={submitTeacherAction}
+              status={status}
+              setActionMode={setActionMode}
+            />
+          )}
+
+          {activeView === "homework-submissions" && (
+            <HomeworkSubmissionsView setActiveView={setActiveView} homework={dashboard.homework} />
+          )}
+
+          {activeView === "upload-notes" && (
+            <UploadNotesView
+              setActiveView={setActiveView}
+              notes={dashboard.notes}
+              form={form}
+              setForm={(patch) => setForm((current) => ({ ...current, ...patch }))}
+              classOptions={classOptions}
+              submitting={submitting}
+              onSubmit={submitTeacherAction}
+              status={status}
+              setActionMode={setActionMode}
+            />
+          )}
+
+          {activeView === "quiz-console" && (
+            <QuizConsoleView setActiveView={setActiveView} />
+          )}
+
+          {activeView === "skills-planner" && (
+            <SkillsPlannerView setActiveView={setActiveView} />
+          )}
 
           {activeView === "doubts" && (
             <DoubtsView
@@ -700,35 +785,22 @@ function HomeView({
           <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
             {hubTab === "classroom" ? (
               <>
-                <HubCard icon={Users} badge={`${dashboard.stats.students} Students`} title="My Students" subtitle={studentPreview ? `${studentPreview} +${Math.max(0, dashboard.stats.students - 3)}` : "No students linked"} />
-                <HubCard icon={Calendar} badge="Attendance Page" title="Attendance Log" subtitle="Mark class status" />
-                <HubCard icon={Video} badge="Recorded Library" title="Upload Recorded Video" subtitle="Publish to Class Library" />
-                <HubCard icon={PlayCircle} badge="Live Manager" title="Live Class Console" subtitle="Manage pre-scheduled streams" />
+                <HubCard icon={Users} badge={`${dashboard.stats.students} Students`} title="My Students" subtitle={studentPreview ? `${studentPreview} +${Math.max(0, dashboard.stats.students - 3)}` : "No students linked"} onClick={() => setActiveView("students")} />
+                <HubCard icon={Calendar} badge="Attendance Page" title="Attendance Log" subtitle="Mark class status" onClick={() => setActiveView("attendance")} />
+                <HubCard icon={Video} badge="Recorded Library" title="Upload Recorded Video" subtitle="Publish to Class Library" onClick={() => setActiveView("recorded-video")} />
+                <HubCard icon={PlayCircle} badge="Live Manager" title="Live Class Console" subtitle="Manage pre-scheduled streams" onClick={() => setActiveView("live-class")} />
               </>
             ) : (
               <>
-                <HubCard icon={TrendingUp} badge="Visual Page" title="Class Progress" subtitle="Syllabus indexes" />
-                <HubCard icon={CheckCircle2} badge="Worksheets Page" title="Assign Homework" subtitle="Upload student quests" />
-                <HubCard icon={ClipboardList} badge="Submissions" title="Homework Submissions" subtitle="View & grade uploads" />
-                <HubCard icon={FileText} badge="Resource Page" title="Upload Notes" subtitle="Chapter PDFs" />
-                <HubCard icon={Gamepad2} badge="MCQ Injector" title="Arcade & Quiz Console" subtitle="Preview & manage 4 games" />
-                <HubCard icon={Rocket} badge="Superpower Hub" title="Future Skills Planner" subtitle="Classroom lesson manuals" />
+                <HubCard icon={TrendingUp} badge="Visual Page" title="Class Progress" subtitle="Syllabus indexes" onClick={() => setActiveView("class-progress")} />
+                <HubCard icon={CheckCircle2} badge="Worksheets Page" title="Assign Homework" subtitle="Upload student quests" onClick={() => setActiveView("assign-homework")} />
+                <HubCard icon={ClipboardList} badge="Submissions" title="Homework Submissions" subtitle="View & grade uploads" onClick={() => setActiveView("homework-submissions")} />
+                <HubCard icon={FileText} badge="Resource Page" title="Upload Notes" subtitle="Chapter PDFs" onClick={() => setActiveView("upload-notes")} />
+                <HubCard icon={Gamepad2} badge="MCQ Injector" title="Arcade & Quiz Console" subtitle="Preview & manage 4 games" onClick={() => setActiveView("quiz-console")} />
+                <HubCard icon={Rocket} badge="Superpower Hub" title="Future Skills Planner" subtitle="Classroom lesson manuals" onClick={() => setActiveView("skills-planner")} />
               </>
             )}
           </div>
-
-          {hubTab === "academics" && (
-            <TeacherActionForm
-              mode={actionMode}
-              setMode={setActionMode}
-              form={form}
-              setForm={setForm}
-              classOptions={classOptions}
-              submitting={submitting}
-              onSubmit={onSubmitAction}
-              status={status}
-            />
-          )}
         </section>
       </div>
 
@@ -747,9 +819,9 @@ function HomeView({
   );
 }
 
-function HubCard({ icon: Icon, badge, title, subtitle }: { icon: typeof Users; badge: string; title: string; subtitle: string }) {
+function HubCard({ icon: Icon, badge, title, subtitle, onClick }: { icon: typeof Users; badge: string; title: string; subtitle: string; onClick?: () => void }) {
   return (
-    <div className="group flex flex-col items-start rounded-2xl bg-white p-4 md:p-5 text-left shadow-sm ring-1 ring-gray-100 transition-all hover:shadow-md hover:ring-blue-200 hover:-translate-y-0.5">
+    <button onClick={onClick} className="group flex flex-col items-start rounded-2xl bg-white p-4 md:p-5 text-left shadow-sm ring-1 ring-gray-100 transition-all hover:shadow-md hover:ring-blue-200 hover:-translate-y-0.5 cursor-pointer">
       <div className="flex w-full items-start justify-between">
         <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl bg-blue-50 group-hover:bg-blue-100 transition-colors">
           <Icon className="h-6 w-6 text-blue-600" />
@@ -758,7 +830,7 @@ function HubCard({ icon: Icon, badge, title, subtitle }: { icon: typeof Users; b
       </div>
       <h4 className="mt-4 text-sm font-bold text-gray-900 md:text-base">{title}</h4>
       <p className="mt-0.5 text-xs text-gray-500 md:text-sm line-clamp-2">{subtitle}</p>
-    </div>
+    </button>
   );
 }
 
@@ -967,7 +1039,7 @@ function DoubtsView({
   return (
     <section className="min-h-screen pb-12">
       <div className="flex h-[64px] items-center gap-4 bg-white px-5 md:px-8 lg:px-10 border-b border-gray-100">
-        <button onClick={() => setActiveView("home")} className="rounded-full p-1 lg:hidden">
+        <button onClick={() => setActiveView("home")} className="rounded-full p-1">
           <ArrowLeft className="h-6 w-6 text-slate-950" />
         </button>
         <h1 className="text-xl font-bold text-slate-950">Student Doubts Solver</h1>
@@ -1084,6 +1156,275 @@ function DoubtCard({
         </div>
       )}
     </article>
+  );
+}
+
+function StudentsView({
+  students,
+  classBreakdown,
+  query,
+  setQuery,
+  setActiveView,
+}: {
+  students: TeacherStudent[];
+  classBreakdown: Array<{ classLevel: string; total: number }>;
+  query: string;
+  setQuery: (value: string) => void;
+  setActiveView: (view: ActiveView) => void;
+}) {
+  const [filterClass, setFilterClass] = useState("");
+  const filtered = filterClass
+    ? students.filter((s) => cleanText(s.classLevel).toLowerCase() === filterClass.toLowerCase())
+    : students;
+
+  // Compute per-class counts from actual students (case-insensitive)
+  const classCounts = classBreakdown.map((item) => ({
+    ...item,
+    count: students.filter((s) => cleanText(s.classLevel).toLowerCase() === item.classLevel.toLowerCase()).length,
+  }));
+
+  return (
+    <section className="min-h-screen pb-28 lg:pb-8">
+      <div className="flex h-[64px] items-center gap-4 bg-white px-5 md:px-8 lg:px-10 border-b border-gray-100">
+        <button onClick={() => setActiveView("home")} className="rounded-full p-1">
+          <ArrowLeft className="h-6 w-6 text-slate-950" />
+        </button>
+        <h1 className="text-xl font-bold text-slate-950">My Students</h1>
+        <span className="ml-auto rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">{students.length} total</span>
+      </div>
+
+      <div className="px-5 py-5 md:px-8 lg:px-10 space-y-5 max-w-5xl">
+        {/* Class breakdown chips */}
+        {classCounts.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setFilterClass("")}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${!filterClass ? "bg-blue-600 text-white" : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50"}`}
+            >
+              All ({students.length})
+            </button>
+            {classCounts.map((item) => (
+              <button
+                key={item.classLevel}
+                onClick={() => setFilterClass(item.classLevel)}
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${filterClass.toLowerCase() === item.classLevel.toLowerCase() ? "bg-blue-600 text-white" : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50"}`}
+              >
+                {item.classLevel} ({item.count})
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Search */}
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="h-10 w-full rounded-xl border-0 bg-white pl-10 pr-4 text-sm text-gray-700 shadow-sm ring-1 ring-gray-200 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            placeholder="Search by name, email, phone..."
+          />
+        </div>
+
+        {/* Student List */}
+        {filtered.length === 0 ? (
+          <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-100">
+            <Users className="mx-auto h-10 w-10 text-gray-300" />
+            <p className="mt-3 text-sm font-semibold text-gray-500">No students found</p>
+            <p className="mt-1 text-xs text-gray-400">Students assigned to your classes will appear here</p>
+          </div>
+        ) : (
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((student) => (
+              <div key={student.id} className="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-100 transition hover:shadow-md">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+                  {initials(student.name)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate">{student.name || "Student"}</p>
+                  <p className="text-xs text-gray-500 truncate">{student.email || "No email"}</p>
+                  <div className="mt-1 flex items-center gap-2">
+                    {student.classLevel && (
+                      <span className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600">{student.classLevel}</span>
+                    )}
+                    {student.phone && (
+                      <span className="text-[10px] text-gray-400">{student.phone}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function AttendanceView({
+  students,
+  classBreakdown,
+  setActiveView,
+}: {
+  students: TeacherStudent[];
+  classBreakdown: Array<{ classLevel: string; total: number }>;
+  setActiveView: (view: ActiveView) => void;
+}) {
+  const [filterClass, setFilterClass] = useState("");
+  const [attendance, setAttendance] = useState<Record<string, "present" | "absent" | "late">>({});
+  const [saved, setSaved] = useState(false);
+  const today = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+  const filtered = filterClass
+    ? students.filter((s) => cleanText(s.classLevel).toLowerCase() === filterClass.toLowerCase())
+    : students;
+
+  function markAll(status: "present" | "absent") {
+    const newAttendance: Record<string, "present" | "absent" | "late"> = {};
+    filtered.forEach((s) => { newAttendance[s.id] = status; });
+    setAttendance((prev) => ({ ...prev, ...newAttendance }));
+  }
+
+  function markStudent(id: string, status: "present" | "absent" | "late") {
+    setAttendance((prev) => ({ ...prev, [id]: status }));
+  }
+
+  async function saveAttendance() {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  }
+
+  const presentCount = filtered.filter((s) => attendance[s.id] === "present").length;
+  const absentCount = filtered.filter((s) => attendance[s.id] === "absent").length;
+  const lateCount = filtered.filter((s) => attendance[s.id] === "late").length;
+  const unmarkedCount = filtered.filter((s) => !attendance[s.id]).length;
+
+  return (
+    <section className="min-h-screen pb-28 lg:pb-8">
+      <div className="flex h-[64px] items-center gap-4 bg-white px-5 md:px-8 lg:px-10 border-b border-gray-100">
+        <button onClick={() => setActiveView("home")} className="rounded-full p-1">
+          <ArrowLeft className="h-6 w-6 text-slate-950" />
+        </button>
+        <h1 className="text-xl font-bold text-slate-950">Attendance Log</h1>
+      </div>
+
+      <div className="px-5 py-5 md:px-8 lg:px-10 space-y-5 max-w-4xl">
+        {/* Date */}
+        <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Today</p>
+          <p className="mt-1 text-base font-bold text-gray-900">{today}</p>
+        </div>
+
+        {/* Class filter */}
+        {classBreakdown.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setFilterClass("")}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${!filterClass ? "bg-blue-600 text-white" : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50"}`}
+            >
+              All Classes
+            </button>
+            {classBreakdown.map((item) => (
+              <button
+                key={item.classLevel}
+                onClick={() => setFilterClass(item.classLevel)}
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${filterClass.toLowerCase() === item.classLevel.toLowerCase() ? "bg-blue-600 text-white" : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50"}`}
+              >
+                {item.classLevel}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Quick actions */}
+        <div className="flex gap-2">
+          <button onClick={() => markAll("present")} className="rounded-lg bg-green-50 px-3 py-2 text-xs font-semibold text-green-700 ring-1 ring-green-200 hover:bg-green-100 transition">
+            Mark All Present
+          </button>
+          <button onClick={() => markAll("absent")} className="rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 ring-1 ring-red-200 hover:bg-red-100 transition">
+            Mark All Absent
+          </button>
+        </div>
+
+        {/* Stats bar */}
+        <div className="grid grid-cols-4 gap-2">
+          <div className="rounded-lg bg-green-50 p-3 text-center ring-1 ring-green-100">
+            <p className="text-lg font-bold text-green-700">{presentCount}</p>
+            <p className="text-[10px] font-medium text-green-600">Present</p>
+          </div>
+          <div className="rounded-lg bg-red-50 p-3 text-center ring-1 ring-red-100">
+            <p className="text-lg font-bold text-red-700">{absentCount}</p>
+            <p className="text-[10px] font-medium text-red-600">Absent</p>
+          </div>
+          <div className="rounded-lg bg-yellow-50 p-3 text-center ring-1 ring-yellow-100">
+            <p className="text-lg font-bold text-yellow-700">{lateCount}</p>
+            <p className="text-[10px] font-medium text-yellow-600">Late</p>
+          </div>
+          <div className="rounded-lg bg-gray-50 p-3 text-center ring-1 ring-gray-100">
+            <p className="text-lg font-bold text-gray-700">{unmarkedCount}</p>
+            <p className="text-[10px] font-medium text-gray-500">Unmarked</p>
+          </div>
+        </div>
+
+        {/* Student attendance list */}
+        {filtered.length === 0 ? (
+          <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-100">
+            <Users className="mx-auto h-10 w-10 text-gray-300" />
+            <p className="mt-3 text-sm font-semibold text-gray-500">No students to mark</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map((student) => {
+              const status = attendance[student.id];
+              return (
+                <div key={student.id} className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+                      {initials(student.name)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 truncate">{student.name || "Student"}</p>
+                      <p className="text-[11px] text-gray-500">{student.classLevel || "—"}</p>
+                    </div>
+                  </div>
+                  {/* 3 separate buttons: Present, Absent, Late */}
+                  <div className="mt-3 grid grid-cols-3 gap-2">
+                    <button
+                      onClick={() => markStudent(student.id, "present")}
+                      className={`rounded-lg py-2 text-xs font-bold transition ${status === "present" ? "bg-green-500 text-white shadow-sm" : "bg-green-50 text-green-700 ring-1 ring-green-200 hover:bg-green-100"}`}
+                    >
+                      Present
+                    </button>
+                    <button
+                      onClick={() => markStudent(student.id, "absent")}
+                      className={`rounded-lg py-2 text-xs font-bold transition ${status === "absent" ? "bg-red-500 text-white shadow-sm" : "bg-red-50 text-red-700 ring-1 ring-red-200 hover:bg-red-100"}`}
+                    >
+                      Absent
+                    </button>
+                    <button
+                      onClick={() => markStudent(student.id, "late")}
+                      className={`rounded-lg py-2 text-xs font-bold transition ${status === "late" ? "bg-yellow-500 text-white shadow-sm" : "bg-yellow-50 text-yellow-700 ring-1 ring-yellow-200 hover:bg-yellow-100"}`}
+                    >
+                      Late
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Save button */}
+        {filtered.length > 0 && (
+          <button
+            onClick={saveAttendance}
+            className="w-full rounded-xl bg-blue-600 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 disabled:opacity-60"
+          >
+            {saved ? "✓ Attendance Saved" : "Save Attendance"}
+          </button>
+        )}
+      </div>
+    </section>
   );
 }
 

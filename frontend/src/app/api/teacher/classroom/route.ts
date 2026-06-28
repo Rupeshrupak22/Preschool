@@ -25,6 +25,9 @@ export async function POST(request: Request) {
       studentEmail: payload.studentEmail ? String(payload.studentEmail) : undefined,
       dueDate: payload.dueDate ? String(payload.dueDate) : undefined,
       priority: payload.priority,
+      fileName: payload.fileName ? String(payload.fileName) : undefined,
+      fileSize: payload.fileSize ? String(payload.fileSize) : undefined,
+      url: payload.fileUrl ? String(payload.fileUrl) : undefined,
     });
 
     return result
@@ -46,7 +49,7 @@ export async function POST(request: Request) {
       fileName: payload.fileName ? String(payload.fileName) : undefined,
       fileSize: payload.fileSize ? String(payload.fileSize) : undefined,
       noteType: payload.noteType,
-      url: payload.url ? String(payload.url) : undefined,
+      url: payload.fileUrl ? String(payload.fileUrl) : (payload.url ? String(payload.url) : undefined),
     });
 
     return result

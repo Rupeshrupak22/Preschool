@@ -80,6 +80,9 @@ export interface HomeworkItem {
   status: "pending" | "submitted" | "overdue";
   priority: "high" | "medium" | "low";
   teacher?: string;
+  fileName?: string;
+  fileSize?: string;
+  url?: string;
 }
 
 export interface NoteItem {
@@ -93,6 +96,7 @@ export interface NoteItem {
   bookmarked: boolean;
   teacher?: string;
   fileName?: string;
+  url?: string;
 }
 
 export interface DashboardNotification {

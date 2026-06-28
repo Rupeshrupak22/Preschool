@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle2, Clock, AlertTriangle, Circle } from "lucide-react";
+import { CheckCircle2, Clock, AlertTriangle, Circle, Download } from "lucide-react";
 import type { HomeworkItem } from "@/lib/dashboard/dashboard-data";
 
 interface Props {
@@ -111,6 +111,11 @@ export default function HomeworkSection({ items }: Props) {
                     Due: {hw.dueDate}
                   </span>
                 </div>
+                {hw.url && (
+                  <a href={hw.url} download={hw.fileName || true} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1 rounded-md bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700 hover:bg-blue-200 transition">
+                    <Download className="h-3 w-3" /> {hw.fileName || "Download File"}
+                  </a>
+                )}
               </div>
 
               {/* Status Badge */}
