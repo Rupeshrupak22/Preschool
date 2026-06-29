@@ -14,6 +14,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
   }
 
+  const contentType = request.headers.get("content-type") || "";
+
+  // Handle multipart form data (direct avatar upload)
+  if (contentType.includes("multipart/form-data")) {
+    const formData = await request.formData();
+    const file = formData.get("file") as File | null;
+    if (!file || file.size === 0) {
+      return NextResponse.json({ error: "No file provided." }, { status: 400 });
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      return NextResponse.json({ error: "File too large. Max 5MB for avatar." }, { status: 400 });
+    }
+    // Convert to base64 data URL and store in DB
+    const bytes = await file.arrayBuffer();
+    const base64 = Buffer.from(bytes).toString("base64");
+    const dataUrl = `data:${file.type};base64,${base64}`;
+
+    await pool.query(
+      "UPDATE users SET avatar_url = ?, updated_at = NOW() WHERE id = ? OR email = ?",
+      [dataUrl, user.id, user.email]
+    );
+    return NextResponse.json({ ok: true, avatarUrl: dataUrl });
+  }
+
+  // Handle JSON body
   const body = await request.json().catch(() => ({}));
   const action = body.action;
 
@@ -35,11 +60,12 @@ export async function POST(request: Request) {
 
   if (action === "avatar") {
     const { avatarUrl } = body;
+    if (!avatarUrl) return NextResponse.json({ error: "avatarUrl required." }, { status: 400 });
     await pool.query(
       "UPDATE users SET avatar_url = ?, updated_at = NOW() WHERE id = ? OR email = ?",
       [avatarUrl, user.id, user.email]
     );
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, avatarUrl });
   }
 
   if (action === "notifications") {

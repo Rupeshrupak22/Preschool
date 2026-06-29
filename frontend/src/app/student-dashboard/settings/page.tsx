@@ -85,18 +85,17 @@ export default function SettingsPage() {
   async function confirmAvatarUpload() {
     if (!previewFile) return;
     setAvatarUploading(true);
+    // Upload directly to settings API as multipart (stores as base64 in DB)
     const fd = new FormData();
     fd.append("file", previewFile);
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
+    const res = await fetch("/api/student-dashboard/settings", { method: "POST", body: fd });
     const data = await res.json().catch(() => ({}));
-    if (res.ok && data.file?.url) {
-      setAvatarUrl(data.file.url);
-      await fetch("/api/student-dashboard/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "avatar", avatarUrl: data.file.url }),
-      });
+    if (res.ok && data.avatarUrl) {
+      setAvatarUrl(data.avatarUrl);
       setStatus("Photo uploaded!");
+      setTimeout(() => setStatus(""), 3000);
+    } else {
+      setStatus("Upload failed. Try a smaller image.");
       setTimeout(() => setStatus(""), 3000);
     }
     setAvatarUploading(false);
@@ -289,7 +288,7 @@ export default function SettingsPage() {
                 <div className="mb-6 flex items-center gap-4">
                   <div className="relative">
                     {avatarUrl ? (
-                      <img src={avatarUrl} alt="Avatar" className="h-20 w-20 rounded-full object-cover border-2 border-blue-200" />
+                      <img src={avatarUrl} alt="Avatar" className="h-20 w-20 rounded-full object-cover border-2 border-blue-200" key={avatarUrl} />
                     ) : (
                       <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-2xl font-black text-white">
                         {name ? name.charAt(0).toUpperCase() : "S"}
@@ -298,7 +297,7 @@ export default function SettingsPage() {
                     {/* Only show camera if no avatar uploaded yet */}
                     {!avatarUrl && (
                       <label className="absolute -bottom-1 -right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition">
-                        <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+                        <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" className="hidden" onChange={handleAvatarUpload} />
                         {avatarUploading ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Camera className="h-3.5 w-3.5" />}
                       </label>
                     )}
