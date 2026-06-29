@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     sid,
     email: user.email,
     role: user.role,
-    ttlSeconds: 15 * 60
+    ttlSeconds: 24 * 60 * 60
   });
 
   await recordLoginEvent({
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 15 * 60
+    maxAge: 24 * 60 * 60
   });
   return response;
 }

@@ -14,16 +14,22 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Fetch submissions for homework assigned by this teacher
-    const [rows] = await pool.query(
-      `SELECT s.id, s.homework_id, s.student_email, s.student_name, s.file_name, s.file_url, s.comment, s.status, s.grade, s.teacher_feedback, s.created_at
-       FROM homework_submissions s
-       INNER JOIN teacher_homework h ON h.id = s.homework_id
-       WHERE h.teacher_id = ?
-       ORDER BY s.created_at DESC
-       LIMIT 100`,
-      [teacher.id]
-    );
+    // Fetch submissions for homework assigned by this teacher (from both web and app tables)
+    const query = `
+      SELECT s.id, s.homework_id, s.student_email, s.student_name, s.file_name, s.file_url, s.comment, s.status, s.grade, s.teacher_feedback, s.created_at
+      FROM homework_submissions s
+      INNER JOIN teacher_homework h ON h.id = s.homework_id
+      WHERE h.teacher_id = ?
+      UNION ALL
+      SELECT s.id, CAST(s.homework_id AS CHAR) as homework_id, s.student_email, s.student_name, s.file_name, s.file_path as file_url, s.student_comment as comment, 'submitted' as status, s.grade, s.teacher_feedback, s.created_at
+      FROM app_homework_submissions s
+      INNER JOIN app_homework h ON h.id = s.homework_id
+      WHERE h.teacher_id = ?
+      ORDER BY created_at DESC
+      LIMIT 100
+    `;
+
+    const [rows] = await pool.query(query, [teacher.id, teacher.id]);
 
     const submissions = (rows as any[]).map((row) => ({
       id: row.id,

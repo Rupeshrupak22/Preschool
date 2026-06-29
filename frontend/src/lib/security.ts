@@ -33,7 +33,7 @@ function jwtSecret() {
 
 export function signToken(payload: AuthPayload) {
   return jwt.sign(payload, jwtSecret(), {
-    expiresIn: "15m",
+    expiresIn: "24h",
     issuer: "adyapan-frontend",
     audience: "adyapan-app",
   });

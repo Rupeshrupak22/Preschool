@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { findUserByEmail, isMysqlConfigured } from "@/lib/db";
+import { findUserByEmail, isMysqlConfigured, refreshActiveSession } from "@/lib/db";
 import { currentUser } from "@/lib/security";
 import { publicUser, store } from "@/lib/store";
 
@@ -8,6 +8,11 @@ export async function GET(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
+
+  // Refresh session TTL (sliding window) — keeps user logged in while active
+  if (user.sid) {
+    refreshActiveSession(user.id, user.sid).catch(() => {});
   }
 
   if (isMysqlConfigured()) {

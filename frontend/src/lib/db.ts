@@ -916,7 +916,7 @@ export async function createActiveSession(data: {
   );
 }
 
-export async function validateActiveSession(userId?: string, sid?: string, ttlSeconds = 15 * 60) {
+export async function validateActiveSession(userId?: string, sid?: string, ttlSeconds = 24 * 60 * 60) {
   if (!userId || !sid) return false;
   const pool = await connectDb();
   if (!pool) return false;
@@ -939,6 +939,15 @@ export async function clearActiveSessions(userId: string) {
   const pool = await connectDb();
   if (!pool) return;
   await pool.query("DELETE FROM active_sessions WHERE user_id = ?", [userId]);
+}
+
+export async function refreshActiveSession(userId: string, sid: string) {
+  const pool = await connectDb();
+  if (!pool) return;
+  await pool.query(
+    "UPDATE active_sessions SET last_seen_at = NOW(), expires_at = DATE_ADD(NOW(), INTERVAL 86400 SECOND) WHERE user_id = ? AND sid = ?",
+    [userId, sid]
+  );
 }
 
 export async function findPrincipalByEmail(email: string) {
