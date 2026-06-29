@@ -1547,12 +1547,12 @@ export async function getTeacherDashboard(teacherId: string) {
 
   const [studentRows, loginRows, sessionRows, certificateRows, homeworkRows, noteRows, doubtRows, notificationRows] = await Promise.all([
     pool.query<RowDataPacket[]>(
-      `SELECT s.id, s.name, s.email, s.phone, s.class_level, s.class_name, s.school_name, s.school, s.signup_source, s.status, s.created_at, u.avatar_url
-       FROM students s
-       LEFT JOIN users u ON u.email = s.email
-       WHERE ${schoolWhereClause.replace(/school_id/g, 's.school_id').replace(/school_name/g, 's.school_name').replace(/school\)/g, 's.school)')}
-       ${classClause.replace(/class_level/g, 's.class_level').replace(/class_name/g, 's.class_name')}
-       ORDER BY s.class_level ASC, s.name ASC
+      `SELECT id, name, email, phone, class_level, class_name, school_name, school, signup_source, status, created_at,
+              (SELECT avatar_url FROM users WHERE users.email = students.email LIMIT 1) AS avatar_url
+       FROM students
+       WHERE ${schoolWhereClause}
+       ${classClause}
+       ORDER BY class_level ASC, name ASC
        LIMIT 300`,
       [...schoolParams, ...classParams]
     ),
