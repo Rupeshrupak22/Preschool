@@ -204,7 +204,7 @@ app.post('/api/v1/upload', require('./middleware/auth').authenticate, uploadMidd
     const uniqueName = `${Date.now()}_${safeName}`;
     fs.writeFileSync(path.join(uploadsDir, uniqueName), req.file.buffer);
     const fileUrl = `/uploads/${uniqueName}`;
-    res.json({ success: true, file: { url: fileUrl, name: req.file.originalname, size: `${(req.file.size / (1024 * 1024)).toFixed(1)} MB`, type: req.file.mimetype } });
+    res.json({ success: true, url: fileUrl, file: { url: fileUrl, name: req.file.originalname, size: `${(req.file.size / (1024 * 1024)).toFixed(1)} MB`, type: req.file.mimetype } });
   } catch (err) {
     console.error('Upload error:', err);
     res.status(500).json({ success: false, message: 'Upload failed' });
