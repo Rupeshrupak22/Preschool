@@ -317,21 +317,24 @@ export function AssignHomeworkView({
           <textarea className="min-h-24 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-200" value={form.description} onChange={(e) => setForm({ description: e.target.value })} placeholder="Instructions / description" />
           <button onClick={async () => {
             if (selectedFile) {
+              // Upload to backend server (Render — persistent storage)
               const fd = new FormData();
               fd.append("file", selectedFile);
-              const uploadRes = await fetch("/api/teacher/upload", { method: "POST", body: fd });
-              const uploadData = await uploadRes.json().catch(() => ({}));
-              if (uploadRes.ok && uploadData.file?.url) {
-                setForm({ fileName: uploadData.file.name, fileSize: uploadData.file.size });
-                await fetch("/api/teacher/classroom", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ action: "homework", subject: form.subject, title: form.title, description: form.description, classLevel: form.classLevel, dueDate: form.dueDate, priority: form.priority, fileName: uploadData.file.name, fileSize: uploadData.file.size, fileUrl: uploadData.file.url }),
-                });
-                setSelectedFile(null);
-                onSubmit();
-                return;
-              }
+              try {
+                const uploadRes = await fetch("https://preschool-wzjj.onrender.com/api/v1/upload", { method: "POST", body: fd });
+                const uploadData = await uploadRes.json().catch(() => ({}));
+                if (uploadRes.ok && uploadData.url) {
+                  const fullUrl = uploadData.url.startsWith("http") ? uploadData.url : `https://preschool-wzjj.onrender.com${uploadData.url}`;
+                  await fetch("/api/teacher/classroom", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "homework", subject: form.subject, title: form.title, description: form.description, classLevel: form.classLevel, dueDate: form.dueDate, priority: form.priority, fileName: selectedFile.name, fileSize: `${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB`, fileUrl: fullUrl }),
+                  });
+                  setSelectedFile(null);
+                  onSubmit();
+                  return;
+                }
+              } catch {}
             }
             onSubmit();
           }} disabled={submitting} className="w-full rounded-xl bg-blue-600 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition disabled:opacity-60">
@@ -495,21 +498,19 @@ export function UploadNotesView({
           <textarea className="min-h-20 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-200" value={form.description} onChange={(e) => setForm({ description: e.target.value })} placeholder="Description" />
           <button onClick={async () => {
             if (selectedFile) {
-              const fd = new FormData();
-              fd.append("file", selectedFile);
-              const uploadRes = await fetch("/api/teacher/upload", { method: "POST", body: fd });
-              const uploadData = await uploadRes.json().catch(() => ({}));
-              if (uploadRes.ok && uploadData.file?.url) {
-                setForm({ fileName: uploadData.file.name, fileSize: uploadData.file.size });
+              const reader = new FileReader();
+              reader.onload = async () => {
+                const dataUrl = reader.result as string;
                 await fetch("/api/teacher/classroom", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ action: "note", subject: form.subject, title: form.title, description: form.description, classLevel: form.classLevel, fileName: uploadData.file.name, fileSize: uploadData.file.size, fileUrl: uploadData.file.url }),
+                  body: JSON.stringify({ action: "note", subject: form.subject, title: form.title, description: form.description, classLevel: form.classLevel, fileName: selectedFile.name, fileSize: `${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB`, fileUrl: dataUrl }),
                 });
                 setSelectedFile(null);
                 onSubmit();
-                return;
-              }
+              };
+              reader.readAsDataURL(selectedFile);
+              return;
             }
             onSubmit();
           }} disabled={submitting || !selectedFile} className="w-full rounded-xl bg-blue-600 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition disabled:opacity-40">

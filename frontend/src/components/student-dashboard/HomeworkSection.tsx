@@ -146,9 +146,15 @@ export default function HomeworkSection({ items }: Props) {
                   </span>
                 </div>
                 {hw.url && (
-                  <a href={hw.url} download={hw.fileName || true} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1 rounded-md bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700 hover:bg-blue-200 transition">
-                    <Download className="h-3 w-3" /> {hw.fileName || "Download File"}
-                  </a>
+                  <div className="mt-1">
+                    {hw.url.startsWith("data:image") ? (
+                      <img src={hw.url} alt={hw.fileName || "Attachment"} className="mt-1 max-h-32 rounded-lg border border-blue-200" />
+                    ) : (
+                      <a href={hw.url} download={hw.fileName || true} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-md bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700 hover:bg-blue-200 transition">
+                        <Download className="h-3 w-3" /> {hw.fileName || "Download File"}
+                      </a>
+                    )}
+                  </div>
                 )}
               </div>
 
