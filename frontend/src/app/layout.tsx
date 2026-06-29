@@ -41,7 +41,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className={inter.className}>
         <AppShell>{children}</AppShell>
         {/* Adyapan CRM visitor tracker */}
-        <Script src="https://api.adyapan.com/tracker.js" strategy="afterInteractive" />
+        <Script src="https://api.adyapancrm.in/tracker.js" strategy="afterInteractive" />
       </body>
     </html>
   );
