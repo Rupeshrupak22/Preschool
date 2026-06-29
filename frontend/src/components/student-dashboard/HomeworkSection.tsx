@@ -119,59 +119,84 @@ export default function HomeworkSection({ items }: Props) {
         ) : items.map((hw, i) => {
           const cfg = statusConfig[hw.status];
           const StatusIcon = cfg.icon;
+          const hasFile = !!(hw.url || hw.fileName);
           return (
             <motion.div
               key={hw.id}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.06 }}
-              className={`flex items-center gap-3 rounded-xl border ${cfg.border} ${cfg.bg} px-4 py-3 transition hover:shadow-sm`}
+              className={`rounded-xl border ${cfg.border} ${cfg.bg} px-4 py-3 transition hover:shadow-sm`}
             >
-              {/* Priority dot */}
-              <span className={`h-2 w-2 shrink-0 rounded-full ${priorityColors[hw.priority]}`} />
-
-              {/* Status Icon */}
-              <StatusIcon className={`h-4 w-4 shrink-0 ${cfg.color}`} />
-
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <p className="truncate text-sm font-semibold text-slate-950">{hw.title}</p>
-                <div className="mt-0.5 flex items-center gap-2">
-                  <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-black ${subjectColors[hw.subject] ?? "bg-slate-100 text-slate-600"}`}>
-                    {hw.subject}
-                  </span>
-                  <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-400">
-                    <Clock className="h-2.5 w-2.5" />
-                    Due: {hw.dueDate}
-                  </span>
-                </div>
-                {hw.url && (
-                  <div className="mt-1">
-                    {hw.url.startsWith("data:image") ? (
-                      <img src={hw.url} alt={hw.fileName || "Attachment"} className="mt-1 max-h-32 rounded-lg border border-blue-200" />
-                    ) : (
-                      <a href={hw.url} download={hw.fileName || true} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-md bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700 hover:bg-blue-200 transition">
-                        <Download className="h-3 w-3" /> {hw.fileName || "Download File"}
-                      </a>
-                    )}
+              <div className="flex items-center gap-3">
+                {/* Priority dot */}
+                <span className={`h-2 w-2 shrink-0 rounded-full ${priorityColors[hw.priority]}`} />
+                {/* Status Icon */}
+                <StatusIcon className={`h-4 w-4 shrink-0 ${cfg.color}`} />
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="truncate text-sm font-semibold text-slate-950">{hw.title}</p>
+                  <div className="mt-0.5 flex items-center gap-2">
+                    <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-black ${subjectColors[hw.subject] ?? "bg-slate-100 text-slate-600"}`}>
+                      {hw.subject}
+                    </span>
+                    <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-400">
+                      <Clock className="h-2.5 w-2.5" />
+                      Due: {hw.dueDate}
+                    </span>
                   </div>
-                )}
+                </div>
+                {/* Status Badge + Submit */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${cfg.badge}`}>
+                    {submitted_ids.includes(hw.id) ? "Submitted" : cfg.label}
+                  </span>
+                  {hw.status === "pending" && !submitted_ids.includes(hw.id) && (
+                    <button
+                      onClick={() => { setShowSubmitModal(hw.id); setSelectedFile(null); }}
+                      className="rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-bold text-white hover:bg-blue-700 transition"
+                    >
+                      Submit
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {/* Status Badge + Submit */}
-              <div className="flex items-center gap-2 shrink-0">
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${cfg.badge}`}>
-                  {submitted_ids.includes(hw.id) ? "Submitted" : cfg.label}
-                </span>
-                {hw.status === "pending" && !submitted_ids.includes(hw.id) && (
-                  <button
-                    onClick={() => { setShowSubmitModal(hw.id); setSelectedFile(null); }}
-                    className="rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-bold text-white hover:bg-blue-700 transition"
-                  >
-                    Submit
-                  </button>
-                )}
-              </div>
+              {/* File attachment area — always show if file exists */}
+              {hasFile && (
+                <div className="mt-2 ml-9 p-2 rounded-lg bg-white/70 border border-slate-100">
+                  {hw.url && hw.url.startsWith("data:image") ? (
+                    <div>
+                      <img src={hw.url} alt={hw.fileName || "Attachment"} className="max-h-40 rounded-lg border border-blue-100" />
+                      <a href={hw.url} download={hw.fileName || "homework-attachment"} className="mt-1 inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 hover:text-blue-900">
+                        <Download className="h-3 w-3" /> Download Image
+                      </a>
+                    </div>
+                  ) : hw.url && hw.url.startsWith("http") ? (
+                    <div className="flex items-center gap-2">
+                      {hw.url.match(/\.(jpg|jpeg|png|gif|webp)/i) ? (
+                        <div>
+                          <img src={hw.url} alt={hw.fileName || "Attachment"} className="max-h-40 rounded-lg border border-blue-100" />
+                          <a href={hw.url} download={hw.fileName} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 hover:text-blue-900">
+                            <Download className="h-3 w-3" /> Download
+                          </a>
+                        </div>
+                      ) : (
+                        <a href={hw.url} download={hw.fileName} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 rounded-md bg-blue-100 px-2.5 py-1 text-[10px] font-bold text-blue-700 hover:bg-blue-200 transition">
+                          <Download className="h-3 w-3" /> {hw.fileName || "Download File"}
+                        </a>
+                      )}
+                    </div>
+                  ) : hw.fileName ? (
+                    <p className="text-[10px] text-slate-500 italic">📎 {hw.fileName} ({hw.fileSize || "attached"}) — ask teacher to re-share</p>
+                  ) : null}
+                </div>
+              )}
+
+              {/* Description if exists */}
+              {hw.description && (
+                <p className="mt-2 ml-9 text-[11px] text-slate-600 leading-relaxed">{hw.description}</p>
+              )}
             </motion.div>
           );
         })}
