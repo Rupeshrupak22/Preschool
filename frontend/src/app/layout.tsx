@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import AppShell from "./components/AppShell";
 import "./globals.css";
 
@@ -39,6 +40,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className={inter.variable}>
       <body className={inter.className}>
         <AppShell>{children}</AppShell>
+        {/* Adyapan CRM visitor tracker */}
+        <Script src="https://api.adyapan.com/tracker.js" strategy="afterInteractive" />
       </body>
     </html>
   );
