@@ -65,6 +65,13 @@ function LoginForm() {
       }
 
       window.dispatchEvent(new Event("adyapan-auth-change"));
+      // Identify visitor in CRM tracker
+      try {
+        const userData = (data as { user?: { name?: string; email?: string } }).user;
+        if (userData && window.AdyapanTracker) {
+          window.AdyapanTracker.identify({ name: userData.name || "", email: userData.email || "" });
+        }
+      } catch {}
       const params = new URLSearchParams(window.location.search);
       const next = params.get("next");
       const isSafeRedirect = next && next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\");
@@ -118,6 +125,13 @@ function LoginForm() {
       }
 
       window.dispatchEvent(new Event("adyapan-auth-change"));
+      // Identify visitor in CRM tracker
+      try {
+        const userData = (data as { user?: { name?: string; email?: string } }).user;
+        if (userData && window.AdyapanTracker) {
+          window.AdyapanTracker.identify({ name: userData.name || "", email: userData.email || "" });
+        }
+      } catch {}
       const target = loginData.user?.role === "admin" ? "/admin" : "/student-dashboard";
       window.location.href = target;
     } catch {
