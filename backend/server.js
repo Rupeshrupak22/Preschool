@@ -87,18 +87,24 @@ app.use(
 // ─── Rate Limiting ──────────────────────────────────────────────────
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // 200 requests per window
+  max: 500, // 500 requests per window (accommodates post-update traffic spikes)
   message: { success: false, message: 'Too many requests, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100, // Allow multiple users on same school network
-  message: { success: false, message: 'Too many login attempts. Try again in 15 minutes.' },
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 200, // 200 requests per minute
+  message: { success: false, message: 'Too many login attempts. Try again in 1 minute.' },
   standardHeaders: true,
   legacyHeaders: false,
+  // Use email + IP combo as key so individual users get their own bucket
+  keyGenerator: (req) => {
+    const email = req.body?.email || '';
+    const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    return `${ip}:${email}`;
+  },
 });
 
 app.use('/api/', generalLimiter);
@@ -179,6 +185,31 @@ app.use('/api/v1/notices', noticeRoutes);
 app.use('/api/v1/messages', require('./routes/messages'));
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/bulk-import', bulkImportRoutes);
+
+// ─── File Upload Endpoint (local storage) ────────────────────────────
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const uploadStorage = multer.memoryStorage();
+const uploadMiddleware = multer({ storage: uploadStorage, limits: { fileSize: 100 * 1024 * 1024 } });
+
+app.post('/api/v1/upload', require('./middleware/auth').authenticate, uploadMiddleware.single('file'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: 'No file uploaded' });
+  }
+  try {
+    const uploadsDir = path.join(__dirname, '..', 'frontend', 'public', 'uploads');
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    const safeName = req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 100);
+    const uniqueName = `${Date.now()}_${safeName}`;
+    fs.writeFileSync(path.join(uploadsDir, uniqueName), req.file.buffer);
+    const fileUrl = `/uploads/${uniqueName}`;
+    res.json({ success: true, file: { url: fileUrl, name: req.file.originalname, size: `${(req.file.size / (1024 * 1024)).toFixed(1)} MB`, type: req.file.mimetype } });
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ success: false, message: 'Upload failed' });
+  }
+});
 
 // ─── 404 Handler ────────────────────────────────────────────────────
 app.use((req, res) => {

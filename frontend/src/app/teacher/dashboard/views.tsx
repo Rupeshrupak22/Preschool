@@ -112,7 +112,22 @@ export function RecordedVideoView({ setActiveView }: { setActiveView: (view: Act
             <option>Mathematics</option><option>Science</option><option>English</option>
           </select>
           <textarea className="min-h-20 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-200" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description (optional)" />
-          <button onClick={() => { if (!selectedFile) return; setUploaded(true); setTimeout(() => { setUploaded(false); setSelectedFile(null); setTitle(""); setDescription(""); }, 3000); }} disabled={!selectedFile || !title} className="w-full rounded-xl bg-blue-600 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition disabled:opacity-40">
+          <button onClick={async () => {
+            if (!selectedFile || !title) return;
+            const fd = new FormData();
+            fd.append("file", selectedFile);
+            const uploadRes = await fetch("/api/teacher/upload", { method: "POST", body: fd });
+            const uploadData = await uploadRes.json().catch(() => ({}));
+            if (uploadRes.ok && uploadData.file?.url) {
+              await fetch("/api/teacher/classroom", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "recording", subject, title, description, fileName: uploadData.file.name, fileSize: uploadData.file.size, fileUrl: uploadData.file.url }),
+              });
+              setUploaded(true);
+              setTimeout(() => { setUploaded(false); setSelectedFile(null); setTitle(""); setDescription(""); }, 3000);
+            }
+          }} disabled={!selectedFile || !title} className="w-full rounded-xl bg-blue-600 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition disabled:opacity-40">
             {uploaded ? "✓ Published to Library" : "Publish to Class Library"}
           </button>
         </div>

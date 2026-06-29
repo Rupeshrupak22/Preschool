@@ -33,6 +33,7 @@ type UserRecord = {
   signupSource?: string | null;
   otpVerified?: boolean;
   unlockedCourses?: string[];
+  avatarUrl?: string;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -613,6 +614,7 @@ function mapUser(row: RowDataPacket): UserRecord {
     signupSource: row.signup_source ?? "web",
     otpVerified: Boolean(row.otp_verified),
     unlockedCourses: parseCourses(row.unlocked_courses),
+    avatarUrl: row.avatar_url ? String(row.avatar_url) : undefined,
     createdAt: dateValue(row.created_at) as string,
     updatedAt: dateValue(row.updated_at) as string
   };
@@ -1227,6 +1229,7 @@ type TeacherContentPayload = {
   fileSize?: string;
   noteType?: "pdf" | "note" | "video";
   url?: string;
+  duration?: string;
 };
 
 type StudentDoubtPayload = {
@@ -1390,6 +1393,39 @@ export async function createTeacherNote(teacherId: string, payload: TeacherConte
   return { id: noteId, notified: students.length };
 }
 
+export async function createTeacherRecording(teacherId: string, payload: TeacherContentPayload) {
+  const pool = await connectDb();
+  if (!pool) return null;
+
+  const [teacherRows] = await pool.query<RowDataPacket[]>("SELECT * FROM teachers WHERE id = ? LIMIT 1", [teacherId]);
+  const teacher = teacherRows[0] ? mapTeacher(teacherRows[0]) : null;
+  if (!teacher) return null;
+
+  const classLevel = payload.classLevel || teacher.assignedClasses[0] || null;
+  const recordingId = id("recording");
+
+  await pool.query(
+    `INSERT INTO teacher_recordings
+       (id, teacher_id, school_id, class_level, subject, title, description, file_name, file_size, url, duration)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      recordingId,
+      teacher.id,
+      teacher.schoolId,
+      classLevel,
+      payload.subject,
+      payload.title,
+      payload.description || null,
+      payload.fileName || null,
+      payload.fileSize || null,
+      payload.url || null,
+      payload.duration || null,
+    ]
+  );
+
+  return { id: recordingId };
+}
+
 export async function replyToStudentDoubt(teacherId: string, doubtId: string, replyText: string) {
   const pool = await connectDb();
   if (!pool) return null;
@@ -1511,11 +1547,12 @@ export async function getTeacherDashboard(teacherId: string) {
 
   const [studentRows, loginRows, sessionRows, certificateRows, homeworkRows, noteRows, doubtRows, notificationRows] = await Promise.all([
     pool.query<RowDataPacket[]>(
-      `SELECT id, name, email, phone, class_level, class_name, school_name, school, signup_source, status, created_at
-       FROM students
-       WHERE ${schoolWhereClause}
-       ${classClause}
-       ORDER BY class_level ASC, name ASC
+      `SELECT s.id, s.name, s.email, s.phone, s.class_level, s.class_name, s.school_name, s.school, s.signup_source, s.status, s.created_at, u.avatar_url
+       FROM students s
+       LEFT JOIN users u ON u.email = s.email
+       WHERE ${schoolWhereClause.replace(/school_id/g, 's.school_id').replace(/school_name/g, 's.school_name').replace(/school\)/g, 's.school)')}
+       ${classClause.replace(/class_level/g, 's.class_level').replace(/class_name/g, 's.class_name')}
+       ORDER BY s.class_level ASC, s.name ASC
        LIMIT 300`,
       [...schoolParams, ...classParams]
     ),
@@ -1596,6 +1633,7 @@ export async function getTeacherDashboard(teacherId: string) {
     schoolName: row.school_name ?? row.school,
     signupSource: row.signup_source,
     status: row.status,
+    avatarUrl: row.avatar_url || undefined,
     createdAt: dateValue(row.created_at)
   }));
 
@@ -2334,8 +2372,10 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
     ...dashboard.studentData,
     rollNumber: user.id,
     class: studentClass,
+    section: schoolName || "Not assigned",
     rank,
     totalStudents: leaderboard.length || totalStudents,
+    avatarUrl: user?.avatarUrl,
     aiInsight:
       attendance.length || courses.length || certificateItems.length || liveClasses.length
         ? "Dashboard is showing live records from your school database."
@@ -2350,6 +2390,36 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
   dashboard.notesLibrary = notesItems;
   dashboard.doubts = doubtItems;
   dashboard.notifications = notificationItems;
+
+  // Fetch recorded classes from teacher_recordings table
+  try {
+    const [recordingRows] = await pool.query<RowDataPacket[]>(
+      `SELECT r.*, t.teacher_name, t.school_name AS teacher_school
+       FROM teacher_recordings r
+       LEFT JOIN teachers t ON t.id = r.teacher_id
+       WHERE r.status = 'active'
+         AND (r.school_id = ? OR TRIM(COALESCE(t.school_name, '')) = ?)
+         AND (r.class_level IS NULL OR r.class_level = '' OR LOWER(r.class_level) = LOWER(?))
+       ORDER BY r.created_at DESC
+       LIMIT 50`,
+      [profile?.school_id ?? "", schoolName, studentClass]
+    );
+    const gradients = ["from-blue-500 to-indigo-600", "from-emerald-500 to-teal-600", "from-purple-500 to-violet-600", "from-rose-500 to-pink-600", "from-cyan-500 to-sky-600", "from-orange-500 to-amber-600"];
+    dashboard.recordedClasses = recordingRows.map((row, index) => ({
+      id: String(row.id),
+      subject: String(row.subject ?? "General"),
+      title: String(row.title ?? "Recorded Class"),
+      teacher: row.teacher_name ? String(row.teacher_name) : "Teacher",
+      duration: String(row.duration ?? ""),
+      date: dateLabel(row.created_at),
+      views: 0,
+      gradient: gradients[index % gradients.length],
+      bookmarked: false,
+      url: row.url ? String(row.url) : undefined,
+      fileName: row.file_name ? String(row.file_name) : undefined,
+    }));
+  } catch { dashboard.recordedClasses = []; }
+
   dashboard.attendanceMonths = attendanceMonths;
   dashboard.subjectAttendance = subjectAttendance;
   dashboard.performanceTrend = performanceTrend;

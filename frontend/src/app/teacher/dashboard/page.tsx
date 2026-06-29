@@ -52,6 +52,7 @@ type TeacherStudent = {
   phone?: string | null;
   classLevel?: string | null;
   schoolName?: string | null;
+  avatarUrl?: string | null;
   createdAt?: string | null;
 };
 
@@ -1237,9 +1238,13 @@ function StudentsView({
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map((student) => (
               <div key={student.id} className="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-100 transition hover:shadow-md">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
-                  {initials(student.name)}
-                </div>
+                {student.avatarUrl ? (
+                  <img src={student.avatarUrl} alt={student.name || "Student"} className="h-10 w-10 rounded-full object-cover border border-blue-200" />
+                ) : (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+                    {initials(student.name)}
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-900 truncate">{student.name || "Student"}</p>
                   <p className="text-xs text-gray-500 truncate">{student.email || "No email"}</p>

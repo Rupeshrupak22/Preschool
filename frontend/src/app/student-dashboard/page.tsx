@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import {
@@ -49,6 +50,8 @@ export default function StudentDashboardHome() {
   const courseCount = data.courses.length || numberFromStat(data.quickAccessCards.find((card) => card.id === "skills")?.stat);
   const questCount = numberFromStat(homeworkCard?.stat) + data.upcomingQuizzes.length;
   const rankText = data.studentData.rank > 0 ? `#${data.studentData.rank}` : "-";
+
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const heroStats = [
     {
@@ -109,9 +112,13 @@ export default function StudentDashboardHome() {
             <div>
               <div className="mb-5 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-base font-black text-white shadow-[0_10px_30px_rgba(168,85,247,0.35)]">
-                    {data.studentData.avatar}
-                  </div>
+                  {data.studentData.avatarUrl ? (
+                    <img src={data.studentData.avatarUrl} alt="Avatar" className="h-14 w-14 rounded-2xl object-cover shadow-[0_10px_30px_rgba(168,85,247,0.35)]" />
+                  ) : (
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-base font-black text-white shadow-[0_10px_30px_rgba(168,85,247,0.35)]">
+                      {data.studentData.avatar}
+                    </div>
+                  )}
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-500">Student Dashboard</p>
                     <h1 className="mt-1 text-3xl font-black leading-tight text-slate-950 md:text-4xl">
@@ -119,18 +126,45 @@ export default function StudentDashboardHome() {
                     </h1>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-blue-100 bg-white text-slate-700 shadow-[0_10px_26px_rgba(37,99,235,0.12)] transition hover:-translate-y-0.5 hover:text-blue-600"
-                  aria-label="Notifications"
-                >
-                  <Bell className="h-5 w-5" />
-                  {unreadNotifications > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-black text-white ring-2 ring-white">
-                      {unreadNotifications}
-                    </span>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-blue-100 bg-white text-slate-700 shadow-[0_10px_26px_rgba(37,99,235,0.12)] transition hover:-translate-y-0.5 hover:text-blue-600"
+                    aria-label="Notifications"
+                  >
+                    <Bell className="h-5 w-5" />
+                    {unreadNotifications > 0 && (
+                      <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-black text-white ring-2 ring-white">
+                        {unreadNotifications}
+                      </span>
+                    )}
+                  </button>
+                  {showNotifications && (
+                    <div className="absolute right-0 top-14 z-50 w-80 rounded-2xl border border-slate-100 bg-white p-0 shadow-[0_20px_60px_rgba(15,23,42,0.18)]">
+                      <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+                        <h3 className="text-sm font-black text-slate-900">Notifications ({data.notifications.length})</h3>
+                        <button onClick={() => setShowNotifications(false)} className="text-slate-400 hover:text-slate-700 text-lg">&times;</button>
+                      </div>
+                      <div className="max-h-72 overflow-y-auto">
+                        {data.notifications.length === 0 ? (
+                          <p className="py-8 text-center text-xs text-slate-400">No notifications yet</p>
+                        ) : (
+                          data.notifications.map((n) => (
+                            <div key={n.id} className={`border-b border-slate-50 px-4 py-3 transition hover:bg-slate-50 ${n.status !== "read" ? "bg-blue-50/50" : ""}`}>
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs font-bold text-slate-800">{n.title}</p>
+                                <p className="text-[10px] text-slate-400">{n.createdAt}</p>
+                              </div>
+                              <p className="mt-1 text-xs text-slate-600 line-clamp-2">{n.message}</p>
+                              <span className="mt-1 inline-block rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500">{n.channel}</span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
                   )}
-                </button>
+                </div>
               </div>
 
               <p className="max-w-2xl text-sm font-semibold leading-6 text-slate-600 md:text-base">
@@ -157,14 +191,22 @@ export default function StudentDashboardHome() {
 
             <div className="relative hidden min-h-[220px] lg:block">
               <div className="absolute bottom-0 right-3 h-56 w-56 rounded-[2rem] bg-white/70 shadow-[0_24px_60px_rgba(37,99,235,0.16)]" />
-              <Image
-                src="/assets/primary-student.png"
-                alt="Student learning"
-                width={320}
-                height={320}
-                priority
-                className="absolute bottom-0 right-0 h-[260px] w-auto object-contain"
-              />
+              {data.studentData.avatarUrl ? (
+                <img
+                  src={data.studentData.avatarUrl}
+                  alt="Student"
+                  className="absolute bottom-0 right-0 h-[260px] w-[260px] rounded-[2rem] object-cover"
+                />
+              ) : (
+                <Image
+                  src="/assets/primary-student.png"
+                  alt="Student learning"
+                  width={320}
+                  height={320}
+                  priority
+                  className="absolute bottom-0 right-0 h-[260px] w-auto object-contain"
+                />
+              )}
               <div className="absolute left-0 top-5 rounded-2xl border border-white/80 bg-white/90 px-4 py-3 shadow-[0_16px_34px_rgba(124,58,237,0.16)]">
                 <div className="flex items-center gap-2">
                   <Medal className="h-5 w-5 text-purple-600" />

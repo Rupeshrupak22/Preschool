@@ -9,6 +9,7 @@ export interface Student {
   section: string;
   academicYear: string;
   avatar: string;
+  avatarUrl?: string;
   aiInsight: string;
   rank: number;
   totalStudents: number;
@@ -222,6 +223,8 @@ export interface RecordedClass {
   views: number;
   gradient: string;
   bookmarked: boolean;
+  url?: string;
+  fileName?: string;
 }
 
 export interface GamifiedStat {

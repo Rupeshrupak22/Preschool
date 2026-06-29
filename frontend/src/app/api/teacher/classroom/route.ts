@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createTeacherHomework, createTeacherNote, replyToStudentDoubt } from "@/lib/db";
+import { createTeacherHomework, createTeacherNote, createTeacherRecording, replyToStudentDoubt } from "@/lib/db";
 import { currentTeacher } from "@/lib/security";
 
 export async function POST(request: Request) {
@@ -55,6 +55,27 @@ export async function POST(request: Request) {
     return result
       ? NextResponse.json({ ok: true, result })
       : NextResponse.json({ error: "Note could not be created." }, { status: 500 });
+  }
+
+  if (action === "recording") {
+    if (!payload.title || !payload.subject) {
+      return NextResponse.json({ error: "Title and subject are required." }, { status: 400 });
+    }
+
+    const result = await createTeacherRecording(teacher.id, {
+      title: String(payload.title),
+      subject: String(payload.subject),
+      description: payload.description ? String(payload.description) : undefined,
+      classLevel: payload.classLevel ? String(payload.classLevel) : undefined,
+      fileName: payload.fileName ? String(payload.fileName) : undefined,
+      fileSize: payload.fileSize ? String(payload.fileSize) : undefined,
+      url: payload.fileUrl ? String(payload.fileUrl) : undefined,
+      duration: payload.duration ? String(payload.duration) : undefined,
+    });
+
+    return result
+      ? NextResponse.json({ ok: true, result })
+      : NextResponse.json({ error: "Recording could not be saved." }, { status: 500 });
   }
 
   if (action === "reply-doubt") {

@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Gamepad2, Star, Trophy, Zap, Target, Flame, Lock, Play } from "lucide-react";
+import { Gamepad2, Star, Trophy, Zap, Target, Flame, Lock, Play, ArrowLeft, CheckCircle2, XCircle } from "lucide-react";
 import DashboardLayout from "@/components/student-dashboard/DashboardLayout";
+import { useDashboardData } from "@/lib/dashboard/use-dashboard-data";
 
 const games = [
   {
@@ -82,9 +84,106 @@ const leaderboard = [
 ];
 
 export default function GamifiedPage() {
+  const data = useDashboardData();
+  const [activeGame, setActiveGame] = useState<string | null>(null);
+  const [quizIndex, setQuizIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [answered, setAnswered] = useState<number | null>(null);
+  const [quizDone, setQuizDone] = useState(false);
+
+  const quizQuestions: Record<string, Array<{ q: string; options: string[]; correct: number }>> = {
+    "Math Battle": [
+      { q: "What is 15 × 8?", options: ["120", "110", "130", "125"], correct: 0 },
+      { q: "Solve: 2x + 5 = 15", options: ["x = 5", "x = 10", "x = 7", "x = 3"], correct: 0 },
+      { q: "√144 = ?", options: ["14", "12", "11", "13"], correct: 1 },
+    ],
+    "Science Quiz Blitz": [
+      { q: "What is the chemical formula for water?", options: ["H2O", "CO2", "NaCl", "O2"], correct: 0 },
+      { q: "Which planet is closest to the sun?", options: ["Venus", "Mars", "Mercury", "Earth"], correct: 2 },
+      { q: "What organ pumps blood?", options: ["Lungs", "Heart", "Brain", "Liver"], correct: 1 },
+    ],
+    "Word Wizard": [
+      { q: "What is a synonym of 'happy'?", options: ["Sad", "Joyful", "Angry", "Tired"], correct: 1 },
+      { q: "Which is a noun?", options: ["Run", "Beautiful", "Table", "Quickly"], correct: 2 },
+      { q: "Antonym of 'ancient'?", options: ["Old", "Modern", "Historic", "Classic"], correct: 1 },
+    ],
+  };
+
+  function startGame(title: string) {
+    setActiveGame(title);
+    setQuizIndex(0);
+    setScore(0);
+    setAnswered(null);
+    setQuizDone(false);
+  }
+
+  function answerQuestion(optionIndex: number) {
+    if (answered !== null) return;
+    setAnswered(optionIndex);
+    const questions = quizQuestions[activeGame!];
+    if (optionIndex === questions[quizIndex].correct) {
+      setScore((s) => s + 1);
+    }
+    setTimeout(() => {
+      if (quizIndex + 1 < questions.length) {
+        setQuizIndex((i) => i + 1);
+        setAnswered(null);
+      } else {
+        setQuizDone(true);
+      }
+    }, 1200);
+  }
   return (
     <DashboardLayout activeSection="/student-dashboard/gamified">
       <div className="space-y-8">
+
+        {/* Quiz Game Modal */}
+        {activeGame && quizQuestions[activeGame] && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+            <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-black text-slate-900">{activeGame}</h2>
+                <button onClick={() => setActiveGame(null)} className="rounded-full bg-slate-100 p-2 hover:bg-slate-200"><ArrowLeft className="h-4 w-4" /></button>
+              </div>
+              {quizDone ? (
+                <div className="text-center py-8">
+                  <Trophy className="mx-auto h-14 w-14 text-yellow-500" />
+                  <h3 className="mt-4 text-2xl font-black text-slate-900">Quiz Complete!</h3>
+                  <p className="mt-2 text-lg font-bold text-slate-600">Score: {score}/{quizQuestions[activeGame].length}</p>
+                  <p className="mt-1 text-sm text-slate-500">+{score * 50} XP earned</p>
+                  <button onClick={() => setActiveGame(null)} className="mt-6 rounded-xl bg-purple-600 px-6 py-3 text-sm font-bold text-white hover:bg-purple-700">Back to Games</button>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold text-slate-500">Question {quizIndex + 1}/{quizQuestions[activeGame].length}</span>
+                    <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-bold text-purple-700">Score: {score}</span>
+                  </div>
+                  <p className="text-base font-bold text-slate-900 mb-4">{quizQuestions[activeGame][quizIndex].q}</p>
+                  <div className="grid gap-2">
+                    {quizQuestions[activeGame][quizIndex].options.map((opt, idx) => {
+                      const isCorrect = idx === quizQuestions[activeGame][quizIndex].correct;
+                      const isSelected = answered === idx;
+                      let btnClass = "border-slate-200 bg-white text-slate-700 hover:border-purple-300 hover:bg-purple-50";
+                      if (answered !== null) {
+                        if (isCorrect) btnClass = "border-green-400 bg-green-50 text-green-700";
+                        else if (isSelected) btnClass = "border-red-400 bg-red-50 text-red-700";
+                      }
+                      return (
+                        <button key={idx} onClick={() => answerQuestion(idx)} disabled={answered !== null} className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-sm font-semibold transition ${btnClass}`}>
+                          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-bold">{String.fromCharCode(65 + idx)}</span>
+                          {opt}
+                          {answered !== null && isCorrect && <CheckCircle2 className="ml-auto h-5 w-5 text-green-500" />}
+                          {answered !== null && isSelected && !isCorrect && <XCircle className="ml-auto h-5 w-5 text-red-500" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Hero */}
         <motion.div
@@ -183,6 +282,7 @@ export default function GamifiedPage() {
                     <Target className="h-3 w-3" /> {game.players}
                   </span>
                   <button
+                    onClick={() => game.status !== "locked" && startGame(game.title)}
                     disabled={game.status === "locked"}
                     className={`flex items-center gap-1.5 rounded-2xl px-4 py-2 text-xs font-black text-white transition hover:-translate-y-0.5 ${
                       game.status === "locked"

@@ -12,8 +12,17 @@ export default function DoubtSectionPage() {
   const [subject, setSubject] = useState(subjects[0]);
   const [question, setQuestion] = useState("");
   const [attachmentName, setAttachmentName] = useState("");
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const [status, setStatus] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAttachmentFile(file);
+      setAttachmentName(file.name);
+    }
+  }
 
   async function submitDoubt(event: FormEvent) {
     event.preventDefault();
@@ -24,6 +33,20 @@ export default function DoubtSectionPage() {
 
     setSubmitting(true);
     setStatus("");
+
+    let fileUrl: string | undefined;
+
+    // Upload file if selected
+    if (attachmentFile) {
+      const fd = new FormData();
+      fd.append("file", attachmentFile);
+      const uploadRes = await fetch("/api/teacher/upload", { method: "POST", body: fd });
+      const uploadData = await uploadRes.json().catch(() => ({}));
+      if (uploadRes.ok && uploadData.file?.url) {
+        fileUrl = uploadData.file.url;
+      }
+    }
+
     const response = await fetch("/api/student-doubts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -31,7 +54,8 @@ export default function DoubtSectionPage() {
         subject,
         question,
         attachmentName,
-        attachmentType: attachmentName ? "image" : undefined,
+        attachmentType: attachmentFile ? attachmentFile.type : undefined,
+        attachmentUrl: fileUrl,
       }),
     });
     const payload = await response.json().catch(() => ({}));
@@ -44,6 +68,7 @@ export default function DoubtSectionPage() {
 
     setQuestion("");
     setAttachmentName("");
+    setAttachmentFile(null);
     setStatus("Doubt sent to your teacher.");
     setSubmitting(false);
   }
@@ -68,8 +93,14 @@ export default function DoubtSectionPage() {
               </select>
             </label>
             <label className="block">
-              <span className="text-xs font-black uppercase text-slate-500">Attachment name</span>
-              <input value={attachmentName} onChange={(event) => setAttachmentName(event.target.value)} placeholder="loop_error.png" className="mt-1 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm font-bold outline-none" />
+              <span className="text-xs font-black uppercase text-slate-500">Attach File</span>
+              <label className="mt-1 flex h-12 items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 cursor-pointer hover:border-blue-300 transition">
+                <input type="file" accept="image/*,.pdf,.doc,.docx" className="hidden" onChange={handleFileSelect} />
+                <ImageIcon className="h-4 w-4 text-slate-400" />
+                <span className="text-sm font-bold text-slate-500 truncate">
+                  {attachmentFile ? attachmentFile.name : "Choose PNG, JPG, PDF..."}
+                </span>
+              </label>
             </label>
           </div>
           <label className="mt-3 block">
