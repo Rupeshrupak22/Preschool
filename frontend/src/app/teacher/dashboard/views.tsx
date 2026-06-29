@@ -346,6 +346,16 @@ export function AssignHomeworkView({
 
 // ─── Homework Submissions View ───────────────────────────────────────
 export function HomeworkSubmissionsView({ setActiveView, homework }: { setActiveView: (view: ActiveView) => void; homework: TeacherHomework[] }) {
+  const [submissions, setSubmissions] = useState<Array<{ id: string; homework_id: string; student_name: string; student_email: string; file_name: string; file_url: string; created_at: string }>>([]);
+  const [loadingSubs, setLoadingSubs] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/teacher/submissions")
+      .then((res) => res.json())
+      .then((data) => { setSubmissions(data.submissions || []); setLoadingSubs(false); })
+      .catch(() => setLoadingSubs(false));
+  }, []);
+
   return (
     <section className="min-h-screen pb-28 lg:pb-8">
       <div className="flex h-[64px] items-center gap-4 bg-white px-5 md:px-8 lg:px-10 border-b border-gray-100">
@@ -353,14 +363,40 @@ export function HomeworkSubmissionsView({ setActiveView, homework }: { setActive
           <ArrowLeft className="h-6 w-6 text-slate-950" />
         </button>
         <h1 className="text-xl font-bold text-slate-950">Homework Submissions</h1>
-        <span className="ml-auto rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">{homework.length} assigned</span>
+        <span className="ml-auto rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">{submissions.length} submissions</span>
       </div>
-      <div className="px-5 py-5 md:px-8 lg:px-10 space-y-4 max-w-4xl">
+      <div className="px-5 py-5 md:px-8 lg:px-10 space-y-5 max-w-4xl">
+        {/* Student Submissions */}
+        {submissions.length > 0 && (
+          <>
+            <h3 className="text-base font-bold text-gray-900">Student Submissions</h3>
+            <div className="space-y-3">
+              {submissions.map((sub) => (
+                <div key={sub.id} className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">{sub.student_name || sub.student_email}</p>
+                      <p className="mt-1 text-xs text-gray-500">{sub.student_email} • {sub.created_at}</p>
+                    </div>
+                    <span className="rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-bold text-green-700">Submitted</span>
+                  </div>
+                  {sub.file_url && (
+                    <a href={sub.file_url} download={sub.file_name} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 rounded-md bg-blue-50 px-2.5 py-1 text-[11px] font-bold text-blue-700 hover:bg-blue-100 transition">
+                      <FileText className="h-3 w-3" /> {sub.file_name || "View Submission"}
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Assigned Homework */}
+        <h3 className="text-base font-bold text-gray-900">Assigned Homework ({homework.length})</h3>
         {homework.length === 0 ? (
           <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-100">
             <ClipboardList className="mx-auto h-10 w-10 text-gray-300" />
             <p className="mt-3 text-sm font-semibold text-gray-500">No homework assigned yet</p>
-            <p className="mt-1 text-xs text-gray-400">Assign homework from the Academics section</p>
           </div>
         ) : (
           <div className="space-y-3">

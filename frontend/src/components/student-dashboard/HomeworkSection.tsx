@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, Clock, AlertTriangle, Circle, Download } from "lucide-react";
+import { CheckCircle2, Clock, AlertTriangle, Circle, Download, Upload, Send } from "lucide-react";
 import type { HomeworkItem } from "@/lib/dashboard/dashboard-data";
 
 interface Props {
@@ -54,6 +55,39 @@ export default function HomeworkSection({ items }: Props) {
   const pending = items.filter((i) => i.status === "pending").length;
   const submitted = items.filter((i) => i.status === "submitted").length;
   const overdue = items.filter((i) => i.status === "overdue").length;
+  const [submitting, setSubmitting] = useState<string | null>(null);
+  const [submitted_ids, setSubmittedIds] = useState<string[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showSubmitModal, setShowSubmitModal] = useState<string | null>(null);
+
+  async function handleSubmit(hwId: string) {
+    if (!selectedFile) return;
+    setSubmitting(hwId);
+
+    // Upload file
+    const fd = new FormData();
+    fd.append("file", selectedFile);
+    const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
+    const uploadData = await uploadRes.json().catch(() => ({}));
+
+    if (uploadRes.ok && uploadData.file?.url) {
+      // Submit to teacher
+      await fetch("/api/student-dashboard/submit-homework", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          homeworkId: hwId,
+          fileName: uploadData.file.name,
+          fileUrl: uploadData.file.url,
+        }),
+      });
+      setSubmittedIds((prev) => [...prev, hwId]);
+    }
+
+    setSubmitting(null);
+    setSelectedFile(null);
+    setShowSubmitModal(null);
+  }
 
   return (
     <section id="homework">
@@ -118,14 +152,64 @@ export default function HomeworkSection({ items }: Props) {
                 )}
               </div>
 
-              {/* Status Badge */}
-              <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black ${cfg.badge}`}>
-                {cfg.label}
-              </span>
+              {/* Status Badge + Submit */}
+              <div className="flex items-center gap-2 shrink-0">
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${cfg.badge}`}>
+                  {submitted_ids.includes(hw.id) ? "Submitted" : cfg.label}
+                </span>
+                {hw.status === "pending" && !submitted_ids.includes(hw.id) && (
+                  <button
+                    onClick={() => { setShowSubmitModal(hw.id); setSelectedFile(null); }}
+                    className="rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-bold text-white hover:bg-blue-700 transition"
+                  >
+                    Submit
+                  </button>
+                )}
+              </div>
             </motion.div>
           );
         })}
       </div>
+
+      {/* Submit Modal */}
+      {showSubmitModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+            <h3 className="text-base font-black text-slate-900">Submit Assignment</h3>
+            <p className="mt-1 text-xs text-slate-500">{items.find((h) => h.id === showSubmitModal)?.title}</p>
+
+            <label className="mt-4 flex h-24 items-center justify-center rounded-xl border-2 border-dashed border-blue-200 bg-blue-50/50 cursor-pointer hover:bg-blue-50 transition">
+              <input type="file" accept="image/*,.pdf,.doc,.docx" className="hidden" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} />
+              <div className="text-center">
+                {selectedFile ? (
+                  <>
+                    <CheckCircle2 className="mx-auto h-6 w-6 text-green-500" />
+                    <p className="mt-1 text-xs font-semibold text-green-600">{selectedFile.name}</p>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="mx-auto h-6 w-6 text-blue-400" />
+                    <p className="mt-1 text-xs font-medium text-blue-600">Select file (photo, PDF, doc)</p>
+                  </>
+                )}
+              </div>
+            </label>
+
+            <div className="mt-4 flex gap-2">
+              <button onClick={() => { setShowSubmitModal(null); setSelectedFile(null); }} className="flex-1 rounded-xl border border-slate-200 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50">
+                Cancel
+              </button>
+              <button
+                onClick={() => handleSubmit(showSubmitModal)}
+                disabled={!selectedFile || submitting === showSubmitModal}
+                className="flex-1 rounded-xl bg-blue-600 py-2.5 text-xs font-bold text-white hover:bg-blue-700 disabled:opacity-40 flex items-center justify-center gap-1"
+              >
+                <Send className="h-3 w-3" /> {submitting === showSubmitModal ? "Submitting..." : "Submit"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
