@@ -556,7 +556,13 @@ async function ensureIndex(pool: Pool, tableName: string, indexName: string, col
   }
 }
 
+// Cache column existence checks — schema doesn't change at runtime
+const columnCache = new Map<string, boolean>();
+
 async function hasColumn(pool: Pool, tableName: string, columnName: string) {
+  const key = `${tableName}.${columnName}`;
+  if (columnCache.has(key)) return columnCache.get(key)!;
+
   const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT COUNT(*) AS count
      FROM INFORMATION_SCHEMA.COLUMNS
@@ -566,7 +572,9 @@ async function hasColumn(pool: Pool, tableName: string, columnName: string) {
     [tableName, columnName]
   );
 
-  return Number(rows[0]?.count ?? 0) > 0;
+  const result = Number(rows[0]?.count ?? 0) > 0;
+  columnCache.set(key, result);
+  return result;
 }
 
 function parseCourses(value: unknown): string[] {
@@ -1557,7 +1565,7 @@ export async function getTeacherDashboard(teacherId: string) {
   const [studentRows, loginRows, sessionRows, certificateRows, homeworkRows, noteRows, doubtRows, notificationRows] = await Promise.all([
     pool.query<RowDataPacket[]>(
       `SELECT id, name, email, phone, class_level, class_name, school_name, school, signup_source, status, created_at,
-              (SELECT avatar_url FROM users WHERE users.email = students.email LIMIT 1) AS avatar_url
+              (SELECT CASE WHEN LENGTH(avatar_url) < 500 THEN avatar_url ELSE CONCAT('HAS_AVATAR:', LEFT(avatar_url, 30)) END FROM users WHERE users.email = students.email LIMIT 1) AS avatar_url
        FROM students
        WHERE ${schoolWhereClause}
        ${classClause}
@@ -1642,7 +1650,7 @@ export async function getTeacherDashboard(teacherId: string) {
     schoolName: row.school_name ?? row.school,
     signupSource: row.signup_source,
     status: row.status,
-    avatarUrl: row.avatar_url || undefined,
+    avatarUrl: row.avatar_url && !String(row.avatar_url).startsWith('HAS_AVATAR:') ? row.avatar_url : undefined,
     createdAt: dateValue(row.created_at)
   }));
 
@@ -2088,7 +2096,7 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
            LEFT JOIN teachers t ON t.id = s.teacher_id
            WHERE s.status <> 'cancelled'
            ORDER BY s.start_time ASC
-           LIMIT 250`
+           LIMIT 50`
         )
       : Promise.resolve<[RowDataPacket[], unknown]>([[], undefined]),
     pool.query<RowDataPacket[]>(
@@ -2123,8 +2131,10 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
          GROUP BY user_email
        ) p ON p.user_email = u.email
        WHERE u.role = 'student'
+         AND (LOWER(COALESCE(u.school_name, '')) = LOWER(?) OR LOWER(COALESCE(u.class_name, u.class_level, '')) = LOWER(?))
        ORDER BY u.created_at ASC
-       LIMIT 250`
+       LIMIT 100`,
+      [schoolName || "", studentClass || ""]
     ),
     pool.query<RowDataPacket[]>(
       `SELECT h.*, t.teacher_name
