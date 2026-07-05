@@ -81,8 +81,13 @@ router.post('/', authenticate, authorize('admin', 'principal', 'teacher'), async
     }
 
     const senderRole = req.user.role;
-    const senderName = req.user.name || senderRole;
     const senderEmail = req.user.email;
+
+    // Build sender_name with school context for non-admin roles
+    let senderName = req.user.name || senderRole;
+    if (senderRole !== 'admin' && req.user.school_name) {
+      senderName = `${senderName} – ${senderRole.charAt(0).toUpperCase() + senderRole.slice(1)} (${req.user.school_name})`;
+    }
 
     // Validate sender permissions
     if (senderRole === 'admin') {
