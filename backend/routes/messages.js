@@ -179,4 +179,21 @@ router.delete('/:id', authenticate, async (req, res) => {
   }
 });
 
+// DELETE /api/v1/messages — clear all messages for the authenticated user
+router.delete('/', authenticate, async (req, res) => {
+  try {
+    const email = req.user.email;
+    const role = req.user.role;
+    // Delete messages where user is the recipient
+    await prisma.$executeRawUnsafe(
+      `DELETE FROM admin_messages WHERE recipient_email = ? OR (recipient_type = 'broadcast' AND recipient_role = ?)`,
+      email, role
+    );
+    sendResponse(res, 200, true, 'All messages cleared');
+  } catch (err) {
+    console.error('Clear all messages error:', err.message);
+    sendResponse(res, 500, false, 'Failed to clear messages');
+  }
+});
+
 module.exports = router;
