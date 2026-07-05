@@ -1,5 +1,12 @@
 "use client";
 
+// Extend Window type for CRM tracker
+declare global {
+  interface Window {
+    AdyapanTracker?: { identify: (data: { name: string; email: string }) => void };
+  }
+}
+
 import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, Eye, EyeOff, GraduationCap, Lock, Mail, RefreshCw } from "lucide-react";
