@@ -165,4 +165,18 @@ router.put('/:id/read', authenticate, async (req, res) => {
   }
 });
 
+// DELETE /api/v1/messages/:id — delete a message
+router.delete('/:id', authenticate, async (req, res) => {
+  try {
+    await prisma.$executeRawUnsafe(
+      'DELETE FROM admin_messages WHERE id = ?',
+      req.params.id
+    );
+    sendResponse(res, 200, true, 'Message deleted');
+  } catch (err) {
+    console.error('Delete message error:', err.message);
+    sendResponse(res, 500, false, 'Failed to delete message');
+  }
+});
+
 module.exports = router;
