@@ -111,7 +111,7 @@ type TeacherDashboard = {
   notifications: Array<Record<string, string | number | null>>;
 };
 
-type ActiveView = "home" | "syllabus" | "roadmap" | "leaderboard" | "doubts";
+type ActiveView = "home" | "syllabus" | "roadmap" | "leaderboard" | "doubts" | "students" | "attendance" | "recordings" | "live-classes" | "submissions" | "homework" | "notes" | "quiz";
 type HubTab = "classroom" | "academics";
 type ActionMode = "homework" | "note";
 
@@ -361,65 +361,149 @@ export default function TeacherDashboardPage() {
   const studentPreview = dashboard.students.slice(0, 3).map((student) => student.name).filter(Boolean).join(", ");
 
   return (
-    <main className="min-h-screen bg-white text-slate-950">
-      <div className="mx-auto min-h-screen max-w-[560px] overflow-hidden bg-[linear-gradient(180deg,#eef5ff_0%,#e9eeff_48%,#fff2f8_100%)] shadow-2xl shadow-slate-200 lg:my-6 lg:rounded-[32px]">
-        {drawerOpen && (
-          <TeacherDrawer
-            dashboard={dashboard}
-            onClose={() => setDrawerOpen(false)}
-            onLogout={logout}
-            setActiveView={(view) => {
-              setActiveView(view);
-              setDrawerOpen(false);
-            }}
-          />
-        )}
+    <main className="min-h-screen bg-[#f0f4ff] text-slate-950">
+      <div className="flex min-h-screen">
+        {/* Desktop Sidebar - Fixed */}
+        <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:flex lg:w-[250px] lg:flex-col lg:border-r lg:border-blue-100 lg:bg-white">
+          <div className="flex items-center gap-3 border-b border-blue-50 px-5 py-5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-400 text-sm font-bold text-white">
+              {initials(dashboard.teacher.name)}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-slate-900">{dashboard.teacher.name}</p>
+              <p className="truncate text-xs text-slate-500">{dashboard.teacher.email}</p>
+            </div>
+          </div>
 
-        {activeView === "home" && (
-          <HomeView
-            dashboard={dashboard}
-            hubTab={hubTab}
-            setHubTab={setHubTab}
-            query={query}
-            setQuery={setQuery}
-            onOpenDrawer={() => setDrawerOpen(true)}
-            setActiveView={setActiveView}
-            actionMode={actionMode}
-            setActionMode={setActionMode}
-            form={form}
-            setForm={(patch) => setForm((current) => ({ ...current, ...patch }))}
-            classOptions={classOptions}
-            submitting={submitting}
-            onSubmitAction={submitTeacherAction}
-            status={status}
-            studentPreview={studentPreview}
-            pendingDoubts={pendingDoubts}
-          />
-        )}
+          <nav className="flex-1 px-3 py-4">
+            <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Navigation</p>
+            <div className="space-y-0.5">
+              {navItems.map((item) => {
+                const active = activeView === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveView(item.id)}
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[13px] font-medium transition ${
+                      active
+                        ? "bg-blue-50 text-blue-700 font-semibold"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
+                  >
+                    <item.icon className={`h-4 w-4 ${active ? "text-blue-600" : "text-slate-400"}`} />
+                    {item.label}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => setActiveView("doubts")}
+                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[13px] font-medium transition ${
+                  activeView === "doubts"
+                    ? "bg-blue-50 text-blue-700 font-semibold"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                <MessageSquare className={`h-4 w-4 ${activeView === "doubts" ? "text-blue-600" : "text-slate-400"}`} />
+                Doubts
+                {pendingDoubts.length > 0 && (
+                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-bold text-white">
+                    {pendingDoubts.length}
+                  </span>
+                )}
+              </button>
+            </div>
+          </nav>
 
-        {activeView === "syllabus" && (
-          <SyllabusView subject={subject} setSubject={setSubject} items={syllabusBySubject[subject]} />
-        )}
+          <div className="border-t border-blue-50 px-3 py-3">
+            <button
+              onClick={logout}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[13px] font-medium text-rose-600 hover:bg-rose-50"
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </button>
+          </div>
+        </aside>
 
-        {activeView === "roadmap" && <RoadmapView />}
+        {/* Main Content Area - offset by sidebar width on desktop */}
+        <div className="flex-1 lg:ml-[250px]">
+          <div className="mx-auto min-h-screen max-w-[560px] bg-[linear-gradient(180deg,#eef5ff_0%,#e9eeff_48%,#fff2f8_100%)] shadow-2xl shadow-slate-200 lg:max-w-full lg:rounded-none lg:shadow-none lg:bg-[#f7f9ff]">
+            {drawerOpen && (
+              <TeacherDrawer
+                dashboard={dashboard}
+                onClose={() => setDrawerOpen(false)}
+                onLogout={logout}
+                setActiveView={(view) => {
+                  setActiveView(view);
+                  setDrawerOpen(false);
+                }}
+              />
+            )}
 
-        {activeView === "leaderboard" && <LeaderboardView students={filteredStudents} />}
+            {activeView === "home" && (
+              <HomeView
+                dashboard={dashboard}
+                hubTab={hubTab}
+                setHubTab={setHubTab}
+                query={query}
+                setQuery={setQuery}
+                onOpenDrawer={() => setDrawerOpen(true)}
+                setActiveView={setActiveView}
+                actionMode={actionMode}
+                setActionMode={setActionMode}
+                form={form}
+                setForm={(patch) => setForm((current) => ({ ...current, ...patch }))}
+                classOptions={classOptions}
+                submitting={submitting}
+                onSubmitAction={submitTeacherAction}
+                status={status}
+                studentPreview={studentPreview}
+                pendingDoubts={pendingDoubts}
+              />
+            )}
 
-        {activeView === "doubts" && (
-          <DoubtsView
-            doubts={dashboard.doubts}
-            pendingDoubts={pendingDoubts}
-            solvedDoubts={solvedDoubts}
-            replyDrafts={replyDrafts}
-            setReplyDrafts={setReplyDrafts}
-            onReply={replyToDoubt}
-            submitting={submitting}
-            status={status}
-            setActiveView={setActiveView}
-          />
-        )}
+            {activeView === "syllabus" && (
+              <SyllabusView subject={subject} setSubject={setSubject} items={syllabusBySubject[subject]} />
+            )}
 
-        {activeView !== "doubts" && <BottomNav activeView={activeView} setActiveView={setActiveView} />}
+            {activeView === "roadmap" && <RoadmapView />}
+
+            {activeView === "leaderboard" && <LeaderboardView students={filteredStudents} />}
+
+            {activeView === "students" && <StudentsView students={filteredStudents} />}
+
+            {activeView === "attendance" && <AttendanceView dashboard={dashboard} />}
+
+            {activeView === "recordings" && <RecordingsView dashboard={dashboard} />}
+
+            {activeView === "live-classes" && <LiveClassesView dashboard={dashboard} />}
+
+            {activeView === "submissions" && <SubmissionsView dashboard={dashboard} />}
+
+            {activeView === "homework" && <HomeworkView dashboard={dashboard} actionMode={actionMode} setActionMode={setActionMode} form={form} setForm={(patch) => setForm((current) => ({ ...current, ...patch }))} classOptions={classOptions} submitting={submitting} onSubmitAction={submitTeacherAction} status={status} />}
+
+            {activeView === "notes" && <NotesView dashboard={dashboard} actionMode={actionMode} setActionMode={setActionMode} form={form} setForm={(patch) => setForm((current) => ({ ...current, ...patch }))} classOptions={classOptions} submitting={submitting} onSubmitAction={submitTeacherAction} status={status} />}
+
+            {activeView === "quiz" && <QuizView />}
+
+            {activeView === "doubts" && (
+              <DoubtsView
+                doubts={dashboard.doubts}
+                pendingDoubts={pendingDoubts}
+                solvedDoubts={solvedDoubts}
+                replyDrafts={replyDrafts}
+                setReplyDrafts={setReplyDrafts}
+                onReply={replyToDoubt}
+                submitting={submitting}
+                status={status}
+                setActiveView={setActiveView}
+              />
+            )}
+
+            {/* Mobile bottom nav only */}
+            {activeView !== "doubts" && <BottomNav activeView={activeView} setActiveView={setActiveView} />}
+          </div>
+        </div>
       </div>
     </main>
   );
@@ -446,7 +530,7 @@ function TeacherDrawer({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 mx-auto max-w-[560px]">
+    <div className="fixed inset-0 z-50 mx-auto max-w-[560px] lg:hidden">
       <button aria-label="Close drawer" className="absolute inset-0 bg-black/55" onClick={onClose} />
       <aside className="absolute left-0 top-0 h-full w-[78%] min-w-[310px] max-w-[430px] overflow-hidden bg-[#edf4ff] shadow-2xl">
         <div className="rounded-br-[38px] bg-[#126bef] px-8 pb-9 pt-8 text-white">
@@ -545,25 +629,31 @@ function HomeView({
   pendingDoubts: TeacherDoubt[];
 }) {
   return (
-    <div className="min-h-screen pb-28">
-      <section className="px-7 pb-5 pt-8">
+    <div className="min-h-screen pb-28 lg:pb-8">
+      <section className="px-7 pb-5 pt-8 lg:px-8 lg:pt-6 lg:pb-4">
         <div className="flex items-center justify-between">
-          <button onClick={onOpenDrawer} className="flex items-center gap-4 text-left">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full border-[3px] border-white bg-orange-400 text-2xl font-black text-white shadow-lg">
+          <button onClick={onOpenDrawer} className="flex items-center gap-4 text-left lg:pointer-events-none">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full border-[3px] border-white bg-orange-400 text-2xl font-black text-white shadow-lg lg:hidden">
               {initials(dashboard.teacher.name)}
             </div>
             <div>
-              <p className="text-sm font-black text-blue-800">{getGreeting()},</p>
-              <h1 className="text-2xl font-black leading-tight text-blue-950">{dashboard.teacher.name}</h1>
+              <p className="text-sm font-black text-blue-800 lg:text-xs lg:font-semibold">{getGreeting()},</p>
+              <h1 className="text-2xl font-black leading-tight text-blue-950 lg:text-lg lg:font-bold">{dashboard.teacher.name}</h1>
             </div>
           </button>
-          <button className="relative flex h-14 w-14 items-center justify-center rounded-full border border-blue-100 bg-blue-50 shadow-sm">
-            <Bell className="h-6 w-6 fill-yellow-400 text-yellow-400" />
-            {dashboard.stats.notifications > 0 && <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-red-500" />}
-          </button>
+          <div className="flex items-center gap-3">
+            <div className="hidden lg:block min-w-[160px] rounded-lg border border-blue-200 bg-blue-50/80 px-3 py-2">
+              <p className="text-[9px] font-semibold uppercase tracking-wider text-slate-500">Your UID</p>
+              <p className="truncate text-xs font-semibold text-slate-800">{dashboard.teacher.email}</p>
+            </div>
+            <button className="relative flex h-14 w-14 items-center justify-center rounded-full border border-blue-100 bg-blue-50 shadow-sm lg:h-9 lg:w-9">
+              <Bell className="h-6 w-6 fill-yellow-400 text-yellow-400 lg:h-4 lg:w-4" />
+              {dashboard.stats.notifications > 0 && <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-red-500 lg:right-1 lg:top-1 lg:h-2 lg:w-2" />}
+            </button>
+          </div>
         </div>
 
-        <div className="mt-8 flex items-start justify-between gap-4">
+        <div className="mt-8 flex items-start justify-between gap-4 lg:hidden">
           <div>
             <p className="text-[11px] font-black uppercase tracking-[0.22em] text-slate-500">Educator Portal</p>
             <h2 className="text-xl font-black leading-tight text-blue-950">Supervision Control Center</h2>
@@ -578,55 +668,55 @@ function HomeView({
         </div>
       </section>
 
-      <section className="px-7">
+      <section className="px-7 lg:px-8">
         <div className="relative">
-          <Search className="absolute left-6 top-1/2 h-6 w-6 -translate-y-1/2 text-blue-600" />
+          <Search className="absolute left-5 top-1/2 h-6 w-6 -translate-y-1/2 text-blue-600 lg:left-4 lg:h-4 lg:w-4" />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="h-[64px] w-full rounded-[28px] border border-blue-200 bg-white pl-16 pr-5 text-lg font-semibold text-slate-800 shadow-lg shadow-blue-100 outline-none"
+            className="h-[64px] w-full rounded-[28px] border border-blue-200 bg-white pl-16 pr-5 text-lg font-semibold text-slate-800 shadow-lg shadow-blue-100 outline-none lg:h-10 lg:max-w-[400px] lg:rounded-lg lg:pl-10 lg:text-sm lg:font-normal lg:shadow-sm"
             placeholder="Search students, classes, homework, doubts..."
           />
         </div>
 
-        <div className="mt-5 grid grid-cols-3 rounded-[30px] bg-white px-4 py-6 shadow-lg shadow-blue-100">
+        <div className="mt-5 grid grid-cols-3 rounded-[30px] bg-white px-4 py-6 shadow-lg shadow-blue-100 lg:mt-4 lg:inline-flex lg:gap-8 lg:rounded-xl lg:px-6 lg:py-4 lg:shadow-sm">
           <StatCell icon={Users} value={dashboard.stats.students} label="Students" />
           <StatCell icon={Calendar} value={dashboard.stats.upcomingClasses} label="Live Class" bordered />
           <StatCell icon={MessageSquare} value={dashboard.stats.pendingDoubts} label="Pending" />
         </div>
 
-        <h3 className="mt-5 text-2xl font-black text-slate-950">Supervision Quick Access Hub</h3>
-        <div className="mt-3 grid grid-cols-2 gap-3 rounded-[28px]">
+        <h3 className="mt-5 text-2xl font-black text-slate-950 lg:mt-6 lg:text-base lg:font-bold">Supervision Quick Access Hub</h3>
+        <div className="mt-3 inline-grid grid-cols-2 gap-3 lg:mt-2 lg:gap-2">
           <button
             onClick={() => setHubTab("classroom")}
-            className={`h-14 rounded-[24px] text-lg font-black shadow-sm transition ${hubTab === "classroom" ? "bg-blue-600 text-white" : "bg-white text-slate-950"}`}
+            className={`h-12 rounded-[18px] px-8 text-base font-black shadow-sm transition lg:h-9 lg:rounded-lg lg:px-5 lg:text-xs lg:font-semibold ${hubTab === "classroom" ? "bg-blue-600 text-white" : "bg-white text-slate-950"}`}
           >
             Classroom
           </button>
           <button
             onClick={() => setHubTab("academics")}
-            className={`h-14 rounded-[24px] text-lg font-black shadow-sm transition ${hubTab === "academics" ? "bg-blue-600 text-white" : "bg-white text-slate-950"}`}
+            className={`h-12 rounded-[18px] px-8 text-base font-black shadow-sm transition lg:h-9 lg:rounded-lg lg:px-5 lg:text-xs lg:font-semibold ${hubTab === "academics" ? "bg-blue-600 text-white" : "bg-white text-slate-950"}`}
           >
             Academics
           </button>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-4">
+        <div className="mt-5 grid grid-cols-2 gap-4 lg:mt-4 lg:grid-cols-3 lg:gap-3 xl:grid-cols-4">
           {hubTab === "classroom" ? (
             <>
-              <HubCard icon={Users} badge={`${dashboard.stats.students} Students`} title="My Students" subtitle={studentPreview ? `${studentPreview} +${Math.max(0, dashboard.stats.students - 3)}` : "No students linked"} />
-              <HubCard icon={Calendar} badge="Attendance Page" title="Attendance Log" subtitle="Mark class status" />
-              <HubCard icon={Video} badge="Recorded Library" title="Upload Recorded Video" subtitle="Publish to Class Library" />
-              <HubCard icon={PlayCircle} badge="Live Manager" title="Live Class Console" subtitle="Manage pre-scheduled streams" />
+              <HubCard icon={Users} badge={`${dashboard.stats.students} Students`} title="My Students" subtitle={studentPreview ? `${studentPreview} +${Math.max(0, dashboard.stats.students - 3)}` : "No students linked"} onClick={() => setActiveView("students")} />
+              <HubCard icon={Calendar} badge="Attendance Page" title="Attendance Log" subtitle="Mark class status" onClick={() => setActiveView("attendance")} />
+              <HubCard icon={Video} badge="Recorded Library" title="Upload Recorded Video" subtitle="Publish to Class Library" onClick={() => setActiveView("recordings")} />
+              <HubCard icon={PlayCircle} badge="Live Manager" title="Live Class Console" subtitle="Manage pre-scheduled streams" onClick={() => setActiveView("live-classes")} />
             </>
           ) : (
             <>
-              <HubCard icon={TrendingUp} badge="Visual Page" title="Class Progress" subtitle="Syllabus indexes" />
-              <HubCard icon={CheckCircle2} badge="Worksheets Page" title="Assign Homework" subtitle="Upload student quests" />
-              <HubCard icon={ClipboardList} badge="Submissions" title="Homework Submissions" subtitle="View & grade uploads" />
-              <HubCard icon={FileText} badge="Resource Page" title="Upload Notes" subtitle="Chapter PDFs" />
-              <HubCard icon={Gamepad2} badge="MCQ Injector" title="Arcade & Quiz Console" subtitle="Preview & manage 4 games" />
-              <HubCard icon={Rocket} badge="Superpower Hub" title="Future Skills Planner" subtitle="Classroom lesson manuals" />
+              <HubCard icon={TrendingUp} badge="Visual Page" title="Class Progress" subtitle="Syllabus indexes" onClick={() => setActiveView("syllabus")} />
+              <HubCard icon={CheckCircle2} badge="Worksheets Page" title="Assign Homework" subtitle="Upload student quests" onClick={() => setActiveView("homework")} />
+              <HubCard icon={ClipboardList} badge="Submissions" title="Homework Submissions" subtitle="View & grade uploads" onClick={() => setActiveView("submissions")} />
+              <HubCard icon={FileText} badge="Resource Page" title="Upload Notes" subtitle="Chapter PDFs" onClick={() => setActiveView("notes")} />
+              <HubCard icon={Gamepad2} badge="MCQ Injector" title="Arcade & Quiz Console" subtitle="Preview & manage 4 games" onClick={() => setActiveView("quiz")} />
+              <HubCard icon={Rocket} badge="Superpower Hub" title="Future Skills Planner" subtitle="Classroom lesson manuals" onClick={() => setActiveView("roadmap")} />
             </>
           )}
         </div>
@@ -647,7 +737,7 @@ function HomeView({
 
       <button
         onClick={() => setActiveView("doubts")}
-        className="fixed bottom-24 right-[max(1.75rem,calc((100vw-560px)/2+1.75rem))] z-20 flex h-[78px] items-center gap-3 rounded-[22px] bg-blue-600 px-7 text-xl font-black text-white shadow-xl shadow-blue-300"
+        className="fixed bottom-24 right-7 z-20 flex h-[78px] items-center gap-3 rounded-[22px] bg-blue-600 px-7 text-xl font-black text-white shadow-xl shadow-blue-300 lg:bottom-6 lg:right-6 lg:h-10 lg:gap-2 lg:rounded-lg lg:px-4 lg:text-xs lg:font-semibold lg:shadow-md"
       >
         <MessageSquare className="h-7 w-7" />
         Solve Doubts
@@ -659,30 +749,30 @@ function HomeView({
 
 function StatCell({ icon: Icon, value, label, bordered = false }: { icon: typeof Users; value: number; label: string; bordered?: boolean }) {
   return (
-    <div className={`text-center ${bordered ? "border-x border-slate-200" : ""}`}>
+    <div className={`text-center ${bordered ? "border-x border-slate-200 lg:border-slate-100 lg:px-6" : "lg:px-4"}`}>
       <div className="flex items-center justify-center gap-2">
-        <Icon className="h-7 w-7 text-blue-600" />
-        <span className="text-3xl font-black text-blue-950">{value}</span>
+        <Icon className="h-7 w-7 text-blue-600 lg:h-4 lg:w-4" />
+        <span className="text-3xl font-black text-blue-950 lg:text-xl lg:font-bold">{value}</span>
       </div>
-      <p className="mt-1 text-[12px] font-black uppercase tracking-wider text-slate-600">{label}</p>
+      <p className="mt-1 text-[12px] font-black uppercase tracking-wider text-slate-600 lg:text-[10px] lg:font-semibold">{label}</p>
     </div>
   );
 }
 
-function HubCard({ icon: Icon, badge, title, subtitle }: { icon: typeof Users; badge: string; title: string; subtitle: string }) {
+function HubCard({ icon: Icon, badge, title, subtitle, onClick }: { icon: typeof Users; badge: string; title: string; subtitle: string; onClick?: () => void }) {
   return (
-    <div className="min-h-[170px] rounded-[28px] bg-white p-5 shadow-lg shadow-blue-100">
+    <button onClick={onClick} className="min-h-[170px] rounded-[28px] bg-white p-5 shadow-lg shadow-blue-100 text-left transition hover:shadow-xl active:scale-[0.98] lg:min-h-[140px] lg:rounded-xl lg:p-4 lg:shadow-sm lg:hover:shadow-md">
       <div className="flex items-start justify-between">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-blue-100 bg-blue-50">
-          <Icon className="h-6 w-6 text-blue-600" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-blue-100 bg-blue-50 lg:h-9 lg:w-9">
+          <Icon className="h-6 w-6 text-blue-600 lg:h-4 lg:w-4" />
         </div>
-        <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-black text-blue-600">{badge}</span>
+        <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-black text-blue-600 lg:px-2 lg:py-0.5 lg:text-[9px] lg:font-semibold">{badge}</span>
       </div>
-      <div className="mt-12">
-        <h4 className="text-xl font-black leading-tight text-slate-950">{title}</h4>
-        <p className="mt-1 line-clamp-2 text-sm font-semibold text-slate-500">{subtitle}</p>
+      <div className="mt-12 lg:mt-6">
+        <h4 className="text-xl font-black leading-tight text-slate-950 lg:text-sm lg:font-bold">{title}</h4>
+        <p className="mt-1 line-clamp-2 text-sm font-semibold text-slate-500 lg:text-xs lg:font-normal">{subtitle}</p>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -764,21 +854,23 @@ function SyllabusView({
   items: readonly (readonly [string, string, string])[];
 }) {
   return (
-    <section className="min-h-screen pb-28">
-      <div className="bg-white px-7 py-5">
-        <div className="grid grid-cols-3 gap-5">
+    <section className="min-h-screen pb-28 lg:pb-8">
+      <div className="bg-white px-7 py-5 lg:px-8 lg:py-4">
+        <div className="grid grid-cols-3 gap-5 lg:inline-flex lg:gap-2">
           {subjects.map((item) => (
             <button
               key={item}
               onClick={() => setSubject(item as keyof typeof syllabusBySubject)}
-              className={`h-14 rounded-[24px] text-lg font-black ${subject === item ? "bg-blue-600 text-white shadow-lg shadow-blue-200" : item === "Science" ? "border border-emerald-200 bg-emerald-50 text-emerald-600" : "border border-purple-200 bg-purple-50 text-purple-500"}`}
+              className={`h-14 rounded-[24px] text-lg font-black lg:h-9 lg:rounded-lg lg:px-5 lg:text-xs lg:font-semibold ${subject === item ? "bg-blue-600 text-white shadow-lg shadow-blue-200 lg:shadow-sm" : item === "Science" ? "border border-emerald-200 bg-emerald-50 text-emerald-600" : "border border-purple-200 bg-purple-50 text-purple-500"}`}
             >
               {item}
             </button>
           ))}
         </div>
       </div>
-      <Timeline items={items} compact />
+      <div className="lg:px-8">
+        <Timeline items={items} compact />
+      </div>
       <FloatingAction icon={Plus} label="Add Chapter" />
     </section>
   );
@@ -786,10 +878,10 @@ function SyllabusView({
 
 function RoadmapView() {
   return (
-    <section className="min-h-screen px-6 pb-28 pt-10">
-      <h1 className="text-2xl font-black leading-tight text-slate-950">Future Skills Curriculum Pathway</h1>
-      <p className="mt-1 text-base font-semibold text-slate-500">Prepare students with essential, modern future-ready career skills.</p>
-      <div className="mt-6">
+    <section className="min-h-screen px-6 pb-28 pt-10 lg:px-8 lg:pb-8 lg:pt-6">
+      <h1 className="text-2xl font-black leading-tight text-slate-950 lg:text-lg lg:font-bold">Future Skills Curriculum Pathway</h1>
+      <p className="mt-1 text-base font-semibold text-slate-500 lg:text-sm lg:font-normal">Prepare students with essential, modern future-ready career skills.</p>
+      <div className="mt-6 lg:mt-4 lg:max-w-[550px]">
         <Timeline items={roadmapItems} />
       </div>
       <FloatingAction icon={Rocket} label="Manage Skills" />
@@ -799,18 +891,18 @@ function RoadmapView() {
 
 function Timeline({ items, compact = false }: { items: readonly (readonly [string, string, string])[]; compact?: boolean }) {
   return (
-    <div className={compact ? "px-7 pt-6" : ""}>
-      <div className="relative pl-10">
-        <div className="absolute bottom-6 left-[15px] top-4 w-[3px] rounded-full bg-slate-200" />
+    <div className={compact ? "px-7 pt-6 lg:px-0 lg:pt-4" : ""}>
+      <div className="relative pl-10 lg:pl-8">
+        <div className="absolute bottom-6 left-[15px] top-4 w-[3px] rounded-full bg-slate-200 lg:left-[12px] lg:w-[2px]" />
         {items.map(([title, subtitle, state], index) => (
-          <div key={title} className="relative mb-4">
-            <div className={`absolute -left-10 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 bg-white shadow-sm ${state === "done" ? "border-emerald-200 text-emerald-500" : state === "active" ? "border-blue-200 text-blue-500" : "border-slate-200 text-slate-400"}`}>
-              {state === "done" ? <Check className="h-5 w-5" /> : state === "active" ? <PlayCircle className="h-5 w-5 fill-blue-500 text-blue-500" /> : <Lock className="h-4 w-4" />}
+          <div key={title} className="relative mb-4 lg:mb-3">
+            <div className={`absolute -left-10 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 bg-white shadow-sm lg:-left-8 lg:h-6 lg:w-6 ${state === "done" ? "border-emerald-200 text-emerald-500" : state === "active" ? "border-blue-200 text-blue-500" : "border-slate-200 text-slate-400"}`}>
+              {state === "done" ? <Check className="h-5 w-5 lg:h-3 lg:w-3" /> : state === "active" ? <PlayCircle className="h-5 w-5 fill-blue-500 text-blue-500 lg:h-3 lg:w-3" /> : <Lock className="h-4 w-4 lg:h-3 lg:w-3" />}
             </div>
-            {index > 0 && <div className={`absolute -left-[25px] -top-4 h-9 w-[3px] ${state === "done" ? "bg-emerald-400" : state === "active" ? "bg-blue-500" : "bg-slate-200"}`} />}
-            <div className={`rounded-[18px] border px-4 py-4 shadow-sm ${state === "done" ? "border-emerald-200 bg-emerald-50/40" : state === "active" ? "border-blue-100 bg-white/70" : "border-slate-200 bg-white/55"}`}>
-              <h3 className={`text-xl font-black leading-tight ${state === "locked" ? "text-slate-500" : "text-slate-950"}`}>{title}</h3>
-              <p className="mt-1 text-base font-semibold leading-snug text-slate-500">{subtitle}</p>
+            {index > 0 && <div className={`absolute -left-[25px] -top-4 h-9 w-[3px] lg:-left-[20px] lg:h-7 lg:w-[2px] ${state === "done" ? "bg-emerald-400" : state === "active" ? "bg-blue-500" : "bg-slate-200"}`} />}
+            <div className={`rounded-[18px] border px-4 py-4 shadow-sm lg:rounded-lg lg:px-4 lg:py-3 ${state === "done" ? "border-emerald-200 bg-emerald-50/40" : state === "active" ? "border-blue-100 bg-white/70" : "border-slate-200 bg-white/55"}`}>
+              <h3 className={`text-xl font-black leading-tight lg:text-sm lg:font-bold ${state === "locked" ? "text-slate-500" : "text-slate-950"}`}>{title}</h3>
+              <p className="mt-1 text-base font-semibold leading-snug text-slate-500 lg:text-xs lg:font-normal lg:mt-0.5">{subtitle}</p>
             </div>
           </div>
         ))}
@@ -829,9 +921,9 @@ function LeaderboardView({ students }: { students: TeacherStudent[] }) {
   ] as const;
 
   return (
-    <section className="min-h-screen px-6 pb-28 pt-10">
-      <h1 className="text-[34px] font-black leading-tight text-slate-950">Student Leaderboard Standings</h1>
-      <div className="mt-8 space-y-6">
+    <section className="min-h-screen px-6 pb-28 pt-10 lg:px-8 lg:pb-8 lg:pt-6">
+      <h1 className="text-[34px] font-black leading-tight text-slate-950 lg:text-lg lg:font-bold">Student Leaderboard Standings</h1>
+      <div className="mt-8 space-y-6 lg:mt-4 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
         {arenas.map(([title, color, arenaNames]) => (
           <LeaderboardCard key={title} title={title} color={color} names={[...arenaNames]} />
         ))}
@@ -849,14 +941,14 @@ function LeaderboardCard({ title, color, names }: { title: string; color: "blue"
   };
 
   return (
-    <div className={`rounded-[22px] border-2 p-6 ${styles[color]}`}>
-      <h2 className="text-2xl font-black text-slate-950">{title}</h2>
-      <div className="mt-5 space-y-3">
+    <div className={`rounded-[22px] border-2 p-6 lg:rounded-xl lg:p-4 ${styles[color]}`}>
+      <h2 className="text-2xl font-black text-slate-950 lg:text-sm lg:font-bold">{title}</h2>
+      <div className="mt-5 space-y-3 lg:mt-3 lg:space-y-2">
         {names.map((name, index) => (
-          <div key={`${title}-${name}-${index}`} className="grid grid-cols-[44px_1fr_auto] items-center gap-1 text-lg font-black">
+          <div key={`${title}-${name}-${index}`} className="grid grid-cols-[44px_1fr_auto] items-center gap-1 text-lg font-black lg:grid-cols-[32px_1fr_auto] lg:text-xs lg:font-semibold">
             <span>{index + 1}{index === 0 ? "st" : index === 1 ? "nd" : "rd"}</span>
             <span className="text-slate-950">{name}</span>
-            <span className="text-base text-slate-500">Level {Math.max(5 - index, 3)} {index === 0 ? "(Complete)" : "Finished"}</span>
+            <span className="text-base text-slate-500 lg:text-[11px]">Level {Math.max(5 - index, 3)} {index === 0 ? "(Complete)" : "Finished"}</span>
           </div>
         ))}
       </div>
@@ -889,16 +981,16 @@ function DoubtsView({
   const visible = filter === "pending" ? pendingDoubts : filter === "solved" ? solvedDoubts : doubts;
 
   return (
-    <section className="min-h-screen bg-[linear-gradient(180deg,#f4f8ff_0%,#e9eeff_56%,#fff2f8_100%)] pb-12">
-      <div className="flex h-[88px] items-center gap-5 bg-white px-7">
-        <button onClick={() => setActiveView("home")} className="rounded-full p-1">
+    <section className="min-h-screen bg-[linear-gradient(180deg,#f4f8ff_0%,#e9eeff_56%,#fff2f8_100%)] pb-12 lg:bg-transparent">
+      <div className="flex h-[88px] items-center gap-5 bg-white px-7 lg:h-14 lg:gap-3 lg:px-8 lg:border-b lg:border-slate-100">
+        <button onClick={() => setActiveView("home")} className="rounded-full p-1 lg:hidden">
           <ArrowLeft className="h-9 w-9 text-slate-950" />
         </button>
-        <h1 className="text-[26px] font-black text-slate-950">Student Doubts Solver</h1>
+        <h1 className="text-[26px] font-black text-slate-950 lg:text-base lg:font-bold">Student Doubts Solver</h1>
       </div>
 
-      <div className="px-6 py-5">
-        <div className="grid grid-cols-3 rounded-[24px] bg-white/75 p-2 shadow-sm">
+      <div className="px-6 py-5 lg:px-8 lg:py-4">
+        <div className="grid grid-cols-3 rounded-[24px] bg-white/75 p-2 shadow-sm lg:inline-flex lg:gap-1 lg:rounded-lg lg:p-1">
           <DoubtTab active={filter === "all"} label="All Doubts" count={doubts.length} onClick={() => setFilter("all")} />
           <DoubtTab active={filter === "pending"} label="Pending" count={pendingDoubts.length} dot onClick={() => setFilter("pending")} />
           <DoubtTab active={filter === "solved"} label="Solved" count={solvedDoubts.length} onClick={() => setFilter("solved")} />
@@ -1013,8 +1105,8 @@ function DoubtCard({
 
 function FloatingAction({ icon: Icon, label }: { icon: typeof Plus; label: string }) {
   return (
-    <button className="fixed bottom-24 right-[max(1.5rem,calc((100vw-560px)/2+1.5rem))] z-20 flex h-[76px] items-center gap-4 rounded-[22px] bg-blue-600 px-7 text-xl font-black text-white shadow-xl shadow-blue-300">
-      <Icon className="h-7 w-7" />
+    <button className="fixed bottom-24 right-7 z-20 flex h-[76px] items-center gap-4 rounded-[22px] bg-blue-600 px-7 text-xl font-black text-white shadow-xl shadow-blue-300 lg:bottom-6 lg:right-6 lg:h-10 lg:gap-2 lg:rounded-lg lg:px-4 lg:text-xs lg:font-semibold lg:shadow-md">
+      <Icon className="h-7 w-7 lg:h-4 lg:w-4" />
       {label}
     </button>
   );
@@ -1022,7 +1114,7 @@ function FloatingAction({ icon: Icon, label }: { icon: typeof Plus; label: strin
 
 function BottomNav({ activeView, setActiveView }: { activeView: ActiveView; setActiveView: (view: ActiveView) => void }) {
   return (
-    <nav className="fixed bottom-0 left-1/2 z-30 grid h-[86px] w-full max-w-[560px] -translate-x-1/2 grid-cols-4 border-t border-slate-100 bg-white">
+    <nav className="fixed bottom-0 left-1/2 z-30 grid h-[86px] w-full max-w-[560px] -translate-x-1/2 grid-cols-4 border-t border-slate-100 bg-white lg:hidden">
       {navItems.map((item) => {
         const active = activeView === item.id;
         return (
@@ -1033,6 +1125,202 @@ function BottomNav({ activeView, setActiveView }: { activeView: ActiveView; setA
         );
       })}
     </nav>
+  );
+}
+
+function StudentsView({ students }: { students: TeacherStudent[] }) {
+  return (
+    <section className="min-h-screen pb-28 lg:pb-8">
+      <div className="flex h-14 items-center gap-3 border-b border-slate-100 bg-white px-7 lg:px-8">
+        <h1 className="text-lg font-bold text-slate-950 lg:text-base">My Students ({students.length})</h1>
+      </div>
+      <div className="px-7 py-4 lg:px-8">
+        {students.length === 0 ? (
+          <p className="py-12 text-center text-sm text-slate-500">No students found.</p>
+        ) : (
+          <div className="space-y-2">
+            {students.map((s) => (
+              <div key={s.id} className="flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm lg:p-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700 lg:h-8 lg:w-8 lg:text-xs">
+                  {(s.name || "S").charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-slate-900 lg:text-xs">{s.name || "Unknown"}</p>
+                  <p className="truncate text-xs text-slate-500">{s.email || s.phone || "No contact"}</p>
+                </div>
+                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700">{s.classLevel || "N/A"}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function AttendanceView({ dashboard }: { dashboard: TeacherDashboard }) {
+  return (
+    <section className="min-h-screen pb-28 lg:pb-8">
+      <div className="flex h-14 items-center gap-3 border-b border-slate-100 bg-white px-7 lg:px-8">
+        <h1 className="text-lg font-bold text-slate-950 lg:text-base">Attendance Log</h1>
+      </div>
+      <div className="px-7 py-4 lg:px-8">
+        <p className="text-sm text-slate-600">Total students: <strong>{dashboard.stats.students}</strong></p>
+        <div className="mt-4 space-y-2">
+          {dashboard.students.map((s) => (
+            <div key={s.id} className="flex items-center justify-between rounded-xl bg-white p-3 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-emerald-100 text-center text-xs font-bold leading-8 text-emerald-700">
+                  {(s.name || "S").charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-900">{s.name}</p>
+                  <p className="text-[10px] text-slate-500">{s.classLevel || "N/A"}</p>
+                </div>
+              </div>
+              <span className="rounded bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">Present</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RecordingsView({ dashboard }: { dashboard: TeacherDashboard }) {
+  return (
+    <section className="min-h-screen pb-28 lg:pb-8">
+      <div className="flex h-14 items-center gap-3 border-b border-slate-100 bg-white px-7 lg:px-8">
+        <h1 className="text-lg font-bold text-slate-950 lg:text-base">Recorded Classes</h1>
+      </div>
+      <div className="px-7 py-4 lg:px-8">
+        <p className="py-12 text-center text-sm text-slate-500">No recorded videos uploaded yet.</p>
+      </div>
+    </section>
+  );
+}
+
+function LiveClassesView({ dashboard }: { dashboard: TeacherDashboard }) {
+  return (
+    <section className="min-h-screen pb-28 lg:pb-8">
+      <div className="flex h-14 items-center gap-3 border-b border-slate-100 bg-white px-7 lg:px-8">
+        <h1 className="text-lg font-bold text-slate-950 lg:text-base">Live Classes ({dashboard.schedule.length})</h1>
+      </div>
+      <div className="px-7 py-4 lg:px-8">
+        {dashboard.schedule.length === 0 ? (
+          <p className="py-12 text-center text-sm text-slate-500">No live classes scheduled.</p>
+        ) : (
+          <div className="space-y-2">
+            {dashboard.schedule.map((s, i) => (
+              <div key={i} className="rounded-xl bg-white p-4 shadow-sm lg:p-3">
+                <p className="text-sm font-semibold text-slate-900 lg:text-xs">{String(s.title || "Untitled Session")}</p>
+                <p className="mt-1 text-xs text-slate-500">{String(s.subject || "")} • {String(s.classLevel || "")}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function SubmissionsView({ dashboard }: { dashboard: TeacherDashboard }) {
+  return (
+    <section className="min-h-screen pb-28 lg:pb-8">
+      <div className="flex h-14 items-center gap-3 border-b border-slate-100 bg-white px-7 lg:px-8">
+        <h1 className="text-lg font-bold text-slate-950 lg:text-base">Homework Submissions</h1>
+      </div>
+      <div className="px-7 py-4 lg:px-8">
+        {dashboard.homework.length === 0 ? (
+          <p className="py-12 text-center text-sm text-slate-500">No homework submissions yet.</p>
+        ) : (
+          <div className="space-y-2">
+            {dashboard.homework.map((hw) => (
+              <div key={hw.id} className="rounded-xl bg-white p-4 shadow-sm lg:p-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 lg:text-xs">{hw.title}</p>
+                    <p className="mt-0.5 text-xs text-slate-500">{hw.subject} • {hw.classLevel || "All"}</p>
+                  </div>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${hw.priority === "high" ? "bg-rose-50 text-rose-600" : hw.priority === "medium" ? "bg-yellow-50 text-yellow-600" : "bg-slate-100 text-slate-600"}`}>
+                    {hw.priority || "normal"}
+                  </span>
+                </div>
+                {hw.dueDate && <p className="mt-1 text-[10px] text-slate-400">Due: {hw.dueDate}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function HomeworkView({ dashboard, actionMode, setActionMode, form, setForm, classOptions, submitting, onSubmitAction, status }: { dashboard: TeacherDashboard; actionMode: ActionMode; setActionMode: (m: ActionMode) => void; form: { subject: string; title: string; description: string; classLevel: string; dueDate: string; priority: string; fileName: string; fileSize: string }; setForm: (patch: Partial<{ subject: string; title: string; description: string; classLevel: string; dueDate: string; priority: string; fileName: string; fileSize: string }>) => void; classOptions: string[]; submitting: boolean; onSubmitAction: () => void; status: string }) {
+  return (
+    <section className="min-h-screen pb-28 lg:pb-8">
+      <div className="flex h-14 items-center gap-3 border-b border-slate-100 bg-white px-7 lg:px-8">
+        <h1 className="text-lg font-bold text-slate-950 lg:text-base">Assign Homework ({dashboard.homework.length})</h1>
+      </div>
+      <div className="px-7 py-4 lg:px-8 lg:max-w-[600px]">
+        <TeacherActionForm mode="homework" setMode={setActionMode} form={form} setForm={setForm} classOptions={classOptions} submitting={submitting} onSubmit={onSubmitAction} status={status} />
+        {dashboard.homework.length > 0 && (
+          <div className="mt-6 space-y-2">
+            <h3 className="text-sm font-bold text-slate-800 lg:text-xs">Recent Homework</h3>
+            {dashboard.homework.slice(0, 10).map((hw) => (
+              <div key={hw.id} className="rounded-lg bg-white p-3 shadow-sm">
+                <p className="text-sm font-semibold text-slate-900 lg:text-xs">{hw.title}</p>
+                <p className="text-xs text-slate-500">{hw.subject} • {hw.classLevel || "All"} {hw.dueDate ? `• Due: ${hw.dueDate}` : ""}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function NotesView({ dashboard, actionMode, setActionMode, form, setForm, classOptions, submitting, onSubmitAction, status }: { dashboard: TeacherDashboard; actionMode: ActionMode; setActionMode: (m: ActionMode) => void; form: { subject: string; title: string; description: string; classLevel: string; dueDate: string; priority: string; fileName: string; fileSize: string }; setForm: (patch: Partial<{ subject: string; title: string; description: string; classLevel: string; dueDate: string; priority: string; fileName: string; fileSize: string }>) => void; classOptions: string[]; submitting: boolean; onSubmitAction: () => void; status: string }) {
+  return (
+    <section className="min-h-screen pb-28 lg:pb-8">
+      <div className="flex h-14 items-center gap-3 border-b border-slate-100 bg-white px-7 lg:px-8">
+        <h1 className="text-lg font-bold text-slate-950 lg:text-base">Upload Notes ({dashboard.notes.length})</h1>
+      </div>
+      <div className="px-7 py-4 lg:px-8 lg:max-w-[600px]">
+        <TeacherActionForm mode="note" setMode={setActionMode} form={form} setForm={setForm} classOptions={classOptions} submitting={submitting} onSubmit={onSubmitAction} status={status} />
+        {dashboard.notes.length > 0 && (
+          <div className="mt-6 space-y-2">
+            <h3 className="text-sm font-bold text-slate-800 lg:text-xs">Uploaded Notes</h3>
+            {dashboard.notes.slice(0, 10).map((note) => (
+              <div key={note.id} className="rounded-lg bg-white p-3 shadow-sm">
+                <p className="text-sm font-semibold text-slate-900 lg:text-xs">{note.title}</p>
+                <p className="text-xs text-slate-500">{note.subject} {note.fileName ? `• ${note.fileName}` : ""}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function QuizView() {
+  return (
+    <section className="min-h-screen pb-28 lg:pb-8">
+      <div className="flex h-14 items-center gap-3 border-b border-slate-100 bg-white px-7 lg:px-8">
+        <h1 className="text-lg font-bold text-slate-950 lg:text-base">Arcade & Quiz Console</h1>
+      </div>
+      <div className="px-7 py-4 lg:px-8">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {["Word Unscramble", "Quiz Arena", "Cognitive Arena", "Syntax Block"].map((game) => (
+            <div key={game} className="rounded-xl bg-white p-4 text-center shadow-sm lg:p-3">
+              <Gamepad2 className="mx-auto h-8 w-8 text-blue-500 lg:h-6 lg:w-6" />
+              <p className="mt-2 text-sm font-semibold text-slate-900 lg:text-xs">{game}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
