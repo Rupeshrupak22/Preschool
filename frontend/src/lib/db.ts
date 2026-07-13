@@ -1576,6 +1576,46 @@ export async function getTeacherDashboard(teacherId: string) {
     )
   ]);
 
+  // Also query adyapanschool app tables (app_doubts, app_homework, app_notes)
+  // Match by teacher_id (ID or email) or by any teacher in the same school
+  const [schoolTeacherRows] = await pool.query<RowDataPacket[]>(
+    `SELECT id, email FROM teachers WHERE school_name = ? OR school_id = ?`,
+    [schoolScope, schoolId]
+  );
+  const schoolTeacherIds = schoolTeacherRows.map((r) => r.id);
+  const schoolTeacherEmails = schoolTeacherRows.map((r) => r.email);
+  const allTeacherIdentifiers = [...new Set([teacher.id, teacher.email, ...schoolTeacherIds, ...schoolTeacherEmails])];
+  const placeholders = allTeacherIdentifiers.map(() => "?").join(", ");
+
+  const [appDoubtRows, appHomeworkRows, appNoteRows] = await Promise.all([
+    pool.query<RowDataPacket[]>(
+      `SELECT id, student_name, student_email, student_class, subject, question,
+              replied, reply_text, attachment_type, attachment_name, teacher_id, created_at
+       FROM app_doubts
+       WHERE teacher_id IN (${placeholders})
+       ORDER BY created_at DESC
+       LIMIT 120`,
+      allTeacherIdentifiers
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT id, title, subject, description, due_date, priority, added_by,
+              teacher_id, class_level, created_at, file_name
+       FROM app_homework
+       WHERE teacher_id IN (${placeholders})
+       ORDER BY created_at DESC
+       LIMIT 120`,
+      allTeacherIdentifiers
+    ),
+    pool.query<RowDataPacket[]>(
+      `SELECT id, title, subject, description, file_name, file_size, teacher_id, created_at
+       FROM app_notes
+       WHERE teacher_id IN (${placeholders})
+       ORDER BY created_at DESC
+       LIMIT 120`,
+      allTeacherIdentifiers
+    )
+  ]);
+
   const students = studentRows[0].map((row) => ({
     id: row.id,
     name: row.name,
@@ -1631,6 +1671,23 @@ export async function getTeacherDashboard(teacherId: string) {
     createdAt: dateValue(row.created_at)
   }));
 
+  // Merge app_homework into homework
+  const appHomework = appHomeworkRows[0].map((row) => ({
+    id: `app_hw_${row.id}`,
+    teacherId: row.teacher_id,
+    classLevel: row.class_level,
+    studentEmail: null,
+    subject: row.subject,
+    title: row.title,
+    description: row.description,
+    dueDate: row.due_date,
+    priority: row.priority,
+    status: "active",
+    teacherName: row.added_by,
+    createdAt: dateValue(row.created_at)
+  }));
+  homework.push(...appHomework);
+
   const notes = noteRows[0].map((row) => ({
     id: row.id,
     teacherId: row.teacher_id,
@@ -1648,6 +1705,25 @@ export async function getTeacherDashboard(teacherId: string) {
     createdAt: dateValue(row.created_at)
   }));
 
+  // Merge app_notes into notes
+  const appNotes = appNoteRows[0].map((row) => ({
+    id: `app_note_${row.id}`,
+    teacherId: row.teacher_id,
+    classLevel: null,
+    studentEmail: null,
+    subject: row.subject,
+    title: row.title,
+    description: row.description,
+    fileName: row.file_name,
+    fileSize: row.file_size,
+    noteType: null,
+    url: null,
+    status: "active",
+    teacherName: null,
+    createdAt: dateValue(row.created_at)
+  }));
+  notes.push(...appNotes);
+
   const doubts = doubtRows[0].map((row) => ({
     id: row.id,
     studentEmail: row.student_email,
@@ -1662,6 +1738,23 @@ export async function getTeacherDashboard(teacherId: string) {
     createdAt: dateValue(row.created_at),
     repliedAt: dateValue(row.replied_at)
   }));
+
+  // Merge app_doubts into doubts
+  const appDoubts = appDoubtRows[0].map((row) => ({
+    id: `app_doubt_${row.id}`,
+    studentEmail: row.student_email,
+    studentName: row.student_name,
+    classLevel: row.student_class,
+    subject: row.subject,
+    question: row.question,
+    attachmentName: row.attachment_name || null,
+    attachmentType: row.attachment_type === "None" ? null : row.attachment_type,
+    status: row.replied ? "solved" : "pending",
+    replyText: row.reply_text || null,
+    createdAt: dateValue(row.created_at),
+    repliedAt: row.replied ? dateValue(row.created_at) : null
+  }));
+  doubts.push(...appDoubts);
 
   const notifications = notificationRows[0].map((row) => ({
     id: row.id,
