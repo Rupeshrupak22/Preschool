@@ -9,6 +9,7 @@ import {
   Cpu,
   GraduationCap,
   HeartHandshake,
+  Newspaper,
   Lightbulb,
   Rocket,
   School,
@@ -57,7 +58,7 @@ const values: {
   },
   {
     title: "Safe modern technology",
-    copy: "AI, coding, robotics, and digital skills are taught with responsible habits and guided practice.",
+    copy: "AI, coding, current affairs, and digital skills are taught with responsible habits and guided practice.",
     icon: ShieldCheck,
     iconGradient: "from-slate-800 to-slate-950",
     glow: "0 12px 40px rgba(15,23,42,0.4)",
@@ -73,7 +74,7 @@ const pillars: {
 }[] = [
   { title: "Coding", icon: Code2, accent: "group-hover:text-blue-600", iconBg: "bg-blue-600", cardBg: "from-blue-50/90 to-white" },
   { title: "Artificial Intelligence", icon: Brain, accent: "group-hover:text-violet-600", iconBg: "bg-violet-600", cardBg: "from-violet-50/90 to-white" },
-  { title: "Robotics", icon: Cpu, accent: "group-hover:text-emerald-600", iconBg: "bg-emerald-600", cardBg: "from-emerald-50/90 to-white" },
+  { title: "Current Affairs", icon: Newspaper, accent: "group-hover:text-emerald-600", iconBg: "bg-emerald-600", cardBg: "from-emerald-50/90 to-white" },
   { title: "Communication", icon: Users, accent: "group-hover:text-rose-600", iconBg: "bg-rose-600", cardBg: "from-rose-50/90 to-white" },
   { title: "Innovation", icon: Lightbulb, accent: "group-hover:text-amber-600", iconBg: "bg-amber-500", cardBg: "from-amber-50/90 to-white" },
   { title: "Certification", icon: Award, accent: "group-hover:text-cyan-600", iconBg: "bg-cyan-600", cardBg: "from-cyan-50/90 to-white" },

@@ -11,6 +11,7 @@ import {
   Cpu,
   GraduationCap,
   Laptop,
+  Newspaper,
   Rocket,
   ShieldCheck,
   Sparkles,
@@ -24,7 +25,7 @@ import {
 type Icon = React.ComponentType<{ className?: string }>;
 
 const skillTiles: { label: string; icon: Icon; color: string }[] = [
-  { label: "Robotics", icon: Cpu, color: "from-orange-500 to-red-500" },
+  { label: "Current Affairs", icon: Newspaper, color: "from-orange-500 to-red-500" },
   { label: "Coding", icon: Laptop, color: "from-blue-500 to-indigo-600" },
   { label: "IoT", icon: Wifi, color: "from-green-500 to-emerald-600" },
   { label: "Electronics", icon: Zap, color: "from-yellow-500 to-orange-500" },

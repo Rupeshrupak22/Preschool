@@ -10,6 +10,7 @@ import {
   Cpu,
   GraduationCap,
   LineChart,
+  Newspaper,
   Lock,
   Radio,
   Rocket,
@@ -29,12 +30,11 @@ const fadeUp = {
 };
 
 const subjects: { name: string; icon: Icon; color: string }[] = [
-  { name: "Robotics", icon: Cpu, color: "from-blue-500 to-cyan-400" },
+  { name: "Current Affairs", icon: Newspaper, color: "from-blue-500 to-cyan-400" },
   { name: "Coding", icon: Code2, color: "from-green-500 to-emerald-400" },
   { name: "IoT", icon: Wifi, color: "from-cyan-500 to-sky-400" },
   { name: "Electronics", icon: Radio, color: "from-orange-500 to-amber-400" },
   { name: "AI/ML", icon: Brain, color: "from-purple-500 to-violet-400" },
-  { name: "Programming", icon: Code2, color: "from-pink-500 to-rose-400" },
 ];
 
 const features: { icon: Icon; title: string; desc: string; tone: string }[] = [
@@ -150,7 +150,7 @@ export default function MentorsPage() {
             </p>
           </div>
 
-          <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="mt-12 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
             {subjects.map((subject, index) => (
               <motion.div
                 key={index}

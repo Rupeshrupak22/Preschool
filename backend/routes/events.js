@@ -1,21 +1,34 @@
 const express = require('express');
 const prisma = require('../lib/prisma');
 const { authenticate, authorize } = require('../middleware/auth');
+const { sendResponse } = require('../utils/response');
 const router = express.Router();
 
 // GET /api/v1/events
 router.get('/', authenticate, async (req, res) => {
   try {
     const { limit } = req.query;
+    const take = Math.min(parseInt(limit) || 50, 200);
+
+    // Scope events by role — students/teachers see only their own or broadcast events
+    let where = {};
+    if (req.user.role === 'student' || req.user.role === 'teacher') {
+      where.OR = [
+        { user_email: req.user.email },
+        { user_email: null }, // broadcast events
+      ];
+    }
 
     const events = await prisma.notifications.findMany({
+      where,
       orderBy: { created_at: 'desc' },
-      take: limit ? parseInt(limit) : 50,
+      take,
     });
 
     res.json(events);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch events error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -37,7 +50,8 @@ router.post('/', authenticate, authorize('teacher', 'principal', 'admin'), async
 
     res.status(201).json(event);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Create event error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -47,7 +61,8 @@ router.delete('/:id', authenticate, authorize('admin'), async (req, res) => {
     await prisma.notifications.delete({ where: { id: req.params.id } });
     res.json({ message: 'Event deleted' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Delete event error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 

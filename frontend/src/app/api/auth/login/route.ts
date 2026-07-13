@@ -7,8 +7,7 @@ import { publicUser } from "@/lib/store";
 import { loginSchema } from "@/lib/validators";
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  const payload = loginSchema.safeParse(body);
+  const payload = loginSchema.safeParse(await request.json());
 
   if (!payload.success) {
     return NextResponse.json({ error: "Enter a valid email, password, and CAPTCHA." }, { status: 400 });
@@ -31,41 +30,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid password." }, { status: 401 });
   }
 
-  // Verify access key for admin users — each admin must use their OWN access key
-  if (user.role === "admin") {
-    const accessKey = body.accessKey;
-
-    if (!accessKey) {
-      return NextResponse.json({ error: "Access key is required for admin login." }, { status: 401 });
-    }
-
-    let keyValid = false;
-
-    if (user.accessKeyHash) {
-      // Verify against this user's own stored access key hash
-      const keyResult = await verifyPassword(accessKey, user.accessKeyHash);
-      keyValid = keyResult.valid;
-    } else {
-      // Fallback: only the designated ADMIN_EMAIL can use the global ADMIN_ACCESS_KEY
-      const expectedKey = process.env.ADMIN_ACCESS_KEY;
-      const expectedEmail = process.env.ADMIN_EMAIL;
-
-      if (expectedKey && expectedEmail && user.email.toLowerCase() === expectedEmail.toLowerCase()) {
-        keyValid = accessKey === expectedKey;
-      }
-    }
-
-    if (!keyValid) {
-      return NextResponse.json({ error: "Invalid access key." }, { status: 401 });
-    }
-  }
-
-  // Check for existing active session — prompt user to clear it first
   const existingSession = await findActiveSession(user.id);
   if (existingSession) {
     return NextResponse.json(
       {
-        error: "This admin account is already logged in on another device. Clear the previous session to continue.",
+        error: `This ${user.role} account is already active on another device. Clear previous sessions, refresh, and login again.`,
         code: "ACTIVE_SESSION_EXISTS",
         action: "CLEAR_PREVIOUS_SESSIONS_AND_RELOGIN"
       },
@@ -87,7 +56,7 @@ export async function POST(request: Request) {
     sid,
     email: user.email,
     role: user.role,
-    ttlSeconds: 24 * 60 * 60
+    ttlSeconds: 15 * 60
   });
 
   await recordLoginEvent({
@@ -104,7 +73,7 @@ export async function POST(request: Request) {
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 24 * 60 * 60
+    maxAge: 15 * 60
   });
   return response;
 }

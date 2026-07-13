@@ -45,14 +45,15 @@ router.get('/principal', authenticate, authorize('principal'), async (req, res) 
 });
 
 async function getStudentDashboard(userId, email) {
-  const [attendance, payments, notices, enrollments, totalAtt, presentCount] = await Promise.all([
+  const [attendance, payments, notices, enrollments] = await Promise.all([
     prisma.attendance.findMany({ where: { user_id: userId }, orderBy: { created_at: 'desc' }, take: 10 }),
     prisma.payments.findMany({ where: { user_email: email }, orderBy: { created_at: 'desc' }, take: 5 }),
     prisma.notifications.findMany({ where: { OR: [{ user_email: email }, { user_email: null }] }, orderBy: { created_at: 'desc' }, take: 5 }),
     prisma.enrollments.findMany({ where: { user_email: email }, orderBy: { enrolled_at: 'desc' }, take: 5 }),
-    prisma.attendance.count({ where: { user_id: userId } }),
-    prisma.attendance.count({ where: { user_id: userId, status: 'present' } }),
   ]);
+
+  const totalAtt = await prisma.attendance.count({ where: { user_id: userId } });
+  const presentCount = await prisma.attendance.count({ where: { user_id: userId, status: 'present' } });
 
   return {
     attendancePercentage: totalAtt > 0 ? Math.round((presentCount / totalAtt) * 100) : 0,
@@ -84,23 +85,66 @@ async function getPrincipalDashboard(userId) {
   const [totalStudents, totalTeachers, recentLogins] = await Promise.all([
     prisma.student.count({ where }),
     prisma.teacher.count({ where }),
-    prisma.login_events.findMany({ orderBy: { created_at: 'desc' }, take: 10 }),
+    getRecentLoginEvents(schoolId),
   ]);
   return { totalStudents, totalTeachers, recentLogins, schoolId };
 }
 
+async function getRecentLoginEvents(schoolId) {
+  if (!schoolId) return [];
+
+  // 1. Student logins — filter by student emails belonging to this school
+  const students = await prisma.student.findMany({
+    where: { schoolId },
+    select: { email: true },
+  });
+  const schoolEmails = students.map((s) => s.email);
+
+  const [studentLogins, teacherLogins, principalLogins] = await Promise.all([
+    schoolEmails.length > 0
+      ? prisma.login_events.findMany({
+          where: { email: { in: schoolEmails } },
+          select: { id: true, email: true, name: true, role: true, status: true, created_at: true, ip_address: true },
+          take: 50,
+        })
+      : [],
+    // 2. Teacher logins — teacher_login_events has school_id directly
+    prisma.teacher_login_events.findMany({
+      where: { school_id: schoolId },
+      select: { id: true, email: true, status: true, created_at: true, ip_address: true },
+      take: 50,
+    }),
+    // 3. Principal logins — principal_login_events has school_id directly
+    prisma.principal_login_events.findMany({
+      where: { school_id: schoolId },
+      select: { id: true, email: true, status: true, created_at: true, ip_address: true },
+    }),
+  ]);
+
+  // Normalise to a common shape
+  const allLogins = [
+    ...studentLogins.map((e) => ({ ...e, role: e.role || 'student' })),
+    ...teacherLogins.map((e) => ({ ...e, name: null, role: 'teacher' })),
+    ...principalLogins.map((e) => ({ ...e, name: null, role: 'principal' })),
+  ];
+
+  // Sort by created_at descending, take top 10
+  return allLogins
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 10);
+}
+
 async function getAdminDashboard() {
-  const [totalUsers, totalStudents, totalTeachers, totalSchools, totalPrincipals, totalPayments, recentLogins] = await Promise.all([
+  const [totalUsers, totalStudents, totalTeachers, totalSchools, totalPayments, recentLogins] = await Promise.all([
     prisma.users.count(),
     prisma.student.count(),
     prisma.teacher.count(),
     prisma.school.count(),
-    prisma.principals.count(),
     prisma.payments.count(),
     prisma.login_events.findMany({ orderBy: { created_at: 'desc' }, take: 10 }),
   ]);
   const paidPayments = await prisma.payments.count({ where: { status: 'paid' } });
-  return { totalUsers, totalStudents, totalTeachers, totalSchools, totalPrincipals, totalPayments, paidPayments, recentLogins };
+  return { totalUsers, totalStudents, totalTeachers, totalSchools, totalPayments, paidPayments, recentLogins };
 }
 
 module.exports = router;

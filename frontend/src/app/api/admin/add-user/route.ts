@@ -49,11 +49,8 @@ export async function POST(request: Request) {
       );
       const hasPasswordCol = Number(cols[0]?.count ?? 0) > 0;
 
-      const columns = ["id", "name", "email", "password_hash", ...(hasPasswordCol ? ["password"] : []), "phone", "class_level", "class_name", "school_name", "school", "role", "signup_source", "access_key_hash"];
-      // For admin users, set the default access key hash (SHA-256 of ADMIN-ADY-2026)
-      const crypto = await import("node:crypto");
-      const accessKeyHash = role === "admin" ? crypto.createHash("sha256").update("ADMIN-ADY-2026").digest("hex") : null;
-      const values = [userId, name, email, passwordHash, ...(hasPasswordCol ? [passwordHash] : []), phone || null, classLevel || null, classLevel || null, school || null, school || null, role, "admin", accessKeyHash];
+      const columns = ["id", "name", "email", "password_hash", ...(hasPasswordCol ? ["password"] : []), "phone", "class_level", "class_name", "school_name", "school", "role", "signup_source"];
+      const values = [userId, name, email, passwordHash, ...(hasPasswordCol ? [passwordHash] : []), phone || null, classLevel || null, classLevel || null, school || null, school || null, role, "admin"];
 
       await pool.query(
         `INSERT INTO users (${columns.join(", ")}) VALUES (${columns.map(() => "?").join(", ")})`,

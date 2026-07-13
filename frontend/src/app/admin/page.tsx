@@ -110,37 +110,6 @@ export default function AdminPage() {
   const [clearingSession, setClearingSession] = useState(false);
   const [pendingCredentials, setPendingCredentials] = useState<{ email: string; password: string; accessKey: string } | null>(null);
   const [adminName, setAdminName] = useState("");
-  const [adminEmail, setAdminEmail] = useState("");
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState<Array<{id: string; text: string; time: string; sender_name?: string}>>([]);
-  const [showMessageBox, setShowMessageBox] = useState(false);
-
-  // Poll for received messages (from principals/teachers sending to admin)
-  useEffect(() => {
-    if (!adminEmail) return; // wait until email is set after login
-    async function fetchAdminMessages() {
-      try {
-        const res = await fetch(`/api/messages?email=${encodeURIComponent(adminEmail)}&role=admin&unread=1`);
-        if (res.ok) {
-          const data = await res.json();
-          const msgs = (data.messages ?? []) as Array<{id: string; sender_name: string; message: string; created_at: string; is_read: number}>;
-          setNotifications(msgs.map(m => ({
-            id: m.id,
-            text: `${m.sender_name}: ${m.message}`,
-            time: m.created_at,
-            sender_name: m.sender_name,
-          })));
-        }
-      } catch {}
-    }
-    fetchAdminMessages();
-    const interval = setInterval(fetchAdminMessages, 3000);
-    return () => clearInterval(interval);
-  }, [adminEmail]);
-  const [messageRecipient, setMessageRecipient] = useState("all-teachers");
-  const [messageText, setMessageText] = useState("");
-  const [messageSending, setMessageSending] = useState(false);
-  const [messageSent, setMessageSent] = useState(false);
 
   async function handleAdminLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -267,7 +236,6 @@ export default function AdminPage() {
     }
 
     setAdminName(authData.user?.name || "Admin");
-    setAdminEmail(authData.user?.email || "");
 
     const overviewResponse = await fetch("/api/admin/overview", { cache: "no-store" });
     const data = await overviewResponse.json().catch(() => ({}));
@@ -375,88 +343,84 @@ export default function AdminPage() {
 
   if (showLogin) {
     return (
-      <main className="relative flex h-screen w-full overflow-hidden">
-        {/* Full-screen background video */}
+      <main className="relative flex h-screen items-center justify-end overflow-hidden">
+        {/* Background video */}
         <video
           autoPlay
-          loop
+          loop={true}
           muted
           playsInline
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover opacity-80"
           aria-hidden="true"
         >
           <source src="/newlogin-vid_qPNCEcV9.mp4" type="video/mp4" />
         </video>
-        {/* Watermark cover — gradient at bottom */}
-        <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-40 w-full bg-gradient-to-t from-black via-black/90 to-transparent" />
-
-        {/* Left half — Adyapan branding (hidden on mobile) */}
-        <div className="relative z-10 hidden w-1/2 flex-col items-center justify-center lg:flex pointer-events-none">
+        {/* Adyapan logo and branding centered on the left half */}
+        <div className="absolute left-0 top-0 hidden h-full w-1/2 flex-col items-center justify-center lg:flex z-10 pointer-events-none">
           <img
             src="/ady-logo.png"
-            alt="Adyapan"
-            className="h-36 w-36 rounded-full object-cover shadow-2xl"
+            alt="ADYAPAN"
+            className="h-36 w-36 rounded-full object-cover"
           />
           <h2 className="mt-6 text-5xl font-black text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-            Adyapan{" "}
-            <span className="text-sky-400 drop-shadow-[0_2px_8px_rgba(56,189,248,0.6)]">School</span>
+            Adyapan <span className="text-sky-400 drop-shadow-[0_2px_8px_rgba(56,189,248,0.5)]">School</span>
           </h2>
         </div>
 
-        {/* Right half — login card */}
-        <div className="relative z-10 flex w-full items-center justify-center px-6 lg:w-1/2">
-          <div className="w-full max-w-sm">
-            {/* Active session conflict banner */}
-            {showClearSession && (
-              <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
-                <p className="text-sm font-black text-amber-900">⚠️ Active Session Detected</p>
-                <p className="mt-1 text-sm font-medium text-amber-800">
-                  This admin account is already logged in on another device. Clear the previous session to continue.
-                </p>
-                <div className="mt-3 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={handleClearAdminSessions}
-                    disabled={clearingSession}
-                    className="flex-1 rounded-lg bg-amber-600 px-3 py-2.5 text-xs font-black text-white transition hover:bg-amber-700 disabled:opacity-60"
-                  >
-                    {clearingSession ? "Clearing..." : "Clear & Login"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setShowClearSession(false); setPendingCredentials(null); }}
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-black text-slate-700 transition hover:bg-slate-50"
-                  >
-                    Cancel
-                  </button>
+        {/* Right side form container */}
+        <div className="relative z-10 flex w-full items-center justify-center px-6 sm:w-[60%] md:w-[52%] lg:w-[48%]">
+          <div className="w-full max-w-[380px]">
+            {/* Login Card */}
+            <div className="rounded-2xl border border-white bg-white/90 px-6 py-6 shadow-[0_8px_40px_rgba(0,0,0,0.25)] backdrop-blur-md">
+              {/* Welcome heading */}
+              <div className="mb-5">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 shadow-md">
+                    <ShieldCheck className="h-4 w-4 text-white" />
+                  </div>
+                  <h1 className="text-[22px] font-black text-slate-900">Admin Login</h1>
                 </div>
+                <p className="mt-1 pl-[46px] text-[13px] text-slate-700 font-medium">Authorized access only</p>
               </div>
-            )}
 
-            {/* Card */}
-            <div className="rounded-2xl bg-white/95 px-7 py-7 shadow-[0_8px_40px_rgba(0,0,0,0.28)] backdrop-blur-md">
-              {/* Header */}
-              <div className="mb-5 flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-white">
-                  <ShieldCheck className="h-5 w-5" />
+              {/* Active session conflict banner */}
+              {showClearSession && (
+                <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                  <p className="text-sm font-black text-amber-900">⚠️ Active Session Detected</p>
+                  <p className="mt-1 text-sm font-medium text-amber-800">
+                    This admin account is already logged in on another device. Clear the previous session to continue.
+                  </p>
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      type="button"
+                      onClick={handleClearAdminSessions}
+                      disabled={clearingSession}
+                      className="flex-1 rounded-lg bg-amber-600 px-3 py-2.5 text-xs font-black text-white transition hover:bg-amber-700 disabled:opacity-60"
+                    >
+                      {clearingSession ? "Clearing..." : "Clear & Login"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowClearSession(false); setPendingCredentials(null); }}
+                      className="rounded-lg border border-slate-200 px-3 py-2.5 text-xs font-black text-slate-700 transition hover:bg-slate-50"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-                <div>
-                  <h1 className="text-xl font-black text-slate-900">Admin Login</h1>
-                  <p className="text-xs text-slate-500">Adyapan Admin Portal — Authorized access only</p>
-                </div>
-              </div>
+              )}
 
               <form onSubmit={handleAdminLogin} className="space-y-4">
                 {/* Email */}
                 <div>
                   <label className="mb-1.5 block text-sm font-bold text-slate-700">Email Address</label>
                   <div className="relative">
-                    <svg className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    <svg className="absolute left-3.5 top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                     <input
                       name="email"
                       type="email"
                       placeholder="admin@adyapan.com"
-                      className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                      className="h-[44px] w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                       required
                     />
                   </div>
@@ -466,21 +430,21 @@ export default function AdminPage() {
                 <div>
                   <label className="mb-1.5 block text-sm font-bold text-slate-700">Password</label>
                   <div className="relative">
-                    <svg className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    <svg className="absolute left-3.5 top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                     <input
                       name="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
-                      className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-11 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                      className="h-[44px] w-full rounded-lg border border-slate-200 bg-white pl-10 pr-12 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
                       aria-label="Toggle password visibility"
                     >
-                      <Eye className="h-4 w-4" />
+                      <Eye className="h-[16px] w-[16px]" />
                     </button>
                   </div>
                 </div>
@@ -489,28 +453,28 @@ export default function AdminPage() {
                 <div>
                   <label className="mb-1.5 block text-sm font-bold text-slate-700">Access Key</label>
                   <div className="relative">
-                    <svg className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+                    <svg className="absolute left-3.5 top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
                     <input
                       name="accessKey"
                       type={showAccessKey ? "text" : "password"}
                       placeholder="Enter your admin access key"
-                      className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-11 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-100"
+                      className="h-[44px] w-full rounded-lg border border-slate-200 bg-white pl-10 pr-12 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowAccessKey(!showAccessKey)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
                       aria-label="Toggle access key visibility"
                     >
-                      <Eye className="h-4 w-4" />
+                      <Eye className="h-[16px] w-[16px]" />
                     </button>
                   </div>
                 </div>
 
                 {/* Error */}
                 {loginError && (
-                  <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                  <div className="rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 border border-red-100">
                     {loginError}
                   </div>
                 )}
@@ -519,24 +483,27 @@ export default function AdminPage() {
                 <button
                   type="submit"
                   disabled={loginLoading || showClearSession}
-                  className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-sm font-black text-white shadow-lg shadow-orange-300/40 transition hover:from-orange-500 hover:to-orange-600 active:scale-[0.98] disabled:opacity-60"
+                  className="group flex h-[44px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-sm font-black text-white shadow-lg shadow-blue-200/50 transition-all hover:from-blue-600 hover:to-blue-700 active:scale-[0.98] disabled:opacity-60 disabled:shadow-none"
                 >
                   {loginLoading ? (
                     <RefreshCw className="h-4 w-4 animate-spin" />
                   ) : (
-                    <>Sign In to Admin →</>
+                    <>
+                      Sign In to Admin
+                      <svg className="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    </>
                   )}
                 </button>
               </form>
 
-              <p className="mt-4 text-center text-[11px] text-slate-500">
-                All login attempts are logged and monitored
+              <p className="mt-4 text-center text-[11px] text-slate-900 font-semibold leading-relaxed">
+                All login attempts are logged and monitored.
               </p>
             </div>
 
             {/* Back link */}
             <p className="mt-4 text-center text-sm">
-              <a href="/" className="font-semibold text-white drop-shadow transition hover:text-orange-300">
+              <a href="/" className="inline-flex items-center gap-1 font-bold text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] transition hover:text-blue-300">
                 ← Back to Adyapan
               </a>
             </p>
@@ -578,16 +545,6 @@ export default function AdminPage() {
             </div>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="relative inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-black text-slate-950 transition hover:bg-slate-950 hover:text-white"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-              Notifications
-              {notifications.length > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">{notifications.length}</span>
-              )}
-            </button>
             <button
               onClick={() => exportCsv(`${activeTab}.csv`, activeRows)}
               className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-black text-slate-950 transition hover:bg-slate-950 hover:text-white"
@@ -721,182 +678,6 @@ export default function AdminPage() {
 
         {selectedStudent && (
           <StudentDetailsModal student={selectedStudent} onClose={() => setSelectedStudent(null)} />
-        )}
-      </div>
-
-      {/* Notification Dropdown */}
-      {showNotifications && (
-        <div className="fixed right-6 top-20 z-50 w-96 rounded-lg border border-slate-200 bg-white shadow-xl">
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-            <h3 className="text-sm font-black text-slate-950">Notifications ({notifications.length})</h3>
-            <div className="flex items-center gap-2">
-              {notifications.length > 0 && (
-                <button
-                  onClick={async () => {
-                    for (const n of notifications) {
-                      try { await fetch("/api/messages", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: n.id }) }); } catch {}
-                    }
-                    setNotifications([]);
-                  }}
-                  className="text-[10px] font-bold text-cyan-700 hover:underline"
-                >
-                  Mark all read
-                </button>
-              )}
-              <button onClick={() => setShowNotifications(false)} className="text-slate-400 hover:text-slate-700">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-          <div className="max-h-72 overflow-y-auto">
-            {notifications.length === 0 ? (
-              <p className="py-8 text-center text-xs text-slate-400">No new notifications</p>
-            ) : (
-              notifications.map((n) => (
-                <div key={n.id} className="flex items-start justify-between border-b border-slate-50 px-4 py-3 hover:bg-slate-50">
-                  <div className="flex-1">
-                    <p className="text-xs font-semibold text-slate-700">{n.text}</p>
-                    <p className="text-[10px] text-slate-400">{(() => {
-                      const d = new Date(n.time);
-                      if (isNaN(d.getTime())) return n.time;
-                      const diff = Date.now() - d.getTime();
-                      if (diff < 0 || diff < 60000) return "Just now";
-                      if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-                      if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-                      return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
-                    })()}</p>
-                  </div>
-                  <button
-                    onClick={async () => {
-                      try { await fetch("/api/messages", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: n.id }) }); } catch {}
-                      setNotifications(prev => prev.filter(msg => msg.id !== n.id));
-                    }}
-                    className="ml-2 shrink-0 rounded-md border border-slate-200 px-2 py-1 text-[10px] font-bold text-cyan-700 hover:bg-cyan-50"
-                    title="Mark as read"
-                  >
-                    ✓ Read
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Floating Message Box - Bottom Right */}
-      <div className="fixed bottom-6 right-6 z-50">
-        {!showMessageBox ? (
-          <button
-            onClick={() => setShowMessageBox(true)}
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-cyan-700 text-white shadow-lg transition hover:bg-slate-950 hover:scale-105"
-            title="Send message to teachers/principals"
-          >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-          </button>
-        ) : (
-          <div className="w-80 rounded-lg border border-slate-200 bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-              <h3 className="text-sm font-black text-slate-950">Send Message</h3>
-              <button onClick={() => { setShowMessageBox(false); setMessageSent(false); }} className="text-slate-400 hover:text-slate-700">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="p-4">
-              {messageSent ? (
-                <div className="py-4 text-center">
-                  <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-                    <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                  </div>
-                  <p className="text-sm font-bold text-green-700">Message sent!</p>
-                  <button onClick={() => setMessageSent(false)} className="mt-2 text-xs text-cyan-700 hover:underline">Send another</button>
-                </div>
-              ) : (
-                <>
-                  <select
-                    value={messageRecipient}
-                    onChange={(e) => setMessageRecipient(e.target.value)}
-                    className="mb-3 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 focus:border-cyan-500 focus:outline-none"
-                  >
-                    <optgroup label="Broadcast">
-                      <option value="all-teachers">All Teachers</option>
-                      <option value="all-principals">All Principals</option>
-                      <option value="all">All Teachers & Principals</option>
-                    </optgroup>
-                    <optgroup label="Individual Teachers">
-                      {(overview?.teachers ?? []).map((t) => (
-                        <option key={`t-${text(t.email)}`} value={`teacher:${text(t.email)}`}>
-                          {text(t.name || t.teacher_name)}
-                        </option>
-                      ))}
-                    </optgroup>
-                    <optgroup label="Individual Principals">
-                      {(overview?.principals ?? []).map((p) => (
-                        <option key={`p-${text(p.email)}`} value={`principal:${text(p.email)}`}>
-                          {text(p.name || p.principal_name)}
-                        </option>
-                      ))}
-                    </optgroup>
-                  </select>
-
-                  {/* Show selected individual's details */}
-                  {messageRecipient.includes(":") && (
-                    <div className="mb-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
-                      {(() => {
-                        const [role, email] = messageRecipient.split(":");
-                        const person = role === "teacher"
-                          ? (overview?.teachers ?? []).find((t) => text(t.email) === email)
-                          : (overview?.principals ?? []).find((p) => text(p.email) === email);
-                        if (!person) return null;
-                        const name = text(person.name ?? person.teacher_name ?? person.principal_name);
-                        const school = text(person.school_name ?? person.schoolName ?? person.school, "No school");
-                        const phone = text(person.phone, "-");
-                        return (
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="text-sm font-bold text-slate-800">{name}</p>
-                              <p className="text-xs text-slate-500">{school}</p>
-                            </div>
-                            <p className="text-xs font-semibold text-cyan-700">{phone}</p>
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  )}
-                  <textarea
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    placeholder="Type your message..."
-                    rows={3}
-                    className="mb-3 w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none"
-                  />
-                  <button
-                    onClick={async () => {
-                      if (!messageText.trim()) return;
-                      setMessageSending(true);
-                      try {
-                        await fetch("/api/messages/send", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ recipient: messageRecipient, message: messageText, senderName: adminName, senderEmail: adminEmail, senderRole: "admin" }),
-                        });
-                      } catch {}
-                      setMessageSending(false);
-                      setMessageSent(true);
-                      const recipientLabel = messageRecipient.includes(":") ? messageRecipient.split(":")[1] : messageRecipient.replace("all-", "all ");
-                      setNotifications(prev => [{ id: Date.now().toString(), text: `Message sent to ${recipientLabel}`, time: "Just now" }, ...prev]);
-                      setMessageText("");
-                    }}
-                    disabled={messageSending || !messageText.trim()}
-                    className="w-full rounded-lg bg-cyan-700 py-2 text-sm font-black text-white transition hover:bg-slate-950 disabled:opacity-50"
-                  >
-                    {messageSending ? "Sending..." : "Send Message"}
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
         )}
       </div>
     </main>

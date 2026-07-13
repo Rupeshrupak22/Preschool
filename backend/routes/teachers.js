@@ -2,6 +2,7 @@ const express = require('express');
 const prisma = require('../lib/prisma');
 const { authenticate, authorize } = require('../middleware/auth');
 const { hashPassword, hashAccessKey, generateAccessKey } = require('../utils/password');
+const { sendResponse } = require('../utils/response');
 const router = express.Router();
 
 // GET /api/v1/teachers
@@ -13,17 +14,7 @@ router.get('/', authenticate, authorize('admin', 'principal', 'teacher'), async 
     if (req.user.role === 'teacher') {
       where.id = req.user.teacher_id || req.user.id;
     } else if (req.user.role === 'principal') {
-      // Match by schoolId OR school_name (teachers may have school_name but different schoolId)
-      const userSchoolId = req.user.school_id;
-      const userSchoolName = req.user.school_name;
-      if (userSchoolId || userSchoolName) {
-        where.OR = [
-          ...(userSchoolId ? [{ schoolId: userSchoolId }] : []),
-          ...(userSchoolName ? [{ school_name: userSchoolName }] : []),
-        ];
-      } else {
-        where.schoolId = '__no_school__';
-      }
+      where.schoolId = req.user.school_id || '__no_school__';
     } else if (schoolId) {
       where.schoolId = schoolId;
     }
@@ -43,7 +34,8 @@ router.get('/', authenticate, authorize('admin', 'principal', 'teacher'), async 
 
     res.json(teachers);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch teachers error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -59,7 +51,8 @@ router.get('/:id', authenticate, authorize('admin', 'principal', 'teacher'), asy
     if (!canAccessTeacher(req.user, teacher)) return res.status(403).json({ error: 'Access denied' });
     res.json(teacher);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch teacher error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -68,6 +61,14 @@ router.post('/', authenticate, authorize('admin', 'principal'), async (req, res)
   try {
     const { teacher_name, email, password, subject, phone, schoolId, school_name, assigned_classes } = req.body;
     if (!teacher_name || !email || !password) return res.status(400).json({ error: 'teacher_name, email and password are required' });
+
+    // Enforce password policy
+    const { checkPasswordStrength } = require('../middleware/validate');
+    const policyError = checkPasswordStrength(password);
+    if (policyError) {
+      return sendResponse(res, 400, false, policyError);
+    }
+
     const staffKey = req.body.staffKey || generateAccessKey();
     const finalSchoolId = req.user.role === 'principal' ? req.user.school_id : schoolId;
     const finalSchoolName = req.user.role === 'principal' ? req.user.school_name : school_name;
@@ -92,7 +93,8 @@ router.post('/', authenticate, authorize('admin', 'principal'), async (req, res)
     if (err.code === 'P2002') {
       return res.status(409).json({ error: 'Teacher with this email already exists' });
     }
-    res.status(500).json({ error: err.message });
+    console.error('Create teacher error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -114,7 +116,8 @@ router.put('/:id', authenticate, authorize('admin', 'principal'), async (req, re
     });
     res.json(teacher);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Update teacher error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -127,7 +130,8 @@ router.delete('/:id', authenticate, authorize('admin', 'principal'), async (req,
     await prisma.teacher.delete({ where: { id: req.params.id } });
     res.json({ message: 'Teacher removed successfully' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Delete teacher error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 

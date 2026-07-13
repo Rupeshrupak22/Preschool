@@ -2,6 +2,7 @@ const express = require('express');
 const prisma = require('../lib/prisma');
 const mysql = require('mysql2/promise');
 const { authenticate, authorize } = require('../middleware/auth');
+const { sendResponse } = require('../utils/response');
 const router = express.Router();
 
 // Using raw mysql2 for leaves since there's no Prisma model for it yet
@@ -39,7 +40,8 @@ router.get('/', authenticate, authorize('teacher', 'principal', 'admin'), async 
     const [rows] = await getPool().query(query, params);
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch leaves error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -59,7 +61,8 @@ router.post('/', authenticate, authorize('teacher'), async (req, res) => {
 
     res.status(201).json({ id, teacherName, subject, teacherUid, dates, reason, status: 'Pending' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Create leave error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -75,7 +78,8 @@ router.put('/:id', authenticate, authorize('principal', 'admin'), async (req, re
     await getPool().query('UPDATE leave_requests SET status = ? WHERE id = ?', [status, req.params.id]);
     res.json({ id: req.params.id, status });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Update leave error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -85,7 +89,8 @@ router.delete('/:id', authenticate, authorize('principal', 'admin'), async (req,
     await getPool().query('DELETE FROM leave_requests WHERE id = ?', [req.params.id]);
     res.json({ message: 'Leave request deleted' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Delete leave error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 

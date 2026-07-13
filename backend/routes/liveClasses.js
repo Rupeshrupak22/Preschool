@@ -1,6 +1,7 @@
 const express = require('express');
 const prisma = require('../lib/prisma');
 const { authenticate, authorize } = require('../middleware/auth');
+const { sendResponse } = require('../utils/response');
 const router = express.Router();
 
 // GET /api/v1/live-classes
@@ -15,7 +16,8 @@ router.get('/', authenticate, async (req, res) => {
     });
     res.json(classes);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch live classes error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -42,7 +44,8 @@ router.post('/', authenticate, authorize('teacher', 'principal', 'admin'), async
 
     res.status(201).json(session);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Create live class error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -54,13 +57,29 @@ router.put('/:id', authenticate, authorize('teacher', 'principal', 'admin'), asy
     if (req.user.role === 'teacher' && existing.teacher_id !== (req.user.teacher_id || req.user.id)) {
       return res.status(403).json({ error: 'Access denied' });
     }
+
+    // Whitelist allowed fields to prevent mass assignment
+    const allowedFields = ['title', 'class_level', 'subject', 'start_time', 'end_time', 'room', 'mode', 'status'];
+    const data = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        data[field] = req.body[field];
+      }
+    }
+    data.updated_at = new Date();
+
+    if (Object.keys(data).length <= 1) {
+      return sendResponse(res, 400, false, 'No valid fields provided for update.');
+    }
+
     const session = await prisma.teacher_class_sessions.update({
       where: { id: req.params.id },
-      data: req.body,
+      data,
     });
     res.json(session);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Update live class error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -70,7 +89,8 @@ router.delete('/:id', authenticate, authorize('principal', 'admin'), async (req,
     await prisma.teacher_class_sessions.delete({ where: { id: req.params.id } });
     res.json({ message: 'Live class removed' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Delete live class error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
