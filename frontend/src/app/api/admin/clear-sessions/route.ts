@@ -20,15 +20,18 @@ export async function POST(request: Request) {
 
   const user = await findUserByEmail(email.trim().toLowerCase());
 
+  // Must be an admin account
   if (!user || user.role !== "admin") {
     return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
   }
 
+  // Re-verify password before clearing sessions — prevents unauthorized clearing
   const { valid } = await verifyPassword(password, user.passwordHash);
   if (!valid) {
     return NextResponse.json({ error: "Invalid credentials." }, { status: 401 });
   }
 
+  // Clear all active sessions for this admin
   await clearActiveSessions(user.id);
 
   const response = NextResponse.json({
@@ -36,6 +39,8 @@ export async function POST(request: Request) {
     message: "Previous sessions cleared. You can now log in."
   });
 
+  // Also clear any cookies on this device
   clearAuthCookies(response);
+
   return response;
 }

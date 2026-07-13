@@ -6,7 +6,7 @@ import { ArrowUp, Clock, Instagram, Linkedin, Mail, MapPin, Phone, Youtube } fro
 const learningPrograms = [
   "Future Skills Foundation (Class 5 to 8)",
   "Coding & AI Creators (Class 6 to 10)",
-  "Robotics & Innovation Lab (Class 7 to 12)",
+  "Current Affairs & Innovation Lab (Class 7 to 12)",
   "Career, Communication & Design (Class 9 to 12)"
 ];
 
@@ -26,7 +26,7 @@ const portalLinks = [
 ];
 
 const socials: [string, string, React.ComponentType<{ className?: string }>][] = [
-  ["Instagram", "https://www.instagram.com/adyapanschool/", Instagram],
+  ["Instagram", "https://www.instagram.com/adyapanschool_?igsh=MXJ0b3FpNzh1YW1vNg==", Instagram],
   ["LinkedIn", "https://www.linkedin.com/company/adyapan-edutech-pvt-ltd/posts/?feedView=all", Linkedin],
   ["YouTube", "https://www.youtube.com/@adyapan21", Youtube]
 ];
@@ -60,7 +60,7 @@ export default function SiteFooter() {
               </div>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-slate-400">
-              We help students from Class 5 to 12 become confident creators through coding, AI, robotics,
+              We help students from Class 5 to 12 become confident creators through coding, AI, current affairs,
               communication, design, and career-ready future skills.
             </p>
             <div className="mt-5 flex gap-3">
@@ -214,7 +214,7 @@ export default function SiteFooter() {
         {/* Bottom Bar */}
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-6 sm:flex-row">
           <p className="text-xs text-slate-500">
-            © 2026 SR's Adyapan Future Skills Platform
+            © 2026 SR's Adyapan Edutech Pvt. Ltd. All rights reserved.
           </p>
           <div className="flex gap-6 text-xs text-slate-500">
             <a href="#" className="transition hover:text-slate-300">Privacy Policy</a>

@@ -15,9 +15,9 @@ import { createHash, timingSafeEqual } from "crypto";
 export async function hashPassword(password: string): Promise<string> {
   return argon2.hash(password, {
     type: argon2.argon2id,
-    memoryCost: 19456, // 19 MB — optimized for serverless (Vercel)
-    timeCost: 2,
-    parallelism: 1,
+    memoryCost: 65536, // 64 MB
+    timeCost: 3,
+    parallelism: 1,    // Must match backend
   });
 }
 

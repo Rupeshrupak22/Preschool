@@ -1,6 +1,7 @@
 const express = require('express');
 const prisma = require('../lib/prisma');
 const { authenticate, authorize } = require('../middleware/auth');
+const { sendResponse } = require('../utils/response');
 const router = express.Router();
 
 // GET /api/v1/schools
@@ -13,7 +14,8 @@ router.get('/', authenticate, authorize('admin', 'principal'), async (req, res) 
     });
     res.json(schools);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch schools error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -30,7 +32,8 @@ router.get('/:id', authenticate, authorize('admin', 'principal'), async (req, re
     if (!school) return res.status(404).json({ error: 'School not found' });
     res.json(school);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Fetch school error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -53,20 +56,35 @@ router.post('/', authenticate, authorize('admin'), async (req, res) => {
 
     res.status(201).json(school);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Create school error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
 // PUT /api/v1/schools/:id
 router.put('/:id', authenticate, authorize('admin'), async (req, res) => {
   try {
+    // Whitelist allowed fields to prevent mass assignment
+    const allowedFields = ['name', 'email', 'phone', 'city', 'address', 'contact_person', 'status'];
+    const data = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        data[field] = req.body[field];
+      }
+    }
+
+    if (Object.keys(data).length === 0) {
+      return sendResponse(res, 400, false, 'No valid fields provided for update.');
+    }
+
     const school = await prisma.school.update({
       where: { id: req.params.id },
-      data: req.body,
+      data,
     });
     res.json(school);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Update school error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 
@@ -76,7 +94,8 @@ router.delete('/:id', authenticate, authorize('admin'), async (req, res) => {
     await prisma.school.delete({ where: { id: req.params.id } });
     res.json({ message: 'School removed successfully' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Delete school error:', err.message);
+    sendResponse(res, 500, false, 'Internal server error');
   }
 });
 

@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { broadcastLogout, onAuthChange } from "@/lib/auth-channel";
 import { useSessionHeartbeat } from "@/lib/use-session-heartbeat";
-import { MessageSystem } from "@/components/MessageSystem";
 
 type PrincipalDashboard = {
   principal: {
@@ -306,21 +305,6 @@ export default function PrincipalDashboardPage() {
           </div>
         </section>
       </div>
-
-      {/* Messaging System */}
-      <MessageSystem
-        userEmail={dashboard.principal.email}
-        userRole="principal"
-        recipients={[
-          { label: "All Admins", value: "all-admins" },
-          { label: "All Teachers", value: "all-teachers" },
-          { label: "All Students", value: "all-students" },
-          ...(dashboard.students ?? []).filter((s) => s.email).map((s) => ({
-            label: `${s.name || "Student"} (${s.class_level || s.class_name || "Student"})`,
-            value: `student:${String(s.email)}`,
-          })),
-        ]}
-      />
     </main>
   );
 }

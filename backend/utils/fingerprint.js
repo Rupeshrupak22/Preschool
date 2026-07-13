@@ -11,7 +11,10 @@
 const crypto = require('crypto');
 
 /**
- * Generate a request fingerprint
+ * Generate a FULL request fingerprint (includes IP)
+ * Used for: credential stuffing detection at login time
+ * IP is essential here — bots don't switch IPs mid-attack
+ *
  * @param {object} req - Express request object
  * @returns {string} SHA-256 hash (first 16 chars)
  */
@@ -21,6 +24,26 @@ function generateFingerprint(req) {
     req.get('user-agent') || 'no-ua',
     req.get('accept-language') || 'no-lang',
     req.get('accept-encoding') || 'no-enc',
+    req.get('sec-ch-ua-platform') || '',
+  ];
+
+  const raw = components.join('|');
+  return crypto.createHash('sha256').update(raw).digest('hex').slice(0, 16);
+}
+
+/**
+ * Generate a STABLE fingerprint (excludes IP)
+ * Used for: session validation on every request
+ * IP excluded because it changes legitimately (WiFi→4G, VPN, proxy)
+ * Only checks browser-level signals that stay constant within a session
+ *
+ * @param {object} req - Express request object
+ * @returns {string} SHA-256 hash (first 16 chars)
+ */
+function generateStableFingerprint(req) {
+  const components = [
+    req.get('user-agent') || 'no-ua',
+    req.get('accept-language') || 'no-lang',
     req.get('sec-ch-ua-platform') || '',
   ];
 
@@ -48,13 +71,7 @@ trackerTimer.unref();
  * Track a login attempt by fingerprint
  * @returns {{ suspicious: boolean, uniqueEmails: number }}
  */
-function trackAttempt(fingerprint, email, userAgent) {
-  // Skip credential stuffing check for mobile apps — multiple users
-  // on the same network is normal (school/office scenario)
-  if (userAgent && /dart|flutter|okhttp/i.test(userAgent)) {
-    return { suspicious: false, uniqueEmails: 0, totalAttempts: 0 };
-  }
-
+function trackAttempt(fingerprint, email) {
   let data = fingerprintTracker.get(fingerprint);
   if (!data) {
     data = { emails: new Set(), lastSeen: Date.now(), attempts: 0 };
@@ -71,4 +88,4 @@ function trackAttempt(fingerprint, email, userAgent) {
   return { suspicious, uniqueEmails: data.emails.size, totalAttempts: data.attempts };
 }
 
-module.exports = { generateFingerprint, trackAttempt };
+module.exports = { generateFingerprint, generateStableFingerprint, trackAttempt };

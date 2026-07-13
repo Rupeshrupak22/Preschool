@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { ArrowRight, Eye, EyeOff, KeyRound, Lock, Mail, ShieldCheck } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, KeyRound, Lock, Mail, RefreshCw, ShieldCheck } from "lucide-react";
 
 export default function PrincipalLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,7 +16,7 @@ export default function PrincipalLoginPage() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
-    setStatus("Verifying principal access...");
+    setStatus("");
     setStatusType("info");
 
     try {
@@ -45,8 +45,6 @@ export default function PrincipalLoginPage() {
       }
 
       window.dispatchEvent(new Event("adyapan-auth-change"));
-      setStatus("Access granted. Opening dashboard...");
-      setStatusType("info");
       window.location.href = "/principal/dashboard";
     } catch {
       setStatus("Network issue. Please try again.");
@@ -105,74 +103,69 @@ export default function PrincipalLoginPage() {
   }
 
   return (
-    <main className="relative flex h-screen w-full overflow-hidden">
-      {/* Full-screen background video */}
+    <main className="relative flex h-screen items-center justify-end overflow-hidden">
+      {/* Background video */}
       <video
         autoPlay
-        loop
+        loop={true}
         muted
         playsInline
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-cover opacity-80"
         aria-hidden="true"
       >
         <source src="/newlogin-vid_qPNCEcV9.mp4" type="video/mp4" />
       </video>
-      {/* Watermark cover — gradient at bottom */}
-      <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-40 w-full bg-gradient-to-t from-black via-black/90 to-transparent" />
-
-      {/* Left half — Adyapan branding (hidden on mobile) */}
-      <div className="relative z-10 hidden w-1/2 flex-col items-center justify-center lg:flex pointer-events-none">
+      {/* Adyapan logo and branding centered on the left half */}
+      <div className="absolute left-0 top-0 hidden h-full w-1/2 flex-col items-center justify-center lg:flex z-10 pointer-events-none">
         <img
           src="/ady-logo.png"
-          alt="Adyapan"
-          className="h-36 w-36 rounded-full object-cover shadow-2xl"
+          alt="ADYAPAN"
+          className="h-36 w-36 rounded-full object-cover"
         />
         <h2 className="mt-6 text-5xl font-black text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
-          Adyapan{" "}
-          <span className="text-sky-400 drop-shadow-[0_2px_8px_rgba(56,189,248,0.6)]">School</span>
+          Adyapan <span className="text-sky-400 drop-shadow-[0_2px_8px_rgba(56,189,248,0.5)]">School</span>
         </h2>
       </div>
 
-      {/* Right half — login card */}
-      <div className="relative z-10 flex w-full items-center justify-center px-6 lg:w-1/2">
-        <div className="w-full max-w-sm">
-          {/* Active session conflict banner */}
-          {showClearSession && (
-            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
-              <p className="text-sm font-black text-amber-900">⚠️ Active Session Detected</p>
-              <p className="mt-1 text-sm font-medium text-amber-800">
-                This principal account is already logged in on another device. Clear the previous session to continue.
-              </p>
-              <div className="mt-3 flex gap-2">
-                <button
-                  onClick={handleClearSessions}
-                  disabled={clearingSession}
-                  className="flex-1 rounded-lg bg-amber-600 px-3 py-2.5 text-xs font-black text-white transition hover:bg-amber-700 disabled:opacity-60"
-                >
-                  {clearingSession ? "Clearing..." : "Clear & Login"}
-                </button>
-                <button
-                  onClick={() => { setShowClearSession(false); setPendingCredentials(null); setStatus(""); }}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-black text-slate-700 transition hover:bg-slate-50"
-                >
-                  Cancel
-                </button>
+      {/* Right side form container */}
+      <div className="relative z-10 flex w-full items-center justify-center px-6 sm:w-[60%] md:w-[52%] lg:w-[48%]">
+        <div className="w-full max-w-[380px]">
+          {/* Login Card */}
+          <div className="rounded-2xl border border-white bg-white/90 px-6 py-6 shadow-[0_8px_40px_rgba(0,0,0,0.25)] backdrop-blur-md">
+            {/* Welcome heading */}
+            <div className="mb-5">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 shadow-md">
+                  <ShieldCheck className="h-4 w-4 text-white" />
+                </div>
+                <h1 className="text-[22px] font-black text-slate-900">Principal Login</h1>
               </div>
+              <p className="mt-1 pl-[46px] text-[13px] text-slate-700 font-medium">Sign in to access your principal dashboard</p>
             </div>
-          )}
-
-          {/* Card */}
-          <div className="rounded-2xl bg-white/95 px-7 py-7 shadow-[0_8px_40px_rgba(0,0,0,0.28)] backdrop-blur-md">
-            {/* Header */}
-            <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-white">
-                <ShieldCheck className="h-5 w-5" />
+            {/* Active session conflict banner */}
+            {showClearSession && (
+              <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                <p className="text-sm font-black text-amber-900">⚠️ Active Session Detected</p>
+                <p className="mt-1 text-sm font-medium text-amber-800">
+                  This principal account is already logged in on another device. Clear the previous session to continue.
+                </p>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={handleClearSessions}
+                    disabled={clearingSession}
+                    className="flex-1 rounded-lg bg-amber-600 px-3 py-2.5 text-xs font-black text-white transition hover:bg-amber-700 disabled:opacity-60"
+                  >
+                    {clearingSession ? "Clearing..." : "Clear & Login"}
+                  </button>
+                  <button
+                    onClick={() => { setShowClearSession(false); setPendingCredentials(null); setStatus(""); }}
+                    className="rounded-lg border border-slate-200 px-3 py-2.5 text-xs font-black text-slate-700 transition hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
-              <div>
-                <h1 className="text-xl font-black text-slate-900">Principal Login</h1>
-                <p className="text-xs text-slate-500">Sign in to access your principal dashboard</p>
-              </div>
-            </div>
+            )}
 
             <form onSubmit={onSubmit} className="space-y-4">
               <input type="hidden" name="captcha" value="ADYAPAN" />
@@ -181,13 +174,14 @@ export default function PrincipalLoginPage() {
               <div>
                 <label className="mb-1.5 block text-sm font-bold text-slate-700">Principal Email</label>
                 <div className="relative">
-                  <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Mail className="absolute left-3.5 top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-slate-400" />
                   <input
                     name="email"
                     type="email"
-                    required
                     placeholder="principal@school.edu"
-                    className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                    autoComplete="email"
+                    className="h-[44px] w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                    required
                   />
                 </div>
               </div>
@@ -196,22 +190,22 @@ export default function PrincipalLoginPage() {
               <div>
                 <label className="mb-1.5 block text-sm font-bold text-slate-700">Password</label>
                 <div className="relative">
-                  <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Lock className="absolute left-3.5 top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-slate-400" />
                   <input
                     name="password"
                     type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    className="h-[44px] w-full rounded-lg border border-slate-200 bg-white pl-10 pr-12 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                     required
                     minLength={8}
-                    placeholder="Enter your password"
-                    className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-11 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
                     aria-label="Toggle password visibility"
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? <EyeOff className="h-[16px] w-[16px]" /> : <Eye className="h-[16px] w-[16px]" />}
                   </button>
                 </div>
               </div>
@@ -220,27 +214,27 @@ export default function PrincipalLoginPage() {
               <div>
                 <label className="mb-1.5 block text-sm font-bold text-slate-700">School Access Key</label>
                 <div className="relative">
-                  <KeyRound className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <KeyRound className="absolute left-3.5 top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-slate-400" />
                   <input
                     name="schoolKey"
                     type={showKey ? "text" : "password"}
+                    placeholder="Private school key"
+                    className="h-[44px] w-full rounded-lg border border-slate-200 bg-white pl-10 pr-12 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                     required
                     minLength={8}
-                    placeholder="Private school key"
-                    className="h-11 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-11 text-sm font-medium text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowKey((v) => !v)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700"
+                    onClick={() => setShowKey(!showKey)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
                     aria-label="Toggle school key visibility"
                   >
-                    {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showKey ? <EyeOff className="h-[16px] w-[16px]" /> : <Eye className="h-[16px] w-[16px]" />}
                   </button>
                 </div>
               </div>
 
-              {/* Status */}
+              {/* Error/Status */}
               {status && !showClearSession && (
                 <div className={`rounded-lg px-4 py-3 text-sm font-semibold ${
                   statusType === "error" ? "bg-red-50 text-red-700 border border-red-100" :
@@ -255,21 +249,27 @@ export default function PrincipalLoginPage() {
               <button
                 type="submit"
                 disabled={loading || showClearSession}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-blue-600 text-sm font-black text-white shadow-lg shadow-blue-300/40 transition hover:bg-blue-700 active:scale-[0.98] disabled:opacity-60"
+                className="group flex h-[44px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-sm font-black text-white shadow-lg shadow-blue-200/50 transition-all hover:from-blue-600 hover:to-blue-700 active:scale-[0.98] disabled:opacity-60 disabled:shadow-none"
               >
-                {loading ? "Verifying..." : "Open Principal Dashboard"}
-                {!loading && <ArrowRight className="h-4 w-4" />}
+                {loading ? (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    Open Principal Dashboard
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  </>
+                )}
               </button>
             </form>
 
-            <p className="mt-4 text-center text-[11px] text-slate-500">
+            <p className="mt-4 text-center text-[11px] text-slate-900 font-semibold leading-relaxed">
               Only pre-registered principal accounts can login.<br />Contact your school admin for access.
             </p>
           </div>
 
           {/* Back link */}
           <p className="mt-4 text-center text-sm">
-            <a href="/" className="font-semibold text-white drop-shadow transition hover:text-sky-300">
+            <a href="/" className="inline-flex items-center gap-1 font-bold text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] transition hover:text-blue-300">
               ← Back to Adyapan
             </a>
           </p>

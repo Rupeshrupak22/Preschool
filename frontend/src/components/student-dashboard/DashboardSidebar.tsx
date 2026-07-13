@@ -50,89 +50,6 @@ const sidebarItems: SidebarItem[] = [
   { id: "/student-dashboard/settings",         label: "Settings",         icon: Settings,        href: "/student-dashboard/settings",         group: "tertiary" },
 ];
 
-// ─── NavItems — extracted to module scope to prevent re-creation on every render ───
-interface NavItemsProps {
-  forMobile?: boolean;
-  collapsed: boolean;
-  pathname: string;
-  cardBadges: Map<string, string | undefined>;
-  onMobileClose: () => void;
-}
-
-function NavItems({ forMobile = false, collapsed, pathname, cardBadges, onMobileClose }: NavItemsProps) {
-  const groups: Array<{ key: "primary" | "secondary" | "tertiary"; label: string }> = [
-    { key: "primary",   label: "Main" },
-    { key: "secondary", label: "Explore" },
-    { key: "tertiary",  label: "More" },
-  ];
-
-  return (
-    <nav className="flex-1 overflow-y-auto px-3 py-3 no-scrollbar">
-      {groups.map(({ key, label }) => {
-        const items = sidebarItems.filter((i) => i.group === key);
-        return (
-          <div key={key} className="mb-4">
-            {(!collapsed || forMobile) && (
-              <p className="mb-2 px-3 text-[9px] font-black uppercase tracking-widest text-white/30">
-                {label}
-              </p>
-            )}
-            <div className="space-y-0.5">
-              {items.map((item) => {
-                const isActive = pathname === item.id;
-                const badge = cardBadges.get(item.href) ?? item.badge;
-                return (
-                  <a
-                    key={item.id}
-                    href={item.href}
-                    onClick={onMobileClose}
-                    className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
-                      isActive
-                        ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-[0_4px_20px_rgba(168,85,247,0.45)]"
-                        : "text-white/60 hover:bg-white/10 hover:text-white"
-                    }`}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeIndicator"
-                        className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500"
-                        style={{ zIndex: -1 }}
-                      />
-                    )}
-                    <item.icon
-                      className={`h-4 w-4 shrink-0 ${
-                        isActive ? "text-white" : "text-white/50 group-hover:text-white"
-                      }`}
-                    />
-                    {(!collapsed || forMobile) && (
-                      <span className="flex-1 truncate">{item.label}</span>
-                    )}
-                    {(!collapsed || forMobile) && badge && (
-                      <span
-                        className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${
-                          badge === "LIVE"
-                            ? "animate-pulse bg-rose-500 text-white"
-                            : badge === "NEW"
-                            ? "bg-emerald-500 text-white"
-                            : "bg-white/20 text-white"
-                        }`}
-                      >
-                        {badge}
-                      </span>
-                    )}
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
-    </nav>
-  );
-}
-
-// ─── Main Sidebar Component ─────────────────────────────────────────
-
 interface Props {
   activeSection?: string;
   collapsed: boolean;
@@ -154,6 +71,78 @@ export default function DashboardSidebar({
   const pathname = usePathname();
   const data = useDashboardData();
   const cardBadges = new Map(data.quickAccessCards.map((card) => [card.href, card.badge]));
+
+  const NavItems = ({ forMobile = false }: { forMobile?: boolean }) => {
+    const groups: Array<{ key: "primary" | "secondary" | "tertiary"; label: string }> = [
+      { key: "primary",   label: "Main" },
+      { key: "secondary", label: "Explore" },
+      { key: "tertiary",  label: "More" },
+    ];
+
+    return (
+      <nav className="flex-1 overflow-y-auto px-3 py-3 no-scrollbar">
+        {groups.map(({ key, label }) => {
+          const items = sidebarItems.filter((i) => i.group === key);
+          return (
+            <div key={key} className="mb-4">
+              {(!collapsed || forMobile) && (
+                <p className="mb-2 px-3 text-[9px] font-black uppercase tracking-widest text-white/30">
+                  {label}
+                </p>
+              )}
+              <div className="space-y-0.5">
+                {items.map((item) => {
+                  const isActive = pathname === item.id;
+                  const badge = cardBadges.get(item.href) ?? item.badge;
+                  return (
+                    <a
+                      key={item.id}
+                      href={item.href}
+                      onClick={onMobileClose}
+                      className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                        isActive
+                          ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-[0_4px_20px_rgba(168,85,247,0.45)]"
+                          : "text-white/60 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeIndicator"
+                          className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500"
+                          style={{ zIndex: -1 }}
+                        />
+                      )}
+                      <item.icon
+                        className={`h-4 w-4 shrink-0 ${
+                          isActive ? "text-white" : "text-white/50 group-hover:text-white"
+                        }`}
+                      />
+                      {(!collapsed || forMobile) && (
+                        <span className="flex-1 truncate">{item.label}</span>
+                      )}
+                      {(!collapsed || forMobile) && badge && (
+                        <span
+                          className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${
+                            badge === "LIVE"
+                              ? "animate-pulse bg-rose-500 text-white"
+                              : badge === "NEW"
+                              ? "bg-emerald-500 text-white"
+                              : "bg-white/20 text-white"
+                          }`}
+                        >
+                          {badge}
+                        </span>
+                      )}
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </nav>
+    );
+  };
 
   return (
     <>
@@ -188,12 +177,7 @@ export default function DashboardSidebar({
           )}
         </div>
 
-        <NavItems
-          collapsed={collapsed}
-          pathname={pathname}
-          cardBadges={cardBadges}
-          onMobileClose={onMobileClose}
-        />
+        <NavItems />
 
         {/* Collapse toggle */}
         <div className="shrink-0 border-t border-white/10 p-3">
@@ -259,13 +243,7 @@ export default function DashboardSidebar({
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              <NavItems
-                forMobile
-                collapsed={false}
-                pathname={pathname}
-                cardBadges={cardBadges}
-                onMobileClose={onMobileClose}
-              />
+              <NavItems forMobile />
             </motion.aside>
           </>
         )}

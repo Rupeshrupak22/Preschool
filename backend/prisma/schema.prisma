@@ -48,20 +48,21 @@ model Student {
 }
 
 model Teacher {
-  id               String    @id @default(cuid()) @db.VarChar(64)
-  schoolId         String    @map("school_id") @db.VarChar(64)
-  school_name      String    @db.VarChar(190)
-  teacher_name     String    @db.VarChar(160)
-  email            String    @unique(map: "email") @db.VarChar(190)
-  password_hash    String    @db.VarChar(255)
-  staff_key_hash   String    @db.VarChar(255)
-  subject          String?   @db.VarChar(120)
-  phone            String?   @db.VarChar(30)
-  assigned_classes Json?
-  status           String    @default("active") @db.VarChar(40)
-  last_login_at    DateTime? @db.DateTime(0)
-  created_at       DateTime  @default(now()) @db.Timestamp(0)
-  updated_at       DateTime  @default(now()) @db.Timestamp(0)
+  id                   String    @id @default(cuid()) @db.VarChar(64)
+  schoolId             String    @map("school_id") @db.VarChar(64)
+  school_name          String    @db.VarChar(190)
+  teacher_name         String    @db.VarChar(160)
+  email                String    @unique(map: "email") @db.VarChar(190)
+  password_hash        String    @db.VarChar(255)
+  staff_key_hash       String    @db.VarChar(255)
+  subject              String?   @db.VarChar(120)
+  phone                String?   @db.VarChar(30)
+  assigned_classes     Json?
+  status               String    @default("active") @db.VarChar(40)
+  must_change_password Boolean   @default(false)
+  last_login_at        DateTime? @db.DateTime(0)
+  created_at           DateTime  @default(now()) @db.Timestamp(0)
+  updated_at           DateTime  @default(now()) @db.Timestamp(0)
 
   @@index([schoolId], map: "idx_teachers_school_id")
   @@index([school_name], map: "idx_teachers_school_name")
@@ -225,18 +226,19 @@ model principal_login_events {
 }
 
 model principals {
-  id              String    @id @db.VarChar(64)
-  school_id       String    @db.VarChar(64)
-  school_name     String    @db.VarChar(190)
-  principal_name  String    @db.VarChar(160)
-  email           String    @unique(map: "email") @db.VarChar(190)
-  password_hash   String    @db.VarChar(255)
-  access_key_hash String    @db.VarChar(255)
-  phone           String?   @db.VarChar(30)
-  status          String    @default("active") @db.VarChar(40)
-  last_login_at   DateTime? @db.DateTime(0)
-  created_at      DateTime  @default(now()) @db.Timestamp(0)
-  updated_at      DateTime  @default(now()) @db.Timestamp(0)
+  id                   String    @id @db.VarChar(64)
+  school_id            String    @db.VarChar(64)
+  school_name          String    @db.VarChar(190)
+  principal_name       String    @db.VarChar(160)
+  email                String    @unique(map: "email") @db.VarChar(190)
+  password_hash        String    @db.VarChar(255)
+  access_key_hash      String    @db.VarChar(255)
+  phone                String?   @db.VarChar(30)
+  status               String    @default("active") @db.VarChar(40)
+  must_change_password Boolean   @default(false)
+  last_login_at        DateTime? @db.DateTime(0)
+  created_at           DateTime  @default(now()) @db.Timestamp(0)
+  updated_at           DateTime  @default(now()) @db.Timestamp(0)
 
   @@index([school_id], map: "idx_principals_school_id")
   @@index([school_name], map: "idx_principals_school_name")
@@ -276,25 +278,26 @@ model teacher_login_events {
 }
 
 model users {
-  id               String    @id @db.VarChar(64)
-  name             String    @db.VarChar(160)
-  email            String    @unique(map: "email") @db.VarChar(190)
-  password_hash    String    @db.VarChar(255)
-  phone            String?   @db.VarChar(30)
-  class_level      String?   @db.VarChar(80)
-  school_name      String?   @db.VarChar(190)
-  role             String    @default("student") @db.VarChar(30)
-  otp_verified     Boolean   @default(false)
-  unlocked_courses Json?
-  created_at       DateTime  @default(now()) @db.Timestamp(0)
-  updated_at       DateTime  @default(now()) @db.Timestamp(0)
-  signup_source    String    @default("web") @db.VarChar(40)
-  class_name       String?   @db.VarChar(80)
-  school           String?   @db.VarChar(190)
-  password         String    @db.VarChar(255)
-  teacher_id       String?   @db.VarChar(64)
-  school_id        String?   @db.VarChar(64)
-  students         Student[]
+  id                   String    @id @db.VarChar(64)
+  name                 String    @db.VarChar(160)
+  email                String    @unique(map: "email") @db.VarChar(190)
+  password_hash        String    @db.VarChar(255)
+  phone                String?   @db.VarChar(30)
+  class_level          String?   @db.VarChar(80)
+  school_name          String?   @db.VarChar(190)
+  role                 String    @default("student") @db.VarChar(30)
+  otp_verified         Boolean   @default(false)
+  must_change_password Boolean   @default(false)
+  unlocked_courses     Json?
+  created_at           DateTime  @default(now()) @db.Timestamp(0)
+  updated_at           DateTime  @default(now()) @db.Timestamp(0)
+  signup_source        String    @default("web") @db.VarChar(40)
+  class_name           String?   @db.VarChar(80)
+  school               String?   @db.VarChar(190)
+  password             String    @db.VarChar(255)
+  teacher_id           String?   @db.VarChar(64)
+  school_id            String?   @db.VarChar(64)
+  students             Student[]
 
   @@index([school_name], map: "idx_users_school_name")
 }

@@ -1,11 +1,11 @@
 const argon2 = require('argon2');
 const crypto = require('crypto');
 
-// Argon2id config (balanced for free-tier hosting)
+// Argon2id config (OWASP recommended)
 const ARGON2_OPTIONS = {
   type: argon2.argon2id,
-  memoryCost: 19456,   // 19 MB (OWASP minimum for Argon2id)
-  timeCost: 2,         // 2 iterations
+  memoryCost: 65536,   // 64 MB
+  timeCost: 3,         // 3 iterations
   parallelism: 1,      // 1 thread
 };
 

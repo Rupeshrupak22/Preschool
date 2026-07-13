@@ -9,7 +9,6 @@ export interface Student {
   section: string;
   academicYear: string;
   avatar: string;
-  avatarUrl?: string;
   aiInsight: string;
   rank: number;
   totalStudents: number;
@@ -81,9 +80,6 @@ export interface HomeworkItem {
   status: "pending" | "submitted" | "overdue";
   priority: "high" | "medium" | "low";
   teacher?: string;
-  fileName?: string;
-  fileSize?: string;
-  url?: string;
 }
 
 export interface NoteItem {
@@ -97,7 +93,6 @@ export interface NoteItem {
   bookmarked: boolean;
   teacher?: string;
   fileName?: string;
-  url?: string;
 }
 
 export interface DashboardNotification {
@@ -223,8 +218,6 @@ export interface RecordedClass {
   views: number;
   gradient: string;
   bookmarked: boolean;
-  url?: string;
-  fileName?: string;
 }
 
 export interface GamifiedStat {

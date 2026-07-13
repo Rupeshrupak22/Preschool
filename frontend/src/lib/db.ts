@@ -25,7 +25,6 @@ type UserRecord = {
   name: string;
   email: string;
   passwordHash: string;
-  accessKeyHash?: string | null;
   phone?: string | null;
   classLevel?: string | null;
   schoolName?: string | null;
@@ -33,7 +32,6 @@ type UserRecord = {
   signupSource?: string | null;
   otpVerified?: boolean;
   unlockedCourses?: string[];
-  avatarUrl?: string;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -145,7 +143,6 @@ async function ensureSchema(pool: Pool) {
       name VARCHAR(160) NOT NULL,
       email VARCHAR(190) NOT NULL UNIQUE,
       password_hash VARCHAR(255) NOT NULL,
-      access_key_hash VARCHAR(255),
       phone VARCHAR(30),
       class_level VARCHAR(80),
       class_name VARCHAR(80),
@@ -159,11 +156,6 @@ async function ensureSchema(pool: Pool) {
       updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
   `);
-
-  // Migration: add access_key_hash column to users if it doesn't exist
-  await pool.query(`
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS access_key_hash VARCHAR(255) AFTER password_hash
-  `).catch(() => {});
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS active_sessions (
@@ -556,13 +548,7 @@ async function ensureIndex(pool: Pool, tableName: string, indexName: string, col
   }
 }
 
-// Cache column existence checks — schema doesn't change at runtime
-const columnCache = new Map<string, boolean>();
-
 async function hasColumn(pool: Pool, tableName: string, columnName: string) {
-  const key = `${tableName}.${columnName}`;
-  if (columnCache.has(key)) return columnCache.get(key)!;
-
   const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT COUNT(*) AS count
      FROM INFORMATION_SCHEMA.COLUMNS
@@ -572,9 +558,7 @@ async function hasColumn(pool: Pool, tableName: string, columnName: string) {
     [tableName, columnName]
   );
 
-  const result = Number(rows[0]?.count ?? 0) > 0;
-  columnCache.set(key, result);
-  return result;
+  return Number(rows[0]?.count ?? 0) > 0;
 }
 
 function parseCourses(value: unknown): string[] {
@@ -614,7 +598,6 @@ function mapUser(row: RowDataPacket): UserRecord {
     name: String(row.name),
     email: String(row.email),
     passwordHash: String(row.password_hash),
-    accessKeyHash: row.access_key_hash ? String(row.access_key_hash) : null,
     phone: row.phone,
     classLevel: row.class_level ?? row.class_name,
     schoolName: row.school_name ?? row.school,
@@ -622,7 +605,6 @@ function mapUser(row: RowDataPacket): UserRecord {
     signupSource: row.signup_source ?? "web",
     otpVerified: Boolean(row.otp_verified),
     unlockedCourses: parseCourses(row.unlocked_courses),
-    avatarUrl: row.avatar_url ? String(row.avatar_url) : undefined,
     createdAt: dateValue(row.created_at) as string,
     updatedAt: dateValue(row.updated_at) as string
   };
@@ -924,7 +906,7 @@ export async function createActiveSession(data: {
   );
 }
 
-export async function validateActiveSession(userId?: string, sid?: string, ttlSeconds = 24 * 60 * 60) {
+export async function validateActiveSession(userId?: string, sid?: string, ttlSeconds = 15 * 60) {
   if (!userId || !sid) return false;
   const pool = await connectDb();
   if (!pool) return false;
@@ -947,15 +929,6 @@ export async function clearActiveSessions(userId: string) {
   const pool = await connectDb();
   if (!pool) return;
   await pool.query("DELETE FROM active_sessions WHERE user_id = ?", [userId]);
-}
-
-export async function refreshActiveSession(userId: string, sid: string) {
-  const pool = await connectDb();
-  if (!pool) return;
-  await pool.query(
-    "UPDATE active_sessions SET last_seen_at = NOW(), expires_at = DATE_ADD(NOW(), INTERVAL 86400 SECOND) WHERE user_id = ? AND sid = ?",
-    [userId, sid]
-  );
 }
 
 export async function findPrincipalByEmail(email: string) {
@@ -1246,7 +1219,6 @@ type TeacherContentPayload = {
   fileSize?: string;
   noteType?: "pdf" | "note" | "video";
   url?: string;
-  duration?: string;
 };
 
 type StudentDoubtPayload = {
@@ -1290,10 +1262,10 @@ async function getTeacherTargetStudents(
   const params: unknown[] = [teacher.schoolId, teacher.schoolName, teacher.schoolName];
   let classClause = "";
   if (classFilter) {
-    classClause = "AND (LOWER(class_level) = LOWER(?) OR LOWER(class_name) = LOWER(?))";
+    classClause = "AND (class_level = ? OR class_name = ?)";
     params.push(classFilter, classFilter);
   } else if (teacher.assignedClasses.length) {
-    classClause = `AND (LOWER(class_level) IN (${teacher.assignedClasses.map(() => "LOWER(?)").join(", ")}) OR LOWER(class_name) IN (${teacher.assignedClasses.map(() => "LOWER(?)").join(", ")}))`;
+    classClause = `AND (class_level IN (${teacher.assignedClasses.map(() => "?").join(", ")}) OR class_name IN (${teacher.assignedClasses.map(() => "?").join(", ")}))`;
     params.push(...teacher.assignedClasses, ...teacher.assignedClasses);
   }
 
@@ -1341,8 +1313,8 @@ export async function createTeacherHomework(teacherId: string, payload: TeacherC
 
   await pool.query(
     `INSERT INTO teacher_homework
-       (id, teacher_id, school_id, class_level, student_email, subject, title, description, due_date, priority, file_name, file_size, url)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (id, teacher_id, school_id, class_level, student_email, subject, title, description, due_date, priority)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       homeworkId,
       teacher.id,
@@ -1354,9 +1326,6 @@ export async function createTeacherHomework(teacherId: string, payload: TeacherC
       payload.description || null,
       payload.dueDate || null,
       priorityValue(payload.priority),
-      payload.fileName || null,
-      payload.fileSize || null,
-      payload.url || null,
     ]
   );
 
@@ -1408,39 +1377,6 @@ export async function createTeacherNote(teacherId: string, payload: TeacherConte
   });
 
   return { id: noteId, notified: students.length };
-}
-
-export async function createTeacherRecording(teacherId: string, payload: TeacherContentPayload) {
-  const pool = await connectDb();
-  if (!pool) return null;
-
-  const [teacherRows] = await pool.query<RowDataPacket[]>("SELECT * FROM teachers WHERE id = ? LIMIT 1", [teacherId]);
-  const teacher = teacherRows[0] ? mapTeacher(teacherRows[0]) : null;
-  if (!teacher) return null;
-
-  const classLevel = payload.classLevel || teacher.assignedClasses[0] || null;
-  const recordingId = id("recording");
-
-  await pool.query(
-    `INSERT INTO teacher_recordings
-       (id, teacher_id, school_id, class_level, subject, title, description, file_name, file_size, url, duration)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      recordingId,
-      teacher.id,
-      teacher.schoolId,
-      classLevel,
-      payload.subject,
-      payload.title,
-      payload.description || null,
-      payload.fileName || null,
-      payload.fileSize || null,
-      payload.url || null,
-      payload.duration || null,
-    ]
-  );
-
-  return { id: recordingId };
 }
 
 export async function replyToStudentDoubt(teacherId: string, doubtId: string, replyText: string) {
@@ -1549,7 +1485,7 @@ export async function getTeacherDashboard(teacherId: string) {
   const schoolId = teacher.schoolId;
   const classFilters = teacher.assignedClasses;
   const classClause = classFilters.length
-    ? ` AND (LOWER(class_level) IN (${classFilters.map(() => "LOWER(?)").join(", ")}) OR LOWER(class_name) IN (${classFilters.map(() => "LOWER(?)").join(", ")}))`
+    ? ` AND (class_level IN (${classFilters.map(() => "?").join(", ")}) OR class_name IN (${classFilters.map(() => "?").join(", ")}))`
     : "";
   const classParams = classFilters.length ? [...classFilters, ...classFilters] : [];
 
@@ -1564,8 +1500,7 @@ export async function getTeacherDashboard(teacherId: string) {
 
   const [studentRows, loginRows, sessionRows, certificateRows, homeworkRows, noteRows, doubtRows, notificationRows] = await Promise.all([
     pool.query<RowDataPacket[]>(
-      `SELECT id, name, email, phone, class_level, class_name, school_name, school, signup_source, status, created_at,
-              (SELECT CASE WHEN LENGTH(avatar_url) < 500 THEN avatar_url ELSE CONCAT('HAS_AVATAR:', LEFT(avatar_url, 30)) END FROM users WHERE users.email = students.email LIMIT 1) AS avatar_url
+      `SELECT id, name, email, phone, class_level, class_name, school_name, school, signup_source, status, created_at
        FROM students
        WHERE ${schoolWhereClause}
        ${classClause}
@@ -1650,7 +1585,6 @@ export async function getTeacherDashboard(teacherId: string) {
     schoolName: row.school_name ?? row.school,
     signupSource: row.signup_source,
     status: row.status,
-    avatarUrl: row.avatar_url && !String(row.avatar_url).startsWith('HAS_AVATAR:') ? row.avatar_url : undefined,
     createdAt: dateValue(row.created_at)
   }));
 
@@ -2096,7 +2030,7 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
            LEFT JOIN teachers t ON t.id = s.teacher_id
            WHERE s.status <> 'cancelled'
            ORDER BY s.start_time ASC
-           LIMIT 50`
+           LIMIT 250`
         )
       : Promise.resolve<[RowDataPacket[], unknown]>([[], undefined]),
     pool.query<RowDataPacket[]>(
@@ -2131,10 +2065,8 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
          GROUP BY user_email
        ) p ON p.user_email = u.email
        WHERE u.role = 'student'
-         AND (LOWER(COALESCE(u.school_name, '')) = LOWER(?) OR LOWER(COALESCE(u.class_name, u.class_level, '')) = LOWER(?))
        ORDER BY u.created_at ASC
-       LIMIT 100`,
-      [schoolName || "", studentClass || ""]
+       LIMIT 250`
     ),
     pool.query<RowDataPacket[]>(
       `SELECT h.*, t.teacher_name
@@ -2146,7 +2078,7 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
            OR (
              h.student_email IS NULL
              AND (h.school_id = ? OR TRIM(COALESCE(t.school_name, '')) = ?)
-             AND (h.class_level IS NULL OR h.class_level = '' OR LOWER(h.class_level) = LOWER(?))
+             AND (h.class_level IS NULL OR h.class_level = '' OR h.class_level = ?)
            )
          )
        ORDER BY h.created_at DESC
@@ -2163,7 +2095,7 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
            OR (
              n.student_email IS NULL
              AND (n.school_id = ? OR TRIM(COALESCE(t.school_name, '')) = ?)
-             AND (n.class_level IS NULL OR n.class_level = '' OR LOWER(n.class_level) = LOWER(?))
+             AND (n.class_level IS NULL OR n.class_level = '' OR n.class_level = ?)
            )
          )
        ORDER BY n.created_at DESC
@@ -2248,9 +2180,6 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
     status: statusForDueDate(row.due_date),
     priority: priorityValue(row.priority),
     teacher: row.teacher_name ? String(row.teacher_name) : undefined,
-    fileName: row.file_name ? String(row.file_name) : undefined,
-    fileSize: row.file_size ? String(row.file_size) : undefined,
-    url: row.url ? String(row.url) : undefined,
   }));
 
   const notesItems = noteRows[0].map<NoteItem>((row) => ({
@@ -2264,7 +2193,6 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
     bookmarked: false,
     teacher: row.teacher_name ? String(row.teacher_name) : undefined,
     fileName: row.file_name ? String(row.file_name) : undefined,
-    url: row.url ? String(row.url) : undefined,
   }));
 
   const doubtItems = doubtRows[0].map<StudentDoubt>((row) => ({
@@ -2391,10 +2319,8 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
     ...dashboard.studentData,
     rollNumber: user.id,
     class: studentClass,
-    section: schoolName || "Not assigned",
     rank,
     totalStudents: leaderboard.length || totalStudents,
-    avatarUrl: user?.avatarUrl,
     aiInsight:
       attendance.length || courses.length || certificateItems.length || liveClasses.length
         ? "Dashboard is showing live records from your school database."
@@ -2409,36 +2335,6 @@ async function buildLiveStudentDashboard(pool: Pool, user: UserRecord | null): P
   dashboard.notesLibrary = notesItems;
   dashboard.doubts = doubtItems;
   dashboard.notifications = notificationItems;
-
-  // Fetch recorded classes from teacher_recordings table
-  try {
-    const [recordingRows] = await pool.query<RowDataPacket[]>(
-      `SELECT r.*, t.teacher_name, t.school_name AS teacher_school
-       FROM teacher_recordings r
-       LEFT JOIN teachers t ON t.id = r.teacher_id
-       WHERE r.status = 'active'
-         AND (r.school_id = ? OR TRIM(COALESCE(t.school_name, '')) = ?)
-         AND (r.class_level IS NULL OR r.class_level = '' OR LOWER(r.class_level) = LOWER(?))
-       ORDER BY r.created_at DESC
-       LIMIT 50`,
-      [profile?.school_id ?? "", schoolName, studentClass]
-    );
-    const gradients = ["from-blue-500 to-indigo-600", "from-emerald-500 to-teal-600", "from-purple-500 to-violet-600", "from-rose-500 to-pink-600", "from-cyan-500 to-sky-600", "from-orange-500 to-amber-600"];
-    dashboard.recordedClasses = recordingRows.map((row, index) => ({
-      id: String(row.id),
-      subject: String(row.subject ?? "General"),
-      title: String(row.title ?? "Recorded Class"),
-      teacher: row.teacher_name ? String(row.teacher_name) : "Teacher",
-      duration: String(row.duration ?? ""),
-      date: dateLabel(row.created_at),
-      views: 0,
-      gradient: gradients[index % gradients.length],
-      bookmarked: false,
-      url: row.url ? String(row.url) : undefined,
-      fileName: row.file_name ? String(row.file_name) : undefined,
-    }));
-  } catch { dashboard.recordedClasses = []; }
-
   dashboard.attendanceMonths = attendanceMonths;
   dashboard.subjectAttendance = subjectAttendance;
   dashboard.performanceTrend = performanceTrend;
@@ -2775,7 +2671,7 @@ export async function getAdminOverview() {
 
   return {
     totals: {
-      connections: students.length + teachers.length + principals.length,
+      connections: schools.length + students.length + teachers.length + principals.length,
       schools: schools.length,
       students: students.length,
       teachers: teachers.length,

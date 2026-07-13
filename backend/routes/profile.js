@@ -49,22 +49,4 @@ router.put('/', authenticate, async (req, res) => {
   }
 });
 
-// POST /api/v1/profile/avatar
-router.post('/avatar', authenticate, async (req, res) => {
-  try {
-    const { avatarUrl } = req.body;
-    if (!avatarUrl) return sendResponse(res, 400, false, 'avatarUrl is required.');
-
-    await prisma.users.update({
-      where: { id: req.user.id },
-      data: { avatar_url: avatarUrl, updated_at: new Date() },
-    });
-
-    sendResponse(res, 200, true, 'Avatar updated.');
-  } catch (error) {
-    console.error('Avatar update error:', error);
-    sendResponse(res, 500, false, 'Failed to update avatar.');
-  }
-});
-
 module.exports = router;

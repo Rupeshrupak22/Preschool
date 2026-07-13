@@ -107,7 +107,7 @@ export default function FloatingGallery() {
             </span>
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-sm font-semibold leading-7 text-slate-600">
-            Creativity, AI, robotics, and real-world projects — all in one joyful classroom experience.
+            Creativity, AI, current affairs, and real-world projects — all in one joyful classroom experience.
           </p>
         </motion.div>
 

@@ -84,7 +84,7 @@ export async function POST(request: Request) {
     sid,
     email: principal.email,
     role: "principal",
-    ttlSeconds: 24 * 60 * 60
+    ttlSeconds: 15 * 60
   });
 
   await recordPrincipalLoginEvent({
@@ -112,7 +112,7 @@ export async function POST(request: Request) {
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 24 * 60 * 60
+    maxAge: 15 * 60
   });
 
   return response;
