@@ -178,6 +178,8 @@ app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/notices', noticeRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/bulk-import', bulkImportRoutes);
+app.use('/api/v1/messages', require('./routes/messages'));
+app.use('/api/v1/admin-messages', require('./routes/messages'));
 
 // ─── 404 Handler ────────────────────────────────────────────────────
 app.use((req, res) => {
