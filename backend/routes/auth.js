@@ -421,41 +421,66 @@ function sanitizeUser(user) {
 async function findLoginIdentity(email, requestedRole) {
   const normalizedEmail = email.toLowerCase().trim();
 
+  // Use raw SQL to avoid Prisma schema mismatch issues with production DB
   if (!requestedRole || requestedRole === 'student' || requestedRole === 'admin') {
-    const user = await prisma.users.findUnique({ where: { email: normalizedEmail } });
-    if (user && (!requestedRole || user.role === requestedRole || (requestedRole === 'student' && user.role === 'student'))) {
-      return { source: 'users', user };
+    try {
+      const rows = await prisma.$queryRawUnsafe(
+        'SELECT * FROM users WHERE email = ? LIMIT 1',
+        normalizedEmail
+      );
+      const user = rows?.[0];
+      if (user && (!requestedRole || user.role === requestedRole || (requestedRole === 'student' && user.role === 'student'))) {
+        return { source: 'users', user };
+      }
+    } catch (err) {
+      console.error('findLoginIdentity users query error:', err.message);
     }
   }
 
   if (!requestedRole || requestedRole === 'teacher') {
-    const teacher = await prisma.teacher.findUnique({ where: { email: normalizedEmail } });
-    if (teacher) {
-      return {
-        source: 'teachers',
-        user: {
-          ...teacher,
-          name: teacher.teacher_name,
-          role: 'teacher',
-          school_id: teacher.schoolId,
-          teacher_id: teacher.id,
-        },
-      };
+    try {
+      const rows = await prisma.$queryRawUnsafe(
+        'SELECT * FROM teachers WHERE email = ? LIMIT 1',
+        normalizedEmail
+      );
+      const teacher = rows?.[0];
+      if (teacher) {
+        return {
+          source: 'teachers',
+          user: {
+            ...teacher,
+            name: teacher.teacher_name,
+            role: 'teacher',
+            school_id: teacher.school_id || teacher.schoolId,
+            teacher_id: teacher.id,
+          },
+        };
+      }
+    } catch (err) {
+      console.error('findLoginIdentity teachers query error:', err.message);
     }
   }
 
   if (!requestedRole || requestedRole === 'principal') {
-    const principal = await prisma.principals.findUnique({ where: { email: normalizedEmail } });
-    if (principal) {
-      return {
-        source: 'principals',
-        user: {
-          ...principal,
-          name: principal.principal_name,
-          role: 'principal',
-          school_id: principal.school_id,
-        },
-      };
+    try {
+      const rows = await prisma.$queryRawUnsafe(
+        'SELECT * FROM principals WHERE email = ? LIMIT 1',
+        normalizedEmail
+      );
+      const principal = rows?.[0];
+      if (principal) {
+        return {
+          source: 'principals',
+          user: {
+            ...principal,
+            name: principal.principal_name,
+            role: 'principal',
+            school_id: principal.school_id,
+          },
+        };
+      }
+    } catch (err) {
+      console.error('findLoginIdentity principals query error:', err.message);
     }
   }
 

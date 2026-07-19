@@ -287,14 +287,14 @@ model users {
   school_name          String?   @db.VarChar(190)
   role                 String    @default("student") @db.VarChar(30)
   otp_verified         Boolean   @default(false)
-  must_change_password Boolean   @default(false)
+  must_change_password Boolean?  @default(false)
   unlocked_courses     Json?
   created_at           DateTime  @default(now()) @db.Timestamp(0)
   updated_at           DateTime  @default(now()) @db.Timestamp(0)
   signup_source        String    @default("web") @db.VarChar(40)
   class_name           String?   @db.VarChar(80)
   school               String?   @db.VarChar(190)
-  password             String    @default("") @db.VarChar(255)
+  password             String?   @db.VarChar(255)
   teacher_id           String?   @db.VarChar(64)
   school_id            String?   @db.VarChar(64)
   students             Student[]
