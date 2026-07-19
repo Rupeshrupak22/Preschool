@@ -38,7 +38,13 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
     }
 
     // 2. Find account in the proper portal/table
-    const identity = await findLoginIdentity(email, requestedRole);
+    let identity;
+    try {
+      identity = await findLoginIdentity(email, requestedRole);
+    } catch (identityErr) {
+      console.error('Login error at findLoginIdentity:', identityErr.message, identityErr.stack);
+      return sendResponse(res, 500, false, 'Internal server error');
+    }
     const effectiveRole = identity?.user?.role || requestedRole || 'student';
 
     // 3. Check account lockout using per-role threshold
@@ -136,7 +142,7 @@ router.post('/login', validateBody('email', 'password'), validateEmail, async (r
       mustChangePassword: Boolean(user.must_change_password),
     });
   } catch (err) {
-    console.error('Login error:', err.message);
+    console.error('Login error:', err.message, err.stack);
     sendResponse(res, 500, false, 'Internal server error');
   }
 });
@@ -262,6 +268,14 @@ router.get('/me', authenticate, async (req, res) => {
     const user = identity?.user;
 
     if (!user) return sendResponse(res, 404, false, 'User not found');
+
+    // Check if account was deactivated — kick immediately
+    if (user.status && user.status !== 'active') {
+      await destroyAllSessions(req.user.id);
+      revokeAllUserTokens(req.user.id);
+      return sendResponse(res, 403, false, 'Your account has been deactivated. Contact admin.');
+    }
+
     sendResponse(res, 200, true, 'User fetched', { user: sanitizeUser(user) });
   } catch (err) {
     console.error('Auth/me error:', err.message);
@@ -288,6 +302,14 @@ router.post('/refresh', async (req, res) => {
     const identity = await findLoginIdentity(decoded.email, decoded.role);
     const user = identity?.user;
     if (!user) return sendResponse(res, 404, false, 'User not found');
+
+    // ─── isActive check — kick deactivated users on token refresh ────
+    if (user.status && user.status !== 'active') {
+      await destroyAllSessions(decoded.id);
+      revokeAllUserTokens(decoded.id);
+      clearAuthCookies(res);
+      return sendResponse(res, 403, false, 'Your account has been deactivated. Contact admin.');
+    }
 
     const newToken = generateAccessToken(user, decoded.sid);
     const newRefreshToken = generateRefreshToken(user, decoded.sid);

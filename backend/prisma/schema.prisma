@@ -294,10 +294,133 @@ model users {
   signup_source        String    @default("web") @db.VarChar(40)
   class_name           String?   @db.VarChar(80)
   school               String?   @db.VarChar(190)
-  password             String    @db.VarChar(255)
+  password             String    @default("") @db.VarChar(255)
   teacher_id           String?   @db.VarChar(64)
   school_id            String?   @db.VarChar(64)
   students             Student[]
 
   @@index([school_name], map: "idx_users_school_name")
+}
+
+model active_sessions {
+  user_id                      String    @id @db.VarChar(64)
+  sid                          String    @unique(map: "sid") @db.VarChar(64)
+  email                        String    @db.VarChar(190)
+  role                         String    @db.VarChar(30)
+  refresh_jti                  String?   @db.VarChar(64)
+  previous_refresh_jti         String?   @db.VarChar(64)
+  previous_refresh_valid_until DateTime? @db.DateTime(0)
+  fingerprint                  String?   @db.VarChar(128)
+  user_agent                   String?   @db.Text
+  ip_address                   String?   @db.VarChar(80)
+  created_at                   DateTime  @db.DateTime(0)
+  last_seen_at                 DateTime  @db.DateTime(0)
+  expires_at                   DateTime  @db.DateTime(0)
+
+  @@index([sid], map: "idx_active_sessions_sid")
+  @@index([expires_at], map: "idx_active_sessions_expires_at")
+}
+
+model meetings {
+  id         String   @id @db.VarChar(64)
+  title      String   @db.VarChar(190)
+  hosted_by  String   @default("Admin") @db.VarChar(160)
+  duration   Int      @default(600)
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+model leave_requests {
+  id           String   @id @db.VarChar(64)
+  teacher_name String   @db.VarChar(160)
+  subject      String?  @db.VarChar(120)
+  teacher_uid  String   @db.VarChar(64)
+  dates        String   @db.Text
+  reason       String?  @db.Text
+  status       String   @default("Pending") @db.VarChar(40)
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([teacher_uid], map: "idx_leave_requests_teacher_uid")
+  @@index([status], map: "idx_leave_requests_status")
+}
+
+model admin_messages {
+  id              String   @id @db.VarChar(64)
+  sender_email    String   @db.VarChar(190)
+  sender_name     String?  @db.VarChar(190)
+  recipient_type  String   @default("individual") @db.VarChar(40)
+  recipient_email String?  @db.VarChar(190)
+  recipient_role  String?  @db.VarChar(40)
+  message         String   @db.Text
+  is_read         Boolean  @default(false)
+  created_at      DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([recipient_email], map: "idx_admin_messages_recipient_email")
+  @@index([recipient_role], map: "idx_admin_messages_recipient_role")
+  @@index([sender_email], map: "idx_admin_messages_sender_email")
+}
+
+model teacher_homework {
+  id            String   @id @db.VarChar(64)
+  teacher_id    String   @db.VarChar(64)
+  school_id     String?  @db.VarChar(64)
+  class_level   String?  @db.VarChar(80)
+  student_email String?  @db.VarChar(190)
+  subject       String   @db.VarChar(120)
+  title         String   @db.VarChar(190)
+  description   String?  @db.Text
+  due_date      String?  @db.VarChar(80)
+  priority      String   @default("medium") @db.VarChar(40)
+  status        String   @default("active") @db.VarChar(40)
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  updated_at    DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([teacher_id], map: "idx_teacher_homework_teacher_id")
+  @@index([school_id, class_level], map: "idx_teacher_homework_school_class")
+  @@index([student_email], map: "idx_teacher_homework_student_email")
+}
+
+model teacher_notes {
+  id            String   @id @db.VarChar(64)
+  teacher_id    String   @db.VarChar(64)
+  school_id     String?  @db.VarChar(64)
+  class_level   String?  @db.VarChar(80)
+  student_email String?  @db.VarChar(190)
+  subject       String   @db.VarChar(120)
+  title         String   @db.VarChar(190)
+  description   String?  @db.Text
+  file_name     String?  @db.VarChar(190)
+  file_size     String?  @db.VarChar(80)
+  note_type     String   @default("pdf") @db.VarChar(40)
+  url           String?  @db.Text
+  status        String   @default("active") @db.VarChar(40)
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  updated_at    DateTime @default(now()) @db.Timestamp(0)
+
+  @@index([teacher_id], map: "idx_teacher_notes_teacher_id")
+  @@index([school_id, class_level], map: "idx_teacher_notes_school_class")
+  @@index([student_email], map: "idx_teacher_notes_student_email")
+}
+
+model student_doubts {
+  id              String    @id @db.VarChar(64)
+  student_email   String    @db.VarChar(190)
+  student_name    String?   @db.VarChar(160)
+  teacher_id      String?   @db.VarChar(64)
+  school_id       String?   @db.VarChar(64)
+  class_level     String?   @db.VarChar(80)
+  subject         String    @db.VarChar(120)
+  question        String    @db.Text
+  attachment_name String?   @db.VarChar(190)
+  attachment_type String?   @db.VarChar(40)
+  status          String    @default("pending") @db.VarChar(40)
+  reply_text      String?   @db.Text
+  created_at      DateTime  @default(now()) @db.Timestamp(0)
+  replied_at      DateTime? @db.DateTime(0)
+
+  @@index([student_email], map: "idx_student_doubts_student_email")
+  @@index([teacher_id], map: "idx_student_doubts_teacher_id")
+  @@index([status], map: "idx_student_doubts_status")
 }
