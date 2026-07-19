@@ -35,25 +35,52 @@ function fromRow(row) {
 
 async function ensureSessionTable() {
   if (!initPromise) {
-    initPromise = prisma.$executeRawUnsafe(`
-      CREATE TABLE IF NOT EXISTS active_sessions (
-        user_id VARCHAR(64) NOT NULL PRIMARY KEY,
-        sid VARCHAR(64) NOT NULL UNIQUE,
-        email VARCHAR(190) NOT NULL,
-        role VARCHAR(30) NOT NULL,
-        refresh_jti VARCHAR(64) NULL,
-        previous_refresh_jti VARCHAR(64) NULL,
-        previous_refresh_valid_until DATETIME NULL,
-        fingerprint VARCHAR(128) NULL,
-        user_agent TEXT NULL,
-        ip_address VARCHAR(80) NULL,
-        created_at DATETIME NOT NULL,
-        last_seen_at DATETIME NOT NULL,
-        expires_at DATETIME NOT NULL,
-        KEY idx_active_sessions_sid (sid),
-        KEY idx_active_sessions_expires_at (expires_at)
-      )
-    `);
+    initPromise = (async () => {
+      // Create table if it doesn't exist
+      await prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS active_sessions (
+          user_id VARCHAR(64) NOT NULL PRIMARY KEY,
+          sid VARCHAR(64) NOT NULL UNIQUE,
+          email VARCHAR(190) NOT NULL,
+          role VARCHAR(30) NOT NULL,
+          refresh_jti VARCHAR(64) NULL,
+          previous_refresh_jti VARCHAR(64) NULL,
+          previous_refresh_valid_until DATETIME NULL,
+          fingerprint VARCHAR(128) NULL,
+          user_agent TEXT NULL,
+          ip_address VARCHAR(80) NULL,
+          created_at DATETIME NOT NULL,
+          last_seen_at DATETIME NOT NULL,
+          expires_at DATETIME NOT NULL,
+          KEY idx_active_sessions_sid (sid),
+          KEY idx_active_sessions_expires_at (expires_at)
+        )
+      `);
+
+      // Ensure all required columns exist (handles case where table was created by frontend with fewer columns)
+      const columnsToAdd = [
+        { name: 'refresh_jti', def: 'VARCHAR(64) NULL' },
+        { name: 'previous_refresh_jti', def: 'VARCHAR(64) NULL' },
+        { name: 'previous_refresh_valid_until', def: 'DATETIME NULL' },
+        { name: 'fingerprint', def: 'VARCHAR(128) NULL' },
+        { name: 'user_agent', def: 'TEXT NULL' },
+        { name: 'ip_address', def: 'VARCHAR(80) NULL' },
+      ];
+
+      for (const col of columnsToAdd) {
+        try {
+          const rows = await prisma.$queryRawUnsafe(
+            `SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'active_sessions' AND COLUMN_NAME = ?`,
+            col.name
+          );
+          if (Number(rows?.[0]?.cnt ?? 0) === 0) {
+            await prisma.$executeRawUnsafe(`ALTER TABLE active_sessions ADD COLUMN ${col.name} ${col.def}`);
+          }
+        } catch {
+          // Column might already exist or DB doesn't support INFORMATION_SCHEMA — skip
+        }
+      }
+    })();
   }
   return initPromise;
 }
