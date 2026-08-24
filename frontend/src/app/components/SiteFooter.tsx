@@ -217,8 +217,8 @@ export default function SiteFooter() {
             © 2026 SR's Adyapan Edutech Pvt. Ltd. All rights reserved.
           </p>
           <div className="flex gap-6 text-xs text-slate-500">
-            <a href="#" className="transition hover:text-slate-300">Privacy Policy</a>
-            <a href="#" className="transition hover:text-slate-300">Terms of Service</a>
+            <a href="/privacy-policy" className="transition hover:text-slate-300">Privacy Policy</a>
+            <a href="/terms-of-service" className="transition hover:text-slate-300">Terms of Service</a>
           </div>
         </div>
       </div>
