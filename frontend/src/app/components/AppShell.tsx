@@ -11,7 +11,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const isPrincipalDashboard = pathname === "/principal/dashboard" || pathname.startsWith("/principal/dashboard/");
   const isTeacherDashboard = pathname === "/teacher/dashboard" || pathname.startsWith("/teacher/dashboard/") || pathname.startsWith("/teacher/dashboard-preview");
   const isOurApp = pathname === "/our";
-  const hideNav = isLmsRoute || isAdminRoute || isPrincipalDashboard || isTeacherDashboard;
+  const isLegalPage = pathname === "/privacy-policy" || pathname === "/terms-of-service";
+  const hideNav = isLmsRoute || isAdminRoute || isPrincipalDashboard || isTeacherDashboard || isLegalPage;
 
   return (
     <>
